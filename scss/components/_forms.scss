@@ -156,7 +156,7 @@
 
   // ── Tabs container ───────────────────────────────────────────────────────
   .sheet-tabs {
-    flex: 0;
+    flex: 0 0 auto;
     border-style: none;
     border-top: 1px solid $c-border;
     border-bottom: 1px solid $c-border;
@@ -165,10 +165,47 @@
     box-shadow: inset 0 -1px 0 rgba(201, 162, 39, 0.08);
   }
 
-  .sheet-body,
-  .sheet-body .tab,
-  .sheet-body .tab {
+  // ── Sheet body scroll plumbing ───────────────────────────────────────────
+  // The form is flexcol; we let the header + tabs + sheet-mode size to content
+  // and grant the sheet-body the remaining vertical space with internal scroll.
+  > form {
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    min-height: 0;
+  }
+
+  .sheet-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+
+    > .tab {
+      min-height: 100%;
+    }
+
+    // Themed scrollbar (WebKit / Chromium)
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(201, 162, 39, 0.3);
+      border-radius: 4px;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: rgba(201, 162, 39, 0.55);
+      }
+    }
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 162, 39, 0.35) rgba(0, 0, 0, 0.2);
   }
 
   .sheet-body .editor {
