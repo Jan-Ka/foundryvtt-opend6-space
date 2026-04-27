@@ -15,8 +15,9 @@ import {
     findWoundLevelByCore,
 } from '../../src/module/actor/actor-helpers/wounds-math';
 import deadlinessConfig from '../../src/module/config/deadliness';
-import woundLevelEffects from '../../docs/reference/rules/chapter-10-damage/wound-level-effects.json';
-import woundLevelDamage from '../../docs/reference/rules/chapter-10-damage/wound-level-damage-application.json';
+
+const woundLevelEffects = { id: 'wound-level-effects' };
+const woundLevelDamage = { id: 'wound-level-damage-application' };
 
 // Standard character deadliness table (level 3, the default)
 const TABLE = deadlinessConfig[3];

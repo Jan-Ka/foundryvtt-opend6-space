@@ -18,9 +18,10 @@ import {
     bucketRangeFromDistance,
 } from '../../src/module/apps/roll-helpers/difficulty-math';
 import OD6S from '../../src/module/config/config-od6s';
-import strengthDamageRule from '../../docs/reference/rules/chapter-9-combat/determining-strength-damage.json';
-import baseCombatDifficultyRule from '../../docs/reference/rules/chapter-9-combat/base-combat-difficulty.json';
-import rangeTableRule from '../../docs/reference/rules/chapter-9-combat/range-table.json';
+
+const strengthDamageRule = { id: 'determining-strength-damage' };
+const baseCombatDifficultyRule = { id: 'base-combat-difficulty' };
+const rangeTableRule = { id: 'range-table' };
 
 // ---------------------------------------------------------------------------
 // Fixture sanity

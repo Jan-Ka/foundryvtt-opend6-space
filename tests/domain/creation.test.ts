@@ -5,31 +5,42 @@
  * are extracted to src/, replace the inline implementations with imports and
  * these tests become regression guards.
  *
- * Fixtures:
- *   docs/reference/rules/chapter-1-character-basics/
- *   docs/reference/rules/chapter-4-cybernetics/
- *   docs/reference/rules/chapter-6-game-basics/
- *   docs/reference/examples/chapter-1-character-basics/
- *   docs/reference/examples/chapter-3-5-combined/
- *   docs/reference/examples/chapter-6-8-combined/
+ * Rule sources: Chapters 1, 4, 6 (D6 Space)
  */
 
 import { describe, it, expect } from 'vitest';
-import bodyPointsRule from '../../docs/reference/rules/chapter-1-character-basics/body-points-determination.json';
-import strengthDamageRule from '../../docs/reference/rules/chapter-1-character-basics/strength-damage-determination.json';
-import fundsRule from '../../docs/reference/rules/chapter-1-character-basics/funds-determination.json';
-import creationPoolRule from '../../docs/reference/rules/chapter-1-character-basics/creation-point-pool.json';
-import attributeCostRule from '../../docs/reference/rules/chapter-1-character-basics/creation-point-attribute-costs.json';
-import skillCostRule from '../../docs/reference/rules/chapter-1-character-basics/creation-point-skill-costs.json';
-import specCostRule from '../../docs/reference/rules/chapter-1-character-basics/creation-point-specialization-costs.json';
-import multipleActionsRule from '../../docs/reference/rules/chapter-6-game-basics/multiple-actions.json';
-import resultPointsRule from '../../docs/reference/rules/chapter-6-game-basics/result-points.json';
-import cyberneticCostRule from '../../docs/reference/rules/chapter-4-cybernetics/determining-cybernetic-cost.json';
-import bodyPointsExample from '../../docs/reference/examples/chapter-1-character-basics/body-points-example.json';
-import strengthDamageExample from '../../docs/reference/examples/chapter-1-character-basics/strength-damage-example.json';
-import fundsExample from '../../docs/reference/examples/chapter-1-character-basics/funds-example.json';
-import multiActionsExample from '../../docs/reference/examples/chapter-6-8-combined/multiple-actions-dodge-example.json';
-import cyberneticExample from '../../docs/reference/examples/chapter-3-5-combined/cybernetic-installation-example.json';
+
+const bodyPointsRule = { id: 'body-points-determination' };
+const strengthDamageRule = { id: 'strength-damage-determination' };
+const fundsRule = { id: 'funds-determination' };
+const creationPoolRule = {
+    id: 'creation-point-pool',
+    outputs: [{ description: 'Total creation points to spend (79 for novice)' }],
+};
+const attributeCostRule = { id: 'creation-point-attribute-costs' };
+const skillCostRule = { id: 'creation-point-skill-costs' };
+const specCostRule = { id: 'creation-point-specialization-costs' };
+const multipleActionsRule = { id: 'multiple-actions' };
+const resultPointsRule = { id: 'result-points' };
+const cyberneticCostRule = { id: 'determining-cybernetic-cost' };
+const bodyPointsExample = {
+    id: 'body-points-example',
+    given: { step1_dice_total: '4 + 6 + 1 = 11', pip_bonus: 1 },
+    expected: { final_body_points: 32 },
+};
+const strengthDamageExample = { id: 'strength-damage-example' };
+const fundsExample = {
+    id: 'funds-example',
+    expected: { weekly_income_credits: 875 },
+};
+const multiActionsExample = {
+    id: 'multiple-actions-dodge-example',
+    expected: { multi_action_penalty: '-1D' },
+};
+const cyberneticExample = {
+    id: 'cybernetic-installation-example',
+    final_pricing: { price_difficulty: 18, credits_cost: '18 × 1,000 = 18,000' },
+};
 
 // ---------------------------------------------------------------------------
 // Inline formulas

@@ -8,12 +8,13 @@
  *   - Initial 1D: 20 CP (flat)
  *   - Each subsequent pip: 10 × currentDice CP
  *
- * Fixture: docs/reference/rules/chapter-14-metaphysics/metaphysics-access-cost.json
+ * Rule source: p92, table in "Obtaining Access to Metaphysics"
  */
 
 import { describe, it, expect } from 'vitest';
 import { computeMetaphysicsAttributeCost } from '../../src/module/system/utilities/metaphysics';
-import metaphysicsCostRule from '../../docs/reference/rules/chapter-14-metaphysics/metaphysics-access-cost.json';
+
+const metaphysicsCostRule = { id: 'metaphysics-access-cost' };
 
 // ---------------------------------------------------------------------------
 // Fixture sanity

@@ -5,15 +5,33 @@
  * advancement functions are implemented, replace the inline formulas below
  * with imports from the implementation and these tests become regression guards.
  *
- * Fixtures: docs/reference/rules/chapter-5-improving-characters/
- *           docs/reference/examples/chapter-3-5-combined/
+ * Rule sources: Chapter 5 (D6 Space)
  */
 
 import { describe, it, expect } from 'vitest';
-import skillImprovementRule from '../../docs/reference/rules/chapter-5-improving-characters/learning-improving-skills.json';
-import specialAbilityRule from '../../docs/reference/rules/chapter-5-improving-characters/improving-special-abilities.json';
-import skillExample from '../../docs/reference/examples/chapter-3-5-combined/skill-improvement-example.json';
-import specialAbilityExample from '../../docs/reference/examples/chapter-3-5-combined/special-ability-improvement-example.json';
+
+const skillImprovementRule = { id: 'learning-improving-skills' };
+const specialAbilityRule = { id: 'improving-special-abilities' };
+const skillExample = {
+    id: 'skill-improvement-example',
+    cost_progression_example: [
+        { stage: 'Initial',              skill: '4D',   cost: 4 },
+        { stage: 'After 1st improvement', skill: '4D+1', cost: 4 },
+        { stage: 'After 2nd improvement', skill: '4D+2', cost: 4 },
+        { stage: 'After 3rd improvement', skill: '4D+3', cost: 4 },
+        { stage: 'After 4th improvement', skill: '5D',   cost: 5 },
+    ],
+};
+const specialAbilityExample = {
+    id: 'special-ability-improvement-example',
+    setup: { base_cost: 3 },
+    improvement_sequence: [
+        { rank: 1, points_to_reach: 0,    note: 'Starting rank' },
+        { rank: 2, points_needed: '(5 × 3) + 1 = 16' },
+        { rank: 3, points_needed: '(5 × 3) + 2 = 17' },
+        { rank: 4, points_needed: '(5 × 3) + 3 = 18' },
+    ],
+};
 
 // ---------------------------------------------------------------------------
 // Formulas (inline until extracted to pure functions in src/)
