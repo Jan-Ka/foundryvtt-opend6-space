@@ -36,7 +36,7 @@
   "bugs": {
     "url": "https://github.com/Jan-Ka/foundryvtt-opend6-space/issues"
   },
-  "packageManager": "pnpm@10.33.1",
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=22"
   },
