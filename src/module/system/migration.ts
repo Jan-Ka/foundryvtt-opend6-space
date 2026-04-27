@@ -13,7 +13,26 @@
 
 import { debug, isDebugEnabled } from "./logger";
 
-const CURRENT_MIGRATION_VERSION = "2.2.0";
+/**
+ * Migration steps in version order. Each entry runs when the world's stored
+ * `migrationVersion` is older than `since`. Add new steps to the end; the
+ * highest `since` becomes the recorded `migrationVersion` after a clean run.
+ */
+const MIGRATION_STEPS: Array<{ since: string; run: () => Promise<void> }> = [
+  {
+    since: "2.0.0",
+    run: async () => {
+      await migrateExplosiveTemplateFlags();
+      await migrateChatMessageFlags();
+    },
+  },
+  {
+    since: "2.2.0",
+    run: () => migrateStatusEffectIcons(),
+  },
+];
+
+const CURRENT_MIGRATION_VERSION = MIGRATION_STEPS[MIGRATION_STEPS.length - 1]!.since;
 
 /**
  * Check if migration is needed and run it.
@@ -41,13 +60,10 @@ export async function migrateWorld() {
   });
 
   try {
-    // Run all migrations in order
-    if (foundry.utils.isNewerVersion("2.0.0", lastMigration)) {
-      await migrateExplosiveTemplateFlags();
-      await migrateChatMessageFlags();
-    }
-    if (foundry.utils.isNewerVersion("2.2.0", lastMigration)) {
-      await migrateStatusEffectIcons();
+    for (const step of MIGRATION_STEPS) {
+      if (foundry.utils.isNewerVersion(step.since, lastMigration)) {
+        await step.run();
+      }
     }
 
     // Record completion
@@ -77,7 +93,7 @@ export function registerMigrationSetting() {
 
 /**
  * Update active effect icons that still reference old .png paths to .svg equivalents.
- * Affects any effect whose img ends with a known renamed icon.
+ * Affects any effect whose img is under systems/od6s/ and ends with .png.
  */
 async function migrateStatusEffectIcons() {
   console.log("od6s | Migrating status effect icons from .png to .svg...");

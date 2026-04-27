@@ -13,6 +13,7 @@ import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
 import {computeSkillDisplayScore} from "./actor-helpers/skill-score";
+import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
     onDropCharacterTemplate, onDropSpeciesTemplate, onDropItemGroup,
@@ -282,18 +283,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         const root = this.element as HTMLElement;
 
-        const tabGroups = (this as any).tabGroups ?? {};
-        tabGroups.primary ??= "attributes";
-        (this as any).tabGroups = tabGroups;
-        new (foundry.applications.ux as any).Tabs({
-            navSelector: ".sheet-tabs",
-            contentSelector: ".sheet-body",
-            initial: tabGroups.primary,
-            group: "primary",
-            callback: (_ev: Event, _tabs: unknown, active: string) => {
-                (this as any).tabGroups.primary = active;
-            },
-        }).bind(root);
+        bindPrimaryTabs(this as any, root);
 
         if (!this.isEditable) return;
 

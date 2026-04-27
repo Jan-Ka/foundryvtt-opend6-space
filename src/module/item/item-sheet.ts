@@ -1,4 +1,5 @@
 import {od6sutilities} from "../system/utilities";
+import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import OD6S from "../config/config-od6s";
 
 declare const foundry: any;
@@ -61,20 +62,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
         const root = this.element as HTMLElement;
 
-        if (root.querySelector(".sheet-tabs")) {
-            const tabGroups = (this as any).tabGroups ?? {};
-            tabGroups.primary ??= "attributes";
-            (this as any).tabGroups = tabGroups;
-            new (foundry.applications.ux as any).Tabs({
-                navSelector: ".sheet-tabs",
-                contentSelector: ".sheet-body",
-                initial: tabGroups.primary,
-                group: "primary",
-                callback: (_ev: Event, _tabs: unknown, active: string) => {
-                    (this as any).tabGroups.primary = active;
-                },
-            }).bind(root);
-        }
+        bindPrimaryTabs(this as any, root);
 
         if (!this.isEditable) return;
         const $ = (sel: string): NodeListOf<HTMLElement> => root.querySelectorAll(sel);
