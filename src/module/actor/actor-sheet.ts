@@ -328,6 +328,18 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                 if (ok) await this._onClearSpeciesTemplate();
             }));
 
+        // Sheet-mode dropdown: explicit change handler. The template wraps
+        // the body in its own <form> nested inside the application's root
+        // form (which is itself a <form> via DocumentSheetV2's tag:"form"),
+        // and HTML's nested-form parsing prematurely closes the outer form
+        // — so the auto submitOnChange listener doesn't see the select.
+        // Update the actor directly here.
+        root.querySelectorAll<HTMLSelectElement>('select[name="system.sheetmode.value"]')
+            .forEach((el) => el.addEventListener("change", async (ev) => {
+                const value = (ev.target as HTMLSelectElement).value;
+                await this.document.update({"system.sheetmode.value": value});
+            }));
+
         // Existing listener modules accept html[0]; pass [root] for compatibility.
         registerInventoryListeners(html, this);
         registerCombatActionListeners(html, this);
