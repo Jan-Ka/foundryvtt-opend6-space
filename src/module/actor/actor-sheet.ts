@@ -265,9 +265,24 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     async _onRender(context: object, options: object): Promise<void> {
         await super._onRender(context, options);
-        if (!this.isEditable) return;
 
         const root = this.element as HTMLElement;
+
+        const tabGroups = (this as any).tabGroups ?? {};
+        tabGroups.primary ??= "attributes";
+        (this as any).tabGroups = tabGroups;
+        new (foundry.applications.ux as any).Tabs({
+            navSelector: ".sheet-tabs",
+            contentSelector: ".sheet-body",
+            initial: tabGroups.primary,
+            group: "primary",
+            callback: (_ev: Event, _tabs: unknown, active: string) => {
+                (this as any).tabGroups.primary = active;
+            },
+        }).bind(root);
+
+        if (!this.isEditable) return;
+
         const html = [root];
 
         root.querySelectorAll(".alpha-item-sort-button").forEach((elem) =>

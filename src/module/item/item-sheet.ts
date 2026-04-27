@@ -59,8 +59,24 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     async _onRender(context: object, options: object): Promise<void> {
         await super._onRender(context, options);
 
-        if (!this.isEditable) return;
         const root = this.element as HTMLElement;
+
+        if (root.querySelector(".sheet-tabs")) {
+            const tabGroups = (this as any).tabGroups ?? {};
+            tabGroups.primary ??= "attributes";
+            (this as any).tabGroups = tabGroups;
+            new (foundry.applications.ux as any).Tabs({
+                navSelector: ".sheet-tabs",
+                contentSelector: ".sheet-body",
+                initial: tabGroups.primary,
+                group: "primary",
+                callback: (_ev: Event, _tabs: unknown, active: string) => {
+                    (this as any).tabGroups.primary = active;
+                },
+            }).bind(root);
+        }
+
+        if (!this.isEditable) return;
         const $ = (sel: string): NodeListOf<HTMLElement> => root.querySelectorAll(sel);
 
         $(".editskill").forEach((el) => el.addEventListener("change", this._editSkill.bind(this)));
