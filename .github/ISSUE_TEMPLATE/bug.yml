@@ -1,0 +1,78 @@
+name: Bug report
+description: Report unexpected behavior in OpenD6 Space
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! The more concrete the reproduction, the faster a fix lands.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence describing the unexpected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include error messages from the browser console (F12 → Console) if any.
+    validations:
+      required: true
+
+  - type: input
+    id: od6s-version
+    attributes:
+      label: OpenD6 Space version
+    validations:
+      required: true
+
+  - type: input
+    id: foundry-version
+    attributes:
+      label: Foundry VTT version
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+
+  - type: textarea
+    id: other-modules
+    attributes:
+      label: Other active modules
+      description: A `socketlib`-only setup is the cleanest reproduction; if the bug only shows up with other modules, list them.
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Screenshots / video
+      description: Optional but very helpful for UI issues.

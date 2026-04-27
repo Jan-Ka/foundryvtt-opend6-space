@@ -1,0 +1,22 @@
+# Reject commit messages that contain AI-assistant attribution trailers.
+# These can sneak in when authoring commits from AI coding tools.
+#
+# Bypass (with caution): `git commit --no-verify`.
+msg_file="$1"
+
+if grep -qiE '^Co-Authored-By:.*\b(claude|anthropic|copilot|cursor|aider|codeium|windsurf)\b' "$msg_file" \
+   || grep -qE '^[[:space:]]*🤖 Generated with' "$msg_file" \
+   || grep -qiE 'Generated with \[Claude Code\]' "$msg_file"; then
+    cat >&2 <<'EOF'
+error: commit message contains AI-assistant attribution.
+
+Strip any "Co-Authored-By: …Claude/Anthropic/Copilot/…" trailer or
+"🤖 Generated with…" line before committing.
+
+To bypass intentionally: git commit --no-verify
+EOF
+    exit 1
+fi
+
+# Conventional Commits enforcement.
+pnpm exec commitlint --edit "$msg_file"

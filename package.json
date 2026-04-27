@@ -1,0 +1,70 @@
+{
+  "name": "opend6-space",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "OpenD6 Space system for Foundry VTT v14. Uses the rules from the OpenD6 Project SRD.",
+  "scripts": {
+    "prepare": "husky",
+    "build": "pnpm run build:ts && pnpm run build:css && pnpm run build:packs && pnpm run build:translations && pnpm run build:icons",
+    "build:ts": "esbuild src/module/od6s.ts --bundle --format=esm --outfile=src/module/od6s.js --sourcemap",
+    "build:css": "sass scss/od6s.scss src/css/od6s.css --style=expanded --no-source-map && node scripts/wrap-css.mjs",
+    "build:packs": "node scripts/build-packs.mjs",
+    "build:translations": "node scripts/build-translations.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
+    "watch": "pnpm run build:css && pnpm run watch:ts & pnpm run watch:css",
+    "watch:ts": "esbuild src/module/od6s.ts --bundle --format=esm --outfile=src/module/od6s.js --sourcemap --watch",
+    "watch:css": "sass scss/od6s.scss src/css/od6s.css --style=expanded --no-source-map --watch",
+    "lint": "eslint --max-warnings 1700 src/",
+    "lint:fix": "eslint src/ --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:domain": "vitest run --project domain",
+    "test:watch": "vitest --project unit",
+    "test:domain:watch": "vitest --project domain",
+    "test:smoke": "playwright test",
+    "test:smoke:ui": "playwright test --ui",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run test:domain",
+    "clean": "rm -rf dist src/packs src/css/od6s.css src/module/od6s.js src/module/od6s.js.map"
+  },
+  "author": "Jan Ka",
+  "license": "MIT",
+  "homepage": "https://github.com/Jan-Ka/foundryvtt-opend6-space",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jan-Ka/foundryvtt-opend6-space.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jan-Ka/foundryvtt-opend6-space/issues"
+  },
+  "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@cyclonedx/cdxgen": "^12.2.1",
+    "@eslint/js": "^10.0.1",
+    "@foundryvtt/foundryvtt-cli": "^3.0.3",
+    "@iconify-json/game-icons": "^1.2.4",
+    "@playwright/test": "^1.59.1",
+    "@types/mersenne-twister": "^1.1.7",
+    "esbuild": "^0.28.0",
+    "eslint": "^10.2.1",
+    "husky": "^9.1.7",
+    "js-yaml": "^4.1.1",
+    "lint-staged": "^16.4.0",
+    "sass": "^1.97.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
+    "vitest": "^4.1.5"
+  },
+  "dependencies": {
+    "mersenne-twister": "^1.1.0"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --max-warnings 1700 --fix"
+    ]
+  }
+}

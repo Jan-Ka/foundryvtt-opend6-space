@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Berlin",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on the first day of the month"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "Group all non-major devDependencies into one PR",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "devDependencies (non-major)"
+    },
+    {
+      "description": "Group all non-major dependencies into one PR",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "dependencies (non-major)"
+    },
+    {
+      "description": "Major bumps land in separate PRs so they get reviewed properly",
+      "matchUpdateTypes": ["major"],
+      "groupName": null
+    },
+    {
+      "description": "Pin GitHub Actions to digests for supply-chain safety",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "automerge": false
+  }
+}

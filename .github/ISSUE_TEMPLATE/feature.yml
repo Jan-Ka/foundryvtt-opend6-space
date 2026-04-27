@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest a new feature for OpenD6 Space
+labels: ["feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem this solves
+      description: What workflow is awkward today? Who hits this and how often?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: A sketch of what you'd like to see. UI mockups welcome but not required.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you weighed, and why this one is preferred.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links to OpenD6 rule references, related issues, or modules that do something similar.

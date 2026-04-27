@@ -1,0 +1,339 @@
+version: "3"
+
+vars:
+  FOUNDRY_VERSION: "14"
+  CONTAINER_NAME: od6s-foundry
+  FOUNDRY_PORT: "30000"
+  FOUNDRY_DATA: "{{.ROOT_DIR}}/.foundry-data"
+  # Auto-detect container runtime: prefer docker, fall back to nerdctl (Rancher Desktop containerd)
+  CONTAINER_RT:
+    sh: |
+      if docker info >/dev/null 2>&1; then echo docker
+      elif nerdctl info >/dev/null 2>&1; then echo nerdctl
+      else echo none
+      fi
+
+dotenv: [".env"]
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  # ── Prerequisites ────────────────────────────────────────────────
+
+  check:prereqs:
+    desc: Verify required development tools are installed
+    silent: true
+    cmds:
+      - |
+        MISSING=0
+        check() {
+          if command -v "$1" >/dev/null 2>&1; then
+            echo "✓ $1 $(eval "$2")"
+          else
+            echo "✗ $1 is not installed ($3)"
+            MISSING=1
+          fi
+        }
+        check node   "node --version"              "brew install node"
+        check pnpm   "pnpm --version"              "brew install pnpm"
+        check op     "op --version"                 "brew install 1password-cli"
+
+        # Container runtime: docker or nerdctl
+        if docker info >/dev/null 2>&1; then
+          echo "✓ docker (daemon running)"
+        elif nerdctl info >/dev/null 2>&1; then
+          echo "✓ nerdctl (containerd running)"
+        elif command -v docker >/dev/null 2>&1 || command -v nerdctl >/dev/null 2>&1; then
+          echo "⚠ docker/nerdctl installed but daemon not running"
+        else
+          echo "✗ docker or nerdctl not installed (install Docker Desktop or Rancher Desktop)"
+          MISSING=1
+        fi
+
+        [ "$MISSING" -ne 0 ] && echo "" && echo "Install missing tools and re-run." && exit 1
+        echo "" && echo "All prerequisites satisfied."
+
+  # ── Setup ────────────────────────────────────────────────────────
+
+  setup:
+    desc: Bootstrap project from a fresh clone
+    cmds:
+      - task: check:prereqs
+      - task: setup:secrets
+      - task: setup:deps
+      - task: build
+      - echo ""
+      - echo "Setup complete. Run 'task foundry:start' to launch a test instance."
+
+  setup:deps:
+    desc: Install Node dependencies
+    silent: true
+    cmds:
+      - echo "Installing dependencies..."
+      - pnpm install
+      - echo "✓ Dependencies installed"
+
+  setup:secrets:
+    desc: Materialize 1Password secrets into .env
+    silent: true
+    cmds:
+      - |
+        if [ ! -f .env.1password ]; then
+          echo "⏭ .env.1password not found, skipping (see .env.example)"
+          exit 0
+        fi
+        if [ -f .env ]; then
+          echo "⏭ .env already exists, skipping (delete to re-materialize)"
+          exit 0
+        fi
+        if ! op account list >/dev/null 2>&1; then
+          echo "✗ Not signed in to 1Password CLI. Run: eval \$(op signin)"
+          exit 1
+        fi
+        TMPENV=$(mktemp)
+        trap 'rm -f "$TMPENV"' EXIT
+        while IFS= read -r line || [ -n "$line" ]; do
+          case "$line" in ""|\#*) continue ;; esac
+          KEY="${line%%=*}"; VALUE="${line#*=}"; VALUE="${VALUE%\"}"; VALUE="${VALUE#\"}"
+          case "$VALUE" in
+            op://*) RESOLVED=$(op read "$VALUE" 2>/dev/null) || { echo "✗ Failed to resolve $KEY"; exit 1; }
+                    echo "${KEY}=${RESOLVED}" >> "$TMPENV"; echo "✓ $KEY (1password)" ;;
+            *)      echo "${KEY}=${VALUE}" >> "$TMPENV"; echo "✓ $KEY (literal)" ;;
+          esac
+        done < .env.1password
+        mv "$TMPENV" .env; trap - EXIT
+        echo "Secrets materialized to .env"
+
+  # ── Build ────────────────────────────────────────────────────────
+
+  build:
+    desc: Full build (JS bundle, CSS, packs, translations)
+    cmds:
+      - pnpm run build
+
+  build:js:
+    desc: Bundle JavaScript via esbuild
+    cmds:
+      - pnpm run build:ts
+
+  build:css:
+    desc: Compile SCSS
+    cmds:
+      - pnpm run build:css
+
+  build:packs:
+    desc: Compile YAML compendia to LevelDB packs
+    cmds:
+      - pnpm run build:packs
+
+  build:translations:
+    desc: Generate Babele translation files
+    cmds:
+      - pnpm run build:translations
+
+  build:icons:
+    desc: Extract game-icons SVGs into src/icons/
+    cmds:
+      - pnpm run build:icons
+
+  watch:
+    desc: Watch JS and CSS for changes
+    cmds:
+      - pnpm run watch
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - pnpm run clean
+
+  # ── Lint & Typecheck ─────────────────────────────────────────────
+
+  lint:
+    desc: Check for console.log and Handlebars log statements
+    silent: true
+    cmds:
+      - |
+        FAIL=0
+        if grep -rn 'console\.log(' src/module/ 2>/dev/null; then
+          echo "✗ console.log found in src/module/"
+          FAIL=1
+        fi
+        if grep -rn '{{"{{ log"}}' src/templates/ 2>/dev/null; then
+          echo "✗ Handlebars log found in src/templates/"
+          FAIL=1
+        fi
+        [ "$FAIL" -ne 0 ] && exit 1
+        echo "✓ No stray logging found"
+
+  typecheck:
+    desc: Run TypeScript type checking
+    cmds:
+      - pnpm run typecheck
+
+  # ── Foundry VTT Test Instance ───────────────────────────────────
+
+  foundry:start:
+    desc: Start a Foundry VTT v14 container for testing
+    deps: [build]
+    preconditions:
+      - sh: test -f .env
+        msg: ".env not found. Run 'task setup:secrets' or copy .env.example to .env"
+      - sh: '[ "{{.CONTAINER_RT}}" != "none" ]'
+        msg: "No container runtime available. Start Docker Desktop or Rancher Desktop."
+    cmds:
+      - mkdir -p "{{.FOUNDRY_DATA}}/Data/systems"
+      - |
+        if {{.CONTAINER_RT}} ps -a --format '{{"{{.Names}}"}}' 2>/dev/null | grep -q '^{{.CONTAINER_NAME}}$'; then
+          echo "Container {{.CONTAINER_NAME}} already exists. Run 'task foundry:stop' first."
+          exit 1
+        fi
+      - >-
+        {{.CONTAINER_RT}} run -d
+        --name {{.CONTAINER_NAME}}
+        --hostname {{.CONTAINER_NAME}}
+        --env FOUNDRY_USERNAME="${FOUNDRY_USERNAME}"
+        --env FOUNDRY_PASSWORD="${FOUNDRY_PASSWORD}"
+        --env FOUNDRY_LICENSE_KEY="${FOUNDRY_LICENSE_KEY}"
+        --env FOUNDRY_ADMIN_KEY="${FOUNDRY_ADMIN_KEY}"
+        --publish {{.FOUNDRY_PORT}}:30000/tcp
+        --volume "{{.FOUNDRY_DATA}}:/data"
+        --volume "{{.ROOT_DIR}}/src:/data/Data/systems/od6s"
+        ghcr.io/felddy/foundryvtt:{{.FOUNDRY_VERSION}}
+      - echo ""
+      - echo "Foundry VTT starting at http://localhost:{{.FOUNDRY_PORT}}"
+      - echo "Container {{.CONTAINER_NAME}} (via {{.CONTAINER_RT}})"
+      - echo "It takes ~30s for Foundry to download and start."
+      - echo "Run 'task foundry:logs' to follow startup progress."
+
+  foundry:stop:
+    desc: Stop and remove the Foundry test container
+    cmds:
+      - '{{.CONTAINER_RT}} rm -f {{.CONTAINER_NAME}} 2>/dev/null || true'
+      - echo "✓ Container removed"
+
+  foundry:logs:
+    desc: Follow Foundry container logs
+    cmds:
+      - '{{.CONTAINER_RT}} logs -f {{.CONTAINER_NAME}}'
+
+  foundry:status:
+    desc: Check Foundry container status
+    silent: true
+    cmds:
+      - |
+        if {{.CONTAINER_RT}} ps --format '{{"{{.Names}}"}}' 2>/dev/null | grep -q '^{{.CONTAINER_NAME}}$'; then
+          echo "✓ {{.CONTAINER_NAME}} is running (via {{.CONTAINER_RT}})"
+          echo "  URL: http://localhost:{{.FOUNDRY_PORT}}"
+        else
+          echo "✗ {{.CONTAINER_NAME}} is not running"
+        fi
+
+  foundry:restart:
+    desc: Rebuild and restart the Foundry test container
+    cmds:
+      - task: foundry:stop
+      - task: foundry:start
+
+  foundry:shell:
+    desc: Open a shell in the Foundry container
+    cmds:
+      - '{{.CONTAINER_RT}} exec -it {{.CONTAINER_NAME}} /bin/sh'
+
+  foundry:reset-passwords:
+    desc: Reset all user passwords in a world (access via admin UI)
+    silent: true
+    cmds:
+      - |
+        echo "Open http://localhost:{{.FOUNDRY_PORT}}/setup"
+        echo "Click the world's context menu (⋮) → Reset User Passwords"
+        echo "This clears all passwords so you can log in without one."
+
+  foundry:clean:
+    desc: Stop container and remove all Foundry test data (will require re-activation of license)
+    prompt: This will delete all Foundry data including the signed license. Continue?
+    cmds:
+      - task: foundry:stop
+      - rm -rf "{{.FOUNDRY_DATA}}"
+      - echo "✓ Foundry data removed (license will need re-activation)"
+
+  # ── Release ──────────────────────────────────────────────────────
+
+  release:patch:
+    desc: Tag a patch release (v0.1.0 → v0.1.1)
+    cmds:
+      - task: release
+        vars:
+          BUMP: patch
+
+  release:minor:
+    desc: Tag a minor release (v0.1.0 → v0.2.0)
+    cmds:
+      - task: release
+        vars:
+          BUMP: minor
+
+  release:major:
+    desc: Tag a major release (v0.1.0 → v1.0.0)
+    cmds:
+      - task: release
+        vars:
+          BUMP: major
+
+  release:
+    internal: true
+    vars:
+      LATEST_TAG:
+        sh: git describe --tags --match 'v[0-9]*' --abbrev=0 2>/dev/null || echo "v0.0.0"
+      MAJOR:
+        sh: echo "{{.LATEST_TAG}}" | sed 's/^v//' | cut -d. -f1
+      MINOR:
+        sh: echo "{{.LATEST_TAG}}" | sed 's/^v//' | cut -d. -f2
+      PATCH:
+        sh: echo "{{.LATEST_TAG}}" | sed 's/^v//' | cut -d. -f3
+      NEXT_TAG:
+        sh: |
+          case "{{.BUMP}}" in
+            major) echo "v$(({{.MAJOR}}+1)).0.0" ;;
+            minor) echo "v{{.MAJOR}}.$(({{.MINOR}}+1)).0" ;;
+            patch) echo "v{{.MAJOR}}.{{.MINOR}}.$(({{.PATCH}}+1))" ;;
+          esac
+      NEXT_VERSION:
+        sh: echo "{{.NEXT_TAG}}" | sed 's/^v//'
+    preconditions:
+      - sh: test "$(git branch --show-current)" = "main"
+        msg: "Must be on main branch to release"
+      - sh: test -z "$(git status --porcelain)"
+        msg: "Working directory must be clean"
+      - sh: git diff --quiet HEAD origin/main
+        msg: "Local main must be up to date with origin"
+      - sh: grep -q '"version": "{{.NEXT_VERSION}}"' src/system.json
+        msg: 'src/system.json version must be "{{.NEXT_VERSION}}" before tagging'
+      - sh: grep -q '"version": "{{.NEXT_VERSION}}"' package.json
+        msg: 'package.json version must be "{{.NEXT_VERSION}}" before tagging'
+    cmds:
+      - echo "{{.LATEST_TAG}} → {{.NEXT_TAG}}"
+      - git tag "{{.NEXT_TAG}}"
+      - git push origin "{{.NEXT_TAG}}"
+      - echo "Tagged and pushed {{.NEXT_TAG}}"
+
+  foundry:source:
+    desc: Extract Foundry runtime source (foundry.mjs, vendor.mjs, en.json) from the running container into .foundry-src/
+    silent: true
+    preconditions:
+      - sh: '{{.CONTAINER_RT}} ps --format ''{{"{{.Names}}"}}'' 2>/dev/null | grep -q ''^{{.CONTAINER_NAME}}$'''
+        msg: "Foundry container is not running. Run 'task foundry:start' first."
+    cmds:
+      - mkdir -p .foundry-src
+      - '{{.CONTAINER_RT}} cp {{.CONTAINER_NAME}}:/home/node/resources/app/public/scripts/foundry.mjs .foundry-src/foundry.mjs'
+      - '{{.CONTAINER_RT}} cp {{.CONTAINER_NAME}}:/home/node/resources/app/public/scripts/vendor.mjs .foundry-src/vendor.mjs'
+      - '{{.CONTAINER_RT}} cp {{.CONTAINER_NAME}}:/home/node/resources/app/public/lang/en.json .foundry-src/en.json'
+      - |
+        echo "✓ Foundry source extracted to .foundry-src/"
+        echo "  foundry.mjs $(wc -l < .foundry-src/foundry.mjs) lines"
+        echo "  vendor.mjs  $(wc -l < .foundry-src/vendor.mjs) lines"
+        echo "  en.json     $(wc -l < .foundry-src/en.json) lines"
+        echo ""
+        echo "Tip: when a stack trace shows 'foundry.mjs:<line>', open .foundry-src/foundry.mjs at that line."
