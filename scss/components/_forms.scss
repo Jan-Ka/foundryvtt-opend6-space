@@ -1,8 +1,14 @@
 @use '../utils' as *;
 
+// ── Sheet ──────────────────────────────────────────────────────────────────
 .od6s {
   .item-form {
     font-family: $font-primary;
+  }
+
+  // ── Header ───────────────────────────────────────────────────────────────
+  header.sheet-header {
+    border: none;
   }
 
   .sheet-header {
@@ -10,52 +16,153 @@
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    flex-wrap: nowrap;
+    align-items: stretch;
     justify-content: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+    padding: 4px 4px 14px;
+    border-bottom: 1px solid $c-border;
+    gap: 14px;
+    position: relative;
 
-    .profile-img {
-      flex: 0 0 200px;
-      height: 200px;
-      margin-right: 10px;
+    // Gold scribe line under the header
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: $grad-rule;
+      pointer-events: none;
     }
 
-    .header-fields {
+    .profile-img {
+      flex: 0 0 180px;
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid $c-accent-border;
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        0 6px 22px rgba(0, 0, 0, 0.55),
+        inset 0 0 24px rgba(0, 0, 0, 0.45);
+      filter: saturate(1.05) contrast(1.02);
+      transition: filter 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        filter: saturate(1.15) contrast(1.05);
+        box-shadow:
+          0 0 0 1px $c-accent-border,
+          0 6px 28px rgba(0, 0, 0, 0.6),
+          0 0 16px rgba(201, 162, 39, 0.25);
+      }
+    }
+
+    .header-right {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-width: 0;
+      gap: 6px;
+    }
+
+    // Header data strips — replace boxed cells with subtle bar layout
+    .flex-group-center,
+    .flex-group-left {
+      border: none;
+      background:
+        linear-gradient(90deg, rgba(201, 162, 39, 0.08) 0%, transparent 22%),
+        $c-raised;
+      padding: 4px 8px 4px 10px;
+      border-radius: 2px;
+      box-shadow: $c-shadow-inset;
+      position: relative;
+
+      // Left accent rail
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background: $c-accent-strong;
+        border-radius: 2px;
+        opacity: 0.7;
+      }
     }
 
     .header-fields label {
-      display: inline-block;
-      text-align: right;
-      float: left;
-      margin-right: 4px;
+      color: $c-text-muted;
+      font-size: 0.72em;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+      margin-right: 6px;
+      white-space: nowrap;
     }
 
     .header-fields input {
-      display: inline-block;
-      text-align: left;
-      float: right;
+      font-family: $font-numeric;
+      color: $c-text-primary;
+      font-weight: 500;
     }
 
     h2.charname {
-      height: 30px;
-      padding: 0px;
-      margin: 5px 0;
-      border-bottom: 0;
+      height: 44px;
+      padding: 0;
+      margin: 0 0 6px;
+      border: none;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(90deg, $c-accent-strong 0%, $c-accent-border 40%, transparent 100%);
+      }
 
       input {
         width: 100%;
         height: 100%;
         margin: 0;
+        font-family: $font-display;
+        font-size: 2.1em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: $c-accent;
+        background: transparent;
+        border: none;
+        padding: 0 2px;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 0 18px rgba(201, 162, 39, 0.25);
+
+        &::placeholder {
+          color: rgba(201, 162, 39, 0.35);
+        }
+
+        &:focus {
+          outline: none;
+          color: $c-accent-bright;
+        }
       }
     }
   }
 
+  // ── Tabs container ───────────────────────────────────────────────────────
   .sheet-tabs {
     flex: 0;
-    border-width: thick;
-    border-style: double;
+    border-style: none;
+    border-top: 1px solid $c-border;
+    border-bottom: 1px solid $c-border;
+    margin-bottom: 8px;
+    background: $c-panel-deep;
+    box-shadow: inset 0 -1px 0 rgba(201, 162, 39, 0.08);
   }
 
   .sheet-body,
@@ -67,11 +174,27 @@
   .sheet-body .editor {
     height: 8em;
     min-height: 300px;
-    overflow: hidden
+    overflow: hidden;
   }
 
   .sheet-mode {
-    width: 200px
+    width: 220px;
+    margin-top: 6px;
+
+    .sheetmode {
+      gap: 6px;
+      padding: 4px 8px;
+      background: $c-panel;
+      border: 1px solid $c-border;
+      border-radius: 3px;
+
+      label {
+        color: $c-text-muted;
+        font-size: 0.78em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+    }
   }
 
   .tox {
@@ -86,21 +209,25 @@
 
   .boxed {
     box-sizing: border-box;
-    padding: 2px;
+    padding: 4px 6px;
     margin: 5px;
-    border: 1px solid #999;
+    border: 1px solid $c-border;
+    background: $c-panel;
+    border-radius: 2px;
   }
 
   .bordered {
-    border: 3px solid black;
+    border: 1px solid $c-border-strong;
+    border-radius: 2px;
   }
 
   .advancebox {
-    border: 1px solid;
-    border: 5px;
+    border: 1px solid $c-accent-border;
+    background: $c-panel;
     width: 55px;
     height: 55px;
     font-size: 300%;
+    border-radius: 3px;
   }
 
   .actorsetup {
@@ -109,49 +236,115 @@
     align-items: center;
   }
 
+  // ── Section banners (attribute headers + body-points / solid headers) ────
   .attribute,
   .header-solid,
   .body-points-max {
     justify-content: center;
     align-items: center;
-    background-color: black;
-    color: lightgrey;
+    background: $grad-banner;
+    color: $c-accent-bright;
+    padding: 5px 8px;
+    font-family: $font-display;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.95em;
+    border-radius: 2px;
+    border-top: 1px solid $c-accent-border;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   }
 
   .attribute-action {
     justify-content: center;
     align-items: center;
-    background-color: black;
-    color: white;
+    background: transparent;
+    color: $c-accent;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-bottom: 1px solid $c-accent-border;
+    margin-top: 4px;
+  }
+
+  // ── Dice value pill ──────────────────────────────────────────────────────
+  // Right-side dice readouts in attribute/skill/spec/combat lists
+  .attribute-list .flex-group-center,
+  .skill-list .flex-group-center,
+  .specialization-list .flex-group-center,
+  .combat-list .flex-group-center,
+  .grid-2col-combat > .flex-group-center,
+  .grid-4col-resistance > .flex-group-center {
+    background: $grad-pill;
+    border: 1px solid rgba(201, 162, 39, 0.18);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: $font-numeric;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: $c-text-primary;
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+
+    &.rolldialog:hover {
+      color: $c-accent-bright;
+      border-color: $c-accent-strong;
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+        0 0 12px rgba(201, 162, 39, 0.35);
+      background: linear-gradient(180deg, rgba(20, 16, 4, 0.7), rgba(40, 30, 6, 0.55));
+    }
+  }
+
+  .attribute-list b,
+  .skill-list b,
+  .specialization-list b,
+  .combat-list b,
+  .availableaction b {
+    color: $c-accent;
+    font-weight: 700;
   }
 
   .indent {
-    text-indent: 1em;
+    padding-left: 14px;
+    position: relative;
+
+    &::before {
+      content: "›";
+      position: absolute;
+      left: 4px;
+      color: $c-accent-border;
+      font-weight: 700;
+    }
   }
 
   .tab-header {
-    margin-top: 10px;
+    margin-top: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid $c-border;
+    color: $c-accent;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
   }
 
   .small-font {
     font-size: 75%;
   }
 
-  .align-right {
-    text-align: right;
-  }
-
-  .float-right {
-    float: right;
-  }
-
-  .align-left {
-    text-align: left;
-  }
-
-  .align-center {
-    text-align: center;
-  }
+  .align-right    { text-align: right; }
+  .float-right    { float: right; }
+  .align-left     { text-align: left; }
+  .align-center   { text-align: center; }
 
   .align-center-bottom {
     width: auto;
@@ -174,38 +367,167 @@
     width: 4ch;
   }
 
+  // ── Inputs / Selects ─────────────────────────────────────────────────────
+  input[type="text"],
+  input[type="number"],
+  input[type="password"],
+  select {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    color: $c-text-primary;
+    padding: 2px 6px;
+    font-family: $font-primary;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $c-accent-border;
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.18);
+    }
+
+    &::placeholder {
+      color: $c-text-dim;
+    }
+  }
+
+  // Header inputs sit on the data-strip background — go transparent
+  .sheet-header .header-fields input,
+  .sheet-header .header-fields select {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dotted $c-border;
+    border-radius: 0;
+    padding: 1px 2px;
+
+    &:focus {
+      box-shadow: none;
+      border-bottom-color: $c-accent;
+    }
+  }
+
+  input[type="checkbox"] {
+    accent-color: $c-accent;
+    cursor: pointer;
+  }
+
+  // ── Buttons ──────────────────────────────────────────────────────────────
   .reset-template,
   .reset-species-template {
-    background-color: red;
-    border: none;
-    color: black;
+    background: $grad-button-stop;
+    border: 1px solid #c0392b;
+    color: $c-white;
     text-align: center;
     text-decoration: none;
     display: inline-block;
+    border-radius: 2px;
+    padding: 3px 10px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.78em;
+    font-weight: 600;
+    box-shadow: $c-shadow-inset, 0 2px 4px rgba(0, 0, 0, 0.4);
+    transition: filter 0.15s ease, transform 0.05s ease;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
   }
 
   .create-character {
-    background-color: green
+    background: $grad-button-go;
+    border: 1px solid rgba(78, 201, 122, 0.45);
+    color: $c-white;
+    border-radius: 2px;
+    padding: 6px 16px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    font-size: 0.95em;
+    box-shadow: $c-shadow-inset, 0 2px 8px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    position: relative;
+    transition: filter 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      filter: brightness(1.18);
+      box-shadow:
+        $c-shadow-inset,
+        0 2px 10px rgba(0, 0, 0, 0.55),
+        0 0 14px rgba(78, 201, 122, 0.35);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .session-reset-button {
+    background: $c-panel-deep;
+    border: 1px solid $c-border;
+    color: $c-text-muted;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.78em;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      color: $c-accent;
+      border-color: $c-accent-border;
+    }
   }
 
   .damage-button {
-    background-color: crimson;
-    border: none;
-    color: white;
-    padding: 15px 32px;
+    background: $grad-button-stop;
+    border: 1px solid rgba(226, 95, 99, 0.5);
+    color: $c-white;
+    padding: 12px 28px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border-radius: 2px;
+    box-shadow: $c-shadow-inset, 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   .item-info-ok-button {
-    padding: 15px 32px;
+    padding: 12px 28px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     width: 200px;
-    font-size: 24px;
+    font-size: 20px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  // Plus / add affordance
+  .item-add,
+  .addaction {
+    color: $c-text-muted;
+    transition: color 0.15s ease, transform 0.15s ease, text-shadow 0.15s ease;
+
+    &:hover {
+      color: $c-accent-bright;
+      transform: scale(1.1);
+      text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+      cursor: pointer;
+    }
   }
 
   .editor,
@@ -215,25 +537,22 @@
   }
 
   .equip-checkbox {
-    transform: scale(0.66);
+    transform: scale(0.85);
     vertical-align: middle;
-    horiz-align: left;
     text-align: left;
   }
 
   .skill-used-checkbox {
-    transform: scale(0.66);
+    transform: scale(0.85);
     vertical-align: middle;
-    horiz-align: left;
     text-align: left;
     margin: 1px;
     justify-self: start;
   }
 
   .spec-used-checkbox {
-    transform: scale(0.66);
+    transform: scale(0.85);
     vertical-align: middle;
-    horiz-align: left;
     text-align: left;
     margin: 2px;
     justify-self: start;
@@ -242,5 +561,26 @@
   .checkbox {
     vertical-align: middle;
     margin: 2px;
+  }
+
+  // Generic prose-mirror editor — give it a panel background
+  prose-mirror {
+    display: block;
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    min-height: 80px;
+    padding: 4px;
+  }
+
+  .resource-label {
+    font-family: $font-display;
+    color: $c-accent;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    font-size: 0.85em;
   }
 }

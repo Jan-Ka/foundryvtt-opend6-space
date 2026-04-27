@@ -293,6 +293,25 @@
   text-align: right;
 }
 
+// Strip Foundry's default 1px #999 cell outlines inside our sheets — we
+// reintroduce intentional surfaces in the component layer instead.
+.od6s {
+  .flex-group-center,
+  .flex-group-left,
+  .flex-group-right {
+    border: none;
+    padding: 2px 4px;
+  }
+
+  .row {
+    gap: 12px;
+  }
+
+  .column {
+    padding: 0;
+  }
+}
+
 .inv-grid {
   display: grid;
   border: 1px;

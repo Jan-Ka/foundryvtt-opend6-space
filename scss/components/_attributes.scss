@@ -1,46 +1,155 @@
+@use '../utils' as *;
+
 .od6s {
+  // ── List containers ──────────────────────────────────────────────────────
   .attribute-list,
   .skill-list,
   .specialization-list,
   .combat-list {
     list-style: none;
     margin: 1px 0;
-    padding: 2px;
+    padding: 0;
     overflow-y: auto;
   }
 
+  // Attribute list — top-level structural container; gap between attribute groups
+  .attribute-list > li.attributes {
+    margin-bottom: 6px;
+    padding: 0;
+    background: $c-panel;
+    border: 1px solid $c-border;
+    border-radius: 3px;
+    box-shadow: $c-shadow-inset;
+    overflow: hidden;
+  }
+
+  // Nested skill list inside an attribute group: tighter padding
+  .attribute-list .skill-list {
+    margin: 0;
+    padding: 2px 4px 4px;
+  }
+
+  // ── Skill / specialization rows ──────────────────────────────────────────
+  .skill-list > li.skills,
+  .specialization-list > li.specializations {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 2px;
+    border-left: 2px solid transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background-color: $c-row-hover;
+      border-left-color: $c-accent;
+    }
+  }
+
+  // Alternating row tint inside skill/spec lists
+  .skill-list > li:nth-child(even),
+  .specialization-list > li:nth-child(even) {
+    background-color: $c-row-alt;
+  }
+  .skill-list > li:nth-child(even):hover,
+  .specialization-list > li:nth-child(even):hover {
+    background-color: $c-row-hover;
+  }
+
+  // The skilldialog cell holds the skill name (left side)
+  .skilldialog,
+  .specdialog {
+    color: $c-text-primary;
+    font-weight: 400;
+    padding: 2px 6px;
+    transition: color 0.15s ease;
+
+    &.rolldialog:hover {
+      color: $c-accent-bright;
+      background: transparent;
+      text-shadow: 0 0 8px rgba(201, 162, 39, 0.45);
+    }
+  }
+
+  // Specialization name — italic, indented, slightly muted
+  .specdialog {
+    color: $c-text-muted;
+    font-style: italic;
+    padding-left: 18px;
+    position: relative;
+
+    &::before {
+      content: "↳";
+      position: absolute;
+      left: 4px;
+      color: $c-accent-border;
+      font-style: normal;
+    }
+  }
+
+  // Specialization list spacing inside a skill row
+  .specialization-list {
+    padding: 0 0 2px;
+  }
+
+  // ── Modifier indicators ──────────────────────────────────────────────────
   .moddedup {
-    text-shadow: 0 0 2px darkgreen;
+    text-shadow: 0 0 6px $c-mod-up;
+    position: relative;
+
     &:hover,
     &:focus {
-      color: #000;
-      text-shadow: 0 0 10px red;
+      color: $c-accent-bright;
+      background-color: $c-hover-bg;
+      text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
       cursor: pointer;
     }
   }
 
   .moddeddown {
-    text-shadow: 0 0 2px darkred;
+    text-shadow: 0 0 6px $c-mod-down;
+
     &:hover,
     &:focus {
-      color: #000;
-      text-shadow: 0 0 10px red;
+      color: $c-accent-bright;
+      background-color: $c-hover-bg;
+      text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
       cursor: pointer;
     }
   }
 
   .manifestation-active {
-    text-shadow: 0 0 10px lightblue;
+    text-shadow: 0 0 8px rgba(100, 180, 255, 0.9);
   }
 
   .disabled {
-    color: grey;
+    color: $c-text-dim;
   }
 
   .attributes-sort {
     list-style: none;
-    margin: 2px 0;
-    padding: 2px;
-    outline: 1px solid #000;
+    margin: 4px 0;
+    padding: 4px;
+    background: $c-panel;
+    border: 1px solid $c-border;
+    border-radius: 2px;
+  }
+
+  // ── Skill grid alignment ─────────────────────────────────────────────────
+  // The skills-grid contains [checkbox, skill-name] in the left column
+  .skills-grid {
+    padding: 1px 0;
+  }
+
+  // Item controls (advance/edit/delete buttons) on skill/spec rows
+  .item-list .item-controls {
+    a {
+      color: $c-text-muted;
+      transition: color 0.15s ease, text-shadow 0.15s ease;
+
+      &:hover {
+        color: $c-accent-bright;
+        text-shadow: 0 0 6px rgba(201, 162, 39, 0.45);
+      }
+    }
   }
 }

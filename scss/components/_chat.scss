@@ -1,0 +1,509 @@
+@use '../utils' as *;
+
+// ── Chat cards ──────────────────────────────────────────────────────────────
+// Foundry renders chat-message <li> items into the chat sidebar. The system
+// templates produce a specific structure (.message-header.flexrow + .flavor-text
+// + .message-content) that we target here. We also override Foundry's defaults
+// for .dice-roll / .dice-formula / .dice-total inside our message-content so the
+// stark white roll boxes match the sheet theme.
+
+#chat-log .chat-message,
+#chat #chat-log .chat-message,
+.chat-sidebar .chat-message,
+.chat-message.message.flexcol {
+  background:
+    linear-gradient(180deg, rgba(20, 24, 32, 0.92) 0%, rgba(8, 12, 18, 0.92) 100%);
+  color: $c-text-primary;
+  border: 1px solid $c-border;
+  border-left: 2px solid $c-accent-border;
+  border-radius: 3px;
+  margin: 6px 4px;
+  padding: 6px 8px;
+  box-shadow: $c-shadow-deep;
+  font-family: $font-primary;
+  position: relative;
+
+  // Soft corner highlight
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  // ── Header ────────────────────────────────────────────────────────────
+  .message-header {
+    border: none;
+    padding: 0 0 4px;
+    margin: 0 0 6px;
+    border-bottom: 1px solid $c-border;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    position: relative;
+
+    .message-sender {
+      font-family: $font-display;
+      color: $c-accent;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.95em;
+      margin: 0;
+      flex: 1 1 auto;
+      text-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .message-metadata {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+
+      .message-timestamp {
+        color: $c-text-muted;
+        font-size: 0.75em;
+        text-transform: lowercase;
+        letter-spacing: 0.04em;
+      }
+
+      .button,
+      .message-delete,
+      .message-reveal {
+        color: $c-text-muted;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        padding: 2px 5px;
+        line-height: 1;
+        transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover {
+          color: $c-accent-bright;
+          border-color: $c-accent-border;
+          background-color: $c-hover-bg;
+          cursor: pointer;
+          text-shadow: 0 0 6px rgba(201, 162, 39, 0.45);
+        }
+
+        i {
+          font-size: 0.85em;
+        }
+      }
+
+      .message-delete:hover {
+        color: $c-bad;
+        border-color: rgba(226, 95, 99, 0.4);
+        background-color: rgba(226, 95, 99, 0.08);
+      }
+    }
+
+    // Flavor strip beneath the name row
+    .flavor-text {
+      flex: 1 1 100%;
+      color: $c-text-muted;
+      font-style: italic;
+      font-size: 0.88em;
+      line-height: 1.35;
+
+      // Promote item/skill names mentioned in flavor
+      strong, b {
+        color: $c-text-primary;
+        font-style: normal;
+      }
+    }
+
+    .choose-target {
+      color: $c-accent;
+      transition: color 0.15s ease, text-shadow 0.15s ease;
+
+      &:hover {
+        color: $c-accent-bright;
+        text-shadow: 0 0 6px rgba(201, 162, 39, 0.45);
+        cursor: pointer;
+      }
+    }
+  }
+
+  // ── Wild die notice ───────────────────────────────────────────────────
+  .wilddie,
+  .wilddiegm {
+    text-align: center;
+    color: $c-bad;
+    font-family: $font-display;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85em;
+    padding: 3px 6px;
+    margin: 4px 0;
+    background: linear-gradient(180deg, rgba(226, 95, 99, 0.15), rgba(226, 95, 99, 0.05));
+    border-left: 2px solid $c-bad;
+    border-radius: 2px;
+    text-shadow: 0 0 8px rgba(226, 95, 99, 0.5);
+  }
+
+  // ── Roll output (Foundry's .dice-roll inside .message-content) ────────
+  .message-content {
+    padding: 0;
+
+    // Top-level roll wrapper
+    .dice-roll {
+      margin: 6px 0;
+    }
+
+    .dice-result {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    // Formula bar — "6d6[Base] + 1dwx6[Wild]"
+    .dice-formula {
+      background: $grad-pill;
+      border: 1px solid rgba(201, 162, 39, 0.18);
+      border-radius: 3px;
+      color: $c-text-primary;
+      font-family: $font-numeric;
+      font-weight: 500;
+      font-size: 0.95em;
+      letter-spacing: 0.02em;
+      padding: 4px 8px;
+      text-align: center;
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+      // Foundry wraps die labels in spans; gild them subtly
+      .flavor,
+      em,
+      i {
+        color: $c-accent;
+        font-style: normal;
+      }
+    }
+
+    // The big "32" total
+    .dice-total {
+      background: linear-gradient(180deg, rgba(40, 30, 8, 0.85) 0%, rgba(20, 14, 4, 0.85) 100%);
+      border: 1px solid $c-accent-border;
+      border-radius: 3px;
+      color: $c-accent-bright;
+      font-family: $font-display;
+      font-weight: 700;
+      font-size: 1.5em;
+      letter-spacing: 0.08em;
+      padding: 6px 8px;
+      margin: 0;
+      text-align: center;
+      text-shadow: 0 0 14px rgba(201, 162, 39, 0.55), 0 1px 0 rgba(0, 0, 0, 0.6);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.4),
+        0 0 14px rgba(201, 162, 39, 0.18);
+    }
+
+    // Tooltip (per-die breakdown) — keep Foundry's collapsed behavior;
+    // when expanded, soften the panel
+    .dice-tooltip {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid $c-border;
+      border-radius: 2px;
+      padding: 4px 6px;
+      margin-top: 2px;
+
+      .dice-rolls,
+      .tooltip-part {
+        color: $c-text-primary;
+      }
+
+      .roll {
+        color: $c-text-primary;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid $c-border;
+        border-radius: 2px;
+
+        &.max,
+        &.success {
+          color: $c-good;
+          border-color: rgba(78, 201, 122, 0.4);
+        }
+
+        &.min,
+        &.failure {
+          color: $c-bad;
+          border-color: rgba(226, 95, 99, 0.4);
+        }
+      }
+    }
+  }
+
+  // ── Result lines ──────────────────────────────────────────────────────
+  .skillsuccess,
+  .attacksuccess {
+    margin: 6px 0 4px;
+    padding: 4px 8px;
+    background: $c-panel;
+    border-left: 2px solid $c-accent;
+    border-radius: 2px;
+    font-family: $font-display;
+    color: $c-accent-bright;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.92em;
+    text-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+
+    > div {
+      line-height: 1.4;
+    }
+  }
+
+  // Difficulty / modifiers row beneath result
+  > .flexrow {
+    margin: 4px 0;
+    align-items: center;
+    gap: 6px;
+
+    > div:first-child {
+      color: $c-text-muted;
+      font-size: 0.88em;
+      letter-spacing: 0.02em;
+
+      &.edit-difficulty,
+      &.edit-damage {
+        color: $c-text-primary;
+        cursor: pointer;
+        transition: color 0.15s ease;
+
+        &:hover {
+          color: $c-accent-bright;
+          text-shadow: 0 0 6px rgba(201, 162, 39, 0.4);
+        }
+      }
+    }
+
+    .modifiers-button,
+    .damage-modifiers-button {
+      color: $c-text-muted;
+      cursor: pointer;
+      transition: color 0.15s ease, transform 0.1s ease;
+      flex: 0 0 auto;
+
+      &:hover {
+        color: $c-accent-bright;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .modifiers-display,
+  .damage-modifiers-display {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    padding: 4px 8px;
+    margin: 2px 0 4px;
+
+    .modifiers-list,
+    .damage-modifiers-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      > li {
+        color: $c-text-primary;
+        font-size: 0.85em;
+        padding: 1px 0;
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.06);
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  // Difficulty selector (GM)
+  select.choose-difficulty {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    color: $c-text-primary;
+    padding: 2px 6px;
+    margin-left: 6px;
+
+    &:focus {
+      outline: none;
+      border-color: $c-accent-border;
+    }
+  }
+
+  // ── Damage button ─────────────────────────────────────────────────────
+  .damage-button {
+    margin: 6px 0 2px;
+
+    button {
+      width: 100%;
+      background: $grad-button-stop;
+      border: 1px solid rgba(226, 95, 99, 0.5);
+      color: $c-white;
+      padding: 6px 12px;
+      font-family: $font-display;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-weight: 700;
+      font-size: 0.85em;
+      border-radius: 2px;
+      cursor: pointer;
+      box-shadow: $c-shadow-inset, 0 2px 6px rgba(0, 0, 0, 0.45);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+      transition: filter 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+
+      &:hover {
+        filter: brightness(1.18);
+        box-shadow:
+          $c-shadow-inset,
+          0 2px 8px rgba(0, 0, 0, 0.5),
+          0 0 12px rgba(226, 95, 99, 0.35);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  // Damage info row ("7D+0 Energy")
+  .damage-display {
+    margin: 4px 0;
+    padding: 3px 6px;
+    background: $c-panel;
+    border-radius: 2px;
+    font-family: $font-numeric;
+    color: $c-text-primary;
+    font-size: 0.92em;
+    align-items: center;
+    gap: 6px;
+
+    .edit-damage {
+      cursor: pointer;
+      transition: color 0.15s ease, text-shadow 0.15s ease;
+
+      &:hover {
+        color: $c-accent-bright;
+        text-shadow: 0 0 6px rgba(201, 162, 39, 0.4);
+      }
+    }
+  }
+
+  // ── Oppose button (bottom of card) ────────────────────────────────────
+  .message-oppose {
+    margin: 6px 0 0;
+    padding-top: 4px;
+    border-top: 1px solid $c-border;
+
+    .message-oppose-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 24px;
+      background: $c-panel;
+      border: 1px solid $c-border;
+      border-radius: 2px;
+      color: $c-text-muted;
+      transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+      &:hover {
+        color: $c-accent-bright;
+        border-color: $c-accent-border;
+        background-color: $c-hover-bg;
+        cursor: pointer;
+      }
+
+      i {
+        font-size: 0.92em;
+      }
+    }
+  }
+
+  // ── Apply-damage button (used on damage messages) ─────────────────────
+  .apply-damage-button {
+    width: 100%;
+    background: $grad-button-stop;
+    border: 1px solid rgba(226, 95, 99, 0.5);
+    color: $c-white;
+    padding: 5px 10px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    font-size: 0.8em;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow: $c-shadow-inset, 0 2px 6px rgba(0, 0, 0, 0.45);
+
+    &:hover {
+      filter: brightness(1.18);
+    }
+  }
+
+  // ── Explosive damage block ────────────────────────────────────────────
+  .explosive-targets,
+  .explosive-target-zone {
+    background: $c-panel;
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    padding: 4px 6px;
+    margin: 4px 0;
+  }
+
+  .explosive-targets-label {
+    font-family: $font-display;
+    color: $c-accent;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.88em;
+    font-weight: 600;
+  }
+
+  .explosive-damage-button button {
+    background: $grad-button-stop;
+    border: 1px solid rgba(226, 95, 99, 0.5);
+    color: $c-white;
+    border-radius: 2px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+
+    &:hover {
+      filter: brightness(1.18);
+      cursor: pointer;
+    }
+  }
+
+  // ── Range table ───────────────────────────────────────────────────────
+  .ranges {
+    background: $c-panel;
+    border: 1px solid $c-border;
+    border-radius: 2px;
+    padding: 4px 6px;
+    margin: 4px 0;
+    font-family: $font-numeric;
+    color: $c-text-primary;
+  }
+}
+
+// ── Whisper / blind / private message tints ────────────────────────────────
+.chat-message.whisper {
+  background:
+    linear-gradient(180deg, rgba(28, 24, 40, 0.92) 0%, rgba(14, 12, 22, 0.92) 100%) !important;
+}
+
+.chat-message.blind {
+  border-left-color: $c-warning !important;
+}
