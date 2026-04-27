@@ -1,0 +1,40 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"
+             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="effects">{{localize "OD6S.EFFECTS"}}</a>
+        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="editor"><prose-mirror name="system.description" value="{{item.system.description}}"
+                                              {{#unless editable}}disabled{{/unless}}></prose-mirror></div>
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{!-- As you add new fields, add them in here! --}}
+            <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.ADVANTAGE"}}</div>
+        </div>
+
+        {{!-- Effects Tab --}}
+        {{> systems/od6s/templates/item/item-effects.html }}
+
+        {{!--Labels Tab --}}
+        {{> systems/od6s/templates/item/item-labels-tags.html }}
+
+    </section>
+</form>

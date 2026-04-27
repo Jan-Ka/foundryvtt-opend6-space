@@ -1,0 +1,35 @@
+{{#if (isGM) }}
+    <div class="grid grid-container-header">
+        <div class="containerflags">
+            <div class="center">{{localize 'OD6S.CONFIGURATION'}}</div>
+            <div class="boxed">
+                <div class="flexrow ismerchant" title="{{localize 'OD6S.TOOLTIP_MERCHANT_VENDOR'}}">
+                    <label for="actor.system.merchant">{{localize 'OD6S.MERCHANT'}}:</label>
+                    <input id="actor.system.merchant" name="system.merchant" type="checkbox"
+                           data-dtype="Boolean" {{#if actor.system.merchant}}checked{{/if}}/>
+                </div>
+                <div class="flexrow sidebar" title="{{localize 'OD6S.TOOLTIP_SHOW_IN_ACTOR_SIDEBAR'}}">
+                    <label for="actor.system.visible">{{localize 'OD6S.VISIBLE'}}:</label>
+                    <input id="actor.system.visible" name="system.visible" type="checkbox"
+                           data-dtype="Boolean" {{#if actor.system.visible}}checked{{/if}}/>
+                </div>
+            </div>
+        </div>
+        <div class="tabgroup">
+            <div class="center">{{localize 'OD6S.SHOW_ITEM_TYPES_TABS'}}</div>
+            <div class="grid grid-4col">
+                {{#each (getContainerItemCategories) as |item key|}}
+                    <div class="flexrow flex-group-left">
+                        <div class="grid grid-2col-checkbox" title="{{localize item}}">
+                            <label for="actor.system.itemtypes.{{key}}">{{localize item}}:</label>
+                            <input class="checkbox"
+                                   id="actor.system.itemtypes.{{key}}" name="system.itemtypes.{{key}}" type="checkbox"
+                                   data-actor-uuid="{{actor.uuid}}" value="{{getCheckedItemType key ../actor.system.itemtypes}}"
+                                   data-dtype="Boolean" {{#if (getCheckedItemType key ../actor.system.itemtypes)}}checked{{/if}}/>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+{{/if}}

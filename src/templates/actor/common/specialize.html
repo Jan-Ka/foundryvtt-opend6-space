@@ -1,0 +1,42 @@
+<div class="od6s specialize-dialog">
+    <div class="flexrow flex-group-center specializationname" data-specname="{{specname}}">
+        <label for="specname">{{localize "OD6S.SPECIALIZATION_NAME"}}:</label>
+        <input title="{{localize "OD6S.SPECIALIZATION_NAME"}}" name="specname" type="text"
+               value="{{specname}}" id="specname" data-dtype="String"/>
+    </div>
+    {{# if (eq actor.system.sheetmode.value "advance") }}
+        <div class="flexrow flex-group-center">
+            <p>{{localize "OD6S.STARTING_SCORE"}}: <b>{{diceFromScore score}}</b>D+<b>{{pipsFromScore score}}</b></p>
+        </div>
+        <div class="grid grid-2col">
+            <div class="grid grid-2col">
+                <div class="flexrow flex-group-center freeadvancecheckbox" data-freeadvance="{{freeadvance}}">
+                    <label for="freeadvance">{{localize 'OD6S.FREE_ADVANCE'}}?</label>
+                    <input type="checkbox" id="freeadvance" name="freeadvance"
+                           data-dtype="Boolean"
+                           {{#if freeadvance}}checked{{/if}}>
+                </div>
+                <div class="flexrow flex-group-center" data-cpcost="{{cpcost}}">
+                    <p style="color:{{ cpcostcolor }};">CP Cost: {{cpcost}}</p>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+    {{#if (eq actor.type "npc") }}
+        <div class="flexrow flex-group-left">
+            <div class="flex flex-group-left dice">
+                <label for="dice">{{localize 'OD6S.DICE'}}:</label>
+                <input title="{{localize 'OD6S.DICE'}}" id="dice" type="text"
+                       value="{{dice}}" data-dtype="Number"/>
+            </div>
+            <div class="flex flex-group-left pips">
+                <label for="pips">{{localize 'OD6S.PIPS'}}:</label>
+                <input title="{{localize 'OD6S.PIPS'}}" id="pips" type="text"
+                       value="{{pips}}" data-dtype="Number"/>
+            </div>
+        </div>
+    {{/if}}
+    <footer class="form-footer">
+        <button type="submit" data-action="submit">{{localize "OD6S.CREATE_SPECIALIZATION"}}</button>
+    </footer>
+</div>

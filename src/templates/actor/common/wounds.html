@@ -1,0 +1,47 @@
+{{#if (showBodyPoints)}}
+    <div class="flexrow flex-group-left">
+        <div>
+            <label for="actor.system.wounds.body_points.current">{{localize (getBodyPointsLabel)}}:</label>
+        </div>
+        <div class="flexrow flex-group-center flex-between editbodypoints">
+            <input title="{{localize 'OD6S.BODY_POINTS_CURRENT'}}" name="system.wounds.body_points.current"
+                   id="actor.system.wounds.body_points.current" type="number" min="0" max="9999"
+                   value="{{actor.system.wounds.body_points.current}}"/>
+        </div>
+        {{#if (eq actor.system.sheetmode.value 'freeedit')}}
+            <div class="flexrow flex-group-center flex-between">
+                <input title="{{localize 'OD6S.BODY_POINTS_MAX'}}" name="system.wounds.body_points.max"
+                       id="actor.system.wounds.body_points.max" type="number" min="0" max="9999"
+                       value="{{actor.system.wounds.body_points.max}}"/>
+            </div>
+        {{else}}
+            <div class="align-center body-points-max" title="{{localize 'OD6S.BODY_POINTS_MAX'}}">
+                {{actor.system.wounds.body_points.max}}
+            </div>
+        {{/if}}
+        {{#if (eq actor.system.sheetmode.value 'freeedit')}}
+            <div class="rollbodypoints flex-group-center"
+                 title="{{localize 'OD6S.ROLL'}} {{localize (getBodyPointsLabel)}}"><i class="fas fa-dice"></i></div>
+        {{/if}}
+    </div>
+{{/if}}
+{{#if (showWounds)}}
+    {{#if (showBodyPoints)}}
+        <div class="flexrow flex-group-center">
+            {{localize (getWoundLevel actor)}}
+        </div>
+    {{else}}
+        <div class="flexrow flex-group-left">
+            <label for="actor.system.wounds.value">{{localize 'OD6S.WOUNDS'}}:</label>
+            <select name="system.wounds.value" id="actor.system.wounds.value" style="width: 70px;">
+                
+                    {{#each (getWoundLevels actor.type) as |level key|}}
+                        <option value="{{ key }}" {{#if (eq key actor.system.wounds.value)}}selected{{/if}}>
+                            {{localize (woundsFromValue key ../actor.type)}}
+                        </option>
+                    {{/each}}
+                
+            </select>
+        </div>
+    {{/if}}
+{{/if}}

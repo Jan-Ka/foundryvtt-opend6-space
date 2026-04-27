@@ -1,0 +1,241 @@
+<header class="message-header flexrow"{{#if message.flags.od6s.itemId}} data-item-id="{{message.flags.od6s.itemId}}"{{/if}}>
+    <h4 class="message-sender" data-message-id="{{message._id}}">{{alias}}</h4>
+    <span class="message-metadata">
+          <time class="message-timestamp">{{timeSince message.timestamp}}</time>
+        {{#if user.isGM}}
+            {{# if (eq message.flags.od6s.isVisible false)}}
+                <a class="button message-reveal" data-message-id="{{message._id}}"
+                   title="{{localize 'OD6S.REVEAL_DIFFICULTY'}}">
+                        <i class="fas fa-eye"></i></a>
+            {{/if}}
+            <a class="button message-delete" title="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash"></i></a>
+        {{/if}}
+        </span>
+    {{#if message.flavor}}
+        <span class="flavor-text" data-message-id="{{message._id}}">
+            {{{message.flavor}}}
+        </span>
+        {{#unless message.flags.od6s.isExplosive}}
+            {{#if (isAttack message.flags.od6s.subtype) }}
+                {{localize "OD6S.ATTACKING"}}&nbsp
+                {{#if user.isGM}}
+                <span class="choose-target" title="{{localize "OD6S.CHANGE_TARGET"}}"
+                      data-message-id="{{message._id}}">
+                {{else}}
+                <span>
+                {{/if}}
+                {{#if message.flags.od6s.targetName}}
+                    {{message.flags.od6s.targetName}}
+                {{else}}
+                    {{localize "OD6S.NO_TARGET"}}
+                {{/if}}
+            </span>
+            {{/if}}
+        {{/unless}}
+    {{/if}}
+</header>
+{{#if message.flags.od6s.wild}}
+    {{#if message.flags.od6s.wildHandled}}
+        <div class="wilddie">
+            {{localize message.flags.od6s.wildResult}}
+        </div>
+    {{else}}
+        <div {{#if user.isGM}}class="wilddiegm" {{else}}class="wilddie"{{/if}} data-message-id="{{message._id}}">
+            {{localize message.flags.od6s.wildResult}}
+        </div>
+    {{/if}}
+{{/if}}
+<div class="message-content">
+    {{{message.content}}}
+</div>
+{{#if (isCardVisible message)}}
+    {{#if (isAttack message.flags.od6s.subtype)}}
+        <div class="attacksuccess">
+        <div>{{alias}} {{hitsOrMisses message.flags.od6s.success}}
+            {{#unless message.flags.od6s.isExplosive}}
+                {{#if message.flags.od6s.targetName}}
+                    {{message.flags.od6s.targetName}}
+                {{else}}
+                    {{localize 'OD6S.NO_TARGET'}}</div>
+                {{/if}}
+            {{/unless}}
+        </div>
+        {{#unless message.flags.od6s.isExplosive}}
+            {{getHitLocation message.flags.od6s.targetType message.flags.od6s.location}}
+        {{/unless}}
+    {{/if}}
+    {{#if (isSkillOrAttribute message.flags.od6s.type message.flags.od6s.subtype) }}
+        {{#if (eq message.flags.od6s.difficultyLevel 'OD6S.DIFFICULTY_UNKNOWN')}}
+            {{#if user.isGM}}
+                <div class="flexrow flex-group-left">
+                    <label for="choose-difficulty">{{localize "OD6S.DIFFICULTY"}}:</label>
+                    <select class="choose-difficulty" name="choose-difficulty" id="choose-difficulty" data-message-id="{{message._id}}">
+                        
+                            {{#each (getDifficultyLevels) as | level |}}
+                                <option value="{{level}}" {{#if (eq level difficulty)}}selected{{/if}}>{{localize level}}</option>
+                            {{/each}}
+                        
+                    </select>
+                </div>
+            {{/if}}
+        {{else}}
+            <div class="skillsuccess">
+            <div title="{{localize (getResultDescription
+                                           (onSuccess message.flags.od6s.success message.flags.od6s.total message.flags.od6s.difficulty))}}">
+                {{localize
+                        (onSuccess message.flags.od6s.success message.flags.od6s.total message.flags.od6s.difficulty)}}</div>
+        </div>
+        {{/if}}
+    {{/if}}
+    {{#unless (isDefense message.flags.od6s.subtype)}}
+        {{#unless (eq message.flags.od6s.type 'damage')}}
+            {{#unless (eq message.flags.od6s.type 'resistance')}}
+                {{#if (isKnown message.flags.od6s.isKnown)}}
+                    {{#unless (eq message.flags.od6s.difficultyLevel 'OD6S.DIFFICULTY_UNKNOWN')}}
+                    {{#if message.flags.od6s.modifiers.length}}
+                        <div class="flexrow">
+                            <div{{#if user.isGM}}
+                            class="edit-difficulty" data-message-id="{{message._id}}"{{/if}}>{{localize
+                                    "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
+                            <div class="modifiers-button"
+                                 data-message-id="{{message._id}}"
+                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                <i class="fas fa-plus modifier-button"></i>
+                            </div>
+                        </div>
+                        <div class="modifiers-display" id="modifiers-display-{{message._id}}">
+                            <ul class="modifiers-list">
+                                <li>{{localize "OD6S.BASE_DIFFICULTY"}}: {{message.flags.od6s.baseDifficulty}}</li>
+                                {{#each message.flags.od6s.modifiers as |m|}}
+                                    <li>{{m.name}}: {{m.value}}</li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    {{else}}
+                        {{#unless (eq message.flags.od6s.type 'simple')}}
+                            <div{{#if user.isGM}}
+                            class="edit-difficulty" data-message-id="{{message._id}}"{{/if}}>{{localize
+                                    "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
+                        {{/unless}}
+                    {{/if}}
+                    {{/unless}}
+                {{/if}}
+            {{/unless}}
+        {{/unless}}
+    {{/unless}}
+    {{#if message.flags.od6s.isExplosive}}
+        {{#if (notExplosivesEndOfRound)}}
+            {{#if message.flags.od6s.wild}}
+                {{#if message.flags.od6s.wildHandled}}
+                    {{> "systems/od6s/templates/chat/explosive-button.html" }}
+                {{/if}}
+            {{else}}
+                {{> "systems/od6s/templates/chat/explosive-button.html" }}
+            {{/if}}
+        {{else}}
+            {{#if message.flags.od6s.triggered}}
+                {{> "systems/od6s/templates/chat/explosive-button.html" }}
+            {{/if}}
+        {{/if}}
+    {{else}}
+    {{#if (isAttack message.flags.od6s.subtype)}}
+        {{#if message.flags.od6s.success}}
+            {{#if (isGmOrOwner message.speaker.actor)}}
+                {{#if message.flags.od6s.damageScore}}
+                    <div class="damage-button"
+                         data-message-id="{{message._id}}"
+                         data-item-id="{{message.flags.od6s.itemId}}"
+                         data-damage="{{message.flags.od6s.damageScore}}"
+                         data-damage-dice="{{message.flags.od6s.damageDice.dice}}"
+                         data-damage-pips="{{message.flags.od6s.damageDice.pips}}"
+                         data-damageScaleBonus="{{message.flags.od6s.damageScaleBonus}}"
+                         data-damageScaleDice="{{message.flags.od6s.damageScaleDice}}"
+                         data-damageType="{{message.flags.od6s.damageType}}"
+                         data-source="{{message.flags.od6s.source}}"
+                         data-vehicle="{{message.flags.od6s.vehicle}}"
+                         data-actor="{{message.speaker.actor}}"
+                         data-collision="{{eq message.flags.od6s.subtype 'vehicleramattack'}}"
+                         data-targetName="{{message.flags.od6s.targetName}}"
+                         data-targetId="{{message.flags.od6s.targetId}}"
+                         data-stun="{{message.flags.od6s.stun}}"
+                         {{#if message.flags.od6s.stun}}
+                            title="{{localize 'OD6S.ROLL_STUN_DAMAGE'}}">
+                                <button>{{localize 'OD6S.ROLL_STUN_DAMAGE'}}</button>
+                         {{else}}
+                             title="{{localize 'OD6S.ROLL_DAMAGE'}}">
+                                <button>{{localize 'OD6S.ROLL_DAMAGE'}}</button>
+                         {{/if}}
+                    </div>
+                    <div class="damage-display flexrow">
+                        <div{{#if (isGmOrOwner message.speaker.actor)}}
+                        class="edit-damage" data-message-id="{{message._id}}"
+                        data-damage="{{message.flags.od6s.damageScore}}"{{/if}}>
+                            {{message.flags.od6s.damageDice.dice}}D+{{
+                        message.flags.od6s.damageDice.pips}}{{#if (ne message.flags.od6s.damageScaleBonus 0)}}
+                            {{~showScaleDamage message.flags.od6s.damageScaleBonus}}
+                        {{/if}}
+                            {{localize message.flags.od6s.damageTypeName}}</div>
+                    {{#if message.flags.od6s.damageModifiers.length}}
+                            <div class="damage-modifiers-button"
+                                 data-message-id="{{message._id}}"
+                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                <i class="fas fa-plus modifier-button"></i>
+                            </div>
+                        </div>
+                        <div class="damage-modifiers-display" id="damage-modifiers-display-{{message._id}}">
+                            <ul class="damage-modifiers-list">
+                                <li>{{localize "OD6S.BASE_DAMAGE"}}: {{diceFromScore message.flags.od6s.baseDamage}}D+
+                                    {{~pipsFromScore message.flags.od6s.baseDamage}}</li>
+                                {{#each message.flags.od6s.damageModifiers as |m|}}
+                                    {{#if (eq m.name (localize "OD6S.SCALE") ) }}
+                                        <li>
+                                            {{localize "OD6S.SCALE"}}:
+                                            {{#if (eq (diceForScale) true)}}
+                                                {{diceFromScore m.value}}D+{{pipsFromScore m.value}}
+                                            {{else}}
+                                                {{showScaleDamage ../message.flags.od6s.damageScaleBonus}}
+                                            {{/if}}
+                                        </li>
+                                    {{ else if (eq m.name 'OD6S.STRENGTH_DAMAGE_BONUS')}}
+                                        <li>
+                                            {{localize "OD6S.STRENGTH_DAMAGE_BONUS"}}:
+                                            {{../message.flags.od6s.strModDice.dice}}
+                                            D+{{../message.flags.od6s.strModDice.pips}}
+                                        </li>
+                                    {{ else if (eq m.name 'OD6S.WEAPON_DAMAGED')}}
+                                        <li>
+                                            {{localize "OD6S.WEAPON_DAMAGED"}} ({{localize m.level}}):
+                                            {{diceFromScore m.value}}
+                                            D+{{pipsFromScore m.value}}
+                                        </li>
+                                    {{else}}
+                                        {{#if (gt m.value 0)}}
+                                            <li>{{localize m.name}}: {{diceFromScore m.value}}D+{{pipsFromScore
+                                                    m.value}}</li>
+                                        {{else}}
+                                            {{#if (gt m.pips 0)}}
+                                                <li>{{localize m.name}}: + {{m.pips}}</li>
+                                            {{/if}}
+                                        {{/if}}
+                                    {{/if}}
+                                {{/each}}
+                            </ul>
+                        </div>
+                    {{/if}}
+                {{/if}}
+            {{/if}}
+        {{/if}}
+    {{/if}}
+    {{/if}}
+{{/if}}
+{{#if user.isGM}}
+    {{#if message.flags.od6s.isOpposable }}
+        {{#unless message.flags.od6s.isOpposed}}
+            <div class="message-oppose" style="text-align: right"
+                 data-message-id="{{message._id}}">
+                <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}"><i
+                        class="fas fa-exchange-alt"></i></a>
+            </div>
+        {{/unless}}
+    {{/if}}
+{{/if}}

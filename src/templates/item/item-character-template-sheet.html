@@ -1,0 +1,159 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"
+             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="editor"><prose-mirror name="system.description" value="{{item.system.description}}" {{#unless editable}}disabled{{/unless}}></prose-mirror></div>
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{!-- As you add new fields, add them in here! --}}
+            <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.CHARACTER_TEMPLATE"}}</div>
+            <div class="flexrow flex-group-center">
+                <label for="item.system.species">{{getConfig 'speciesLabelName' ''}}:</label>
+                <input title="{{ getConfig 'speciesLabelName' '' }}" name="system.species"
+                       type="text" value="{{item.system.species}}" data-dtype="String"/>
+                <label for="item.system.move">{{localize 'OD6S.CHAR_MOVE'}}:</label>
+                <input class="smallinput" title="{{localize 'OD6S.CHAR_MOVE'}}" name="system.move"
+                       type="number" value="{{item.system.move}}" data-dtype="Number"/>
+                <label for="item.system.fp">{{getFatePointsShortName}}:</label>
+                <input class="smallinput" title="{{getFatePointsShortName}}" name="system.fp"
+                       type="number" value="{{item.system.fp}}" data-dtype="Number"/>
+                <label for="item.system.met">{{getMetaphysicsExtranormalName}}:</label>
+                <input type="checkbox" name="system.met"
+                       id="item.system.met" data-dtype="Boolean"
+                    {{#if item.system.met}}checked{{/if}}>
+            </div>
+            <div class="flexrow flex-group-center">
+                <label for="item.system.cp">{{localize 'OD6S.CHAR_CHAR_POINTS'}}:</label>
+                <input class="smallinput" title="{{localize 'OD6S.CHAR_CHAR_POINTS'}}" name="system.cp"
+                       type="number" value="{{item.system.cp}}" data-dtype="Number"/>
+                <label for="item.system.funds">{{localize 'OD6S.CHAR_FUNDS'}}:</label>
+                <input class="smallinput" title="{{localize 'OD6S.CHAR_FUNDS'}}" name="system.funds"
+                       type="number" value="{{item.system.funds}}" data-dtype="Number"/>
+                <label for="item.system.credits">{{localize 'OD6S.CHAR_CREDITS'}}:</label>
+                <input class="smallinput" title="{{localize 'OD6S.CHAR_CREDITS'}}" name="system.credits"
+                       type="number" value="{{item.system.credits}}" data-dtype="Number"/>
+            </div>
+            <div class="grid grid-2col">
+                {{#each item.system.attributes as |score key|}}
+                    {{#if (eq key "met") }}
+                        {{#if ../item.system.met}}
+                            <div>
+                                <div class="grid grid-3col-attributes">
+                                    <div class="attribute flexrow flex-group-center">{{getMetaphysicsName}}:</div>
+                                    {{#unless (isMetaphysicsAttributeOptional)}}
+                                        <div class="flex-group-center"
+                                             data-type="attribute"
+                                             data-score="{{score}}"
+                                             data-label="{{key}}">
+                                            <b>{{diceFromScore score}}</b>D+<b>{{pipsFromScore score}}</b>
+                                        </div>
+                                        <div class="edittemplateattribute flexrow flex-group-center"
+                                             data-type="attribute"
+                                             data-score="{{score}}"
+                                             data-label="{{key}}"
+                                             data-attrname="{{ key }}"
+                                             data-sub="base">
+                                            <a><i class="fas fa-edit"></i></a>
+                                        </div>
+                                    {{/unless}}
+                                </div>
+                            </div>
+                        {{/if}}
+                    {{else}}
+                        <div>
+                            <div class="grid grid-3col-attributes">
+                                <div class="attribute flexrow flex-group-center">{{getAttributeName key}}:</div>
+                                <div class="flex-group-center"
+                                     data-type="attribute"
+                                     data-score="{{score}}"
+                                     data-label="{{key}}">
+                                    <b>{{diceFromScore score}}</b>D+<b>{{pipsFromScore score}}</b>
+                                </div>
+                                <div class="edittemplateattribute flexrow flex-group-center"
+                                     data-type="attribute"
+                                     data-score="{{score}}"
+                                     data-label="{{key}}"
+                                     data-attrname="{{ key }}"
+                                     data-sub="base">
+                                    <a><i class="fas fa-edit"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/each}}
+            </div>
+            <div class="grid grid-2col">
+                {{#each (templateItemTypes 'character-template') as |itemType typeKey|}}
+                    {{#if (and (eq typeKey 'manifestation') (not ../item.system.met )) }}
+                    {{else}}
+                    <div>
+                        <div>
+                            <div class="flexrow flex-group-center">
+                                <div><b>{{localize itemType.label}}</b></div>
+                                {{#if itemType.label}}
+                                    <div class="item-controls">
+                                        <a class="item-control template-item-add"
+                                           title="{{localize 'OD6S.ADD'}} {{localize itemType.label}}"
+                                           data-type="{{typeKey}}">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div>
+                            <ul class="template-item-list draggable">
+                                {{#each ../item.system.items as |templateItem key| }}
+                                    {{#if (eq templateItem.type typeKey)}}
+                                        <li class="template-item">
+                                            <div class="template-item-grid">
+                                                <div title="{{templateItem.description}}">{{templateItem.name}}</div>
+                                                <div class="template-item template-item-control flexrow flex-group-center">
+                                                    <a class="template-item-control template-item-edit"
+                                                       data-name="{{templateItem.name}}"
+                                                       data-type="{{templateItem.type}}"
+                                                       data-desc="{{templateItem.description}}"
+                                                       title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                                        <i class="fas fa-edit"></i></a>
+                                                    <a class="template-item-control template-item-delete"
+                                                       data-name="{{templateItem.name}}"
+                                                       data-type="{{templateItem.type}}"
+                                                       title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                                        <i class="fas fa-trash"></i></a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {{/if}}
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                {{/if}}
+                {{/each}}
+            </div>
+        </div>
+
+        {{!--Labels Tab --}}
+        {{> systems/od6s/templates/item/item-labels-tags.html }}
+
+    </section>
+</form>

@@ -1,0 +1,20 @@
+{
+  "label": "Cybernetics",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Cyber Arm": {
+      "name": "Brazo Cibernético",
+      "description": "<p>Un brazo cibern&eacute;tico que proporciona bonificaciones al da&ntilde;o cuerpo a cuerpo, pelea, levantar (cargas,objetos,etc) y fuerza.</p>"
+    },
+    "Cyber Eye": {
+      "name": "Ojo Cibernético",
+      "description": "<p>A&ntilde;ade +1D a la percepci&oacute;n y +1D a las tiradas de ataque a distancia.</p>"
+    },
+    "Reflex Enhancer": {
+      "name": "Potenciador de reflejos",
+      "description": "<p>Proporciona una bonificaci&oacute;n de +1D en esquivar e iniciativa.</p>"
+    }
+  }
+}

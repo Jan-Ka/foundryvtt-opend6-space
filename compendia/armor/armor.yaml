@@ -1,0 +1,189 @@
+---
+name: Woven metal fabric (light)
+type: armor
+system:
+  pr: 1
+  er: 1
+  price: E
+  credits: 
+  description:
+---
+name: Hides and fur
+type: armor
+system:
+  pr: 2
+  er: 2
+  price: VE
+  credits: 
+  description:
+---
+name: Bone and hide
+type: armor
+system:
+  pr: 3
+  er: 3
+  price:
+  credits: 
+  description:
+---
+name: Soft leather
+type: armor
+system:
+  pr: 2
+  er: 2
+  price: E
+  credits: 
+  description:
+---
+name: Canvas
+type: armor
+system:
+  pr: 2
+  er: 2
+  price: VE
+  credits: 
+  description:
+---
+name: Heavy Khaki
+type: armor
+system:
+  pr: 2
+  er: 2
+  price: VE
+  credits: 
+  description:
+---
+name: Syntheleather
+type: armor
+system:
+  pr: 2
+  er: 2
+  price: M
+  credits: 
+  description:
+---
+name: Padded leather
+type: armor
+system:
+  pr: 3
+  er: 3
+  price: E
+  credits: 
+  description:
+---
+name: Woven metal fabric (heavy)
+type: armor
+system:
+  pr: 3
+  er: 3
+  price: M
+  credits: 
+  description:
+---
+name: Syntheleather mesh
+type: armor
+system:
+  er: 3
+  pr: 3
+  price: M
+  credits: 
+  description:
+---
+name: Hard leather
+type: armor
+system:
+  pr: 4
+  er: 4
+  price: E
+  credits: 
+  description:
+---
+name: Plastovar
+type: armor
+system:
+  pr: 4
+  er: 4
+  price: D
+  credits: 
+  description:
+---
+name: Plasteel
+type: armor
+system:
+  pr: 5
+  er: 5
+  price: D
+  credits: 
+  description:
+---
+name: Chain mail
+type: armor
+system:
+  pr: 6
+  er: 6
+  price: E
+  credits: 
+  description:
+---
+name: Light Kevlar
+type: armor
+system:
+  pr: 7
+  er: 7
+  price: D
+  credits: 
+  description:
+---
+name: Plate mail
+type: armor
+system:
+  pr: 9
+  er: 9
+  price: M
+  credits: 
+  description:
+---
+name: Bulletproof vest
+type: armor
+system:
+  er: 9
+  pr: 9
+  price: M
+  credits: 
+  description:
+---
+name: Reflec
+type: armor
+system:
+  pr: 0
+  er: 9
+  price: H
+  credits: 
+  description:
+---
+name: Flak jacket
+type: armor
+system:
+  pr: 10
+  er: 10
+  price: M
+  credits: 
+  description:
+---
+name: Heavy Kevlar
+type: armor
+system:
+  pr: 9
+  er: 9
+  price: D
+  credits: 
+  description:
+---
+name: Ceramic Armor
+type: armor
+system:
+  er: 10
+  pr: 10
+  price: H
+  credits: 
+  description:

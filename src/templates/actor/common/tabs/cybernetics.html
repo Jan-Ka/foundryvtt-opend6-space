@@ -1,0 +1,181 @@
+<div class="tab cybernetics" data-group="primary" data-tab="cybernetics">
+    <div class="row">
+        <div class="column">
+            <div>
+                <div class="cybernetics-head flexrow flex-group-center header-solid">
+                    <b>{{localize 'OD6S.HEAD'}}</b>
+                </div>
+                <div class="cybernetics-head">
+                    <ul class="cybernetics-list">
+                        {{#each (getCybernetics actor "OD6S.HEAD") as |item key|}}
+                            <li class="item cybernetics">
+                                <div class="skills grid grid-2col-attributes">
+                                    <div class="flexrow flex-group-left show-item-details"
+                                         data-item-name="{{item.name}}"
+                                         data-actor-id="{{../actor.id}}"
+                                         data-item-id="{{item._id}}">
+                                        {{item.name}}
+                                    </div>
+                                    <div class="item item-controls flexrow flex-group-center"
+                                         data-item-id="{{item.id}}"
+                                         data-type="cybernetic"
+                                         data-label="{{item.name}}">
+                                        <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                                class="fas fa-edit"></i></a>
+                                        <a data-item-id="{{item.id}}"
+                                           data-type="skill"
+                                           class="item-control item-delete"
+                                           title="{{localize 'OD6S.DELETE'}}">
+                                            <i class="fas fa-trash"></i></a>
+                                    </div>
+                                </div>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            <div class="cybernetics-ra flexrow flex-group-center header-solid">
+                <b>{{localize 'OD6S.RIGHT_ARM'}}</b>
+            </div>
+            <div class="cybernetics-head">
+                <ul class="cybernetics-list">
+                    {{#each (getCybernetics actor "OD6S.RIGHT_ARM") as |item key|}}
+                        <li class="item cybernetics">
+                            <div class="skills grid grid-2col-attributes">
+                                <div>
+                                    {{item.name}}
+                                </div>
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{item.id}}"
+                                     data-type="cybernetic"
+                                     data-label="{{item.name}}">
+                                    <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a data-item-id="{{item.id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="cybernetics-la flexrow flex-group-center header-solid">
+                <b>{{localize 'OD6S.LEFT_ARM'}}</b>
+            </div>
+            <div class="cybernetics-head">
+                <ul class="cybernetics-list">
+                    {{#each (getCybernetics actor "OD6S.LEFT_ARM") as |item key|}}
+                        <li class="item cybernetics">
+                            <div class="skills grid grid-2col-attributes">
+                                <div>
+                                    {{item.name}}
+                                </div>
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{item.id}}"
+                                     data-type="cybernetic"
+                                     data-label="{{item.name}}">
+                                    <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a data-item-id="{{item.id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <div class="column">
+            <div class="cybernetics-body flexrow flex-group-center header-solid">
+                <b>{{localize 'OD6S.BODY'}}</b>
+            </div>
+            <div class="cybernetics-head">
+                <ul class="cybernetics-list">
+                    {{#each (getCybernetics actor "OD6S.BODY") as |item key|}}
+                        <li class="item cybernetics">
+                            <div class="skills grid grid-2col-attributes">
+                                <div>
+                                    {{item.name}}
+                                </div>
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{item.id}}"
+                                     data-type="cybernetic"
+                                     data-label="{{item.name}}">
+                                    <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a data-item-id="{{item.id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="cybernetics-rl flexrow flex-group-center header-solid">
+                <b>{{localize 'OD6S.RIGHT_LEG'}}</b>
+            </div>
+            <div class="cybernetics-head">
+                <ul class="cybernetics-list">
+                    {{#each (getCybernetics actor "OD6S.RIGHT_LEG") as |item key|}}
+                        <li class="item cybernetics">
+                            <div class="skills grid grid-2col-attributes">
+                                <div>
+                                    {{item.name}}
+                                </div>
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{item.id}}"
+                                     data-type="cybernetic"
+                                     data-label="{{item.name}}">
+                                    <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a data-item-id="{{item.id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="cybernetics-ll flexrow flex-group-center header-solid">
+                <b>{{localize 'OD6S.LEFT_LEG'}}</b>
+            </div>
+            <div class="cybernetics-head">
+                <ul class="cybernetics-list">
+                    {{#each (getCybernetics actor "OD6S.LEFT_LEG") as |item key|}}
+                        <li class="item cybernetics">
+                            <div class="skills grid grid-2col-attributes">
+                                <div>
+                                    {{item.name}}
+                                </div>
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{item.id}}"
+                                     data-type="cybernetic"
+                                     data-label="{{item.name}}">
+                                    <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a data-item-id="{{item.id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

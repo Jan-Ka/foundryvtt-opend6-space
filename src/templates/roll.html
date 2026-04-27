@@ -1,0 +1,444 @@
+<div class="od6s roll-dialog">
+    {{#if (getConfig 'showSkillSpecialization' '')}}
+        <p><b>{{ localize 'OD6S.ROLLING'}} {{specSkill}}: {{title}}: {{setDice dice actionpenalty woundpenalty
+                                                                               stunnedpenalty otherpenalty}}D
+            + {{pips}}</b></p>
+    {{else}}
+        <p><b>{{ localize 'OD6S.ROLLING'}} {{title}}: {{setDice dice actionpenalty woundpenalty
+                                                                stunnedpenalty otherpenalty}}D
+            + {{pips}}</b></p>
+    {{/if}}
+    {{#if (isDefense subtype)}}
+    {{else}}
+        {{#if targets.length }}
+            <div class="flexrow flex-group-left target" data-target="{{target}}">
+                <label for="target">{{localize 'OD6S.TARGET'}}</label>
+                <select name="target" id="target">
+                    {{#each targets as |t|}}
+                        <option value="{{t}}" {{#if (eq t ../target)}}selected{{/if}}>{{t.name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+        {{/if}}
+    {{/if}}
+    {{#if (or (eq actor.type 'character') (eq actor.type 'npc')) }}{{#if canusecp}}
+        <div class="flexrow flex-group-left usecharacterpoints">
+            <div data-characterpoints="{{characterpoints}}">{{ localize 'OD6S.USE_CHARACTER_POINTS'}}</div>
+            <div class="flexrow flex-group-center">
+                <div class="boxed" style="color:{{ cpcostcolor }};">{{characterpoints}}</div>
+                <div class="flex-group-center cpup">
+                    <i class="fas fa-plus-square"></i>
+                </div>
+                <div class="flex-group-center cpdown">
+                    <i class="fas fa-minus-square"></i>
+                </div>
+            </div>
+        </div>
+    {{/if}}{{/if}}
+    {{#if (or (eq actor.type 'character') (eq actor.type 'npc')) }}{{#if canusefp}}
+        {{#if (eq fatepointeffect false)}}
+            {{#if actor.system.fatepoints.value}}
+                <div class="flexrow flex-group-left usefatepoint" data-fatepoint="{{fatepoint}}">
+                    <label for="fatepoint">{{getUseFatePoint}}</label>
+                    <input type="checkbox" data-dtype="Boolean" id="fatepoint" name="fatepoint"
+                           {{#if fatepoint}}checked{{/if}}>
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/if}}{{/if}}
+    {{#if showWildDie}}
+        <div class="flexrow flex-group-left usewilddie" data-wilddie="{{wilddie}}">
+            <label for="wilddie">{{localize 'OD6S.USE_WILD_DIE'}}</label>
+            <input type="checkbox" data-dtype="Boolean" id="wilddie" name="wilddie"
+                   {{#if wilddie}}checked{{/if}}>
+        </div>
+    {{/if}}
+    {{#if (isSkillOrAttribute type subtype)}}
+        {{#if (eq subtype "vehiclemaneuver")}}
+            <div class="flexrow flex-group-left vehiclespeed" data-type="vehiclespeed"
+                 data-speed="{{vehiclespeed}}">
+                <label for="vehiclespeed">{{localize 'OD6S.VEHICLE_ATTACK_SPEED'}}</label>
+                <select name="vehiclespeed" id="vehiclespeed" style="width: 70px;">
+                    {{#each (getVehicleSpeeds) as |speed key|}}
+                        <option value="{{key}}" {{#if (eq key ../vehiclespeed)}}selected{{/if}}>
+                            {{localize speed.name}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="flexrow flex-group-left vehicleterraindifficulty" data-type="vehicleterraindifficulty"
+                 data-speed="{{vehicleterraindifficulty}}">
+                <label for="vehicleterraindifficulty">{{localize 'OD6S.TERRAIN_DIFFICULTY'}}</label>
+                <select name="vehicleterraindifficulty" id="vehicleterraindifficulty" style="width: 70px;">
+                    {{#each (getTerrainDifficulties) as |terrain key|}}
+                        <option value="{{key}}" {{#if (eq key ../vehicleterraindifficulty)}}selected{{/if}}>
+                            {{localize key}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+        {{else}}
+            {{#if (showDifficulty) }}
+                <div class="flexrow flex-group-left">
+                    <div class="flexrow flex-group-left difficultylevel" data-difficultylevel="{{difficultylevel}}">
+                        <label for="difficultylevel">{{localize 'OD6S.DIFFICULTY'}}</label>
+                        <select name="difficultylevel" id="difficultylevel">
+                            {{#each (getDifficulties) as |diff key|}}
+                                <option value="{{key}}" {{#if (eq key ../difficultylevel)}}selected{{/if}}>{{localize key}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    {{#if (eq difficultylevel "OD6S.DIFFICULTY_CUSTOM")}}
+                        <div class="flexrow flex-group-left difficulty" data-difficulty="{{difficulty}}">
+                            <label for="difficulty">{{localize "OD6S.DIFFICULTY_CUSTOM_LABEL"}}</label>
+                            <input type="number" data-dtype="Number"
+                                   max="99" id="difficulty" name="difficulty" value="{{difficulty}}"
+                                   placeholder="10">
+                        </div>
+                    {{/if}}
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/if}}
+    {{#if (ne attribute null)}}
+        <div class="flexrow flex-group-left useattribute" data-attribute="{{attribute}}">
+            <label for="useattribute">{{localize 'OD6S.ATTRIBUTE'}}</label>
+            <select name="useattribute" id="useattribute" style="width: 70px;">
+                {{#each actor.system.attributes as |attr key|}}
+                    <option value="{{key}}" {{#if (eq key ../attribute)}}selected{{/if}}>{{getAttributeName key}}</option>
+                {{/each}}
+            </select>
+        </div>
+    {{/if}}
+    {{#if (isDefense subtype)}}
+        <div class="flexrow flex-group-left fulldefense" data-fulldefense="{{fulldefense}}"
+             title="{{localize 'OD6S.FULL_DEFENSE_DESCRIPTION'}}">
+            <label for="fulldefense">{{localize 'OD6S.FULL_DEFENSE'}}</label>
+            <input type="checkbox" data-dtype="Boolean" id="fulldefense" name="fulldefense"
+                   {{#if fulldefense}}checked{{/if}}>
+        </div>
+    {{/if}}
+    {{#if (isAttack subtype)}}
+        {{#if can_stun}}
+            {{#if only_stun}}
+                <div class="flexrow flex-group-left stun" data-stun="{{stun}}"
+                     title="{{localize 'OD6S.STUN_QUESTION'}}">
+                    <label for="stun">{{localize 'OD6S.STUN_QUESTION'}}</label>
+                    <input type="checkbox" data-dtype="Boolean" id="stun" name="stun" checked disabled>
+                </div>
+            {{else}}
+                <div class="flexrow flex-group-left stun" data-stun="{{stun}}"
+                     title="{{localize 'OD6S.STUN_QUESTION'}}">
+                    <label for="stun">{{localize 'OD6S.STUN_QUESTION'}}</label>
+                    <input type="checkbox" data-dtype="Boolean" id="stun" name="stun"
+                           {{#if stun}}checked{{/if}}>
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/if}}
+    <div class="flexrow flex-group-left">
+        <div class="bonusdice flexrow flex-group-left usebonus">
+            <label for="bonusdice">{{localize 'OD6S.USE_BONUS_DICE'}}</label>
+            <input type="number" data-dtype="Number"
+                   max="99" id="bonusdice" name="bonusdice" value="{{bonusdice}}">
+        </div>
+        <div class="bonuspips flexrow flex-group-left usebonus" data-bonuspips="{{bonuspips}}">
+            <label for="bonuspips">{{localize 'OD6S.USE_BONUS_PIPS'}}</label>
+            <input type="number" data-dtype="Number"
+                   max="99" id="bonuspips" name="bonuspips" value="{{bonuspips}}">
+        </div>
+    </div>
+    {{#if (eq type 'resistance')}}
+        {{#if (diceForScale)}}
+                <div class="flexrow flex-group-left">
+                    <label for="scaledice">{{localize "OD6S.SCALE"}}</label>
+                    <div class="scaledice flexrow flex-group-left">
+                        <input type="number" data-dtype="Number" max="99"
+                               id="scaledice" name="scaledice"
+                               value="{{abs (scaleDiceFromScore modifiers.scalemod)}}"
+                               title="{{localize "OD6S.DICE"}}"/>D
+                    </div>
+                </div>
+        {{/if}}
+    {{/if}}
+    {{#if (showPenalties type) }}
+        <div class="center"><b>{{localize "OD6S.PENALTIES"}}</b></div>
+        <div class="row">
+            <div class="column>">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.ACTION_PENALTY'}}">
+                    <div class="actionpenalty flexrow flex-group-left">
+                        <label for="actionpenalty">{{localize 'OD6S.ACTIONS'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center actionpenalty"
+                         data-actionpenalty="{{actionpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="actionpenalty" name="actionpenalty"
+                               value="{{actionpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.WOUND_PENALTY'}}">
+                    <div class="woundpenalty flexrow flex-group-left">
+                        <label for="woundpenalty">{{localize 'OD6S.WOUNDS'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center woundpenalty"
+                         data-woundpenalty="{{woundpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="woundpenalty" name="woundpenalty"
+                               value="{{woundpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column>">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.STUNNED_PENALTY'}}">
+                    <div class="stunnedpenalty flexrow flex-group-left">
+                        <label for="stunnedpenalty">{{localize 'OD6S.WOUNDS_STUNNED'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center stunnedpenalty"
+                         data-otherpenalty="{{stunnedpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="stunnedpenalty" name="stunnedpenalty"
+                               value="{{stunnedpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+            <div class="column>">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.OTHER_PENALTY'}}">
+                    <div class="otherpenalty flexrow flex-group-left">
+                        <label for="otherpenalty">{{localize 'OD6S.OTHER'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center otherpenalty"
+                         data-otherpenalty="{{otherpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="otherpenalty" name="otherpenalty"
+                               value="{{otherpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+    {{#if (eq subtype 'funds')}}
+        {{#if (showDifficulty)}}
+            <div class="flexrow flex-group-left">
+                <div class="flexrow flex-group-left difficultylevel" data-difficultylevel="{{difficultylevel}}">
+                    <label for="difficultylevel">{{localize 'OD6S.DIFFICULTY'}}</label>
+                    <select name="difficultylevel" id="difficultylevel">
+                        {{#each (getDifficulties) as |diff key|}}
+                            <option value="{{key}}" {{#if (eq key ../difficulty)}}selected{{/if}}>
+                                {{localize key}}
+                            </option>
+                        {{/each}}
+                    </select>
+                </div>
+                {{#if (eq difficultylevel "OD6S.DIFFICULTY_CUSTOM")}}
+                    <div class="flexrow flex-group-left difficulty" data-difficulty="{{difficulty}}">
+                        <label for="difficulty">{{localize "OD6S.DIFFICULTY_CUSTOM_LABEL"}}</label>
+                        <input type="number" data-dtype="Number"
+                               max="99" id="difficulty" name="difficulty" value="{{difficulty}}"
+                               placeholder="10">
+                    </div>
+                {{/if}}
+            </div>
+        {{/if}}
+    {{/if}}
+    {{#if (isAttack subtype)}}
+        {{#if (eq subtype 'vehicleramattack') }}
+            <div class="flexrow flex-group-left vehiclespeed" data-type="vehiclespeed"
+                 data-speed="{{vehiclespeed}}">
+                <label for="vehiclespeed">{{localize 'OD6S.VEHICLE_ATTACK_SPEED'}}</label>
+                <select name="vehiclespeed" id="vehiclespeed" style="width: 70px;">
+                    {{#each (getVehicleSpeeds) as |speed key|}}
+                        <option value="{{key}}" {{#if (eq key ../vehiclespeed)}}selected{{/if}}>
+                            {{localize speed.name}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="flexrow flex-group-left vehiclecollisiontype" data-type="vehiclecollisiontype"
+                 data-speed="{{vehiclecollisiontype}}">
+                <label for="vehiclecollisiontype">{{localize 'OD6S.VEHICLE_COLLISION_TYPE'}}</label>
+                <select name="vehiclecollisiontype" id="vehiclecollisiontype" style="width: 70px;">
+                    {{#each (getCollisionTypes) as |collision key|}}
+                        <option value="{{key}}" {{#if (eq key ../vehiclecollisiontype)}}selected{{/if}}>
+                            {{localize collision.name}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="flexrow flex-group-left vehicleterraindifficulty" data-type="vehicleterraindifficulty"
+                 data-speed="{{vehicleterraindifficulty}}">
+                <label for="vehicleterraindifficulty">{{localize 'OD6S.TERRAIN_DIFFICULTY'}}</label>
+                <select name="vehicleterraindifficulty" id="vehicleterraindifficulty" style="width: 70px;">
+                    {{#each (getTerrainDifficulties) as |terrain key|}}
+                        <option value="{{key}}" {{#if (eq key ../vehicleterraindifficulty)}}selected{{/if}}>
+                            {{localize key}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+        {{else}}
+            {{#if (showModifiers)}}
+                <div class="center"><b>{{localize "OD6S.MODIFIERS"}}</b></div>
+                <div class="flexrow flex-group-left">
+                    {{#unless (displayRange subtype)}}
+                        <div class="flexrow flex-group-left range" data-range="{{range}}">
+                            <label for="range">{{localize 'OD6S.RANGE'}}</label>
+                            <select name="range" id="range" style="width:50px">
+                                {{#each (getRanges) as |r key|}}
+                                    <option value="{{key}}" title="{{localize r.name}}"
+                                            {{#if (eq key ../modifiers.range)}}selected{{/if}}>
+                                        {{localize r.name}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    {{/unless}}
+                    {{#unless isExplosive }}
+                    {{#if (eq subtype 'rangedattack') }}
+                        <div class="flexrow flex-group-left attackoption modifier" data-type="attackoption">
+                            <label for="attackoption">{{localize 'OD6S.ATTACK_OPTIONS'}}</label>
+                            <select name="attackoption" id="attackoption" style="width: 50px;">
+                                {{#each (getAttackOptions "rangedattack") as |option key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.attackoption)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        {{#if multishot }}
+                            <div class="flexrow flex-group-center shots" data-shots="{{ shots }}">
+                                <label for="shots">{{ localize "OD6S.SHOTS"}}</label>
+                                <input type="number" data-dtype="Number"
+                                       max="99" id="shots" name="shots" value="{{shots}}" placeholder="1">
+                            </div>
+                        {{/if}}
+                    {{/if}}
+                    {{/unless}}
+                    {{#if (eq subtype 'meleeattack') }}
+                        <div class="flexrow flex-group-left attackoption modifier">
+                            <label for="attackoption">{{localize 'OD6S.ATTACK_OPTIONS'}}</label>
+                            <select name="attackoption" id="attackoption" style="width: 70px;">
+                                {{#each (getAttackOptions "meleeattack") as |option key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.attackoption)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    {{/if}}
+                    {{#if (eq subtype 'brawlattack') }}
+                        <div class="flexrow flex-group-left attackoption modifier" data-type="attackoption">
+                            <label for="attackoption">{{localize 'OD6S.ATTACK_OPTIONS'}}</label>
+                            <select name="attackoption" id="attackoption" style="width: 70px;">
+                                {{#each (getAttackOptions "brawlattack") as |option key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.attackoption)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    {{/if}}
+                </div>
+                <div class="row">
+                {{#unless isExplosive}}
+                    <div class="column">
+                        <div class="flexrow flex-group-left calledshot modifier" data-type="calledshot">
+                            <label for="calledshot">{{localize "OD6S.CALLED_SHOT"}}</label>
+                            <select name="calledshot" id="calledshot" style="width: 70px;">
+                                {{#each (getCalledShot) as |cs key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.calledshot)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="flexrow flex-group-left cover modifier" data-type="cover">
+                            <label for="cover">{{localize "OD6S.COVER"}}</label>
+                            <select name="cover" id="cover" style="width: 70px;">
+                                {{#each (getCover "OD6S.COVER") as |cv key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.cover)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        {{#if (diceForScale)}}
+                            <div class="flexrow flex-group-left">
+                                <label for="scaledice">{{localize "OD6S.SCALE"}}</label>
+                                <div class="scaledice flexrow flex-group-left">
+                                    <input type="number" data-dtype="Number" max="99"
+                                           id="scaledice" name="scaledice"
+                                           value="{{abs (scaleDiceFromScore modifiers.scalemod)}}"
+                                           title="{{localize "OD6S.DICE"}}"/>D
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="flexrow flex-group-left scalemod modifier">
+                                <label for="scalemod">{{localize "OD6S.SCALE"}}</label>
+                                <input type="number" data-dtype="Number"
+                                       max="99" id="scalemod" name="scalemod" value="{{modifiers.scalemod}}"
+                                       placeholder="0">
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div class="column">
+                        <div class="flexrow flex-group-left coverlight modifier" data-type="coverlight">
+                            <label for="coverlight">{{localize "OD6S.COVER_LIGHT"}}</label>
+                            <select name="coverlight" id="coverlight" style="width: 70px;">
+                                {{#each (getCover "OD6S.COVER_LIGHT") as |cv key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.coverlight)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="flexrow flex-group-left coversmoke modifier" data-type="coversmoke">
+                            <label for="coversmoke">{{localize "OD6S.COVER_SMOKE"}}</label>
+                            <select name="coversmoke" id="coversmoke" style="width: 70px;">
+                                {{#each (getCover "OD6S.COVER_SMOKE") as |cv key|}}
+                                    <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
+                                            {{#if (eq key ../modifiers.coversmoke)}}selected{{/if}}>
+                                        {{localize key}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="flexrow flex-group-left miscmod modifier"
+                             title="{{localize "OD6S.MISC_TARGET_MODIFIER"}}" data-type="miscmod">
+                            <label for="miscmod">{{localize "OD6S.MISC"}}</label>
+                            <input type="number" data-dtype="Number"
+                                   max="99" id="miscmod" name="miscmod" value="{{modifiers.miscmod}}"
+                                   placeholder="0">
+                        </div>
+                    </div>
+                {{/unless}}
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/if}}
+    {{#if (isSkillOrAttribute type subtype) }}
+        <div class="center"><b>{{localize "OD6S.MODIFIERS"}}</b></div>
+        <div class="row">
+            <div class="column">
+                <div class="flexrow flex-group-left miscmod modifier">
+                    <label for="miscmod">{{localize "OD6S.MISC"}}</label>
+                    <input type="number" data-dtype="Number"
+                           max="99" id="miscmod" name="miscmod" value="{{modifiers.miscmod}}" placeholder="0">
+                </div>
+            </div>
+            <div class="column"></div>
+        </div>
+    {{/if}}
+    <footer class="form-footer">
+        <button type="submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+    </footer>
+</div>

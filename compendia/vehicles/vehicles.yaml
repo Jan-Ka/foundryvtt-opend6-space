@@ -1,0 +1,296 @@
+---
+name: Motorcycle, small street
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 3
+  maneuverability:
+    score: 10
+  toughness:
+    score: 11
+  move:
+    value: 84
+  cargo_capacity:
+    value: 100
+  cost:
+    value: 0
+  price:
+    value: D
+  crew:
+    value: 1
+  passengers:
+    value: 2
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Motorcycle'
+  length:
+    value: 2
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_NONE
+  altitude:
+    value: 0
+---
+name: Motorcycle, large
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 3
+  maneuverability:
+    score: 7
+  toughness:
+    score: 12
+  move:
+    value: 98
+  cargo_capacity:
+    value: 250
+  cost:
+    value: 0
+  price:
+    value: D
+  crew:
+    value: 1
+  passengers:
+    value: 2
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Motorcycle'
+  length:
+    value: 2
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_NONE
+  altitude:
+    value: 0
+---
+name: Personal Ground Vehicle(small)
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 6
+  maneuverability:
+    score: 8
+  toughness:
+    score: 13
+  move:
+    value: 49
+  cargo_capacity:
+    value: 200
+  cost:
+    value: 0
+  price:
+    value: D
+  crew:
+    value: 1
+  passengers:
+    value: 3
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Personal Ground Vehicle'
+  length:
+    value: 3
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_HALF
+  altitude:
+    value: 0
+---
+name: Personal Ground Vehicle(mid-size)
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 6
+  maneuverability:
+    score: 4
+  toughness:
+    score: 14
+  move:
+    value: 70
+  cargo_capacity:
+    value: 350
+  cost:
+    value: 0
+  price:
+    value: VD
+  crew:
+    value: 1
+  passengers:
+    value: 6
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Ground Car'
+  length:
+    value: 3
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_HALF
+  altitude:
+    value: 0
+---
+name: Personal Ground Vehicle(large)
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 6
+  maneuverability:
+    score: 3
+  toughness:
+    score: 15
+  move:
+    value: 30
+  cargo_capacity:
+    value: 750
+  cost:
+    value: 0
+  price:
+    value: VD
+  crew:
+    value: 1
+  passengers:
+    value: 3
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Ground Car'
+  length:
+    value: 3
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_HALF
+  altitude:
+    value: 0
+---
+name: Personal Ground Vehicle(sports)
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 6
+  maneuverability:
+    score: 3
+  toughness:
+    score: 15
+  move:
+    value: 70
+  cargo_capacity:
+    value: 750
+  cost:
+    value: 0
+  price:
+    value: VD
+  crew:
+    value: 1
+  passengers:
+    value: 3
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Ground Car'
+  length:
+    value: 3
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_HALF
+  altitude:
+    value: 0
+---
+name: Ground Vehicle(Small Mass Transport)
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Land'
+  scale:
+    score: 6
+  maneuverability:
+    score: 3
+  toughness:
+    score: 15
+  move:
+    value: 70
+  cargo_capacity:
+    value: 750
+  cost:
+    value: 0
+  price:
+    value: VD
+  crew:
+    value: 1
+  passengers:
+    value: 3
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Ground Car'
+  length:
+    value: 3
+  tonnage:
+    value: 1
+  cover:
+    value: OD6S.COVER_THREE_QUARTERS
+  altitude:
+    value: 0
+---
+name: 2-Legged Combat Walker
+type: vehicle
+img: ''
+system:
+  vehicle_type:
+    value: 'Walker'
+  scale:
+    score: 12
+  maneuverability:
+    score: 3
+  toughness:
+    score: 15
+  move:
+    value: 70
+  cargo_capacity:
+    value: 750
+  cost:
+    value: 0
+  price:
+    value: L
+  crew:
+    value: 2
+  passengers:
+    value: 2
+  skill:
+    value: 'Vehicle Operation'
+  specialization:
+    value: 'Walker'
+  length:
+    value: 6
+  tonnage:
+    value: 6
+  cover:
+    value: OD6S.COVER_HALF
+  altitude:
+    value: 0

@@ -1,0 +1,76 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"
+             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+        <div class="header-fields">
+            <div>
+                <h2 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h2>
+                <div class="flex-left">
+                    <div class="resource">
+                        <label class="resource-label" for="item.system.quantity">Quantity</label>
+                        <input type="text" name="system.quantity" id="item.system.quantity" value="{{item.system.quantity}}"
+                               data-dtype="Number"/>
+                    </div>
+                    {{#if (eq (getCost) '0')}}
+                        <div class="resource">
+                            <label class="resource-label" for="item.system.price">{{localize 'OD6S.PRICE'}}</label>
+                            <select name="system.price" id="item.system.price">
+                                
+                                    {{#each (getPrices) as |price key|}}
+                                        <option value="{{ key }}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                            {{key}}: {{localize price}}
+                                        </option>
+                                    {{/each}}
+                                
+                            </select>
+                        </div>
+                    {{else}}
+                        <div class="resource">
+                            <label class="resource-label" for="item.system.cost">{{localize 'OD6S.COST'}}</label>
+                            <input type="text" name="system.cost" id="item.system.cost" value="{{item.system.cost}}"
+                                   data-dtype="Number"/>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="effects">{{localize "OD6S.EFFECTS"}}</a>
+        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="editor"><prose-mirror name="system.description" value="{{item.system.description}}" {{#unless editable}}disabled{{/unless}}></prose-mirror></div>
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{!-- As you add new fields, add them in here! --}}
+            <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.GEAR"}}</div>
+
+            <div class="column">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.CONSUMABLE'}}">
+                    <label for="item.system.consumable">{{localize 'OD6S.CONSUMABLE'}}</label>
+                    <input id="item.system.consumable" name="system.consumable" type="checkbox"
+                           data-dtype="Boolean" {{#if item.system.consumable}}checked{{/if}}/>
+                </div>
+            </div>
+
+        </div>
+
+        {{!-- Effects Tab --}}
+        {{> systems/od6s/templates/item/item-effects.html }}
+
+        {{!--Labels Tab --}}
+        {{> systems/od6s/templates/item/item-labels-tags.html }}
+    </section>
+</form>

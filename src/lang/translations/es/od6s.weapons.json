@@ -1,0 +1,252 @@
+{
+  "label": "Weapons",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Arrow": {
+      "name": "Flecha",
+      "description": null
+    },
+    "Assault Rifle": {
+      "name": "Rifle de asalto",
+      "description": null
+    },
+    "Axe (large)": {
+      "name": "Hacha (Grande)",
+      "description": null
+    },
+    "Baton": {
+      "name": "Porra",
+      "description": null
+    },
+    "Blackjack": {
+      "name": "Cachiporra",
+      "description": null
+    },
+    "Blaster Pistol": {
+      "name": "Pistola Blaster",
+      "description": null
+    },
+    "Blaster Rifle": {
+      "name": "Rifle Blaster",
+      "description": null
+    },
+    "Blowgun": {
+      "name": "Cerbatana",
+      "description": null
+    },
+    "Bow (Composite)": {
+      "name": "Arco (Compuesto)",
+      "description": null
+    },
+    "Brass Knuckles": {
+      "name": "Puño Americano",
+      "description": null
+    },
+    "Bullwhip": {
+      "name": "Látigo",
+      "description": null
+    },
+    "Club": {
+      "name": "Garrote",
+      "description": null
+    },
+    "Concussion Grenade": {
+      "name": "Granada",
+      "description": ""
+    },
+    "Crossbow": {
+      "name": "Ballesta",
+      "description": null
+    },
+    "Crossbow Bolt": {
+      "name": "Virote (Para Ballesta)",
+      "description": null
+    },
+    "Dagger": {
+      "name": "Daga",
+      "description": null
+    },
+    "Dart": {
+      "name": "Dardo",
+      "description": null
+    },
+    "Fragmentation Grenade": {
+      "name": "Granada de Fragmentación",
+      "description": ""
+    },
+    "Gyrojet Pistol": {
+      "name": "Pistola Gyrojet",
+      "description": null
+    },
+    "Gyrojet Rifle": {
+      "name": "Rifle Gyrojet",
+      "description": null
+    },
+    "Hatchet": {
+      "name": "Hachuela",
+      "description": null
+    },
+    "Heavy Semi-automatic Pistol": {
+      "name": "Pistola semiautomática pesada",
+      "description": null
+    },
+    "Heavy Submachine Gun": {
+      "name": "Subfusil pesado",
+      "description": null
+    },
+    "Improvised Weapon": {
+      "name": "Arma improvisada",
+      "description": null
+    },
+    "Katana": {
+      "name": "Katana",
+      "description": null
+    },
+    "Knife (survival)": {
+      "name": "Cuchillo (De supervivencia)",
+      "description": null
+    },
+    "Laser Pistol": {
+      "name": "Pistola Laser",
+      "description": null
+    },
+    "Laser Rifle": {
+      "name": "Rifle Laser",
+      "description": null
+    },
+    "Light Machine Gun": {
+      "name": "Ametralladora ligera",
+      "description": null
+    },
+    "Light Semi-automatic Pistol": {
+      "name": "Pistola semiautomática ligera",
+      "description": null
+    },
+    "Light Submachine Gun": {
+      "name": "Subfusil ligero",
+      "description": null
+    },
+    "Machete": {
+      "name": "Machete",
+      "description": null
+    },
+    "Machine Pistol": {
+      "name": "Pistola automática",
+      "description": null
+    },
+    "Manrikigusari": {
+      "name": "Manrikigusari",
+      "description": null
+    },
+    "Medium Machine Gun": {
+      "name": "Ametralladora mediana",
+      "description": null
+    },
+    "Medium Semi-automatic Pistol": {
+      "name": "Pistola semiautomática mediana",
+      "description": null
+    },
+    "Medium Submachine Gun": {
+      "name": "Subfusil mediano",
+      "description": null
+    },
+    "Needler pistol": {
+      "name": "Pistola Aguijoneadora",
+      "description": null
+    },
+    "Needler rifle": {
+      "name": "Rifle Aguijoneador",
+      "description": null
+    },
+    "Nunchaku": {
+      "name": "Nunchaku",
+      "description": null
+    },
+    "Personal Blaster": {
+      "name": "Personal Blaster",
+      "description": null
+    },
+    "Plasma Pistol": {
+      "name": "Pistola de Plasma",
+      "description": null
+    },
+    "Plasma Rifle": {
+      "name": "Rifle de Plasma",
+      "description": null
+    },
+    "QuarterstaffT": {
+      "name": "QuarterstaffT",
+      "description": null
+    },
+    "Rapier": {
+      "name": "Estoque",
+      "description": null
+    },
+    "Rifle (Semi-Automatic)": {
+      "name": "Rifle (Semi-Automático)",
+      "description": null
+    },
+    "Rifle (Short Range)": {
+      "name": "Rifle (Corto Alcance)",
+      "description": null
+    },
+    "Rifle (Standard)": {
+      "name": "Rifle (Standard)",
+      "description": null
+    },
+    "Sai": {
+      "name": "Sai",
+      "description": null
+    },
+    "Sawed-off Double-Barrel Shotfun (12 gauge)": {
+      "name": "Escopeta recortada de doble cañon (12 Cartuchos)",
+      "description": null
+    },
+    "Semi-Automatic Shotgun (12 gauge)": {
+      "name": "Escopeta Semi-Automática (12 Cartuchos)",
+      "description": null
+    },
+    "Shuriken": {
+      "name": "Shuriken",
+      "description": null
+    },
+    "Single Shot Shotgun(12 gauge)": {
+      "name": "Escopeta (12 Cartuchos)",
+      "description": null
+    },
+    "Stun Pistol": {
+      "name": "pistola aturdidora",
+      "description": null
+    },
+    "Sword (Broad)": {
+      "name": "Espada (Ancha)",
+      "description": null
+    },
+    "Sword (Energized Broad)": {
+      "name": "Espada (ancha energizada)",
+      "description": null
+    },
+    "Sword (Short)": {
+      "name": "Espada (Corta)",
+      "description": null
+    },
+    "Sword (Two-Handed)": {
+      "name": "Espada (Dos Manos)",
+      "description": null
+    },
+    "Throwing Dagger": {
+      "name": "Daga arrojadiza",
+      "description": null
+    },
+    "Tonfa": {
+      "name": "Tonfa",
+      "description": ""
+    },
+    "Wrist Crossbow": {
+      "name": "Ballesta (Muñequera)",
+      "description": null
+    }
+  }
+}

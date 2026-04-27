@@ -1,0 +1,107 @@
+<div class="od6s metaphysics-roll-dialog">
+    {{#each skills as |skill key|}}
+    <div>
+        <b>{{skill.skill.name}}</b>
+        {{#if (eq (showWildDie) true)}}
+            <div class="flexrow flex-group-left showWildDie" data-wilddie="{{wilddie}}">
+                <label for="wilddie">{{localize 'OD6S.USE_WILD_DIE'}}</label>
+                <input type="checkbox" data-dtype="Boolean" id="wilddie" name="wilddie"
+                       {{#if ../wilddie}}checked{{/if}}>
+            </div>
+        {{/if}}
+        <div class="flexrow flex-group-left">
+            <div class="dice flexrow flex-group-left" data-dice="{{diceFromScore skill.system.score}}">
+                <label for="dice">{{localize 'OD6S.DICE'}}</label>
+                <input type="number" data-dtype="Number"
+                       max="99" id="dice" name="dice" value="{{diceFromScore skill.system.score}}">
+            </div>
+            <div class="pips flexrow flex-group-left" data-pips="{{pipsFromScore skill.system.score}}">
+                <label for="pips">{{localize 'OD6S.PIPS'}}</label>
+                <input type="number" data-dtype="Number"
+                       max="99" id="pips" name="pips" value="{{pipsFromScore skill.system.score}}">
+            </div>
+        </div>
+        <div class="flexrow flex-group-left">
+            <div class="bonusdice flexrow flex-group-left usebonus">
+                <label for="bonusdice">{{localize 'OD6S.USE_BONUS_DICE'}}</label>
+                <input type="number" data-dtype="Number"
+                       max="99" id="bonusdice" name="bonusdice" value="{{bonusdice}}">
+            </div>
+            <div class="bonuspips flexrow flex-group-left usebonus" data-bonuspips="{{bonuspips}}">
+                <label for="bonuspips">{{localize 'OD6S.USE_BONUS_PIPS'}}</label>
+                <input type="number" data-dtype="Number"
+                       max="99" id="bonuspips" name="bonuspips" value="{{bonuspips}}">
+            </div>
+        </div>
+        <div class="center"><b>{{localize "OD6S.PENALTIES"}}</b></div>
+        <div class="row">
+            <div class="column>">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.ACTION_PENALTY'}}">
+                    <div class="actionpenalty flexrow flex-group-left">
+                        <label for="actionpenalty">{{localize 'OD6S.ACTIONS'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center actionpenalty"
+                         data-actionpenalty="{{../actionpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="actionpenalty" name="actionpenalty"
+                               value="{{../actionpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.WOUND_PENALTY'}}">
+                    <div class="woundpenalty flexrow flex-group-left">
+                        <label for="woundpenalty">{{localize 'OD6S.WOUNDS'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center woundpenalty"
+                         data-woundpenalty="{{../woundpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="woundpenalty" name="woundpenalty"
+                               value="{{../woundpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+            <div class="column>">
+                <div class="flexrow flex-group-left" title="{{localize 'OD6S.OTHER_PENALTY'}}">
+                    <div class="otherpenalty flexrow flex-group-left">
+                        <label for="otherpenalty">{{localize 'OD6S.OTHER'}}:</label>
+                    </div>
+                    <div class="flexrow flex-group-center otherpenalty"
+                         data-otherpenalty="{{../otherpenalty}}">
+                        <input type="number" data-dtype="Number"
+                               max="99" id="otherpenalty" name="otherpenalty"
+                               value="{{../otherpenalty}}"><b>D</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{#unless (isHideAllRolls)}}
+            <div class="flexrow flex-group-left">
+                <div class="flexrow flex-group-left difficultylevel" data-difficultylevel="{{difficultylevel}}"
+                     data-skill="{{key}}">
+                    <label for="difficultylevel">{{localize 'OD6S.DIFFICULTY'}}</label>
+                    <select name="difficultylevel" id="difficultylevel">
+                        {{#each (getDifficulties) as |diff key|}}
+                            <option value="{{key}}" {{#if (eq key ../skill.difficulty)}}selected{{/if}}>
+                                {{localize key}}
+                            </option>
+                        {{/each}}
+                    </select>
+                </div>
+                {{#if (eq difficultylevel "OD6S.DIFFICULTY_CUSTOM")}}
+                    <div class="flexrow flex-group-left difficulty" data-difficulty="{{difficulty}}">
+                        <label for="difficulty">{{localize "OD6S.DIFFICULTY_CUSTOM_LABEL"}}</label>
+                        <input type="number" data-dtype="Number"
+                               max="99" id="difficulty" name="difficulty" value="{{difficulty}}"
+                               placeholder="10">
+                    </div>
+                {{/if}}
+            </div>
+        {{/unless}}
+    </div>
+        <hr>
+    {{/each}}
+    <footer class="form-footer">
+        <button type="submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+    </footer>
+</div>

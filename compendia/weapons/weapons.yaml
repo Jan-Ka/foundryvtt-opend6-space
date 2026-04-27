@@ -1,0 +1,1531 @@
+---
+name: Light Semi-automatic Pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 11
+  ammo: 6
+  range:
+    short: 010
+    medium: 025
+    long: 050
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Medium Semi-automatic Pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 12
+  ammo: 17
+  range:
+    short: 08
+    medium: 013
+    long: 035
+  price: D
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Heavy Semi-automatic Pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 8
+  range:
+    short: 045
+    medium: 0450
+    long: 0600
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Rifle (Short Range)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 1
+  range:
+    short: 015
+    medium: 050
+    long: 0150
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Rifle (Standard)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 6
+  range:
+    short: 020
+    medium: 075
+    long: 0200
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Rifle (Semi-Automatic)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 17
+  ammo: 6
+  range:
+    short: 030
+    medium: 060
+    long: 0120
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Single Shot Shotgun(12 gauge)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 2
+  range:
+    short: 025
+    medium: 050
+    long: 075
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Semi-Automatic Shotgun (12 gauge)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 5
+  range:
+    short: 025
+    medium: 050
+    long: 075
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Sawed-off Double-Barrel Shotfun (12 gauge)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 16
+  ammo: 2
+  range:
+    short: 010
+    medium: 020
+    long: 040
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Assault Rifle
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 18
+  ammo: 0
+  range:
+    short: 020
+    medium: 050
+    long: 0200
+  price: D
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Light Submachine Gun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 14
+  ammo: 20
+  range:
+    short: 010
+    medium: 025
+    long: 080
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Medium Submachine Gun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 15
+  ammo: 30
+  range:
+    short: 015
+    medium: 040
+    long: 0100
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Heavy Submachine Gun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 17
+  ammo: 50
+  range:
+    short: 015
+    medium: 025
+    long: 060
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Machine Pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 13
+  ammo: 32
+  range:
+    short: 015
+    medium: 025
+    long: 050
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Light Machine Gun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 20
+  ammo: 20
+  range:
+    short: 0100
+    medium: 0500
+    long: 01000
+  price: M
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Medium Machine Gun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 22
+  ammo: 11
+  range:
+    short: 0250
+    medium: 01000
+    long: 02000
+  price: M
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Personal Blaster
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 9
+  ammo: 6
+  range:
+    short: 04
+    medium: 08
+    long: 012
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 9
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Blaster Pistol
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 15
+  ammo: 12
+  range:
+    short: 020
+    medium: 050
+    long: 0150
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 15
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Blaster Rifle
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 21
+  ammo: 30
+  range:
+    short: 025
+    medium: 0150
+    long: 0300
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 9
+    type: 21
+  subtype: Ranged
+  description:
+---
+name: Stun Pistol
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 0
+  ammo: 20
+  range:
+    short: 015
+    medium: 030
+    long: 045
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: true
+    score: 12
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Laser Pistol
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 12
+  ammo: 15
+  range:
+    short: 025
+    medium: 075
+    long: 0175
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Laser Rifle
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 14
+  ammo: 20
+  range:
+    short: 030
+    medium: 0250
+    long: 01000
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Plasma Pistol
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 15
+  ammo: 20
+  range:
+    short: 010
+    medium: 025
+    long: 040
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Plasma Rifle
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 15
+  ammo: 50
+  range:
+    short: 025
+    medium: 0150
+    long: 0300
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: e
+  subtype: Ranged
+  description:
+---
+name: Gyrojet Pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 15
+  ammo: 8
+  range:
+    short: 020
+    medium: 050
+    long: 0150
+  price: M
+  ammo_price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: p
+  subtype: Ranged
+  description:
+---
+name: Gyrojet Rifle
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 21
+  ammo: 20
+  range:
+    short: 025
+    medium: 0150
+    long: 0300
+  price: D
+  ammo_price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+    type: p
+  subtype: Ranged
+  description:
+---
+name: Needler pistol
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 9
+  ammo: 50
+  range:
+    short: 025
+    medium: 075
+    long: 0150
+  price: E
+  ammo_price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Needler rifle
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 12
+  ammo: 200
+  range:
+    short: 025
+    medium: 0150
+    long: 0300
+  price: M
+  ammo_price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Firearms
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Blowgun
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+    muscle: false
+  ammo: 0
+  range:
+    short: 010
+    medium: 040
+    long: 0100
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Ranged
+  description:
+---
+name: Bow (Composite)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 10
+    muscle: true
+  ammo: 0
+  range:
+    short: 010
+    medium: 060
+    long: 0250
+  price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Missile
+  description:
+---
+name: Wrist Crossbow
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 12
+    muscle: false
+  ammo: 0
+  range:
+    short: 010
+    medium: 025
+    long: 050
+  price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Missile
+  description:
+---
+name: Crossbow
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 12
+    muscle: false
+  ammo: 0
+  range:
+    short: 020
+    medium: 0100
+    long: 0300
+  price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 1
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Missile
+  description:
+---
+name: Dart
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 0
+    muscle: true
+  ammo: 0
+  range:
+    short: STR
+    medium: STR+1
+    long: STR+2
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Thrown
+  description:
+---
+name: Throwing Dagger
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+    muscle: true
+  ammo: 0
+  range:
+    short: 05
+    medium: 010
+    long: 015
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Thrown
+  description:
+---
+name: Shuriken
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+    muscle: true
+  ammo: 0
+  range:
+    short: 05
+    medium: 010
+    long: 015
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Thrown
+  description:
+---
+name: Arrow
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 0
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Crossbow Bolt
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 0
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Axe (large)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 10
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Baton
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 4
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Blackjack
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 2
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Brass Knuckles
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 4
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Bullwhip
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Club
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 4
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Dagger
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Hatchet
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 4
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Improvised Weapon
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 2
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  mods:
+    attack: 0
+    damage: 0
+    difficulty: 0
+  difficulty: 5
+  subtype: Melee
+  description:
+---
+name: Katana
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 9
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: M
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Knife (survival)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Machete
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Manrikigusari
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Nunchaku
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: VE
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: QuarterstaffT
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Rapier
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 6
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Sai
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 4
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Sword (Broad)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 8
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Sword (Energized Broad)
+type: weapon
+system:
+  damage: 
+    type: e
+    score: 12
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: D
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Sword (Short)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Sword (Two-Handed)
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 10
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+  description:
+---
+name: Tonfa
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 5
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Melee Combat
+    specialization:
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Melee
+---
+name: Fragmentation Grenade
+type: weapon
+system:
+  damage:
+    type: p
+    score: 18
+  ammo: 0
+  range:
+    short: STR-12
+    medium: STR-9
+    long: STR+9
+  blast_radius:
+    1:
+      range: 2
+      damage: 0
+    2:
+      range: 5
+      damage: 0
+    3:
+      range: 10
+      damage: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Throwing
+    specialization: Grenades
+  rof: 0
+  stun:
+    stun_only: false
+    score: 0
+  subtype: Explosive
+---
+name: Concussion Grenade
+type: weapon
+system:
+  damage:
+    type: p
+    score: 18
+  ammo: 0
+  range:
+    short: STR-12
+    medium: STR-9
+    long: STR+9
+  blast_radius:
+    1:
+      range: 2
+      damage: 0
+    2:
+      range: 5
+      damage: 0
+    3:
+      range: 10
+      damage: 0
+  price: E
+  cost:
+  stats:
+    attribute: AGI
+    skill: Throwing
+    specialization: Grenades
+  rof: 0
+  stun:
+    stun_only: true
+    score: 18
+  subtype: Explosive

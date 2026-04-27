@@ -1,0 +1,20 @@
+{
+  "label": "Character Templates",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Communications/Cultures Expert": {
+      "name": "Experto/a en comunicaciones / culturas",
+      "description": "<p>Te centrastes en el lado m&aacute;s gentil de la vida, como una carga que nunca tiene fin, aprendiendo a encontrar puntos en com&uacute;n con cualquier persona, sin importar de qu&eacute; parte de la galaxia sea.</p>"
+    },
+    "Con Artist": {
+      "name": "Estafador",
+      "description": "<p>La vida es una oportunidad para ser explotada al m&aacute;ximo.</p> <p>Te gusta pensar en ti mismo vagando por el universo, descubriendo las maravillas universales de la epoca que te toca vivir, con la esperanza de llevar la felicidad de un rinc&oacute;n a otro de la galaxia.</p>"
+    },
+    "Security Expert": {
+      "name": "Experto en Seguridad",
+      "description": "<p>Siempre has tenido un don especial para romper sistemas de seguridad y conseguir informaci&oacute;n reservada as&iacute; como para evitar que otros hagan lo mismo contigo.</p> <p>Desafortunadamente, desde que te topaste con el profundo y oscuro secreto de alguien, siempre te pones nervioso antes de intentar cualquier procedimiento de seguridad.</p>"
+    }
+  }
+}

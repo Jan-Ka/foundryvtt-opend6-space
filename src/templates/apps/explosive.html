@@ -1,0 +1,32 @@
+<div class="od6s explosive-dialog">
+    {{#if (eq stage 0) }}
+        <div class="flexrow flex-group-left explosive-type">
+            <label for="explosive-type">{{localize 'OD6S.TYPE'}}:</label>
+            <select name="explosive-type" id="explosive-type" style="width: 70px;">
+                {{#each options as |option|}}
+                    <option value="{{ option }}" {{#if (eq ../type option)}}selected{{/if}}>
+                        {{localize option}}
+                    </option>
+                {{/each}}
+            </select>
+        </div>
+    {{/if}}
+    {{#if (eq stage 1) }}
+        {{#if (eq type 'OD6S.EXPLOSIVE_TIMER')}}
+            TIMER
+        {{/if}}
+        {{# if (eq type 'OS6S.EXPLOSIVE_TRIGGER')}}
+            TRIGGER
+        {{/if}}
+    {{/if}}
+    <input name="explosive-type" type="hidden" value="">
+    <footer class="sheet-footer flexrow align-center-bottom form-footer">
+        <button type="button" class="submit" data-action="submit">
+            {{#if (and (eq stage 0)(isExplosivesAuto)) }}
+                {{ localize 'OD6S.PLACE_TEMPLATE' }}
+            {{else}}
+                {{ localize 'Submit' }}
+            {{/if}}
+        </button>
+    </footer>
+</div>

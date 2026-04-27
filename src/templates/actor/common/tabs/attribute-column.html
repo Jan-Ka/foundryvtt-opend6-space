@@ -1,0 +1,205 @@
+<li class="attributes">
+    {{#if (ne key "met") }}
+        <div {{#if (eq actor.system.sheetmode.value "normal")}}
+        class="attributes grid-2col-attributes"
+        {{else}} class="attributes grid grid-3col-attributes"
+        {{/if}}>
+            <div class="attribute attributedialog flex-group-center{{#if
+                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                 data-type="attribute"
+                 data-score="{{attribute.score}}"
+                 data-label="{{getAttributeName key}}">
+                <b>{{ getAttributeName key }}</b>
+            </div>
+            <div class="flex-group-center{{#if
+                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}{{getModColor attribute.mod}}"
+                 data-type="attribute"
+                 data-score="{{attribute.score}}"
+                 data-label="{{getAttributeName key}}">
+                <b>{{diceFromScore attribute.score}}</b>D+<b>{{pipsFromScore attribute.score}}</b>
+            </div>
+            {{#if (eq actor.system.sheetmode.value "advance")}}
+                <div class="advancedialog flexrow flex-group-center"
+                     data-type="attribute"
+                     data-label="{{getAttributeName key}}"
+                     data-freeadvance="false"
+                     data-attrname="{{ key }}">
+                    <a><i class="fas fa-plus-square"></i></a>
+                </div>{{/if}}
+            {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                <div class="flexrow flex-group-center">
+                    <div class="item-add"
+                         title="{{localize 'OD6S.ADD_SKILL'}}"
+                         data-type="skill"
+                         data-attrname="{{ key }}">
+                        <a><i class="fas fa-plus"></i></a>
+                    </div>
+                    <div class="attribute-edit"
+                         title="{{localize 'OD6S.EDIT_ATTRIBUTE'}}"
+                         data-type="attribute"
+                         data-label="{{getAttributeName key}}"
+                         data-freeadvance="true"
+                         data-attrname="{{ key }}">
+                        <a><i class="fas fa-edit"></i></a>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+        <ul class="item-list skill-list">
+            {{#each actor.skills as |skill skillkey|}}
+                {{#if (eq skill.system.attribute ../key) }}
+                    <li class="item item-list skills" data-item-id="{{skill._id}}" data-drag="true">
+                        <div {{#if (eq ../actor.system.sheetmode.value "normal")}}
+                        class="item skills grid-2col-attributes"
+                        {{else}} class="skills grid grid-3col-attributes"
+                        {{/if}}>
+                        <div class="skills-grid">
+                            <input type="checkbox" class="skill-used-checkbox"
+                                   {{#if skill.system.used.value}}
+                                   title="{{localize 'OD6S.SKILL_USED'}}"
+                                   {{else}}
+                                   title="{{localize 'OD6S.SKILL_NOT_USED'}}"
+                                   {{/if}}
+                                   data-item-id="{{skill._id}}" name="skill-used-{{skill._id}}"
+                                   id="skill-used-{{skill._id}}" data-dtype="Boolean"
+                                   {{#if skill.system.used.value}}checked{{/if}}>
+                            <div class="skilldialog flex-group-left{{#if
+                                    (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-item-id="{{skill._id}}"
+                                 data-type="skill"
+                                 data-score="{{skill.system.score}}"
+                                 data-base="{{skill.system.base}}"
+                                 data-label="{{skill.name}}">
+                                {{skill.name}}
+                            </div>
+                        </div>
+                            <div class="flex-group-center{{#if
+                                    (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                                {{getModColor skill.system.mod}}"
+                                 data-item-id="{{skill._id}}"
+                                 data-type="skill"
+                                 data-score="{{skill.system.score}}"
+                                 data-base="{{skill.system.base}}"
+                                 data-label="{{skill.name}}">
+                                {{#unless (flatSkills)}}
+                                    <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
+                                        skill.system.score}}</b>
+                                {{else}}
+                                    {{ skill.system.base }}
+                                {{/unless}}</div>
+                            {{#if (eq ../actor.system.sheetmode.value "advance")}}
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{skill._id}}">
+                                    <a class="advancedialog"
+                                       title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                       data-item-id="{{skill._id}}"
+                                       data-type="skill"
+                                       data-score="{{skill.system.score}}"
+                                       data-base="{{skill.system.base}}"
+                                       data-label="{{skill.name}}"
+                                       data-freeadvance="false">
+                                        <i class="fas fa-plus-square"></i></a>
+                                    <a class="specializedialog"
+                                       title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                       data-item-id="{{skill._id}}"
+                                       data-type="skill">
+                                        <i class="fas fa-chevron-circle-left"></i></a>
+                                </div>{{/if}}
+                            {{#if (eq ../actor.system.sheetmode.value "freeedit")}}
+                                <div class="item item-controls flexrow flex-group-center"
+                                     data-item-id="{{skill._id}}"
+                                     data-type="skill"
+                                     data-score="{{skill.system.score}}"
+                                     data-base="{{skill.system.base}}"
+                                     data-label="{{skill.name}}"
+                                     data-freeadvance="true">
+                                    <a class="item-control item-edit" title="Edit Skill"><i
+                                            class="fas fa-edit"></i></a>
+                                    <a class="specializedialog"
+                                       title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                       data-item-id="{{skill._id}}"
+                                       data-type="skill">
+                                        <i class="fas fa-chevron-circle-left"></i></a>
+                                    <a data-item-id="{{skill._id}}"
+                                       data-type="skill"
+                                       class="item-control item-delete"
+                                       title={{localize 'OD6S.DELETE_SKILL'}}>
+                                        <i class="fas fa-trash"></i></a>
+                                </div>{{/if}}
+                        </div>
+                        {{#if (skillHasSpecs ../actor skill)}}
+                        <ul class="specialization-list">
+                        {{#each ../actor.specializations as |spec speckey|}}
+                            {{#if (eq spec.system.skill skill.name) }}
+                                <li class="item item-list specializations" data-item-id="{{spec._id}}">
+                                    <div {{#if (eq ../../actor.system.sheetmode.value "normal")}}
+                                    class="attributes grid-2col-attributes"
+                                    {{else}} class="item specialization grid grid-3col-attributes"
+                                    {{/if}}>
+                                    <div class="skills-grid">
+                                        <input type="checkbox" class="spec-used-checkbox"
+                                               data-item-id="{{spec._id}}" name="spec-used-{{spec._id}}"
+                                               id="spec-used-{{spec._id}}" data-dtype="Boolean"
+                                               {{#if spec.system.used.value}}checked{{/if}}>
+                                        <div class="specdialog indent flex-row flex-group-left{{#if
+                                                (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                             data-item-id="{{spec._id}}"
+                                             data-type="specialization"
+                                             data-score="{{spec.system.score}}"
+                                             data-label="{{spec.name}}">
+                                            <i>{{spec.name}}</i>
+                                        </div>
+                                    </div>
+                                        <div class="flex-group-center{{#if
+                                                (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                                            {{getModColor spec.system.mod}}"
+                                             data-item-id="{{spec._id}}"
+                                             data-type="specialization"
+                                             data-score="{{spec.system.score}}"
+                                             data-label="{{spec.name}}">
+                                            {{#unless (flatSkills)}}
+                                                <b>{{diceFromScore spec.system.score}}</b>D+<b>{{pipsFromScore
+                                                    spec.system.score}}</b>
+                                            {{else}}
+                                                {{ spec.system.base }}
+                                            {{/unless}}</div>
+                                        {{#if (eq ../../actor.system.sheetmode.value "advance")}}
+                                            <div class="item item-controls flexrow flex-group-center"
+                                                 data-item-id="{{spec._id}}">
+                                                <a class="advancedialog"
+                                                   title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                                   data-item-id="{{spec._id}}"
+                                                   data-type="specialization"
+                                                   data-score="{{spec.system.score}}"
+                                                   data-base="{{spec.system.base}}"
+                                                   data-label="{{spec.name}}"
+                                                   data-freeadvance="false">
+                                                    <i class="fas fa-plus-square"></i></a>
+                                            </div>{{/if}}
+                                        {{#if (eq ../../actor.system.sheetmode.value "freeedit")}}
+                                            <div class="item item-controls flexrow flex-group-center"
+                                                 data-item-id="{{spec._id}}"
+                                                 data-type="specialization"
+                                                 data-score="{{spec.system.score}}"
+                                                 data-base="{{spec.system.base}}"
+                                                 data-label="{{spec.name}}"
+                                                 data-freeadvance="true">
+                                                <a class="item-control item-edit" title="Edit Specialization"><i
+                                                        class="fas fa-edit"></i></a>
+                                                <a data-item-id="{{spec._id}}"
+                                                   data-type="specialization"
+                                                   class="item-control item-delete"
+                                                   title="Delete Specialization">
+                                                    <i class="fas fa-trash"></i></a>
+                                            </div>{{/if}}
+                                    </div>
+                                </li>
+                            {{/if}}
+                        {{/each}}
+                        </ul>{{/if}}
+                    </li>
+                {{/if}}
+            {{/each}}
+        </ul>
+    {{/if}}
+</li>

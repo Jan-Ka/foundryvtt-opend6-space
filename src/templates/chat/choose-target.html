@@ -1,0 +1,16 @@
+<div class="od6s choose-target-dialog">
+    <label for="choosetarget">{{localize "OD6S.TARGET"}}:</label>
+    <div class="flexrow flex-group-left">
+        <select name="choosetarget" id="choosetarget" {{#if object.isExplosive}}multiple{{/if}}>
+            {{#each object.targets as | target |}}
+                <option value="{{target.id}}" {{#if (eq target.id ../object.target)}}selected{{/if}}>{{target.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <input name="messageId" type="hidden" value="{{object.messageId}}">
+    <footer class="flexrow flex-group-center form-footer"
+            data-message-id="{{object.messageId}}">
+        <button type="submit" name="submit" value="submit">{{localize "OD6S.SUBMIT"}}</button>
+        <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+    </footer>
+</div>

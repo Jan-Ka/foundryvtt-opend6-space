@@ -1,0 +1,368 @@
+<div class="tab inventory" data-group="primary" data-tab="inventory">
+    <div class="row">
+        <div class="column">
+            <div class="grid title-add-grid">
+                <div class="flexrow flex-group-center">
+                    <b>{{localize 'OD6S.ARMOR'}}</b>
+                </div>
+                <div class="flexrow flex-group-center item-controls"
+                     title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.ARMOR'}}">
+                    <a class="item-add"
+                       data-type="armor">
+                        <i class="fas fa-plus"></i></a>
+                </div>
+            </div>
+            <div>
+                <ul class="armor-list">
+                    {{#each actor.armor as |armor key|}}
+                        <li class="armors item" data-item-id="{{armor._id}}">
+                            <div class="inv-grid armor-grid">
+                                <div class="equip-checkbox" data-item-id="{{armor._id}}">
+                                    <input type="checkbox" name="armor.system.equipped.value"
+                                           id="armor.system.equipped.value" data-dtype="Boolean"
+                                           title="{{localize 'OD6S.EQUIPPED'}}"
+                                        {{#if armor.system.equipped.value}}checked{{/if}}>
+                                </div>
+                                <div class="flexrow flex-group-left show-item-details {{#if (gt armor.system.damaged 0)}} damaged{{/if}}"
+                                     data-item-name="{{item.name}}"
+                                     data-actor-id="{{../actor.id}}"
+                                     data-item-id="{{armor._id}}">{{armor.name}}</div>
+                                <div class="flexrow flex-group-center">
+                                          <span title="{{localize 'OD6S.PHYSICAL_RESISTANCE'}}">{{diceFromScore
+                                                  armor.system.pr}}D+{{pipsFromScore
+                                                  armor.system.pr}}</span>
+                                    <b>/</b>
+                                    <span
+                                            title="{{localize 'OD6S.ENERGY_RESISTANCE'}}">
+                                        {{diceFromScore armor.system.er}}D+{{pipsFromScore
+                                            armor.system.er}}</span>
+                                </div>
+                                <div class="item-controls flexrow flex-group-center"
+                                     data-item-id="{{armor._id}}"
+                                     data-type="armor">
+                                    <a class="item-control item-edit small-font" data-item-id="{{armor._id}}"
+                                       title="{{localize 'OD6S.EDIT'}}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a data-item-id="{{armor._id}}"
+                                       data-type="armor"
+                                       class="item-control item-delete small-font"
+                                       title="{{localize 'OD6S.DELETE'}}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div>
+                <div class="grid title-add-grid">
+                    <div class="flexrow flex-group-center">
+                        <b>{{localize 'OD6S.WEAPONS'}}</b>
+                    </div>
+                    <div class="flexrow flex-group-center item-controls"
+                         title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.WEAPON'}}">
+                        <a class="item-add"
+                           data-type="weapon">
+                            <i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <ul class="weapons-list">
+                        {{#each actor.weapons as |weapon key|}}
+                            <li class="weapons item" data-item-id="{{weapon._id}}">
+                                {{#if (compareSubtype weapon.system.subtype 'OD6S.RANGED')}}
+                                    <div class="inv-grid ranged-weapon-grid">
+                                        <div class="equip-checkbox" data-item-id="{{weapon._id}}">
+                                            <input type="checkbox" name="weapon.system.equipped.value"
+                                                   id="weapon.system.equipped.value" data-dtype="Boolean"
+                                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                                {{#if weapon.system.equipped.value}}checked{{/if}}>
+                                        </div>
+                                        <div class="flexrow flex-group-left show-item-details{{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                                             data-item-name="{{item.name}}"
+                                             data-actor-id="{{../actor.id}}"
+                                             data-item-id="{{weapon._id}}">{{weapon.name}}</div>
+                                        <div class="flexrow flex-group-center"
+                                             title="{{localize 'OD6S.RANGE'}}">
+                                            {{weapon.system.range.short}}/{{weapon.system.range.medium}}
+                                            /{{weapon.system.range.long}}</div>
+                                        <div class="flexrow flex-group-center rolldialog"
+                                             title="{{localize 'OD6S.DAMAGE'}}"
+                                             data-score="{{weapon.system.damage.score}}"
+                                             data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="damage"
+                                             data-dtype="{{ weapon.system.damage.type }}">
+                                            <b>{{diceFromScore weapon.system.damage.score}}D+{{pipsFromScore
+                                                    weapon.system.damage.score}}</b>
+                                        </div>
+                                        <div class="item-controls flexrow flex-group-center"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="weapon">
+                                            <a class="item-control item-edit small-font" data-item-id="{{weapon._id}}"
+                                               title="{{localize 'OD6S.EDIT'}}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a data-item-id="{{weapon._id}}"
+                                               data-type="weapon"
+                                               class="item-control item-delete small-font"
+                                               title="{{localize 'OD6S.DELETE'}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {{/if}}
+                                {{#if (compareSubtype weapon.system.subtype 'OD6S.THROWN')}}
+                                    <div class="inv-grid ranged-weapon-grid">
+                                        <div class="equip-checkbox" data-item-id="{{weapon._id}}">
+                                            <input type="checkbox" name="weapon.system.equipped.value"
+                                                   id="weapon.system.equipped.value" data-dtype="Boolean"
+                                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                                {{#if weapon.system.equipped.value}}checked{{/if}}>
+                                        </div>
+                                        <div class="flexrow flex-group-left show-item-details{{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                                             data-item-name="{{item.name}}"
+                                             data-actor-id="{{../actor.id}}"
+                                             data-item-id="{{weapon._id}}">{{weapon.name}}</div>
+                                        <div class="flexrow flex-group-center"
+                                             title="{{localize 'OD6S.RANGE'}}">
+                                            {{weapon.system.range.short}}/{{weapon.system.range.medium}}
+                                            /{{weapon.system.range.long}}</div>
+                                        {{#if weapon.system.damage.muscle}}
+                                            <div class="flexrow flex-group-center rolldialog"
+                                                 title="{{localize 'OD6S.DAMAGE'}}"
+                                                 data-score="{{getMeleeDamage ../actor weapon}}"
+                                                 data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                                 data-item-id="{{weapon._id}}"
+                                                 data-type="damage"
+                                                 data-dtype="{{ weapon.system.damage.type }}">
+                                                <b>{{ diceFromScore (getMeleeDamage ../actor weapon)}}D+{{pipsFromScore (getMeleeDamage ../actor weapon)}}</b>
+                                            </div>
+                                        {{else}}
+                                            <div class="flexrow flex-group-center rolldialog"
+                                                 title="{{localize 'OD6S.DAMAGE'}}"
+                                                 data-score="{{weapon.system.damage.score}}"
+                                                 data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                                 data-item-id="{{weapon._id}}"
+                                                 data-type="damage"
+                                                 data-dtype="{{ weapon.system.damage.type }}">
+                                                <b>{{diceFromScore ../actor weapon.system.damage.score}}D+{{pipsFromScore
+                                                        ../actor weapon.system.damage.score}}</b>
+                                            </div>
+                                        {{/if}}
+                                        <div class="item-controls flexrow flex-group-center"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="weapon">
+                                            <a class="item-control item-edit small-font" data-item-id="{{weapon._id}}"
+                                               title="{{localize 'OD6S.EDIT'}}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a data-item-id="{{weapon._id}}"
+                                               data-type="weapon"
+                                               class="item-control item-delete small-font"
+                                               title="{{localize 'OD6S.DELETE'}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {{/if}}
+                                {{#if (compareSubtype weapon.system.subtype 'OD6S.MISSILE')}}
+                                    <div class="inv-grid ranged-weapon-grid">
+                                        <div class="equip-checkbox" data-item-id="{{weapon._id}}">
+                                            <input type="checkbox" name="weapon.system.equipped.value"
+                                                   id="weapon.system.equipped.value" data-dtype="Boolean"
+                                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                                {{#if weapon.system.equipped.value}}checked{{/if}}>
+                                        </div>
+                                        <div class="flexrow flex-group-left show-item-details{{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                                             data-item-name="{{item.name}}"
+                                             data-actor-id="{{../actor.id}}"
+                                             data-item-id="{{weapon._id}}">{{weapon.name}}</div>
+                                        <div class="flexrow flex-group-center"
+                                             title="{{localize 'OD6S.RANGE'}}">
+                                            {{weapon.system.range.short}}/{{weapon.system.range.medium}}
+                                            /{{weapon.system.range.long}}</div>
+                                        <div class="flexrow flex-group-center rolldialog"
+                                             title="{{localize 'OD6S.DAMAGE'}}"
+                                             data-score="{{weapon.system.damage.score}}"
+                                             data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="damage"
+                                             data-dtype="{{ weapon.system.damage.type }}">
+                                            <b>{{diceFromScore weapon.system.damage.score}}D+{{pipsFromScore
+                                                    weapon.system.damage.score}}</b>
+                                        </div>
+                                        <div class="item-controls flexrow flex-group-center"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="weapon">
+                                            <a class="item-control item-edit small-font" data-item-id="{{weapon._id}}"
+                                               title="{{localize 'OD6S.EDIT'}}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a data-item-id="{{weapon._id}}"
+                                               data-type="weapon"
+                                               class="item-control item-delete small-font"
+                                               title="{{localize 'OD6S.DELETE'}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {{/if}}
+                                {{#if (compareSubtype weapon.system.subtype 'OD6S.EXPLOSIVE')}}
+                                    <div class="inv-grid ranged-weapon-grid">
+                                        <div class="equip-checkbox" data-item-id="{{weapon._id}}">
+                                            <input type="checkbox" name="weapon.system.equipped.value"
+                                                   id="weapon.system.equipped.value" data-dtype="Boolean"
+                                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                                {{#if weapon.system.equipped.value}}checked{{/if}}>
+                                        </div>
+                                        <div class="flexrow flex-group-left show-item-details{{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                                             data-item-name="{{weapon.name}}"
+                                             data-actor-id="{{../actor.id}}"
+                                             data-item-id="{{weapon._id}}">{{weapon.name}}</div>
+                                        <div class="flexrow flex-group-center"
+                                             title="{{localize 'OD6S.RANGE'}}">
+                                            {{weapon.system.range.short}}/{{weapon.system.range.medium}}
+                                            /{{weapon.system.range.long}}</div>
+                                        <div class="flexrow flex-group-center rolldialog"
+                                             title="{{localize 'OD6S.DAMAGE'}}"
+                                             data-score="{{weapon.system.damage.score}}"
+                                             data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="damage"
+                                             data-dtype="{{ weapon.system.damage.type }}">
+                                            <b>{{diceFromScore weapon.system.damage.score}}D+{{pipsFromScore
+                                                    weapon.system.damage.score}}</b>
+                                        </div>
+                                        <div class="item-controls flexrow flex-group-center"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="weapon">
+                                            <a class="item-control item-edit small-font" data-item-id="{{weapon._id}}"
+                                               title="{{localize 'OD6S.EDIT'}}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a data-item-id="{{weapon._id}}"
+                                               data-type="weapon"
+                                               class="item-control item-delete small-font"
+                                               title="{{localize 'OD6S.DELETE'}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {{/if}}
+                                {{#if (compareSubtype weapon.system.subtype 'OD6S.MELEE')}}
+                                    <div class="inv-grid melee-weapon-grid">
+                                        <div class="equip-checkbox" data-item-id="{{weapon._id}}">
+                                            <input type="checkbox" name="weapon.system.equipped.value"
+                                                   id="weapon.system.equipped.value" data-dtype="Boolean"
+                                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                                {{#if weapon.system.equipped.value}}checked{{/if}}>
+                                        </div>
+                                        <div class="flexrow flex-group-left show-item-details{{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                                             data-item-name="{{item.name}}"
+                                             data-actor-id="{{../actor.id}}"
+                                             data-item-id="{{weapon._id}}">{{weapon.name}}</div>
+                                        <div class="flexrow flex-group-center rolldialog"
+                                             title="{{localize 'OD6S.DAMAGE'}}"
+                                             data-score="{{getMeleeDamage ../actor weapon}}"
+                                             data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="damage"
+                                             data-dtype="{{ weapon.system.damage.type }}"><b>
+                                            {{diceFromScore (getMeleeDamage ../actor weapon)}}D+
+                                            {{pipsFromScore (getMeleeDamage ../actor weapon)}}</b>
+                                        </div>
+                                        <div class="item-controls flexrow flex-group-center"
+                                             data-item-id="{{weapon._id}}"
+                                             data-type="weapon">
+                                            <a class="item-control item-edit small-font" data-item-id="{{weapon._id}}"
+                                               title="{{localize 'OD6S.EDIT'}}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a data-item-id="{{weapon._id}}"
+                                               data-type="weapon"
+                                               class="item-control item-delete small-font"
+                                               title="{{localize 'OD6S.DELETE'}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {{/if}}
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div>
+                <div class="grid title-add-grid">
+                    <div class="flexrow flex-group-center">
+                        <b>{{localize 'OD6S.GEAR'}}</b>
+                    </div>
+                    <div class="flexrow flex-group-center item-controls"
+                         title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.GEAR'}}">
+                        <a class="item-add"
+                           data-type="gear">
+                            <i class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <ul class="gear-list">
+                        {{#each actor.gear as |gear key|}}
+                            <li class="gears item" data-item-id="{{gear._id}}">
+                                <div {{#if gear.system.consumable}}
+                                class="inv-grid consumable-grid"
+                                {{else}}
+                                class="inv-grid gear-grid"
+                                {{/if}}>
+                                    <div class="equip-checkbox" data-item-id="{{gear._id}}">
+                                        <input type="checkbox" name="gear.system.equipped.value"
+                                               id="gear.system.equipped.value" data-dtype="Boolean"
+                                               title="{{localize 'OD6S.EQUIPPED'}}"
+                                            {{#if gear.system.equipped.value}}checked{{/if}}>
+                                    </div>
+                                    <div class="edit-quantity" title="{{localize 'OD6S.QUANTITY'}}"
+                                         data-item-id="{{gear._id}}">
+                                        <input type="number" name="gear.system.quantity"
+                                               id="actor.system.quantity" data-dtype="Number"
+                                               value="{{gear.system.quantity}}">
+                                    </div>
+                                    <div class="flexrow flex-group-left show-item-details"
+                                         data-item-name="{{item.name}}"
+                                         data-actor-id="{{../actor.id}}"
+                                         data-item-id="{{gear._id}}">{{gear.name}}</div>
+                                    {{#if gear.system.consumable}}
+                                        <div class="flexrow flex-group-center" data-item-id="{{gear._id}}">
+                                            <a class="item-control use-consumable small-font"
+                                               data-item-id="{{gear._id}}"
+                                               title="{{localize 'OD6S.USE'}}">
+                                                <i class="fas fa-angle-double-right"></i>
+                                            </a>
+                                        </div>
+                                    {{/if}}
+                                    <div class="item-controls flexrow flex-group-center"
+                                         data-item-id="{{gear._id}}"
+                                         data-type="gear">
+                                        <a class="item-control item-edit small-font" data-item-id="{{gear._id}}"
+                                           title="{{localize 'OD6S.EDIT'}}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a data-item-id="{{gear._id}}"
+                                           data-type="gear"
+                                           class="item-control item-delete small-font"
+                                           title="{{localize 'OD6S.DELETE'}}">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

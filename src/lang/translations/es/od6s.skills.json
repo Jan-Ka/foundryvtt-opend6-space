@@ -1,0 +1,248 @@
+{
+  "label": "Skills",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Acrobatics": {
+      "name": "Acrobacias",
+      "description": "<p>Realizar piruetas, equilibrio extraordinario y danza (y artes esc&eacute;nicas relacionadas), as&iacute; como saber caer y escapar de ataduras.</p>"
+    },
+    "Aliens": {
+      "name": "Alienígenas",
+      "description": "<p>Saber general de las especies distintas al propio personaje y su fisiolog&iacute;a, costumbres e historia.</p>"
+    },
+    "Armor Repair": {
+      "name": "Reparar Armaduras",
+      "description": "<p>Reparaci&oacute;n de armaduras da&ntilde;adas.</p>"
+    },
+    "Artist": {
+      "name": "Artista",
+      "description": "<p>Realizaci&oacute;n de obras de arte, como pinturas, fotograf&iacute;as y composiciones musicales o literarias.</p>"
+    },
+    "Astrography": {
+      "name": "Astrografía",
+      "description": "<p>Familiarizaci&oacute;n con las caracter&iacute;sticas astrogr&aacute;ficas (planetas, sistemas estelares, nebulosas) y conocimiento general de cualquier elemento civilizado presente (asentamientos, industria, gobierno, instalaciones orbitales).</p>"
+    },
+    "Bargain": {
+      "name": "Negociar",
+      "description": "<p>Regatear los precios de los bienes y servicios que se compran o venden, as&iacute; como sobornar.</p>"
+    },
+    "Brawling": {
+      "name": "Pelear",
+      "description": "<p>Conocimientos en combate sin armas.</p>"
+    },
+    "Bureaucracy": {
+      "name": "Burocracia",
+      "description": "<p>Conocimiento y capacidad para utilizar los intrincados procedimientos de la burocracia para obtener informaci&oacute;n y favores, o lograr otros objetivos.</p>"
+    },
+    "Business": {
+      "name": "Negocios",
+      "description": "<p>Comprensi&oacute;n de las pr&aacute;cticas comerciales y el valor monetario de los bienes y servicios, incluida la capacidad de determinar c&oacute;mo ganar dinero con otra habilidad que tenga el personaje.</p> <p>Los negocios pueden complementar la negociaci&oacute;n cuando se regatean los precios de los bienes y servicios que se compran o venden.</p>"
+    },
+    "Climb/Jump": {
+      "name": "Escalar/Saltar",
+      "description": "<p>Escalar o saltar obst&aacute;culos.</p>"
+    },
+    "Comm": {
+      "name": "Comunicación",
+      "description": "<p>Uso efectivo de dispositivos y sistemas de comunicaci&oacute;n.</p>"
+    },
+    "Command": {
+      "name": "Mando",
+      "description": "<p>Ordenar y coordinar de manera efectiva a otros en situaciones cooperativas (como comandar la tripulaci&oacute;n de un acorazado).</p>"
+    },
+    "Computer Interface/Repair": {
+      "name": "Reparación de computadora/interfaz",
+      "description": "<p>Programaci&oacute;n, interfaz y reparaci&oacute;n de sistemas inform&aacute;ticos.</p>"
+    },
+    "Con": {
+      "name": "Estafar",
+      "description": "<p>Enga&ntilde;ar, mentir, embaucar o confundir a otros, as&iacute; como evasivas verbales, distracciones, intimidaci&oacute;n y cambios de rasgos o ropa para ser irreconocible o para parecerse a otra persona. Tambi&eacute;n es &uacute;til para realizar representaciones teatrales</p>"
+    },
+    "Cultures": {
+      "name": "Culturas",
+      "description": "<p>Comprensi&oacute;n de los usos, costumbres y expectativas sociales de diferentes culturas, incluida la propia.</p>"
+    },
+    "Demolitions": {
+      "name": "Demoliciones",
+      "description": "<p>Colocar explosivos para lograr efectos destructivos en lugares espec&iacute;ficos.</p>"
+    },
+    "Dodge": {
+      "name": "Esquivar",
+      "description": "<p>evadir peligros, ya sea evitando un ataque o una trampa explosiva.</p>"
+    },
+    "Exoskeleton Operation": {
+      "name": "Exoesqueleto",
+      "description": "<p>Usar Trajes con destrezas y habilidades&nbsp; pr&oacute;pias que sustituyan (no aumenten) las destrezas y habilidades propias del personaje.</p> <p>Esta habilidad sustituye a las habilidades de Agilidad y Fuerza del personaje cuando usa el <strong>traje</strong>.</p>"
+    },
+    "Exoskeleton repair": {
+      "name": "Reparar Exoesqueleto",
+      "description": "<p>Reparaci&oacute;n y modificaci&oacute;n de exoesqueletos, armaduras hidr&aacute;ulicas, trajes ambientales y trajes similares.</p>"
+    },
+    "Firearms": {
+      "name": "Armas de Fuego",
+      "description": "<p>Disparar cualquier arma , incluso si requiere de tr&iacute;pode para disparar.</p> <p>Cubre todo, desde peque&ntilde;as armas de proyectiles hasta cohetes lanzados desde el hombro.</p>"
+    },
+    "Firearms Repair": {
+      "name": "Reparar Armas de Fuego",
+      "description": "<p>Reparar cualquier arma , incluso si requiere de tr&iacute;pode para disparar.</p> <p>Cubre todo, desde peque&ntilde;as armas de proyectiles hasta cohetes lanzados desde el hombro.</p>"
+    },
+    "Flight Systems Repair": {
+      "name": "Reparación de sistemas de vuelo",
+      "description": "<p>Reparaci&oacute;n de sistemas da&ntilde;ados a bordo de veh&iacute;culos voladores y naves espaciales.</p>"
+    },
+    "Flying/0-G": {
+      "name": "Navegar (Gravedad 0)",
+      "description": "<p>Maniobrar por sus propios medios (como con alas) o en entornos de gravedad cero (como desplazarse por el espacio con un traje ambiental).</p>"
+    },
+    "Forgery": {
+      "name": "Falsificar",
+      "description": "<p>Crear y detectar documentaci&oacute;n falsa o alterada en diversos medios (papel, electr&oacute;nico, tarjeta pl&aacute;stica, etc.), incluida la falsificaci&oacute;n, aunque las tareas pueden requerir otras habilidades para ayudar a detectar o cometer la falsificaci&oacute;n.</p>"
+    },
+    "Gambling": {
+      "name": "Juego",
+      "description": "<p>Ganar y hacer trampa en juegos de estrategia y suerte.</p>"
+    },
+    "Gunnery": {
+      "name": "Artillería",
+      "description": "<p>Disparar con precisi&oacute;n armas de exoesqueletos, veh&iacute;culos y naves espaciales, o dentro de fortalezas.</p>"
+    },
+    "Gunnery Repair": {
+      "name": "Reparar Artillería",
+      "description": "<p>Reparar armas de exoesqueletos, veh&iacute;culos y naves espaciales, o dentro de fortalezas.</p>"
+    },
+    "Hide": {
+      "name": "Ocultación",
+      "description": "<p>Ocultar o camuflar objetos, portados por el PJ.</p>"
+    },
+    "Intimidation": {
+      "name": "Intimidación",
+      "description": "<p>Usar la presencia f&iacute;sica, las amenazas verbales, las burlas o el miedo para influir en los dem&aacute;s o sacarles informaci&oacute;n</p>"
+    },
+    "Investigation": {
+      "name": "Investigación",
+      "description": "<p>Recopilar informaci&oacute;n, investigar indicios, analizar datos y juntar pistas.</p>"
+    },
+    "Know-How": {
+      "name": "Experiencia",
+      "description": "<p>Averiguar c&oacute;mo realizar una acci&oacute;n en la que el personaje no tiene experiencia, as&iacute; como una habilidad general que abarque &aacute;reas no cubiertas por otras habilidades (como coser o cocinar).</p>"
+    },
+    "Languages": {
+      "name": "Idiomas",
+      "description": "<p>Familiaridad y capacidad para usar varias formas de comunicaci&oacute;n, incluidas la escrita, hablada y no verbal. Los personajes pueden elegir un idioma <strong>nativo</strong>&nbsp;en el que tengan fluidez escrita y hablada.</p> <p>Los idiomas adicionales en los que un personaje tiene competencia pueden representarse mediante especializaciones de esta habilidad.</p>"
+    },
+    "Lift": {
+      "name": "Levantar (Cargas)",
+      "description": "<p>Mover o levantar objetos pesados, as&iacute; como la capacidad de infligir da&ntilde;o adicional con armas de fuerza.</p>"
+    },
+    "Medicine": {
+      "name": "Medicina",
+      "description": "<p>Usar la medicina de campo b&aacute;sica para tratar lesiones, as&iacute; como comprender y aplicar procedimientos m&eacute;dicos detallados, como el diagn&oacute;stico de enfermedades, la realizaci&oacute;n de cirug&iacute;as y la implantaci&oacute;n de elementos cibern&eacute;ticos.</p>"
+    },
+    "Melee Combat": {
+      "name": "Combate cuerpo a cuerpo",
+      "description": "<p>Manejo de armas cuerpo a cuerpo.</p>"
+    },
+    "Missile Weapons": {
+      "name": "Manejo de Misiles",
+      "description": "<p>Disparar armas a distancia proyectables.</p>"
+    },
+    "Navigation": {
+      "name": "Navigación",
+      "description": "<p>Trazar rumbos, a trav&eacute;s del espacio usando la interfaz de computadora de navegaci&oacute;n de una Nave Inter-estelar, o en tierra usando mapas o puntos de referencia, as&iacute; como crear mapas.</p>"
+    },
+    "Personal Equipment repair": {
+      "name": "Reparación de equipos personales",
+      "description": "<p>Reparaci&oacute;n de peque&ntilde;os equipos electr&oacute;nicos da&ntilde;ados, incluidos los cibern&eacute;ticos.</p>"
+    },
+    "Persuasion": {
+      "name": "Persuasión",
+      "description": "<p>Influenciar a otros u obtener informaci&oacute;n de ellos a trav&eacute;s del soborno, la discusi&oacute;n apacible, el debate, la diplomacia, los discursos, la amabilidad, la adulaci&oacute;n o la seducci&oacute;n. Tambi&eacute;n es &uacute;til en negociaciones, transacciones comerciales y puesta en escena (como cantar, actuar o contar historias).</p>"
+    },
+    "Piloting": {
+      "name": "Pilotaje",
+      "description": "<p>Aeronaves voladoras o espaciales, as&iacute; como aerodeslizadores y cazas atmosf&eacute;ricos hasta transportes y acorazados.</p>"
+    },
+    "Riding": {
+      "name": "Equitación/Montar/Cabalgar",
+      "description": "<p>Controlar y montar monturas domesticadas.</p>"
+    },
+    "Robot Interface/Repair": {
+      "name": "Robot Interface/Repair",
+      "description": "<p>Reparaci&oacute;n de Interfaz rob&oacute;tico</p>"
+    },
+    "Running": {
+      "name": "Correr",
+      "description": "<p>Moverse r&aacute;pidamente evitando obst&aacute;culos y evitando tropezar.</p>"
+    },
+    "Scholar": {
+      "name": "académico",
+      "description": "<p>Esta habilidad representa conocimiento y/o educaci&oacute;n en &aacute;reas no cubiertas por ninguna otra habilidad (como qu&iacute;mica, matem&aacute;ticas, arqueolog&iacute;a, cocina, arte, etc.). Esto puede estar restringido a un campo espec&iacute;fico (representado por especializaciones) o un conocimiento general de una amplia gama de temas.</p> <p>Se utiliza para recordar detalles, rumores, cuentos, leyendas, teor&iacute;as, personajes importantes y similares, seg&uacute;n corresponda al tema en cuesti&oacute;n. Sin embargo, cuanto m&aacute;s amplia es la categor&iacute;a, menos detalles se pueden recordar.</p> <p>Cubre lo que el propio personaje puede recordar.</p> <p>Tener otra habilidad como especializaci&oacute;n de la habilidad de erudito significa que el personaje conoce las teor&iacute;as y la historia detr&aacute;s de la habilidad, pero en realidad no puede usarla. <strong>Acad&eacute;mico</strong> puede ser &uacute;til con la investigaci&oacute;n para limitar la b&uacute;squeda de informaci&oacute;n.</p>"
+    },
+    "Search": {
+      "name": "Investigar/Buscar/Indagar",
+      "description": "<p>Detectar objetos o personas ocultos, reconocer, leer los labios, escuchar a escondidas u observar a otras personas, o rastrear los rastros que han dejado atr&aacute;s.</p>"
+    },
+    "Security": {
+      "name": "Seguridad",
+      "description": "<p>Instalar, alterar y eludir sistemas electr&oacute;nicos de seguridad y vigilancia.</p>"
+    },
+    "Security regulations": {
+      "name": "Normas de seguridad",
+      "description": "<p>Comprensi&oacute;n de c&oacute;mo operan las organizaciones, los reglamentos y el personal encargados de hacer cumplir la ley.</p>"
+    },
+    "Sensors": {
+      "name": "Sensores",
+      "description": "<p>Operar dispositivos de escaneo para recopilar informaci&oacute;n sobre el entorno.</p>"
+    },
+    "Shields": {
+      "name": "Escudos/Blindaje",
+      "description": "<p>Desplegar y redirigir escudos a bordo de veh&iacute;culos.</p>"
+    },
+    "Sleight of Hand": {
+      "name": "Escamotear",
+      "description": "<p>Agilidad con los dedos, incluyendo carteristas, empalmar objetos y abrir cerraduras mec&aacute;nicas.</p>"
+    },
+    "Sneak": {
+      "name": "Escabullirse/Hurtadillas",
+      "description": "<p>Moverse en silencio, evitando ser detectado y ocult&aacute;ndose.</p>"
+    },
+    "Stamina": {
+      "name": "Aguante",
+      "description": "<p>Resistencia f&iacute;sica y resistencia al dolor, la enfermedad y el veneno.</p>"
+    },
+    "Streetwise": {
+      "name": "Bajos Fondos",
+      "description": "<p>Encontrar informaci&oacute;n, bienes y contactos en un entorno urbano, particularmente a trav&eacute;s de organizaciones criminales, mercados negros y otras operaciones il&iacute;citas. Tambi&eacute;n es &uacute;til para determinar <strong>modus operadis</strong> de los delincuentes.</p>"
+    },
+    "Survival": {
+      "name": "Supervivencia y Controlar Animales",
+      "description": "<p>Conocimiento de t&eacute;cnicas para sobrevivir en entornos hostiles y salvajes, as&iacute; como la capacidad de manejar animales.</p>"
+    },
+    "Swim": {
+      "name": "Nadar",
+      "description": "<p>Moverse y sobrevivir en entornos l&iacute;quidos</p>"
+    },
+    "Tactics": {
+      "name": "Tácticas",
+      "description": "<p>Familiaridad con el despliegue y direcci&oacute;n de fuerzas militares para obtener la mayor ventaja.</p>"
+    },
+    "Throwing": {
+      "name": "Lanzamiento",
+      "description": "<p>Golpear un objetivo con precisi&oacute;n con un objeto arrojadizo, incluidas granadas, piedras y cuchillos. Tambi&eacute;n se utiliza para atrapar objetos arrojados. (Usar o modificar granadas como explosivos para efectos destructivos especiales requiere la habilidad de demoliciones).</p>"
+    },
+    "Vehicle Operation": {
+      "name": "Manejo de vehículos",
+      "description": "<p>Operar veh&iacute;culos no voladores que viajan sobre o a trav&eacute;s del suelo o un medio l&iacute;quido.</p>"
+    },
+    "Vehicle Repair": {
+      "name": "Reparar Vehículos",
+      "description": "<p>Reparaci&oacute;n de veh&iacute;culos terrestres y mar&iacute;timos que no vuelan.</p>"
+    },
+    "Willpower": {
+      "name": "Fuerza de voluntad",
+      "description": "<p>Capacidad para resistir el estr&eacute;s, la tentaci&oacute;n, los intentos de interacci&oacute;n de otras personas, los ataques mentales y el dolor. El Game Master puede permitir una especializaci&oacute;n en una tradici&oacute;n de fe espec&iacute;fica o un sistema de creencias para mejorar muchas, aunque no todas, las aplicaciones de la fuerza de voluntad.</p>"
+    }
+  }
+}

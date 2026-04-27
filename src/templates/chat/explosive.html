@@ -1,0 +1,62 @@
+<header class="message-header flexrow">
+    <h4 class="message-sender" data-message-id="{{message._id}}">{{alias}}</h4>
+    <span class="message-metadata">
+          <time class="message-timestamp">{{timeSince message.timestamp}}</time>
+        {{#if user.isGM}}
+            <a class="button message-delete"><i class="fas fa-trash"></i></a>
+        {{/if}}
+      </span>
+    {{#if message.flavor}}
+        <span class="flavor-text">{{{message.flavor}}}</span>
+    {{/if}}
+</header>
+<div class="message-content">
+	{{{message.content}}}
+</div>
+{{#if message.flags.od6s.targets }}
+<div class="explosive-targets">
+    <div class="center">{{localize 'OD6S.TARGETS'}}:</div>
+    <div class="grid-4col-explosive-damage">
+        <span>{{ localize 'OD6S.NAME'}}:</span>
+        <span>{{ localize 'OD6S.ZONE'}}</span>
+        <span>{{ localize 'OD6S.DAMAGE'}}</span>
+        <span></span>
+    {{#each message.flags.od6s.targets as |target key|}}
+        <span>{{target.name}}</span>
+        <span class="center">{{target.zone}}</span>
+        {{#if ../user.isGM}}
+        <div class="flexrow flex-group-right explosive-damage" data-target="{{key}}" data-damage="{{target.damage}}"
+            data-message-id="{{../message._id}}">
+            <input size=3 type="number" data-dtype="Number"
+            max="999" id="damage" name="damage" value="{{target.damage}}" placeholder="{{target.damage}}">
+        </div>
+        {{ else }}
+        <div class="flexrow flex-group-right explosive-damage" data-target="{{key}}" data-damage="{{target.damage}}"
+             data-message-id="{{../message._id}}">{{target.damage}}
+        </div>
+        {{/if}}
+    <div class="message-oppose" style="text-align: right"
+				data-message-id="{{../message._id}}" data-target="{{target.id}}">
+        {{#if ../user.isGM}}
+        <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}">&nbsp<i
+                class="fas fa-exchange-alt"></i></a>
+        {{/if}}
+    </div>
+    {{/each}}
+    </div>
+</div>
+{{/if}}
+{{#if user.isGM}}{{#if isExplosivesAuto}}{{#if message.flags.od6s.apply}}{{#unless message.flags.od6s.applied}}
+    <br>
+    <div class="apply-explosive-damage-button"
+         data-message-id="{{message._id}}"
+         title="{{localize 'OD6S.APPLY_DAMAGE'}}">
+        {{#if message.flags.od6s.stun}}
+            title="{{localize 'OD6S.APPLY_STUN'}}">
+            <button>{{localize 'OD6S.APPLY_STUN'}}</button>
+        {{else}}
+            title="{{localize 'OD6S.APPLY_DAMAGE'}}">
+            <button>{{localize 'OD6S.APPLY_DAMAGE'}}</button>
+        {{/if}}
+    </div>
+{{/unless}}{{/if}}{{/if}}{{/if}}

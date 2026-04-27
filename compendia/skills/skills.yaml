@@ -1,0 +1,480 @@
+---
+name: Acrobatics
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Performing feats of gymnastics, extraordinary balance, and dance (and related performance arts), as well as breaking falls and escaping from bonds.
+  score: 0
+---
+name: Brawling
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Competence in unarmed combat.
+  score: 0
+---
+name: Dodge
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Slipping out of danger’s way, whether avoiding an attack or a sprung booby trap.
+  score: 0
+---
+name: Firearms
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Shooting any gun a person can carry, even if it requires a tripod setup to fire. Covers everything from small slug throwers to shoulder-launched rockets.
+  score: 0
+---
+name: Flying/0-G
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Maneuvering under on one’s own power (such as with wings) or in zero-gravity environments (such as drifting through space in an environmental suit).
+  score: 0
+---
+name: Melee Combat
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Wielding hand-to-hand weapons.
+  score: 0
+---
+name: Missile Weapons
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Firing unpowered ranged weapons.
+  score: 0
+---
+name: Riding
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Controlling and riding domesticated mounts.
+  score: 0
+---
+name: Running
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Moving quickly while avoiding obstacles and keeping from stumbling.
+  score: 0
+---
+name: Sleight of Hand
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Nimbleness with the fingers, including picking pockets, palming items, and opening mechanical locks.
+  score: 0
+---
+name: Throwing
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: agi
+  description: Hitting a target accurately with a thrown item, including grenades, stones, and knives. Also used for catching thrown items. (Using or modifying grenades as explosives for special destructive effects requires the demolitions skill.)
+  score: 0
+---
+name: Aliens
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Understanding of aliens not of the character’s own species and their physiology, customs, and history.
+  score: 0
+---
+name: Astrography
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Familiarity with astrographic features (planets, star systems, nebulae), and general knowledge of any civilized elements present (settlements, industry, government, orbital installations).
+  score: 0
+---
+name: Bureaucracy
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Knowledge of and ability to use a bureaucracy’s intricate procedures to gain information, and favors, or attain other goals.
+  score: 0
+---
+name: Business
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Comprehension of business practices and the monetary value of goods and opportunities, including the ability to determine how to make money with another skill the character has. Business can complement bargain when haggling over prices for goods and services being bought or sold.
+  score: 0
+---
+name: Cultures
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Understanding of the manners, customs, and social expectations of different cultures, including one’s own.
+  score: 0
+---
+name: Intimidation
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Using physical presence, verbal threats, taunts, or fear to influence others or get information out of them.
+  score: 0
+---
+name: Languages
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Familiarity with and ability to use various forms of communication, including written, spoken, and nonverbal. Characters may choose one “native” language in which they have written and spoken fluency. Additional languages in which a character has proficiency can be represented by specializations of this skill.
+  score: 0
+---
+name: Scholar
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: This skill represents knowledge and/or education in areas not covered under any other skill (such as chemistry, mathematics, archeology, cooking, art, etc.). This may be restricted to a specific field (represented by specializations) or a general knowledge of a wide range of subjects. It is used to remember details, rumors, tales, legends, theories, important people, and the like, as appropriate for the subject in question. However, the broader the category, the fewer the details that can be recalled. It covers what the character himself can recall. Having another skill as a specialization of the scholar skill means that the character knows the theories and history behind the skill but can’t actually use it. Scholar can be useful with investigation to narrow a search for information.
+  score: 0
+---
+name: Security regulations
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Understanding of how law enforcement organizations, regulations, and personnel operate.
+  score: 0
+---
+name: Streetwise
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Finding information, goods, and contacts in an urban environment, particularly through criminal organizations, black markets, and other illicit operations. Also useful for determining possible motives and methods of criminals.
+  score: 0
+---
+name: Survival
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Knowledge of techniques for surviving in hostile, wilderness environments, as well as the ability to handle animals.
+  score: 0
+---
+name: Tactics
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Familiarity with deploying military forces and maneuvering them to the best advantage.
+  score: 0
+---
+name: Willpower
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: kno
+  description: Ability to withstand stress, temptation, other people’s interaction attempts, mental attacks, and pain. The Game Master may allow a specialization in a specific faith tradition or belief system to enhance many, though not all, applications of willpower.
+  score: 0
+---
+name: Comm
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Effectively using communication devices and arrays.
+  score: 0
+---
+name: Exoskeleton Operation
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Using single-person conveyances with skills and abilities that substitute for (not augment) the character’s own skills and abilities. This skill substitutes for the character’s Agility and Strength skills when using the “suit.”
+  score: 0
+---
+name: Gunnery
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Accurately firing weapons mounted on powered armor, vehicles, and spaceships, or within fortresses.
+  score: 0
+---
+name: Navigation
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Plotting courses, such as through space using a vessel’s navigational computer interface, or on land using maps or landmarks, as well as creating maps.
+  score: 0
+---
+name: Piloting
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Flying air- or space-borne craft, from hovercraft and in-atmosphere fighters to transports and battleships.
+  score: 0
+---
+name: Sensors
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Operating scanner arrays to gather information about one’s surroundings.
+  score: 0
+---
+name: Shields
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Deploying and redirecting shields aboard vehicles.
+  score: 0
+---
+name: Vehicle Operation
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: mec
+  description: Operating non-flying vehicles traveling on or through the ground or a liquid medium.
+  score: 0
+---
+name: Artist
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Making works of art, like paintings, photographs, and music or literary compositions.
+  score: 0
+---
+name: Bargain
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Haggling over prices for goods and services being bought or sold, as well as using bribery.
+  score: 0
+---
+name: Command
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Effectively ordering and coordinating others in team situations (such as commanding a battleship crew).
+  score: 0
+---
+name: Con
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Bluffng, lying, tricking, or deceiving others, as well as verbal evasiveness, misdirection, blustering, and altering features or clothing to be unrecognizable or to look like someone else. Also useful in putting on acting performances.
+  score: 0
+---
+name: Forgery
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Creating and noticing false or altered documentation in various media (paper, electronic, plastic card, etc.), including counterfeiting, though tasks may require other skills to help detect or make the forgery.
+  score: 0
+---
+name: Gambling
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Winning and cheating at games of strategy and luck.
+  score: 0
+---
+name: Hide
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Concealing objects, both on oneself and using camouflage.
+  score: 0
+---
+name: Investigation
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Gathering information, researching topics, analyzing data, and piecing together clues.
+  score: 0
+---
+name: Know-How
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Figuring out how to perform an action in which the character does not have experience, as well as a catch-all skill encompassing areas not covered by other skills (such as utilitarian sewing or cooking).
+  score: 0
+---
+name: Persuasion
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Influencing others or getting information out of them through bribery, honest discussion, debate, diplomacy, speeches, friendliness, flattery, or seduction. Also useful in negotiations, business transactions, and putting on performances (such as singing, acting, or storytelling).
+  score: 0
+---
+name: Search
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Spotting hidden objects or people, reconnoitering, lipreading, eavesdropping on or watching other people, or tracking the trails they’ve left behind.
+  score: 0
+---
+name: Sneak
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: per
+  description: Moving silently, avoiding detection and hiding one-self.
+  score: 0
+---
+name: Climb/Jump
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: str
+  description: Climbing or jumping over obstacles.
+  score: 0
+---
+name: Lift
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: str
+  description: Moving or lifting heavy objects, as well as the ability to inflict additional damage with strength-powered weapons.
+  score: 0
+---
+name: Stamina
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: str
+  description: Physical endurance and resistance to pain, disease, and poison.
+  score: 0
+---
+name: Swim
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: str
+  description: Moving and surviving in a liquid medium
+  score: 0
+---
+name: Armor Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Fixing damaged armor.
+  score: 0
+---
+name: Computer Interface/Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Programming, interfacing with, and fixing computer systems.
+  score: 0
+---
+name: Demolitions
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Setting explosives to achieve particular destructive effects.
+  score: 0
+---
+name: Exoskeleton repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Repairing and modifying exoskeletons, powered armor, environmental suits, and similar suits.
+  score: 0
+---
+name: Firearms Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Repairing and modifying any gun a person can carry, from small slug throwers to shoulder-launched rockets.
+  score: 0
+---
+name: Flight Systems Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Fixing damaged systems aboard flying vehicles and spaceships.
+  score: 0
+---
+name: Gunnery Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Fixing weapons mounted on powered armor, vehicles, or spaceships, or within fortresses.
+  score: 0
+---
+name: Medicine
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Using basic field medicine to treat injuries, as well as detailed understanding and applying medical procedures, such as diagnosing illnesses, performing surgery, and implanting cybernetics.
+  score: 0
+---
+name: Personal Equipment repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Fixing small electronic equipment, including damaged cybernetics.
+  score: 0
+---
+name: Robot Interface/Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Programming, interfacing with and fixing robots and their systems.
+  score: 0
+---
+name: Security
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Installing, altering, and bypassing electronic security and surveillance systems.
+  score: 0
+---
+name: Vehicle Repair
+type: skill 
+img: icons/svg/dice-target.svg
+system:
+  attribute: tec
+  description: Fixing ground- and ocean-based vehicles that do not fly.
+  score: 0

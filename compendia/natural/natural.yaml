@@ -1,0 +1,280 @@
+---
+name: Natural Hand to Hand Weapon (R1)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage: 
+    type: p
+    score: 3
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Brawling
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Melee
+  description:  Claws, pincers, bone spikes, stinger, etc.
+---
+name: Natural Hand to Hand Weapon (R2)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 6
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Brawling
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Melee
+  description:
+---
+name: Natural Hand to Hand Weapon (R3)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 9
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Brawling
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Melee
+  description:
+---
+name: Natural Hand to Hand Weapon (R4)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 12
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Brawling
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Melee
+  description:
+---
+name: Natural Hand to Hand Weapon (R5)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 15
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Brawling
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Melee
+  description:
+---
+name: Natural Ranged Weapon (R1)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 3
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Ranged
+  description:
+---
+name: Natural Ranged Weapon (R2)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 6
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Ranged
+  description:
+---
+name: Natural Ranged Weapon (R3)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 9
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Ranged
+  description:
+---
+name: Natural Ranged Weapon (R4)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 12
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Ranged
+  description:
+---
+name: Natural Ranged Weapon (R5)
+img: icons/creatures/claws/claw-hooked-curved.webp
+type: weapon
+system:
+  damage:
+    type: p
+    score: 15
+  ammo: 0
+  range:
+    short: 0
+    medium: 0
+    long: 0
+  cost: E(VE)
+  credits:
+  stats:
+    attribute: AGI
+    skill: Missile Weapons
+    specialization:
+  rof: 0
+  stun: 0
+  subtype: Ranged
+  description:
+---
+name: Natural Armor (R1)
+img: icons/creatures/reptiles/turtle-shell-glowing-green.webp
+type: armor
+system:
+  pr: 3
+  er: 3
+  cost: E
+  credits:
+  description:
+---
+name: Natural Armor (R2)
+img: icons/creatures/reptiles/turtle-shell-glowing-green.webp
+type: armor
+system:
+  pr: 6
+  er: 6
+  cost: E
+  credits:
+  description:
+---
+name: Natural Armor (R3)
+img: icons/creatures/reptiles/turtle-shell-glowing-green.webp
+type: armor
+system:
+  pr: 9
+  er: 9
+  cost: E
+  credits:
+  description:
+---
+name: Natural Armor (R4)
+img: icons/creatures/reptiles/turtle-shell-glowing-green.webp
+type: armor
+system:
+  pr: 12
+  er: 12
+  cost: E
+  credits:
+  description:
+---
+name: Natural Armor (R5)
+img: icons/creatures/reptiles/turtle-shell-glowing-green.webp
+type: armor
+system:
+  pr: 15
+  er: 15
+  cost: E
+  credits:
+  description:

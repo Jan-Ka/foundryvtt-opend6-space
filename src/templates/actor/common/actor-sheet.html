@@ -1,0 +1,16 @@
+<form class="{{cssClass}} flexcol" autocomplete="off">
+    {{!-- Sheet Header --}}
+    <header class="sheet-header flex-group-left">
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="200" width="200"
+             alt="{{localize 'OD6S.ALT_ACTOR_IMAGE'}}"/>
+        <div>
+            <h1 class="charname">
+                <input title="{{localize OD6S.CHAR_NAME}}" name="name" type="text" value="{{actor.name}}"
+                       placeholder="{{localize OD6S.CHAR_NAME}}" data-dtype="String"/>
+            </h1>
+            {{> (getHeaderFormTemplate actor.type)}}
+        </div>
+    </header>
+    {{> (getBodyTemplate actor.type)}}
+</form>
+

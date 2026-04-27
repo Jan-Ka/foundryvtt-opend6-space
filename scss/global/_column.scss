@@ -1,0 +1,29 @@
+.column {
+  flex: 50%;
+}
+
+.column-2 {
+  column-count: 2;
+  column-gap: 10px;
+}
+
+.column-3 {
+  column-count: 3;
+  column-gap: 10px;
+}
+
+.column-vw {
+  float: left;
+}
+
+.vw-left {
+  width: 66%;
+}
+
+.vw-right {
+  width: 34%;
+}
+
+.center {
+  text-align: center;
+}

@@ -1,0 +1,115 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"
+             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+        </div>
+    </header>
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="effects">{{localize "OD6S.EFFECTS"}}</a>
+        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="editor"><prose-mirror name="system.description" value="{{item.system.description}}" {{#unless editable}}disabled{{/unless}}></prose-mirror></div>
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{!-- As you add new fields, add them in here! --}}
+            <div class="flexrow flex-group-left">{{localize 'OD6S.TYPE'}}: {{getManifestationsName}}</div>
+            <div class="attributes flexrow flex-group-left">
+                <label class="item.system.attack">{{localize 'OD6S.ATTACK_OR_OPPOSABLE'}}</label>
+                <input id="item.system.attack" name="system.attack" type="checkbox"
+                       data-dtype="Boolean" {{#if item.system.attack}}checked{{/if}}/>
+            </div>
+            {{#unless item.system.attack}}
+                <div class="attributes flexrow flex-group-left">
+                    <label class="item.system.activate">{{localize 'OD6S.REQUIRES_ACTIVATION'}}</label>
+                    <input id="item.system.activate" name="system.activate" type="checkbox"
+                           data-dtype="Boolean" {{#if item.system.activate}}checked{{/if}}/>
+                </div>
+                <div class="attributes flexrow flex-group-left">
+                    <label class="item.system.active">{{localize 'OD6S.ACTIVE'}}</label>
+                    <input id="item.system.active" name="system.active" type="checkbox"
+                           data-dtype="Boolean" {{#if item.system.active}}checked{{/if}}/>
+                </div>
+                <div class="attributes flexrow flex-group-left">
+                    <label class="item.system.roll">{{localize 'OD6S.REQUIRES_ROLL'}}</label>
+                    <input id="item.system.roll" name="system.roll" type="checkbox"
+                           data-dtype="Boolean" {{#if item.system.roll}}checked{{/if}}/>
+                </div>
+            {{/unless}}
+            <div class="flexrow flex-group-center">{{localize 'OD6S.SKILLS'}}</div>
+            <div class="attributes flexrow flex-group-left">
+                <label class="item.system.activate">{{localize (getConfig 'channelSkillName' '')}}</label>
+                <input id="item.system.skills.channel.value" name="system.skills.channel.value" type="checkbox"
+                       data-dtype="Boolean" {{#if item.system.skills.channel.value}}checked{{/if}}/>
+            </div>
+            <div class="flexrow flex-group-left">
+                <label class="item.system.skills.channel.difficulty">{{localize 'OD6S.DEFAULT_DIFFICULTY'}}</label>
+                <select name="system.skills.channel.difficulty" id="item.system.skills.channel.difficulty" style="width: 70px;"
+                        {{#unless item.system.skills.channel.value}}disabled{{/unless}}>
+                    
+                        {{#each (getDifficultiesShort) as |level key|}}
+                            <option value="{{ key }}" {{#if (eq key item.system.skills.channel.difficulty)}}selected{{/if}}>
+                                {{localize level}}
+                            </option>
+                        {{/each}}
+                    
+                </select>
+            </div>
+            <div class="attributes flexrow flex-group-left">
+                <label class="item.system.activate">{{localize (getConfig 'senseSkillName' '')}}</label>
+                <input id="item.system.skills.sense.value" name="system.skills.sense.value" type="checkbox"
+                       data-dtype="Boolean" {{#if item.system.skills.sense.value}}checked{{/if}}/>
+            </div>
+            <div class="flexrow flex-group-left">
+                <label class="item.system.skills.sense.difficulty">{{localize 'OD6S.DEFAULT_DIFFICULTY'}}</label>
+                <select name="system.skills.sense.difficulty" id="item.system.skills.sense.difficulty" style="width: 70px;"
+                        {{#unless item.system.skills.sense.value}}disabled{{/unless}}>
+                    
+                        {{#each (getDifficultiesShort) as |level key|}}
+                            <option value="{{ key }}" {{#if (eq key item.system.skills.sense.difficulty)}}selected{{/if}}>
+                                {{localize level}}
+                            </option>
+                        {{/each}}
+                    
+                </select>
+            </div>
+            <div class="attributes flexrow flex-group-left">
+                <label class="item.system.activate">{{localize (getConfig 'transformSkillName' '')}}</label>
+                <input id="item.system.skills.transform.value" name="system.skills.transform.value" type="checkbox"
+                       data-dtype="Boolean" {{#if item.system.skills.transform.value}}checked{{/if}}/>
+            </div>
+            <div class="flexrow flex-group-left">
+                <label class="item.system.skills.transform.difficulty">{{localize 'OD6S.DEFAULT_DIFFICULTY'}}</label>
+                <select name="system.skills.transform.difficulty" id="item.system.skills.transform.difficulty"
+                        style="width: 70px;"
+                        {{#unless item.system.skills.transform.value}}disabled{{/unless}}>
+                    
+                        {{#each (getDifficultiesShort) as |level key|}}
+                            <option value="{{ key }}" {{#if (eq key item.system.skills.transform.difficulty)}}selected{{/if}}>
+                                {{localize level}}
+                            </option>
+                        {{/each}}
+                    
+                </select>
+            </div>
+        </div>
+
+        {{!-- Effects Tab --}}
+        {{> systems/od6s/templates/item/item-effects.html }}
+
+        {{!--Labels Tab --}}
+        {{> systems/od6s/templates/item/item-labels-tags.html }}
+    </section>
+</form>

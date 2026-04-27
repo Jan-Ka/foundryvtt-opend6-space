@@ -1,0 +1,46 @@
+.od6s {
+  .attribute-list,
+  .skill-list,
+  .specialization-list,
+  .combat-list {
+    list-style: none;
+    margin: 1px 0;
+    padding: 2px;
+    overflow-y: auto;
+  }
+
+  .moddedup {
+    text-shadow: 0 0 2px darkgreen;
+    &:hover,
+    &:focus {
+      color: #000;
+      text-shadow: 0 0 10px red;
+      cursor: pointer;
+    }
+  }
+
+  .moddeddown {
+    text-shadow: 0 0 2px darkred;
+    &:hover,
+    &:focus {
+      color: #000;
+      text-shadow: 0 0 10px red;
+      cursor: pointer;
+    }
+  }
+
+  .manifestation-active {
+    text-shadow: 0 0 10px lightblue;
+  }
+
+  .disabled {
+    color: grey;
+  }
+
+  .attributes-sort {
+    list-style: none;
+    margin: 2px 0;
+    padding: 2px;
+    outline: 1px solid #000;
+  }
+}

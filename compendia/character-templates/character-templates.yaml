@@ -1,0 +1,111 @@
+---
+name: Communications/Cultures Expert
+type: character-template
+system:
+  species: Human
+  attributes:
+    agi: 8
+    str: 7
+    kno: 9
+    mec: 9
+    per: 11
+    tec: 7
+    met: 3
+  fp: 1
+  cp: 5
+  funds: 9
+  credits: 525
+  move: 10
+  items:
+    - name: Cultures (R1)
+      type: advantage
+      description: You have a knack for drawing parallels between known and unusual cultures.
+    - name: Hindrance (R1)
+      type: disadvantage
+      description: Trick Shoulder (+1 to melee combat, climb/jump, and throwing difficulties).
+    - name: Personal Blaster
+      type: weapon
+      description:
+    - name: Hand Computer
+      type: gear
+      description: Has a communications link and data wands with with information about numerous languages and cultures (+1D to aliens, cultures, and languages attempts).
+    - name: Comlink
+      type: gear
+      description: Built into Hand Computer
+    - name: Cred-Key
+      type: gear
+      description:
+  description: With a shoulder that never quite worked correctly, you focused on the softer side of life, learning how find common ground with anyone, no matter what part of the galaxy they’re from.
+---
+name: Con Artist
+type: character-template
+system:
+  species: Human
+  attributes:
+    agi: 10
+    str: 6
+    kno: 9
+    mec: 9
+    per: 11
+    tec: 6
+    met: 3
+  fp: 1
+  cp: 5
+  funds: 9
+  credits: 525
+  move: 10
+  items:
+    - name: Equipment (R1)
+      type: advantage
+      desc: Con game props add +2 to any con attempts when using them.
+    - name: Quirk (R1)
+      type: disadvantage
+      description:  You tend to forget your cons are cons and sometimes get caught in your own lies.
+    - name: Plastovar
+      type: armor
+      description: Decorated to look like a flashy outfit.
+    - name: Personal Blaster
+      type: weapon
+      description:
+  description:  Life is an opportunity to be exploited to its fullest. You like to think of yourself as wandering the universe, revealing the wonders of the ages to the uniformed, hoping to move happiness from one corner of the galaxy to another.
+---
+name: Security Expert
+type: character-template
+system:
+  species: Human
+  attributes:
+    agi: 9
+    str: 9
+    kno: 11
+    mec: 6
+    per: 9
+    tec: 10
+    met: 0
+  fp: 1
+  cp: 5
+  funds: 9
+  credits: 525
+  move: 10
+  items:
+    - name: Enemy (R1)
+      type: disadvantage
+      description: You stumbled across some information you shouldn’t have (you’re not sure what), and someone wants to make sure you never reveal it.
+    - name: Advantage Flaw (R3)
+      type: disadvantage
+      description: You must spend a round doing nothing else but concentrating before using your security, demolitions, or computer interface/repair skills (do not get preparing bonus).
+    - name: Skill Minimum (R4)
+      type: specialability
+      description: Your skill totals for security, demolitions, and computer interface/repair will always be a minimum of 3 times the number before the D.
+    - name: Hand Computer
+      type: gear
+      description:  Has various connectors as well as data wands containing common security protocols and cracking programs (+1D to security and security regulations attempts)
+    - name: Comlink
+      type: gear
+      description: Built into Hand Computer
+    - name: Personal Blaster
+      type: weapon
+      description:
+    - name: Cred-Key
+      type: gear
+      description:
+  description: You’ve always had a knack for breaking and entering — and preventing others from doing the same. Unfortunately, ever since you stumbled across someone’s deep, dark secret, you always get nervous before attempting any security procedures.

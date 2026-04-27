@@ -1,0 +1,56 @@
+{
+  "label": "Macros",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Roll": {
+      "name": "Roll",
+      "description": "Simple roll macro"
+    },
+    "Physical Resistance": {
+      "name": "Physical Resistance",
+      "description": "Roll actor's physical resistance."
+    },
+    "Energy Resistance": {
+      "name": "Energy Resistance",
+      "description": "Roll actor's energy resistance."
+    },
+    "Dodge": {
+      "name": "Dodge",
+      "description": "Roll actor's dodge."
+    },
+    "Block": {
+      "name": "Block",
+      "description": "Roll actor's block."
+    },
+    "Agility": {
+      "name": "Agility",
+      "description": "Roll actor's Agility attribute."
+    },
+    "Strength": {
+      "name": "Strength",
+      "description": "Roll actor's Strength attribute."
+    },
+    "Mechanical": {
+      "name": "Mechanical",
+      "description": "Roll actor's Mechanical attribute."
+    },
+    "Knowledge": {
+      "name": "Knowledge",
+      "description": "Roll actor's Knowledge attribute."
+    },
+    "Perception": {
+      "name": "Perception",
+      "description": "Roll actor's Perception attribute."
+    },
+    "Technical": {
+      "name": "Technical",
+      "description": "Roll actor's Technical attribute."
+    },
+    "Collision": {
+      "name": "Collision",
+      "description": "Roll vehicle collision daamage."
+    }
+  }
+}

@@ -1,0 +1,34 @@
+<div class="tab effects" data-group="primary" data-tab="effects">
+    <div>
+        <div class="flexrow flex-group-center">
+            {{localize 'OD6S.EFFECTS'}}
+            <div class="align-right">
+                <a class="item-control effect-add"
+                   title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.EFFECTS'}}">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
+        <ul class="item-effect-list draggable">
+            {{#each item.effects as |effect key| }}
+                <li class="item-effect">
+                    <div class="grid item-effect-grid">
+                        <div title="{{effect.name}}">{{effect.name}}</div>
+                        <div class="item-control flexrow flex-group-center">
+                            <a class="item-control effect-edit"
+                               data-name="{{effect.name}}"
+                               data-effect-id="{{effect._id}}"
+                               title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                <i class="fas fa-edit"></i></a>
+                            <a class="template-item-control effect-delete"
+                               data-name="{{effect.name}}"
+                               data-effect-id="{{effect._id}}"
+                               title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                <i class="fas fa-trash"></i></a>
+                        </div>
+                    </div>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>

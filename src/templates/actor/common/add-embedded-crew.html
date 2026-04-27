@@ -1,0 +1,18 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+    <div class="flexrow flex-group-left">
+        <label for="addembeddedcrew">{{localize "OD6S.ADD"}}:</label>
+        <select name="addembeddedcrew" id="addembeddedcrew">
+            
+                {{#each object.targets as | target |}}
+                    <option value="{{target.uuid}}" {{#if (eq target.uuid target)}}selected{{/if}}>{{target.name}}</option>
+                {{/each}}
+            
+        </select>
+    </div>
+    <input name="actor" type="hidden" value="{{object.actor}}">
+    <div class="flexrow flex-group-center"
+         data-message-actor="{{object.actor}}">
+        <button type="submit" name="submit" value="submit">{{localize "OD6S.SUBMIT"}}</button>
+        <button type="submit" name="cancel" value="cancel">{{localize "OD6S.CANCEL"}}</button>
+    </div>
+</form>

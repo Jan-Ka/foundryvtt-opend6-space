@@ -1,0 +1,484 @@
+.grid,
+.grid-2col {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin: 5px 0;
+  padding: 0;
+}
+
+.grid-3col {
+  grid-column: span 3 / span 3;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-4col {
+  grid-column: span 4 / span 4;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid-5col {
+  grid-column: span 5 / span 5;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.grid-6col {
+  grid-column: span 6 / span 6;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.grid-7col {
+  grid-column: span 7 / span 7;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.grid-8col {
+  grid-column: span 8 / span 8;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.grid-9col {
+  grid-column: span 9 / span 9;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+.grid-10col {
+  grid-column: span 10 / span 10;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.grid-11col {
+  grid-column: span 11 / span 11;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+}
+
+.grid-12col {
+  grid-column: span 12 / span 12;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.grid-2col-checkbox {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 80% 15%;
+  align-items: center;
+  border: 1px;
+  gap: 2px;
+  margin: 2px 0;
+  padding: 0;
+}
+
+.grid-2col-type {
+  @extend .grid-2col;
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: auto;
+  align-items: center;
+}
+
+.grid-2col-species {
+  @extend .grid-2col;
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: auto;
+  align-items: center;
+}
+
+.grid-2col-attributes,
+.grid-2col-combat {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 75% 20%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-2col-labels {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 20% 80%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-3col-attributes,
+.grid-3col-combat {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 65% 20% 14%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-3col-create-attributes,
+.grid-3col-explosive-damage {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 55% 20% 24%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-3col-manifestations {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 10% 75% 14%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-2col-manifestations {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 85% 14%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-3col-labels {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 42% 42% 14%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-3col-type {
+  @extend .grid-3col;
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: auto;
+  align-items: center;
+}
+
+.grid-3col-species {
+  @extend .grid-3col;
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: auto;
+  align-items: center;
+}
+
+.grid-4col-attributes,
+.grid-4col-combat {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 55% 15% 8% 15%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-4col-attribute-dice {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 55% 15% 8% 15%;
+  border: 1px;
+  gap: 2px;
+  margin: 1px 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.grid-5col-attribute-dice {
+  display: grid;
+  grid-column: span 5 / span 5;
+  grid-template-columns: 55% 9% 9% 9% 15%;
+  border: 1px;
+  gap: 2px;
+  margin: 1px 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.grid-4col-explosive-damage {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 55% 15% 15% 15%;
+  border: 1px;
+  gap: 2px;
+  margin: 1px 0;
+  padding: 2px;
+  justify-content: center;
+}
+
+.grid-4col-vehicle-skill {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 5% 39% 14% 39%;
+  align-items: center;
+  border: 2px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-4col-resistance {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 34% 15% 34% 15%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+.grid-5col-attributes,
+.grid-5col-combat {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 41% 21% 8% 21% 8%;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-6col-vehicle-tab {
+  display: grid;
+  grid-column: span 6 / span 6;
+  grid-template-columns: 25% 12% 12% 12% 20% 12%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-shields {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 20% 20% 20% 30%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.flex-group-center,
+.flex-group-left,
+.flex-group-right {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1px;
+  border: 1px solid #999;
+}
+
+.flex-group-left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.flex-group-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.inv-grid {
+  display: grid;
+  border: 1px;
+  gap: 2px;
+  margin: 5px 0;
+  padding: 1px;
+}
+
+.template-item-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 70% 20%;
+}
+
+.armor-grid {
+  grid-column: span 4 / span 4;
+  grid-template-columns: 3% 65% 20% 8%;
+}
+
+.gear-grid,
+.item-grid {
+  grid-column: span 4 / span 4;
+  grid-template-columns: 3% 7% 80% 8%;
+}
+
+.consumable-grid {
+  grid-column: span 5 / span 5;
+  grid-template-columns: 3% 7% 75% 5% 8%;
+}
+
+.item-effect-grid {
+  grid-column: span 2 / span 2;
+  grid-template-columns: 90% 8%;
+}
+
+.ranged-weapon-grid {
+  grid-column: span 5 / span 5;
+  grid-template-columns: 3% 38% 33% 13% 8%;
+}
+
+.vehicle-ranged-weapon-grid {
+  grid-column: span 7 / span 7;
+  grid-template-columns: 3% 34% 11% 25% 8% 8% 6%;
+}
+
+.vehicle-ranged-weapon-grid-tab {
+  grid-column: span 5 / span 5;
+  grid-template-columns: 34% 14% 29% 8% 8%;
+}
+
+.melee-weapon-grid {
+  grid-column: span 4 / span 4;
+  grid-template-columns: 3% 70% 15% 8%;
+}
+
+.vehicle-grid {
+  grid-column: span 3 / span 3;
+  grid-template-columns: 3% 87% 8%;
+}
+
+.data-grid {
+  grid-column: span 2 / span 2;
+  grid-template-columns: 88% 10%;
+  gap: 1px 0;
+  margin: 2px 0;
+  padding: 0;
+}
+
+.cargo-hold-grid {
+  grid-column: span 3 / span 3;
+  grid-template-columns: 10% 78% 10%;
+  gap: 1px 0;
+  margin: 2px 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+  padding: 2px;
+}
+
+.defense-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 33% 33% 33%;
+}
+
+.float-right {
+  position: relative;
+  float: right;
+}
+
+.data-attribute-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 6 / span 6;
+  grid-template-columns: 19% 16% 16% 16% 16% 16%;
+}
+
+.data-combat-defense-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 33% 33% 33%;
+}
+
+.effects-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 52% 16% 16% 16%;
+}
+
+.title-add-grid {
+  display: grid;
+  border: 1px;
+  gap: 1px;
+  margin: 1px 0;
+  padding: 1px;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 85% 14%;
+}
+
+.merchant-owner-grid {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 10% 60% 15% 10%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.merchant-grid {
+  display: grid;
+  grid-column: span 4 / span 4;
+  grid-template-columns: 10% 70% 10% 5%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.container-grid {
+  display: grid;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 10% 80% 5%;
+  border: 1px;
+  gap: 5px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.grid-container-header {
+  display: grid;
+  grid-column: span 2 / span 2;
+  grid-template-columns: 20% 78%;
+  gap: 3px;
+  margin: 1px 0;
+  padding: 0;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: min-content auto auto auto;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,0 +1,20 @@
+{
+  "label": "Metaphysics Skills",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Channel": {
+      "name": "Channel",
+      "description": "With this skill, a character can focus energy within herself and her surroundings to harm others or protect herself and others from harm. The most common effects produced with this skill include modifying damage or Armor Value or generating a new damage or Armor Value."
+    },
+    "Sense": {
+      "name": "Sense",
+      "description": "<p>A character who has learned this skill can detect anything in existence, learn about her surroundings, and touch and influence minds. Some effects include: modifying Knowledge and general Perception attempts; modifying existing or including stand-alone bargain, command, con, investigation, persuasion, search, or Knowledge-related skills, especially to discern specific information.</p>\n"
+    },
+    "Transform": {
+      "name": "Transform",
+      "description": "<p>This skill allows a character to alter temporarily people and things within the universe, including moving something from one location to another and changing a target’s natural capabilities. Some effects include: modifying a skill or attribute except general Perception uses, bargain, command, con, investigation, persuasion, search, Knowledge, or Knowledge-related skills; adding additional levels of a Special Ability the target already has; giving a target a new Special Ability, Disadvantage, or skill; placing new Limitations or Enhancements on an existing Special Ability; moving targets; and modifying a target’s Move value.</p>\n\n<p>To move a target, the skill total has to overcome the target’s weight value. (Look up the target’s mass on the “Lift Difficulties” table on page 91.) The target can resist by rolling her Strength or lift and adding it to her weight difficulty (theoretically, she tries to make herself harder for the manipulation to grasp; resisting does not count as an action for the target character). If the transform total is equal to or higher than the modified manipulation difficulty, the character is moved. This goes for self-teleportation as well (though the character is not likely to resist).</p>\n"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+<form>
+    <div>
+        <label for="itemname"><b>{{localize 'OD6S.NAME'}}</b>:</label>
+        <select name="itemname" id="itemname">
+            
+                {{#each templateItems as |item key|}}
+                    <option value="{{item.name}}" {{#if (eq item.name itemname)}}selected{{/if}} data-description="{{item.system.description}}">{{item.name}}</option>
+                {{/each}}
+            
+        </select>
+    </div>
+</form>

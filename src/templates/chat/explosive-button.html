@@ -1,0 +1,52 @@
+{{#if message.flags.od6s.showButton}}
+    <div class="explosive-targets-label choose-target" data-message-id={{message._id}}>{{ localize 'OD6S.TARGETS' }}:</div>
+    {{#if (checkExplosiveTargets message.flags.od6s.targets)}}
+    {{#each message.flags.od6s.targets as |target|}}
+        <div class="flexrow flex-group-left">
+            <div class="flexrow flex-group-left explosive-target">{{target.name}}</div>
+            {{#if ../user.isGM}}
+            <div class="flexrow flex-group-left explosive-target-zone"
+                 data-target-id="{{target.id}}" data-message-id="{{../message._id}}">
+                <label for="explosive-target-zone">{{localize 'OD6S.ZONE'}}:</label>
+                <select name="explosive-target-zone" id="explosive-target-zone">
+                    {{#each (getExplosiveZonesCount) as |zone|}}
+                        <option value="{{zone}}" {{#if (eq target.zone zone)}}selected{{/if}}> {{zone}}</option>
+                {{/each}}
+                </select>
+            </div>
+            {{else }}
+                <span>{{ localize 'OD6S.ZONE'}}: {{target.zone}}</span>
+            {{/if}}
+        </div>
+    {{/each}}
+    {{else}}
+        <div class="no-targets">{{localize 'OD6S.NO_TARGETS'}}</div>
+    {{/if}}
+<div class="explosive-damage-button"
+     data-message-id="{{message._id}}"
+     data-actor-id="{{message.speaker.actor}}"
+     data-token-id="{{message.speaker.token}}"
+     data-item-id="{{message.flags.od6s.itemId}}"
+     data-damageScaleBonus="{{message.flags.od6s.damageScaleBonus}}"
+     data-damageType="{{message.flags.od6s.damageType}}"
+     data-stun="{{message.flags.od6s.stun}}"
+    {{#if message.flags.od6s.stun}}
+     title="{{localize 'OD6S.ROLL_STUN_DAMAGE'}}">
+         <button>{{localize 'OD6S.ROLL_STUN_DAMAGE'}}</button>
+    {{else}}
+        title="{{localize 'OD6S.ROLL_DAMAGE'}}">
+        <button>{{localize 'OD6S.ROLL_DAMAGE'}}</button>
+    {{/if}}
+</div>
+{{else}}
+    {{#unless message.flags.od6s.handled}}
+        {{ localize "OD6S.NO_TARGETS_BLAST_RADIUS" }}
+        {{#if user.isGM}}
+    <div class="remove-template-button"
+         data-message-id="{{message._id}}"
+         title="{{localize 'OD6S.REMOVE_TEMPLATE'}}">
+         <button>{{localize 'OD6S.REMOVE_TEMPLATE'}}</button>
+    </div>
+        {{/if}}
+    {{/unless}}
+{{/if}}

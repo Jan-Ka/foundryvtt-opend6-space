@@ -1,0 +1,18 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+
+    <ul class="attributes-sort">
+        {{#each attributes as |attribute|}}
+            {{#if attribute.active }}
+            <li class="attributes-sort-list"
+                style="list-style: none; margin: 2px 0; padding: 2px; outline: 1px solid #000;"
+                data-attribute-id="{{attribute.id}}"  draggable="true">
+                {{attribute.name}}
+            </li>
+            {{/if}}
+        {{/each}}
+    </ul>
+
+    <div class="submit">
+      <button type="submit" name="close" data-action="closeForm">{{localize "Submit"}}</button>
+    </div>
+</form>

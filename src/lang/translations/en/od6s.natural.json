@@ -1,0 +1,68 @@
+{
+  "label": "Natural",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Natural Hand to Hand Weapon (R1)": {
+      "name": "Natural Hand to Hand Weapon (R1)",
+      "description": "Claws, pincers, bone spikes, stinger, etc."
+    },
+    "Natural Hand to Hand Weapon (R2)": {
+      "name": "Natural Hand to Hand Weapon (R2)",
+      "description": ""
+    },
+    "Natural Hand to Hand Weapon (R3)": {
+      "name": "Natural Hand to Hand Weapon (R3)",
+      "description": ""
+    },
+    "Natural Hand to Hand Weapon (R4)": {
+      "name": "Natural Hand to Hand Weapon (R4)",
+      "description": ""
+    },
+    "Natural Hand to Hand Weapon (R5)": {
+      "name": "Natural Hand to Hand Weapon (R5)",
+      "description": ""
+    },
+    "Natural Ranged Weapon (R1)": {
+      "name": "Natural Ranged Weapon (R1)",
+      "description": ""
+    },
+    "Natural Ranged Weapon (R2)": {
+      "name": "Natural Ranged Weapon (R2)",
+      "description": ""
+    },
+    "Natural Ranged Weapon (R3)": {
+      "name": "Natural Ranged Weapon (R3)",
+      "description": ""
+    },
+    "Natural Ranged Weapon (R4)": {
+      "name": "Natural Ranged Weapon (R4)",
+      "description": ""
+    },
+    "Natural Ranged Weapon (R5)": {
+      "name": "Natural Ranged Weapon (R5)",
+      "description": ""
+    },
+    "Natural Armor (R1)": {
+      "name": "Natural Armor (R1)",
+      "description": ""
+    },
+    "Natural Armor (R2)": {
+      "name": "Natural Armor (R2)",
+      "description": ""
+    },
+    "Natural Armor (R3)": {
+      "name": "Natural Armor (R3)",
+      "description": ""
+    },
+    "Natural Armor (R4)": {
+      "name": "Natural Armor (R4)",
+      "description": ""
+    },
+    "Natural Armor (R5)": {
+      "name": "Natural Armor (R5)",
+      "description": ""
+    }
+  }
+}

@@ -1,0 +1,38 @@
+<form>
+    <div>
+        {{#if (eq (showWildDie) true)}}
+            <div class="flexrow flex-group-left showWildDie" data-wilddie="{{wilddie}}">
+                <label for="wilddie">{{localize 'OD6S.USE_WILD_DIE'}}</label>
+                <input type="checkbox" data-dtype="Boolean" id="wilddie" name="wilddie" {{#if wilddie}}checked{{/if}}>
+            </div>
+        {{/if}}
+        <div class="flexrow flex-group-left">
+            <div class="dice flexrow flex-group-left" data-dice="{{dice}}">
+                <label for="dice">{{localize 'OD6S.DICE'}}</label>
+                <input type="number" onfocus="this.value=''" data-dtype="Number"
+                       max="99" id="dice" name="dice" value="{{dice}}">
+            </div>
+            <div class="pips flexrow flex-group-left" data-pips="{{pips}}">
+                <label for="pips">{{localize 'OD6S.PIPS'}}</label>
+                <input type="number" onfocus="this.value=''" data-dtype="Number"
+                       max="99" id="pips" name="pips" placeholder="0">
+            </div>
+        </div>
+        <div class="flexrow flex-group-left">
+            <label for="damageroll">{{localize 'OD6S.DAMAGE_ROLL_QUESTION'}}</label>
+            <input type="checkbox" data-dtype="Boolean" id="damageroll" name="damageroll">
+        </div>
+        <div class="flexrow flex-group-left">
+            <label for="damagetype">{{localize 'OD6S.DAMAGE_TYPE'}}:</label>
+            <select name="damagetype" id="damagetype">
+                
+                    {{#each (getDamageTypes) as |damage_type key|}}
+                        <option value="{{ key }}" {{#if (eq key damagetype)}}selected{{/if}}>
+                            {{localize damage_type}}
+                        </option>
+                    {{/each}}
+                
+            </select>
+        </div>
+    </div>
+</form>

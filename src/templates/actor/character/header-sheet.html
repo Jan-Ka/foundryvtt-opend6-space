@@ -1,0 +1,186 @@
+<div>
+    <div class="grid grid-2col">
+        <div>
+            <div
+                {{#if (eq actor.system.created.value false)}}
+                class="grid grid-3col-type"
+                {{else}}
+                class="grid grid-2col-type"
+                {{/if}}>
+                <div class="flexrow flex-group-center">
+                <label for="actor.system.chartype.content">{{localize actor.system.chartype.label}}:</label>
+                <input title="{{localize actor.system.chartype.label}}" name="system.chartype.content" type="text"
+                       value="{{actor.system.chartype.content}}" placeholder="{{localize actor.system.chartype.label}}"
+                       data-dtype="{{actor.system.chartype.type}}"/>
+                {{#if (eq actor.system.created.value false)}}
+                    {{#if (displayCharacterTemplateClear actor)}}
+                        <button class="reset-template">{{localize 'OD6S.CLEAR'}}</button>
+                    {{/if}}
+                {{/if}}
+                </div>
+            </div>
+        </div>
+        <div>
+            <div
+                {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                class="grid grid-3col-species"
+                {{else}}
+                class="grid grid-2col-species"
+                {{/if}}>
+                <div class="flexrow flex-group-center">
+                <label for="actor.system.species.content">{{localize actor.system.species.label}}:</label>
+                <input title="{{localize actor.system.species.label}}" name="system.species.content" type="text"
+                       value="{{actor.system.species.content}}" placeholder="{{localize actor.system.species.label}}"
+                       data-dtype="{{actor.system.species.type}}"/>
+                {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                    {{#if (displaySpeciesTemplateClear actor)}}
+                        <button class="reset-species-template">{{localize 'OD6S.CLEAR'}}</button>
+                    {{/if}}
+                {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-4col header-fields">
+        <div class="flexrow flex-group-center">
+            <label for="actor.system.characterpoints.value">{{localize actor.system.characterpoints.short_label}}
+                :</label>
+            <input title="{{localize actor.system.characterpoints.label}}" name="system.characterpoints.value"
+                   type="number" min="0" max="9999"
+                   value="{{actor.system.characterpoints.value}}" placeholder="0"
+                   data-dtype="{{actor.system.characterpoints.type}}"/>
+        </div>
+        <div class="flexrow flex-group-center">
+            <label for="actor.system.fatepoints.value">{{getFatePointsShortName}}:</label>
+            <input title="{{getFatePointsShortName}}" name="system.fatepoints.value" type="number"
+                   min="0" max="9999" value="{{actor.system.fatepoints.value}}" placeholder="0"
+                   data-dtype="{{actor.system.fatepoints.type}}"/>
+            <div class="flexrow flex-group-left fatepointeffect"
+                 title="{{localize 'OD6S.IN_EFFECT'}}">
+                <label for="fpInEffect"></label>
+                <input id="fpInEffect" type="checkbox"
+                    {{#unless (gt actor.system.fatepoints.value 0) }}
+                        {{#unless actor.flags.od6s.fatepointeffect}}disabled{{/unless}}
+                    {{/unless}}
+                       data-dtype="Boolean" {{#if actor.flags.od6s.fatepointeffect}}checked{{/if}}/>
+            </div>
+        </div>
+        {{#if (ne (getCustomField1) "")}}
+            {{#if (isCustomFieldUsed 1 actor.type)}}
+                <div class="flexrow flex-group-center">
+                    <label for="actor.system.custom1.value">{{getCustomField1Short}}:</label>
+                    <input title="{{getCustomField1Short}}" name="system.custom1.value" type="{{getCustomField1Type}}"
+                           value="{{actor.system.custom1.value}}" data-dtype="{{getCustomField1FType}}"
+                        {{#if (eq (getCustomField1Type) "number") }}
+                           min="0" max="9999" placeholder="0"
+                        {{/if}}/>
+                </div>
+            {{/if}}
+        {{/if}}
+        {{#if (ne (getCustomField2) "")}}
+            {{#if (isCustomFieldUsed 2 actor.type)}}
+                <div class="flexrow flex-group-center">
+                    <label for="actor.system.custom2.value">{{getCustomField2Short}}:</label>
+                    <input title="{{getCustomField2Short}}" name="system.custom2.value" type="{{getCustomField2Type}}"
+                           value="{{actor.system.custom2.value}}" data-dtype="{{getCustomField2FType}}"
+                        {{#if (eq (getCustomField2Type) "number") }}
+                           min="0" max="9999" placeholder="0"
+                        {{/if}}/>
+                </div>
+            {{/if}}
+        {{/if}}
+        {{#if (ne (getCustomField3) "")}}
+            {{#if (isCustomFieldUsed 3 actor.type)}}
+                <div class="flexrow flex-group-center">
+                    <label for="actor.system.custom3.value">{{getCustomField3Short}}:</label>
+                    <input title="{{getCustomField3Short}}" name="system.custom3.value" type="{{getCustomField3Type}}"
+                           value="{{actor.system.custom3.value}}" data-dtype="{{getCustomField3FType}}"
+                        {{#if (eq (getCustomField3Type) "number") }}
+                           min="0" max="9999" placeholder="0"
+                        {{/if}}/>
+                </div>
+            {{/if}}
+        {{/if}}
+        {{#if (ne (getCustomField4) "")}}
+            {{#if (isCustomFieldUsed 4 actor.type)}}
+                <div class="flexrow flex-group-center">
+                    <label for="actor.system.custom4.value">{{getCustomField4Short}}:</label>
+                    <input title="{{getCustomField4Short}}" name="system.custom4.value" type="{{getCustomField4Type}}"
+                           value="{{actor.system.custom4.value}}" data-dtype="{{getCustomField4FType}}"
+                        {{#if (eq (getCustomField4Type) "number") }}
+                           min="0" max="9999" placeholder="0"
+                        {{/if}}/>
+                </div>
+            {{/if}}
+        {{/if}}
+        <div class="flexrow flex-group-center">
+            <label for="actor.system.move.value">{{localize actor.system.move.label}}:</label>
+            <input title="{{localize actor.system.move.label}}" name="system.move.value" type="number" min="0"
+                   max="9999"
+                   value="{{actor.system.move.value}}" placeholder="10" data-dtype="{{actor.system.move.type}}"/>
+        </div>
+        {{#if (eq (getCost) '0')}}
+            <div class="funds flexrow flex-group-center">
+                <label for="actor.system.funds.score">{{localize 'OD6S.CHAR_FUNDS'}}:</label>
+                {{#if (eq actor.system.sheetmode.value "normal")}}
+                    <div class="funds flex-group-center rolldialog" data-score="{{actor.system.funds.score}}"
+                         data-type="funds" data-subtype="funds" data-label="{{localize 'OD6S.CHAR_FUNDS'}}">
+                        {{diceFromScore actor.system.funds.score}}D+{{pipsFromScore actor.system.funds.score}}
+                    </div>
+                {{else}}
+                    {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                        <div class="edit-funds">
+                            <input title="{{localize 'OD6S.CHAR_FUNDS'}}" name="funds-dice" type="number"
+                                   id="funds-dice"
+                                   data-id="funds-dice" value="{{diceFromScore actor.system.funds.score}}" min="0"
+                                   max="99"
+                                   placeholder="{{diceFromScore actor.system.funds.score}}" data-type="Number"/></div>
+                        D+
+                        <div class="edit-funds">
+                            <input title="{{localize 'OD6S.CHAR_FUNDS'}}" name="funds-pips" type="number"
+                                   id="funds-pips"
+                                   data-id="funds-pips" value="{{pipsFromScore actor.system.funds.score}}" min="0"
+                                   max="99"
+                                   placeholder="{{pipsFromScore actor.system.funds.score}}" data-type="Number"/>
+                        </div>
+                    {{/if}}
+                {{/if}}
+            </div>
+        {{else}}
+            <div class="flexrow flex-group-center">
+                <label for="actor.system.credits.value">{{localize (getCurrencyLabel)}}:</label>
+                <input title="{{localize (getCurrencyLabel)}}" name="system.credits.value" type="number" min="0"
+                       max="999999999999" value="{{actor.system.credits.value}}"
+                       placeholder="{{actor.system.credits.value}}"
+                       data-dtype="{{actor.system.credits.type}}"/>
+            </div>
+        {{/if}}
+        {{> (getWoundsTemplate)}}
+        {{#if (ne actor.system.sheetmode.value "normal") }}
+            <div class="flexrow flex-group-center">
+                <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
+                <input type="checkbox" name="system.metaphysicsextranormal.value"
+                       id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean"
+                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
+            </div>
+        <div>
+            <!--Session Reset Button-->
+            <button class="session-reset-button">Reset Session</button>
+        </div>
+        {{ else }}
+            {{#if actor.system.metaphysicsextranormal.value}}
+            <div class="flexrow flex-group-center">
+                <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
+                <input type="checkbox" name="system.metaphysicsextranormal.value"
+                       id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean" disabled
+                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
+            </div>
+            {{/if}}
+        {{/if}}
+        {{#if (eq actor.system.created.value false)}}
+            <div class="flexrow flex-group-center creation">
+                <button class="create-character">{{localize 'OD6S.CREATE'}}</button>
+            </div>
+        {{/if}}
+    </div>
+    </div>

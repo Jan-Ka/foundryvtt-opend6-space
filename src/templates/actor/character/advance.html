@@ -1,0 +1,91 @@
+<div class="od6s advance-dialog">
+    <div class="flex-group-center">
+        <p>{{ localize 'OD6S.ADVANCE'}} {{localize label}}</p>
+    </div>
+    {{#unless (flatSkills)}}
+        <div class="grid grid-2col">
+            <div class="flex-group-center">
+                <b>{{localize "OD6S.DICE"}}</b>
+            </div>
+            <div class="flex-group-center">
+                <b>{{localize "OD6S.PIPS"}}</b>
+            </div>
+            {{#if freeadvance }}
+                <div class="flex-group-center advancedice" data-dice="{{diceFromScore score}}">
+                    <input type="number" id="dice" min=0 max=999 name="dice"
+                           data-dtype="Number"
+                           value="{{diceFromScore score}}">
+                </div>
+                <div class="flex-group-center advancepips" data-pips="{{pipsFromScore score}}">
+                    <input type="number" max=2 id="pips" min=0 name="pips"
+                           data-dtype="Number"
+                           value="{{pipsFromScore score}}">
+                </div>
+            {{else}}
+                <div class="flex-group-center">
+                    <input type="number" data-dtype="Number"
+                           max="99" id="dice" name="dice" value="{{diceFromScore score}}" readonly>
+                </div>
+                <div class="flex-group-center">
+                    <input type="number" data-dtype="Number"
+                           max="99" id="pips" name="pips" value="{{pipsFromScore score}}" readonly>
+                </div>
+            {{/if}}
+            <div class="flex-group-center advanceup" data-pipsup="{{pipsFromScore score}}">
+                <i class="fas fa-plus-square"></i>
+            </div>
+            <div class="flex-group-center advancedown" data-pipsdown="{{pipsFromScore score}}">
+                <i class="fas fa-minus-square"></i>
+            </div>
+        </div>
+    {{else}}
+        <div class="grid grid-3col">
+            <div class="flex-group-center">
+                <b>{{localize "OD6S.SCORE"}}: </b>
+            </div>
+            <div class="flex-group-center">
+                <div class="flex-group-center advancebase" data-base="{{base}}">
+                    <input type="number" max=2 id="base" min=0 name="base"
+                           data-dtype="Number"
+                           {{#unless freeadvance}}readonly{{/unless}}
+                           value="{{base}}">
+                </div>
+            </div>
+            <div>
+                <div class="flex-group-center advanceup" data-pipsup="{{base}}" data-dtype="Number">
+                    <i class="fas fa-plus-square"></i>
+                </div>
+                <div class="flex-group-center advancedown" data-pipsdown="{{base}}" data-dtype="Number">
+                    <i class="fas fa-minus-square"></i>
+                </div>
+            </div>
+        </div>
+    {{/unless}}
+    {{#if metaPhysicsSkill}}
+        <div class="grid grid-2col">
+            <div class="flexrow flex-group-center metaphysicsteachercheckbox" data-metaphysicsteacher="{{metaphysicsteacher}}">
+                <label for="metaphysicsteacher">{{localize 'OD6S.METAPHYSICS_TEACHER'}}</label>
+                <input type="checkbox" id="metaphysicsteacher" name="metaphysicsteacher"
+                       data-dtype="Boolean"
+                       {{#if metaphysicsteacher}}checked{{/if}}>
+            </div>
+            <div class="flexrow flex-group-center" data-cpcost="{{cpcost}}">
+                <p style="color:{{ cpcostcolor }};">CP Cost: {{cpcost}}</p>
+            </div>
+        </div>
+    {{/if}}
+    <div class="grid grid-2col">
+        <div class="flexrow flex-group-center freeadvancecheckbox" data-freeadvance="{{freeadvance}}">
+            <label for="freeadvance">{{localize 'OD6S.FREE_ADVANCE'}}?</label>
+            <input type="checkbox" id="freeadvance" name="freeadvance"
+                   data-dtype="Boolean"
+                   {{#if freeadvance}}checked{{/if}}>
+        </div>
+        <div class="flexrow flex-group-center" data-cpcost="{{cpcost}}">
+            <p style="color:{{ cpcostcolor }};">CP Cost: {{cpcost}}</p>
+        </div>
+    </div>
+    <footer class="form-footer">
+        <button type="submit" data-action="submit">{{localize "OD6S.ADVANCE"}}</button>
+    </footer>
+</div>

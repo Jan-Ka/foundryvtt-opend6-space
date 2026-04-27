@@ -1,0 +1,14 @@
+<form>
+    <div class="flexrow flex-group-left">
+        <label for="actor-type">{{localize 'OD6S.ACTOR_TYPE'}}:</label>
+        <select name="actor-type" id="actor-type" style="width: 70px;">
+            
+                {{#each actorTypes as |type|}}
+                    <option value="{{ type }}" {{#if (eq type item.system.wounds.value)}}selected{{/if}}>
+                        {{localize (getActorTypeLabel type)}}
+                    </option>
+                {{/each}}
+            
+        </select>
+    </div>
+</form>

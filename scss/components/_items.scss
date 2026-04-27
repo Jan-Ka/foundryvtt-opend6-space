@@ -1,0 +1,76 @@
+.od6s {
+  .gear-list,
+  .weapons-list,
+  .armor-list,
+  .manifestations-list,
+  .cybernetics-list,
+  .advantages-list,
+  .specialabilities-list,
+  .disadvantages-list,
+  .vehicles-list,
+  .template-item-list,
+  .cargo-hold-list,
+  .container-inventory-list,
+  .item-data,
+  .assigned-action-list,
+  .crew-list {
+    list-style: none;
+    margin: 1px 0;
+    padding: 0;
+    overflow-y: auto;
+
+    .item-header {
+      font-weight: bold;
+    }
+
+    .item .item-mod {
+      height: 30px;
+      display: inline-block;
+      line-height: 24px;
+      padding: 3px 0;
+      border-bottom: 1px solid #BBB;
+
+      .item-image {
+        flex: 0 0 24px;
+        margin-right: 5px;
+      }
+
+      img {
+        display: block;
+      }
+    }
+
+    .item-name {
+      margin: 0;
+    }
+
+    .item-controls {
+      display: inline-block;
+      flex: 0 0 86px;
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+
+  .cargo-hold-list {
+    columns: 2;
+  }
+
+  .item-controls-right {
+    position: absolute;
+    vertical-align: middle;
+    right: 20px;
+  }
+
+  .cargo-hold-list li {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid-column;
+  }
+
+  .crew-list li {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid-column;
+  }
+}

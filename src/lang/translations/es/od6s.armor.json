@@ -1,0 +1,89 @@
+{
+  "label": "Armor",
+  "entries": {
+    "Bone and hide": {
+      "name": "piel y Huesos",
+      "description": null
+    },
+    "Bulletproof vest": {
+      "name": "Chaleco antibalas",
+      "description": null
+    },
+    "Canvas": {
+      "name": "Tela",
+      "description": null
+    },
+    "Ceramic Armor": {
+      "name": "Armadura de cerámica",
+      "description": null
+    },
+    "Chain mail": {
+      "name": "Cota de Malla",
+      "description": null
+    },
+    "Flak jacket": {
+      "name": "Chaleco antiaéreo",
+      "description": null
+    },
+    "Hard leather": {
+      "name": "Cuero Endurecido",
+      "description": null
+    },
+    "Heavy Kevlar": {
+      "name": "Kevlar pesado",
+      "description": null
+    },
+    "Heavy Khaki": {
+      "name": "Caqui pesado",
+      "description": null
+    },
+    "Hides and fur": {
+      "name": "Pieles y pelajes",
+      "description": null
+    },
+    "Light Kevlar": {
+      "name": "Kevlar Ligero",
+      "description": null
+    },
+    "Padded leather": {
+      "name": "Cuero acolchado",
+      "description": null
+    },
+    "Plasteel": {
+      "name": "Plastiacero",
+      "description": null
+    },
+    "Plastovar": {
+      "name": "Plastovar",
+      "description": null
+    },
+    "Plate mail": {
+      "name": "Placas protectoras",
+      "description": null
+    },
+    "Reflec": {
+      "name": "Reflectiva",
+      "description": null
+    },
+    "Soft leather": {
+      "name": "Cuero Ligero",
+      "description": null
+    },
+    "Syntheleather": {
+      "name": "Cuero Sintético",
+      "description": null
+    },
+    "Syntheleather mesh": {
+      "name": "Malla de cuero sintético",
+      "description": null
+    },
+    "Woven metal fabric (heavy)": {
+      "name": "Tejidos metálicos (Pesado)",
+      "description": null
+    },
+    "Woven metal fabric (light)": {
+      "name": "Tejidos metálicos (ligero)",
+      "description": null
+    }
+  }
+}

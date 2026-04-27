@@ -1,0 +1,92 @@
+{
+  "label": "Armor",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Woven metal fabric (light)": {
+      "name": "Woven metal fabric (light)",
+      "description": ""
+    },
+    "Hides and fur": {
+      "name": "Hides and fur",
+      "description": ""
+    },
+    "Bone and hide": {
+      "name": "Bone and hide",
+      "description": ""
+    },
+    "Soft leather": {
+      "name": "Soft leather",
+      "description": ""
+    },
+    "Canvas": {
+      "name": "Canvas",
+      "description": ""
+    },
+    "Heavy Khaki": {
+      "name": "Heavy Khaki",
+      "description": ""
+    },
+    "Syntheleather": {
+      "name": "Syntheleather",
+      "description": ""
+    },
+    "Padded leather": {
+      "name": "Padded leather",
+      "description": ""
+    },
+    "Woven metal fabric (heavy)": {
+      "name": "Woven metal fabric (heavy)",
+      "description": ""
+    },
+    "Syntheleather mesh": {
+      "name": "Syntheleather mesh",
+      "description": ""
+    },
+    "Hard leather": {
+      "name": "Hard leather",
+      "description": ""
+    },
+    "Plastovar": {
+      "name": "Plastovar",
+      "description": ""
+    },
+    "Plasteel": {
+      "name": "Plasteel",
+      "description": ""
+    },
+    "Chain mail": {
+      "name": "Chain mail",
+      "description": ""
+    },
+    "Light Kevlar": {
+      "name": "Light Kevlar",
+      "description": ""
+    },
+    "Plate mail": {
+      "name": "Plate mail",
+      "description": ""
+    },
+    "Bulletproof vest": {
+      "name": "Bulletproof vest",
+      "description": ""
+    },
+    "Reflec": {
+      "name": "Reflec",
+      "description": ""
+    },
+    "Flak jacket": {
+      "name": "Flak jacket",
+      "description": ""
+    },
+    "Heavy Kevlar": {
+      "name": "Heavy Kevlar",
+      "description": ""
+    },
+    "Ceramic Armor": {
+      "name": "Ceramic Armor",
+      "description": ""
+    }
+  }
+}

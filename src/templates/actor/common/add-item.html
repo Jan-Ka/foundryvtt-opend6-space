@@ -1,0 +1,47 @@
+<div class="od6s add-item-dialog">
+    <div class="flex0row flex-group-left">
+        <select class="select-skill" name="add-item" id="add-item" style="width: 150px;">
+            {{#each object.items as |item key|}}
+                <option value="{{ key }}" {{#if (eq key ../object.selected)}}selected{{/if}}>
+                    {{item.name}}
+                </option>
+            {{/each}}
+        </select>
+    </div>
+    {{#if (and (or (eq object.type "skill")(eq object.type "specialization")) (eq object.actorType "npc")) }}
+        <div class="flexrow flex-group-left">
+            <div class="flex flex-group-left addskill">
+                <label for="dice">{{localize 'OD6S.DICE'}}:</label>
+                <input title="{{localize 'OD6S.DICE'}}" id="dice" type="text"
+                       value="{{diceFromScore object.score}}" data-dtype="Number"/>
+            </div>
+            <div class="flex flex-group-left addskill">
+                <label for="pips">{{localize 'OD6S.PIPS'}}:</label>
+                <input title="{{localize 'OD6S.PIPS'}}" id="pips" type="text"
+                       value="{{pipsFromScore object.score}}" data-dtype="Number"/>
+            </div>
+        </div>
+    {{/if}}
+    <div>
+        {{{ object.description }}}
+    </div>
+    <div class="flexrow flex-group-center">
+        <button type="submit" name="submit" value="selected">{{localize object.label}}</button>
+        <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+    </div>
+    {{#if object.new}}
+        <br><br>
+        <div class="flex-group-center">
+            {{ localize object.label_empty}}
+        </div>
+        <div class="flexrow flex-group-center">
+            <button type="submit" name="submit" value="empty">{{localize object.label}}</button>
+            <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+        </div>
+    {{/if}}
+    <input name="type" type="hidden" value="{{object.type}}"/>
+    <input name="attrname" type="hidden" value="{{object.attrname}}"/>
+    <input name="actor" type="hidden" value="{{object.actor}}"/>
+    <input name="token" type="hidden" value="{{object.token}}"/>
+    <input name="serializeditems" type="hidden" value="{{object.serializeditems}}"/>
+</div>

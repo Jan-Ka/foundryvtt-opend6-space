@@ -1,0 +1,166 @@
+---
+name: Binoculars
+type: gear
+system:
+  description: +1D bonus to sight-based rolls for viewing objects beyond seven feet in the daylight and twilight. 
+  price: E
+  credits:
+---
+name: Comlink
+type: gear
+system:
+  description: The standard unit of communication equipment, comlinks come in a number of different forms. The most common is the handset, which has an effective range of 10 kilometers and is widely available on the open market. These also can be purchased as headsets. Many high-tech worlds feature communications satellites that allow comlink signals to reach anywhere on the planet.
+  price: E
+  credits:
+---
+name: Military Comlink
+type: gear
+system:
+  description: Military Comlinks have a greater range (approximately 25 kilometers), and are frequently belt units or built into enviro-suit helmets, to allow the soldier to keep her hands free for combat. Many high-tech worlds feature communications satellites that allow comlink signals to reach anywhere on the planet.
+  price: M
+  credits:
+---
+name: Cred-Key
+type: gear
+system:
+  description: |
+      <p>A small plastic card that, when placed in a cred-key receiver, can perform all banking functions. Cred-keys are used by virtually all high-tech worlds, though not all worlds have compatible banking systems. Many frontier worlds do not have the equipment necessary to read the cards and so will only accept hard currency.</p>
+
+      <p>Standard cred-keys contain the name of the bearer and a personal identification number. Megacorporate-issued cred-keys usually feature the name of the firm and a code for it as well. Military officers, who may have extensive credit limits owing to their status, carry cards with their DNA pattern encoded on them for ease of identification.</p>
+
+      <p>Cred-keys are not common on worlds with extensive smuggling, piracy, or other criminal activities — they are too hard to steal and use. A character must be able to generate a forgery, a personal equipment repair, and a computer interface/repair skill total of at least 21 each to forge or strip a civilian cred-key. (Military and megacorp keys are harder to do this to.) Even then, decent detection equipment (not usually found in stores and bars, but common in banks and large-purchase retail outlets) will probably be able to detect the forgery.  Cost: Very Easy to set one up; some fees to transfer money.</p>
+  price: VE
+  credits:
+---
+name: Crowbar
+type: gear
+system:
+  description: Gives a +1D bonus to prying attempts, or does Strength Damage +2 in damage with bashing attacks. 
+  price: VE
+  credits:
+---
+name: Enviro-suit
+type: gear
+system:
+  description: |
+      <p>The basic environmental protection gear, the enviro-suit is designed for use in hostile climates or worlds whose atmosphere is unsafe. The enviro-suit features a helmet and full body suit (the helmet is detachable). Air is recycled by the mechanisms in the suit and bodily moisture is also filtered, to be stored in pouches inside the suit. Straws run up the suit and into the helmet to allow the user to take a drink.</p>
+
+      <p>Enviro-suits commonly have comlink units built into the helmet and the belt. A small indicator light in the helmet flashes when in the presence of another comlink trained to the same frequency. An enviro-suit maintains a constant temperature around its wearer that can be adjusted via controls on the belt. A standard enviro-suit offers only a single layer of protection (Armor Value +1), which, if torn or pierced, renders the entire suit inoperative. More expensive suits offer two layers of protection, with a liquid sealant stored between the interior and the exterior. Damage done to the exterior layer can be sealed within one round (Armor Value +2). However, extensive damage rapidly exhausts the supply of sealant. (The average outfit comes with enough sealant to repair 20 small tears or 10 large ones.)</p>
+
+      <p>Enviro-suits can hold enough air, food, and recycled water for several days to several weeks of use; about two weeks is standard. They can be refilled off of shipboard supplies (deducting the life support from the ship’s life support) or they can be refilled at stations and similar places for 10% of the base price of the suit. </p>
+  price: M
+  credits:
+---
+name: Flashlight
+type: gear
+system:
+  description: Small flashlights reduces darkness modifiers by 2D in a cone-shaped area up to five meters from the user. The internal batteries can be recharged off any local current (the base includes several adapters). 
+  price: VE
+  credits:
+---
+name: Hand Computer
+type: gear
+system:
+  description: Portable and easy to use, hand computers feature rapid processing power, including high quantities of high-speed memory and high capacity, multifunctional chip drives. Most come with a port for connection to a neural jack, as well as cable interfaces for connecting to larger terminals. Smaller computers have slots for a few scholarchips, while larger ones have room for several.
+  price: M
+  credits:
+---
+name: Handcuffs
+type: gear
+system:
+  description: Low-tech metal adjustable restraints require the key or a Moderate sleight of hand roll to remove; 18 Body Points/2 Woundlevels; damage resistance total 15. Key comes with purchase of handcuffs.
+  price: VE
+  credits:
+---
+name: Hand Scanner
+type: gear
+system:
+  description: A portable sensor device, the hand scanner has an effective range of 10 kilometers. It can be set to pick up motion, particular types of matter, and even indications of power generation. They are standard equipment for scouts and are frequently used by miners. Use of a scanner provides a +1D to sensors. Use the “Information Difficulties” or “Observation Difficulties” charts in the “Example Skill Difficulties” chapter to determine what the scanner reveals. Most hand scanners can only be blocked by cover over three solid meters thick (several thick concrete walls or the bulkhead of a ship will usually block scanner readings, but only the most dense of forests or jungles will have any effect at all).
+  price: M
+  credits:
+---
+name: Holo-vid Player
+type: gear
+system:
+  description: This device provides holographic images drawn from data chips for entertainment or informational purposes. Holo-vids can also be connected to comlinks to provide for audio and visual contact between parties. Some holo-vids have the capability to jack into hand computers, projecting the information on scholarchips out for all to read.
+  price: M
+  credits:
+---
+name: Life-Support Refills
+type: gear
+system:
+  description: These are “tanks” of atmosphere and food supplies that can be attached to an environment suit and some portable shelters. They last roughly two weeks and weigh less than 10 kilograms. 
+  price: M
+  credits:
+---
+name: Lockpicking Tools
+type: gear
+system:
+  description: +1D bonus to lockpicking attempts only if the user has the sleight of hand skill. 
+  price: E
+  credits:
+---
+name: Med-kit
+type: gear
+system:
+  description: An assortment of medical supplies collected into a light-weight container that allows for easy transport. Med-kits normally contain antibiotic patches, a compressed-air hypodermic injector, three doses of pain killers, bandages, and tape. Use of a standard med-kit provides a +1D bonus to medicine skill checks. 
+  price: E
+  credits:
+---
+name: Rope, Heavy (braided plastic)
+type: gear
+system:
+  description: Inflicts Strength Damage +2 when used in choking attacks; 10 Body Points/1 Wound level; damage resistance total 5. 
+  price: VE
+  credits:
+---
+name: Rope, Light (braided nylon)
+type: gear
+system:
+  description: Inflicts Strength Damage +1 when used in choking attacks; 6 Body Points/1 Wound level; damage resistance total 3. 
+  price: VE
+  credits:
+---
+name: Scholarchips
+type: gear
+system:
+  description: |
+      <p>Computer chips intended for use with both hand units and larger terminals. These contain available information on sectors, planets, some alien species, equipment, ships, personal data, business transactions, and so on. Use of a computer with a standard scholarchip in place allows the operator to roll as if he possessed a scholar or appropriate Knowledge-based skill in the subject detailed on the chip. Of course, the broader the range of information, and the more encrypted it is, the harder it is to get at what the character needs.  Cost: Very Easy for base die code of 1D, +1 to the price for each additional +1D.</p>
+  price: VE
+  credits:
+---
+name: Shovel
+type: gear
+system:
+  description: Add 1D to digging attempts, or does Strength Damage +2 in damage with bashing attacks. 
+  price: VE
+  credits:
+---
+name: Signal Locator
+type: gear
+system:
+  description: This device, which has a restricted distribution, monitors the signals of tracking devices. It includes a small display to show direction of movement. Pricier ones can pinpoint the location on an electronic map. 
+  price: M
+  credits:
+---
+name: Thermo-disk
+type: gear
+system:
+  description: Useful gear when traveling in a wilderness area, thermo-disks are spheroid plasticene items, roughly the size of the average Human’s fist. They contain storage batteries that, when switched on, give off heat in a 25-meter radius. As they do not provide light, they can be used in hostile areas without betraying of one’s presence. 
+  price: E
+  credits:
+---
+name: Tool Kit
+type: gear
+system:
+  description: |
+      <p>Contains tools (and possibly parts or storage containers) necessary to accomplish basic related tasks. Add 1D to relevant skill attempts only if the user has the appropriate skill (usually some version of repair, but investigation in the case of an evidence or archaeologist’s kit, con: disguise in the case of a disguise kit, or certain applications of artist or forgery with artistic supplies). </p>
+  price: VE
+  credits:
+---
+name: Tracking Device
+type: gear
+system:
+  description: Used with a signal locator, this miniature transmitter allows whatever is attached to it to be electronically located over a distance. Active devices emit a signal, while passive ones wait for a signal to come to it before sending out a response. 
+  price: M
+  credits:

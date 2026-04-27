@@ -1,0 +1,44 @@
+<header class="message-header flexrow">
+    <h4>{{localize "OD6S.DAMAGE_RESULT"}}</h4>
+    <span class="message-metadata">
+          <time class="message-timestamp">{{timeSince message.timestamp}}</time>
+        {{#if user.isGM}}
+            <a class="button message-delete"><i class="fas fa-trash"></i></a>
+        {{/if}}
+      </span>
+    {{#if message.flavor}}
+        <span class="flavor-text">{{{message.flavor}}}</span>
+    {{/if}}
+</header>
+<div class="message-content">
+    {{{message.content}}}
+</div>
+<br/>
+    <div class="result">
+    {{localize 'OD6S.DAMAGE_RESULT'}}: {{#if (showBodyPointsDamage message.flags.od6s.loserIsVehicle)}}
+        {{message.flags.od6s.result}} {{localize 'OD6S.BODY_POINTS'}}
+    {{else}}
+        {{localize message.flags.od6s.result}}
+    {{/if}}
+    {{#if user.isGM}}{{#if message.flags.od6s.apply}}{{#unless message.flags.od6s.applied}}
+            <br>
+            <div class="apply-damage-button"
+                 data-result="{{message.flags.od6s.result}}"
+                 data-token-id="{{message.flags.od6s.loserId}}"
+                 data-is-vehicle="{{message.flags.od6s.loserIsVehicle}}"
+                 data-message-id="{{message._id}}"
+                 data-stun="{{message.flags.od6s.stun}}"
+
+                 {{#if message.flags.od6s.stun}}
+                 title="{{localize 'OD6S.APPLY_STUN'}}">
+                     <button>{{localize 'OD6S.APPLY_STUN'}}</button>
+                 {{else}}
+                 title="{{localize 'OD6S.APPLY_DAMAGE'}}">
+                 <button>{{localize 'OD6S.APPLY_DAMAGE'}}</button>
+                 {{/if}}
+            </div>
+    {{/unless}}{{/if}}{{/if}}
+    {{#if message.flags.od6s.passengerDamage}}
+            <br>{{ localize 'OD6S.PASSENGER_DAMAGE' }}: {{ localize message.flags.od6s.passengerDamage }}
+    {{/if}}
+    </div>

@@ -1,0 +1,361 @@
+<div class="tab combat" data-group="primary" data-tab="combat">
+    {{!-- Tab for combat actions --}}
+    <div class="row">
+        <div class="column">
+            <div class="grid-2col-combat">
+                <div class="flexrow flex-group-left">{{localize 'OD6S.ACTION_PENALTIES'}}</div>
+                <div class="flexrow flex-group-center">{{getActionPenalties actor.actions.length}}D</div>
+                <div class="flexrow flex-group-left">{{localize 'OD6S.STRENGTH_DAMAGE_BONUS'}}</div>
+                <div class="flexrow flex-group-center">
+                    {{diceFromScore actor.system.strengthdamage.score}}D+{{pipsFromScore actor.system.strengthdamage.score}}
+                </div>
+            </div>
+            <div class="grid-4col-resistance">
+                <div class="flexrow flex-group-left">{{localize 'OD6S.PHYSICAL_RESISTANCE'}}</div>
+                <div class="flex-group-center rolldialog"
+                     data-score="{{actor.system.pr.score}}"
+                     data-label="{{localize 'OD6S.PHYSICAL_RESISTANCE'}}"
+                     data-type="resistance"
+                     data-dtype="{{ actor.system.pr.type }}">
+                    <b>{{diceFromScore actor.system.pr.score }}</b>D+<b>{{pipsFromScore actor.system.pr.score }}</b>
+                </div>
+                <div class="flexrow flex-group-left">{{localize 'OD6S.ENERGY_RESISTANCE'}}</div>
+                <div class="flex-group-center rolldialog"
+                     data-score="{{actor.system.er.score}}"
+                     data-label="{{localize 'OD6S.ENERGY_RESISTANCE'}}"
+                     data-type="resistance"
+                     data-dtype="{{ actor.system.er.type }}">
+                    <b>{{diceFromScore actor.system.er.score }}</b>D+<b>{{pipsFromScore actor.system.er.score }}</b>
+                </div>
+                <div class="flexrow flex-group-left">{{localize 'OD6S.RESISTANCE_NO_ARMOR'}}</div>
+                <div class="flex-group-center rolldialog"
+                     data-score="{{ actor.system.noArmor.score }}"
+                     data-label="{{localize 'OD6S.RESISTANCE_NO_ARMOR'}}"
+                     data-type="resistance"
+                     data-dtype="{{ actor.system.attributes.str.type }}">
+                    <b>{{diceFromScore actor.system.noArmor.score }}</b>D+<b>{{pipsFromScore
+                        actor.system.noArmor.score }}</b>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="grid-2col-combat">
+                <div class="flexrow flex-group-left">{{localize 'OD6S.WOUND_PENALTIES'}}</div>
+                <div class="flexrow flex-group-center">{{getWoundPenalties actor}}D</div>
+                {{#if (getSystemConfig 'track_stuns')}}
+                    <div class="flexrow flex-group-left track_stuns_label">{{localize 'OD6S.CHAR_STUNS'}}</div>
+                    <div class="flexrow flex-group-center highlight track_stuns_counter">{{actor.system.stuns.value}}</div>
+                {{/if}}
+                <div class="flexrow flex-group-left">{{localize 'OD6S.INITIATIVE'}}</div>
+                <div class="flex-group-center"
+                     data-score="{{getInitiative actor}}"
+                     data-label="{{localize 'OD6S.INITIATIVE'}}"
+                     data-type="initiative">
+                    {{diceFromScore (getInitiative actor)}}D+{{pipsFromScore (getInitiative actor) }}
+                </div>
+            </div>
+            <div class="defense-grid">
+                <div class="flexrow flex-group-left edit-dodge">
+                    <label for="dodge">{{ localize 'OD6S.DODGE' }}:</label>
+                    <input title="{{localize 'OD6S.DODGE'}}" name="system.dodge.score"
+                           value="{{actor.system.dodge.score}}"
+                           placeholder="{{ actor.system.dodge.score }}"
+                           id="actor.system.dodge.score"
+                           onfocus="this.value=''" type="number" maxlength="2" size="2"/>
+                </div>
+                <div class="flexrow flex-group-left edit-parry">
+                    <label for="parry">{{ localize 'OD6S.PARRY' }}:</label>
+                    <input title="{{localize 'OD6S.PARRY'}}" name="system.parry.score"
+                           value="{{actor.system.parry.score}}"
+                           placeholder="{{actor.system.parry.score}}"
+                           id="actor.system.parry.score"
+                           onfocus="this.value=''" type="number" maxlength="2" size="2"/>
+                </div>
+                <div class="flexrow flex-group-left edit-block">
+                    <label for="block">{{ localize 'OD6S.BLOCK' }}:</label>
+                    <input title="{{localize 'OD6S.BLOCK'}}" name="system.block.score"
+                           value="{{actor.system.block.score}}"
+                           placeholder="{{actor.system.block.score}}"
+                           id="actor.system.block.score"
+                           onfocus="this.value=''" type="number" maxlength="2" size="2"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="flexrow flex-group-center">
+                <b>{{ localize 'OD6S.AVAILABLE_ACTIONS'}}</b>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <ul class="availableaction">
+                        {{#each (getActiveAttributes actor.system.attributes) as |attribute key|}}
+                            {{#if (ne key 'met') }}
+                                <li class="availableaction attribute-action">
+                                    <div class="flexrow flex-group-left combat-action"
+                                         data-type="attribute"
+                                         data-name="{{getAttributeName key}}"
+                                         data-rollable="true"
+                                         title="{{getAttributeName key}}"
+                                         data-id="{{ key }}">
+                                        {{getAttributeName key}}
+                                    </div>
+                                </li>
+                                <div class="skill availableaction skill-action">
+                                    <ul class="availableaction skill-list">
+                                        {{#each ../actor.skills as |skill skillkey|}}
+                                            {{#if (eq skill.system.attribute key) }}
+                                                <li class="availableaction skill-list">
+                                                    <div class="flexrow flex-group-left combat-action"
+                                                         data-type="skill"
+                                                         data-name="{{ skill.name }}"
+                                                         data-rollable="true"
+                                                         title="{{ skill.name }}"
+                                                         data-id="{{ skill._id }}">
+                                                        {{ skill.name }}
+                                                    </div>
+                                                </li>
+                                                <div class="specialization availableaction specialization-action">
+                                                    <ul class="availableaction specialization-list">
+                                                        {{#each ../../actor.specializations as |spec speckey|}}
+                                                            {{#if (eq spec.system.skill skill.name) }}
+                                                                <li class="availableaction specialization-list">
+                                                                    <div class="flexrow flex-group-left combat-action"
+                                                                         data-type="specialization"
+                                                                         data-name="{{ spec.name }}"
+                                                                         data-rollable="true"
+                                                                         title="{{ spec.name }}"
+                                                                         data-id="{{ spec._id }}">
+                                                                        <i>{{ spec.name }}</i>
+                                                                    </div>
+                                                                </li>
+                                                            {{/if}}
+                                                        {{/each}}
+                                                    </ul>
+                                                </div>
+                                            {{/if}}
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                        {{/each}}
+                    </ul>
+                </div>
+                <div class="column">
+                    <ul class="availableaction">
+                        {{# each (getActions) as |action key|}}
+                            <li class="availableaction">
+                                <div class="flexrow flex-group-left combat-action"
+                                     data-type="{{ action.type }}"
+                                     data-name="{{ action.name }}"
+                                     data-subtype="{{ action.subtype }}"
+                                     data-rollable="{{action.rollable}}"
+                                     title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                     data-id="">
+                                    {{localize action.name}}
+                                </div>
+                            </li>
+                            {{#if (eq action.name 'OD6S.ACTION_RANGED_ATTACK') }}
+                                {{#each ../actor.weapons as |weapon key|}}
+                                    {{#if weapon.system.equipped.value}}
+                                        {{#if (isRanged weapon.system.subtype)}}
+                                            <li class="availableaction">
+                                                <div class="flexrow flex-group-left combat-action indent"
+                                                     data-type="rangedattack"
+                                                     data-name="{{weapon.name}}"
+                                                     data-rollable="{{action.rollable}}"
+                                                     title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                     data-id="{{weapon._id}}">
+                                                    <i>{{weapon.name}}</i>
+                                                </div>
+                                            </li>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/each}}
+                            {{/if}}
+                            {{#if (eq action.name 'OD6S.ACTION_MELEE_ATTACK') }}
+                                {{#each ../actor.weapons as |weapon key|}}
+                                    {{#if weapon.system.equipped.value}}
+                                        {{#if (eq weapon.system.subtype (localize 'OD6S.MELEE'))}}
+                                            <li class="availableaction" data-type="action" data-name="{{weapon.name}}">
+                                                <div class="flexrow flex-group-left combat-action indent"
+                                                     data-type="meleeattack"
+                                                     data-name="{{weapon.name}}"
+                                                     data-rollable="{{action.rollable}}"
+                                                     title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                     data-id="{{weapon._id}}">
+                                                    <i>{{weapon.name}}</i>
+                                                </div>
+                                            </li>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/each}}
+                            {{/if}}
+                            {{#if (eq action.name 'OD6S.ACTION_PARRY') }}
+                                {{#each ../actor.weapons as |weapon key|}}
+                                    {{#if weapon.system.equipped.value}}
+                                        {{#if (eq weapon.system.subtype (localize 'OD6S.MELEE'))}}
+                                            <li class="availableaction" data-type="parry" data-name="{{weapon.name}}">
+                                                <div class="flexrow flex-group-left combat-action indent"
+                                                     data-type="parry"
+                                                     data-name="{{weapon.name}}"
+                                                     data-rollable="{{action.rollable}}"
+                                                     title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                     data-id="{{weapon._id}}">
+                                                    <i>{{weapon.name}} ({{localize 'OD6S.PARRY'}})</i>
+                                                </div>
+                                            </li>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/each}}
+                            {{/if}}
+                        {{/each}}
+                    </ul>
+                    {{#if (isCrewMember actor) }}
+                        <br>
+                        <ul class="availableaction">
+                            {{# each (getVehicleActions actor) as |action key|}}
+                                {{#if (ne action.name 'OD6S.ACTION_VEHICLE_SENSORS')}}
+                                    <li class="availableaction">
+                                        <div class="flexrow flex-group-left vehicle-action"
+                                             data-type="{{ action.type }}"
+                                             data-name="{{ action.name }}"
+                                             data-rollable="{{action.rollable}}"
+                                             title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                             data-id="{{key}}">
+                                            {{localize action.name}}
+                                        </div>
+                                    </li>
+                                {{/if}}
+                                {{#if (eq action.name 'OD6S.ACTION_VEHICLE_RANGED_ATTACK') }}
+                                    {{#each ../actor.system.vehicle.vehicle_weapons as |weapon key|}}
+                                        <li class="availableaction">
+                                            <div class="flexrow flex-group-left vehicle-action indent"
+                                                 data-type="vehiclerangedweaponattack"
+                                                 data-name="{{weapon.name}}"
+                                                 data-rollable="{{action.rollable}}"
+                                                 title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                 data-id="{{weapon._id}}">
+                                                <i>{{weapon.name}}</i>
+                                            </div>
+                                        </li>
+                                    {{/each}}
+                                {{/if}}
+                                {{#if (eq action.name 'OD6S.ACTION_VEHICLE_SENSORS')}}
+                                    {{#if (getSensorsConfig)}}
+                                        {{#each ../actor.system.vehicle.sensors.types as |type key|}}
+                                            <li class="availableaction">
+                                                <div class="flexrow flex-group-left vehicle-action"
+                                                     data-type="vehiclesensors"
+                                                     data-score="{{type.score}}"
+                                                     data-name="{{localize 'OD6S.SENSORS'}}: {{localize type.label}}"
+                                                     data-rollable="{{action.rollable}}"
+                                                     title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                     data-id="sensors">
+                                                    {{localize 'OD6S.SENSORS'}}: {{localize type.label}}
+                                                </div>
+                                            </li>
+                                        {{/each}}
+                                    {{else}}
+                                        <li class="availableaction">
+                                            <div class="flexrow flex-group-left vehicle-action"
+                                                 data-type="{{ action.type }}"
+                                                 data-name="{{ action.name }}"
+                                                 data-rollable="{{action.rollable}}"
+                                                 title="{{localize 'OD6S.ACTION_TOOLTIP'}}"
+                                                 data-id="{{key}}">
+                                                {{localize action.name}}
+                                            </div>
+                                        </li>
+                                    {{/if}}
+                                {{/if}}
+                            {{/each}}
+                        </ul>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            {{#if actor.system.metaphysicsextranormal.value}}
+                {{#if (isMetaphysicsAttributeOptional)}}
+                    <div class="flexrow flex-group-center">
+                        <b>{{getMetaphysicsName}}</b>
+                    </div>
+                {{else}}
+                    <li class="availableaction attribute-action">
+                        <div class="flexrow flex-group-left combat-action"
+                             data-type="attribute"
+                             data-name="{{getAttributeName 'met'}}"
+                             data-rollable="true"
+                             title="{{getAttributeName 'met'}}"
+                             data-id="met">
+                            {{getAttributeName 'met'}}
+                        </div>
+                    </li>
+                {{/if}}
+                <div class="skill availableaction skill-action">
+                    <ul class="availableaction skill-list">
+                        {{#each actor.skills as |skill skillkey|}}
+                            {{#if (eq skill.system.attribute 'met') }}
+                                <li class="availableaction skill-list">
+                                    <div class="flexrow flex-group-left combat-action"
+                                         data-type="skill"
+                                         data-name="{{ skill.name }}"
+                                         data-rollable="true"
+                                         title="{{ skill.name }}"
+                                         data-id="{{ skill._id }}">
+                                        {{ skill.name }}
+                                    </div>
+                                </li>
+                            {{/if}}
+                        {{/each}}
+                    </ul>
+                </div>
+            {{/if}}
+            <div class="flexrow flex-group-center grid-3col-combat">
+                <div class="flexrow flex-group-center"><b>{{localize 'OD6S.ACTIONS'}}</b></div>
+                <div class="flexrow flex-group-center">
+                    <a class="addaction"
+                       title="{{localize 'OD6S.ADD_ACTION'}}">
+                        <i class="fas fa-plus-square"></i></a>
+                </div>
+                <div class="flexrow flex-group-center">{{#if actor.actions.length }}
+                    {{actor.actions.length}}{{else}}0{{/if}}
+                </div>
+            </div>
+            <div class="action-column">
+                <ul class="assigned-action-list">
+                    {{#each actor.actions as |action key|}}
+                        <li class="assignedaction item" data-item-id="{{action._id}}">
+                            <div class="grid grid-2col-combat"
+                                 data-item-id="{{action._id}}"
+                                 data-type="{{ action.type }}"
+                                 data-name="{{ action.name }}"
+                                 data-rollable="{{action.system.rollable}}"
+                                 data-id="{{key}}">
+                                <div class="flexrow flex-group-left{{#if
+                                        (eq action.system.rollable "true")}} actionroll{{/if}}"
+                                     data-item-id="{{action._id}}">
+                                    {{# if (eq action.system.subtype 'misc')}}
+                                        <input class="editmiscaction" data-item-id="{{action._id}}"
+                                               onfocus="this.value=''" type="text" value="{{action.name}}">
+                                    {{else}}
+                                        {{action.name}}{{#if (eq action.system.subtype "parry")}}
+                                        ({{localize 'OD6S.PARRY'}}){{/if}}
+                                    {{/if}}
+                                </div>
+                                <div class="flexrow flex-group-center item-delete item-control"
+                                     data-type="action"
+                                     data-item-id="{{action._id}}"
+                                     data-confirm="false">
+                                    <a><i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

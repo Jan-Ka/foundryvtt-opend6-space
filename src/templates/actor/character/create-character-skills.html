@@ -1,0 +1,117 @@
+<div class="skills-holder">
+    <div style="border-radius: 10px;
+                                        background: #ffff66;padding: 10px;
+                                        width: 95%;
+                                        height: auto;
+                                        min-height: 80%;
+                                        ">
+        <div class="row">
+            <div class="column">
+                {{#each attrs as |attr|}}
+                    {{#if attr.active }}
+                        {{#if (isEvenAttribute attr.sort) }}
+                        {{> systems/od6s/templates/actor/character/create-skill-column.html
+                                key=attr.id value=attr actor=../actor templateData=../templateData}}
+                        {{/if}}
+                    {{/if}}
+                {{/each}}
+                {{#if actor.system.metaphysicsextranormal.value}}
+                    <li class="attributes" style="list-style: none;">
+                        <div class="attributes grid-3col-create-attributes">
+                            <div class="attribute flex-group-center">
+                                <b>{{ getAttributeName "met" }}:</b>
+                            </div>
+                            {{#if (isMetaphysicsAttributeOptional)}}
+                                <div></div>
+                            {{else}}
+                                <div class="flex-group-center">
+                                    <b>{{diceFromScore
+                                            actor.system.attributes.met}}</b>D+<b>{{pipsFromScore
+                                        actor.system.attributes.met}}</b>
+                                </div>
+                            {{/if}}
+                            <div class="item-add flex flex-group-center"
+                                 data-tooltip="{{localize 'OD6S.ADD_SKILL'}}"
+                                 data-type="skill"
+                                 data-attrname="met">
+                                <a><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                        <div>
+                            <ul class="skill-list" style="list-style: none;">
+                                {{#each actor.skills as |skill skillkey|}}
+                                    {{#if (eq skill.system.attribute "met") }}
+                                        <li class="item skills">
+                                            <div class="skills grid grid-3col-create-attributes">
+                                                <div class="skillname" data-tooltip="{{skill.system.description}}">
+                                                    {{skill.name}}
+                                                </div>
+                                                <div class="flex-group-center"
+                                                     data-item-id="{{skill._id}}"
+                                                     data-type="skill"
+                                                     data-score="{{skill.system.score}}"
+                                                     data-base="{{skill.system.base}}"
+                                                     data-label="{{skill.name}}">
+                                                    {{#unless (flatSkills)}}
+                                                        <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
+                                                            skill.system.score}}</b>
+                                                    {{else}}
+                                                        {{ skill.system.base }}
+                                                    {{/unless}}</div>
+                                                <div class="item item-controls flexrow flex-group-center"
+                                                     data-item-id="{{skill._id}}">
+                                                    <div class="increase-dialog"
+                                                         title="{{localize "OD6S.INCREASE_SKILL"}}"
+                                                         data-item-id="{{skill._id}}"
+                                                         data-type="skill"
+                                                         data-score="{{skill.system.score}}"
+                                                         data-base="{{skill.system.base}}"
+                                                         data-label="{{skill.name}}">
+                                                        <a><i class="fas fa-plus-square"></i></a></div>
+                                                    <div class="decrease-dialog"
+                                                         title="{{localize "OD6S.DECREASE_SKILL"}}"
+                                                         data-item-id="{{skill._id}}"
+                                                         data-type="skill"
+                                                         data-score="{{skill.system.score}}"
+                                                         data-base="{{skill.system.base}}"
+                                                         data-label="{{skill.name}}">
+                                                        <a><i class="fas fa-minus-square"></i></a></div>
+                                                    <div class="specialize-dialog"
+                                                         title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                                         data-item-id="{{skill._id}}"
+                                                         data-type="skill">
+                                                        <a><i class="fas fa-chevron-circle-left"></i></a>
+                                                    </div>
+                                                    {{#if (itemNotInTemplate skill.name ../templateData) }}
+                                                        <div data-item-id="{{skill._id}}"
+                                                             data-type="skill"
+                                                             class="item-control item-delete"
+                                                             title={{localize 'OD6S.DELETE_SKILL'}}>
+                                                            <a><i class="fas fa-trash"></i></a>
+                                                        </div>
+                                                    {{else}}
+                                                        <div></div>
+                                                    {{/if}}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {{/if}}
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </li>
+                {{/if}}
+            </div>
+            <div class="column">
+                {{#each attrs as |attr|}}
+                    {{#if attr.active }}
+                        {{#unless (isEvenAttribute attr.sort) }}
+                            {{> systems/od6s/templates/actor/character/create-skill-column.html
+                                    key=attr.id value=attr actor=../actor templateData=../templateData}}
+                        {{/unless}}
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

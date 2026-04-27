@@ -1,0 +1,189 @@
+{
+  "id": "od6s",
+  "title": "OpenD6 Space",
+  "description": "OpenD6 Space System for FoundryVTT",
+  "version": "2.0.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.360",
+    "maximum": "14"
+  },
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {},
+      "creature": {},
+      "vehicle": {},
+      "starship": {},
+      "container": {}
+    },
+    "Item": {
+      "skill": {},
+      "specialization": {},
+      "advantage": {},
+      "disadvantage": {},
+      "specialability": {},
+      "armor": {},
+      "weapon": {},
+      "gear": {},
+      "cybernetic": {},
+      "manifestation": {},
+      "character-template": {},
+      "action": {},
+      "vehicle-weapon": {},
+      "vehicle-gear": {},
+      "starship-weapon": {},
+      "starship-gear": {},
+      "species-template": {},
+      "item-group": {}
+    }
+  },
+  "authors": [
+    {
+      "name": "Jan-Ka",
+      "url": "https://github.com/jan-ka"
+    }
+  ],
+  "esmodules": [
+    "module/od6s.js"
+  ],
+  "scripts": [],
+  "styles": [
+    "css/od6s.css"
+  ],
+  "packs": [
+    {
+      "name": "weapons",
+      "label": "Weapons",
+      "path": "packs/weapons",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "armor",
+      "label": "Armor",
+      "path": "packs/armor",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "natural",
+      "label": "Natural Combat Items",
+      "path": "packs/natural",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "advantages",
+      "label": "Advantages",
+      "path": "packs/advantages",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "disadvantages",
+      "label": "Disadvantages",
+      "path": "packs/disadvantages",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "skills",
+      "label": "Skills",
+      "path": "packs/skills",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "metaphysics-skills",
+      "label": "Metaphysics Skills",
+      "path": "packs/metaphysics-skills",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "specialabilities",
+      "label": "Special Abilities",
+      "path": "packs/special-abilities",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "gear",
+      "label": "Gear",
+      "path": "packs/gear",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "cybernetics",
+      "label": "Cybernetics",
+      "path": "packs/cybernetics",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "vehicles",
+      "label": "Vehicles",
+      "path": "packs/vehicles",
+      "type": "Actor",
+      "system": "od6s"
+    },
+    {
+      "name": "starships",
+      "label": "Starships",
+      "path": "packs/starships",
+      "type": "Actor",
+      "system": "od6s"
+    },
+    {
+      "name": "character-templates",
+      "label": "Character Templates",
+      "path": "packs/character-templates",
+      "type": "Item",
+      "system": "od6s"
+    },
+    {
+      "name": "macros",
+      "label": "Macros",
+      "path": "packs/macros",
+      "type": "Macro",
+      "system": "od6s"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "lang/ru.json"
+    }
+  ],
+  "relationships": {
+    "requires": [
+      {
+        "id": "socketlib",
+        "type": "module"
+      }
+    ]
+  },
+  "socket": true,
+  "url": "https://github.com/Jan-Ka/foundryvtt-opend6-space",
+  "manifest": "https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/system.json",
+  "download": "https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/od6s.zip",
+  "license": "https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/LICENSE"
+}

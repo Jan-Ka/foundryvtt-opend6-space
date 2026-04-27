@@ -1,0 +1,96 @@
+{
+  "label": "Gear",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Binoculars": {
+      "name": "Prismáticos",
+      "description": "<p>Bonificaci&oacute;n de +1D a las tiradas basadas en la vista/visi&oacute;n (Percepci&oacute;n) para ver objetos a m&aacute;s de siete pies a la luz del d&iacute;a y al atardecer.</p>"
+    },
+    "Comlink": {
+      "name": "Comunicador",
+      "description": "<p>Es el dispositivo est&aacute;ndar de equipo de comunicaci&oacute;n, los dispositivos de comunicaci&oacute;n, vienen en varias formas diferentes. El m&aacute;s com&uacute;n es el tel&eacute;fono (Terminal), que tiene un alcance efectivo de 10 kil&oacute;metros y se encuentra facilmente en el mercado. Estos tambi&eacute;n se pueden comprar como auriculares.</p> <p>Muchos mundos avanzados tecnol&oacute;gicamente cuentan con sat&eacute;lites de comunicaciones que permiten que las se&ntilde;ales del comunicador lleguen a cualquier parte del planeta.</p>"
+    },
+    "Cred-Key": {
+      "name": "Tarjeta de crédito",
+      "description": "<p>Una peque&ntilde;a tarjeta de pl&aacute;stico que, cuando se coloca en un receptor (Terminal Bancario), puede realizar todas las funciones bancarias. Las tarjetas de cr&eacute;dito son utilizadas por pr&aacute;cticamente todos los mundos desarrolados tecnologicamente, aunque no todos los mundos tienen sistemas bancarios compatibles. Muchos mundos fronterizos no tienen el equipo necesario para leer las tarjetas, por lo que solo aceptar&aacute;n la moneda vigente en ellos (Normalmete dinero en efectivo).</p> <p>Las tarjetas de cr&eacute;dito est&aacute;ndar contienen el nombre del portador y un n&uacute;mero de identificaci&oacute;n personal.</p> <p>Las tarjetas de cr&eacute;dito emitidas por megacorporaciones generalmente incluyen el nombre de la empresa y tambi&eacute;n un c&oacute;digo para la misma. Los oficiales militares, que pueden tener amplios l&iacute;mites de cr&eacute;dito debido a su estatus, llevan tarjetas con su patr&oacute;n de ADN codificado para facilitar su identificaci&oacute;n.</p> <p>Las tarjetas de cr&eacute;dito no son comunes en mundos con mucho contrabando, pirater&iacute;a u otras actividades delictivas: son demasiado dif&iacute;ciles de robar y usar.</p> <p>Un PJ puede ser capaz de falsificarlas, Usando reparaci&oacute;n de equipo personal y un total de habilidades de interfaz/reparaci&oacute;n de computadora de al menos 21 cada uno para falsificar o quitar una clave de credencial civil. (Las claves militares y de megacorporaci&oacute;n son m&aacute;s dif&iacute;ciles de hacer). Incluso entonces, un equipo de detecci&oacute;n decente (que generalmente no se encuentra en tiendas y bares, pero es com&uacute;n en bancos y tiendas minoristas de compras grandes) probablemente podr&aacute; detectar la falsificaci&oacute;n.</p> <p><strong> Coste</strong>: muy f&aacute;cil de configurar; se cobraran intereses para transferir dinero.</p>"
+    },
+    "Crowbar": {
+      "name": "Palanca",
+      "description": "<p>Otorga una bonificaci&oacute;n de +1D a los intentos de entrometerse/fisgonear/entrar en (abrir puertas, quitar tablones,etc)</p> <p>Hace Da&ntilde;o de fuerza +2 en da&ntilde;o con ataques contundentes.</p>"
+    },
+    "Enviro-suit": {
+      "name": "Traje medioambiental",
+      "description": "<p>El equipo b&aacute;sico de protecci&oacute;n ambiental, el traje ambiental, est&aacute; dise&ntilde;ado para usarse en climas hostiles o mundos cuya atm&oacute;sfera es insegura.</p> <p>El traje ambiental cuenta con un casco y un traje de cuerpo completo (el casco es desmontable). Los mecanismos del traje reciclan el aire y tambi&eacute;n filtran la humedad corporal para almacenarla en bolsas dentro del traje.</p> <p>Las tuberias de circulaci&oacute;n suben por el traje y se meten en el casco para permitir que el usuario respire.</p> <p>Los trajes ambientales com&uacute;nmente tienen unidades de comunicador integradas en el casco y el cintur&oacute;n. Una peque&ntilde;a luz indicadora en el casco parpadea cuando est&aacute; en presencia de otro comunicador configurado en la misma frecuencia.</p> <p>El traje ambiental mantiene una temperatura constante alrededor de su usuario que se puede ajustar a trav&eacute;s de controles en el cintur&oacute;n.</p> <p>El traje ambiental est&aacute;ndar ofrece solo una &uacute;nica capa de protecci&oacute;n (Valor de armadura +1), que, si se rasga o perfora, hace que todo el traje quede inoperativo. Los trajes m&aacute;s caros ofrecen dos capas de protecci&oacute;n, con un sellador l&iacute;quido almacenado entre el interior y el exterior. El da&ntilde;o hecho a la capa exterior se puede sellar en una ronda (valor de armadura +2). Sin embargo, un da&ntilde;o extenso agota r&aacute;pidamente el suministro de sellado. (El equipo promedio viene con suficiente sellador para reparar 20 desgarros peque&ntilde;os o 10 grandes).</p> <p>Los trajes ambientales pueden contener suficiente aire, comida y agua reciclada para varios d&iacute;as o varias semanas de uso; unas dos semanas es est&aacute;ndar. Se pueden recargar con suministros a bordo (deduciendo el soporte vital del soporte vital de la aeronave) o se pueden recargar en estaciones y lugares similares por el 10 % del coste base del traje.</p>"
+    },
+    "Flashlight": {
+      "name": "Linterna",
+      "description": "<p>Las linternas reducen los modificadores de oscuridad en 2D en un &aacute;rea en forma de cono de hasta cinco metros del usuario.</p> <p>Las bater&iacute;as internas se pueden recargar con cualquier corriente local (la base de la linterna incluye varios adaptadores).</p>"
+    },
+    "Hand Computer": {
+      "name": "Ordenador de bolsillo",
+      "description": "<p>Port&aacute;tiles y f&aacute;ciles de usar, estos dispositivos cuentan con una r&aacute;pida potencia de procesamiento, que incluye grandes cantidades de memoria de alta velocidad y unidades de chip multifuncionales de alta capacidad.</p> <p>La mayor&iacute;a viene con un puerto para la conexi&oacute;n a un conector neural, as&iacute; como interfaces de cable para conectarse a terminales m&aacute;s grandes.</p> <p>Los ordenadores m&aacute;s peque&ntilde;os tienen ranuras para unos cuantos micropocesadores mientras que las m&aacute;s grandes tienen espacio para bastante mas.</p>"
+    },
+    "Hand Scanner": {
+      "name": "Escaner de bolsillo",
+      "description": "<p>Un dispositivo port&aacute;til, el esc&aacute;ner de mano tiene un alcance efectivo de 10 kil&oacute;metros. Se puede configurar para captar movimiento, tipos particulares de materia e incluso indicaciones de generaci&oacute;n de energ&iacute;a. Son equipo est&aacute;ndar para exploradores y los mineros los usan con frecuencia.</p> <p>El uso de un esc&aacute;ner proporciona un +1D a los sensores. Utilice las tablas de <strong>Dificultades de informaci&oacute;n</strong> o <strong>Dificultades de observaci&oacute;n</strong>&nbsp;en el cap&iacute;tulo <strong>Dificultades de habilidad de ejemplo</strong>&nbsp;para determinar lo que revela el esc&aacute;ner.</p> <p>La mayor&iacute;a de los esc&aacute;neres manuales solo se ver&aacute;n afectador por una cubierta de m&aacute;s de tres metros s&oacute;lidos de espesor (varios muros de hormig&oacute;n grueso o el mamparo de una aeronave generalmente bloquear&aacute;n las lecturas del esc&aacute;ner, solo los bosques o junglas m&aacute;s densos tendr&aacute;n dicho efecto).</p>"
+    },
+    "Handcuffs": {
+      "name": "Esposas",
+      "description": "<p>Las esposas ajustables de metal de baja tecnolog&iacute;a requieren la llave o un juego moderado de manos para quitarlas (Habilidad); 18 puntos corporales/2 niveles de herida; resistencia al da&ntilde;o total 15.</p> <p>La llave viene con la compra de las esposas.</p>"
+    },
+    "Holo-vid Player": {
+      "name": "Reproductor de holo-videos",
+      "description": "<p>Este dispositivo proporciona im&aacute;genes hologr&aacute;ficas extra&iacute;das de chips de datos con fines informativos o de entretenimiento.</p> <p>Los holo-videos tambi&eacute;n se pueden conectar a los enlaces de comunicaci&oacute;n para proporcionar contacto de audio y visual entre las partes. Algunos holo-videos tienen la capacidad de conectarse a computadoras port&aacute;tiles, proyectando la informaci&oacute;n para que todos la lean.</p>"
+    },
+    "Life-Support Refills": {
+      "name": "Recargas de soporte vital",
+      "description": "<p>Son <strong>tanques</strong>&nbsp;de atm&oacute;sfera y suministros de alimentos que se pueden unir a un traje ambiental y algunos refugios port&aacute;tiles.</p> <p>Duran aproximadamente dos semanas y pesan menos de 10 kilogramos.</p>"
+    },
+    "Lockpicking Tools": {
+      "name": "Herramientas para abrir cerraduras",
+      "description": "<p>Bonificaci&oacute;n de +1D a los intentos de abrir cerraduras solo si el usuario tiene la habilidad de prestidigitaci&oacute;n.</p>"
+    },
+    "Med-kit": {
+      "name": "Botiquín",
+      "description": "<p>Una variedad de suministros m&eacute;dicos recogidos en un contenedor liviano que permite un f&aacute;cil transporte.</p> <p>Los botiquines normalmente contienen parches de antibi&oacute;ticos, un inyector hipod&eacute;rmico de aire comprimido, tres dosis de analg&eacute;sicos, vendajes y cinta adhesiva.</p> <p>El uso de un botiqu&iacute;n est&aacute;ndar proporciona una bonificaci&oacute;n de +1D a las tiradas de habilidades de medicina.</p>"
+    },
+    "Military Comlink": {
+      "name": "Inter-comunicador militar",
+      "description": "<p>Los comunicadores militares tienen un mayor alcance (aproximadamente 25 kil&oacute;metros) y con frecuencia son unidades de cintur&oacute;n o est&aacute;n integrados en cascos de trajes ambientales, para permitir que el soldado mantenga sus manos libres para el combate.</p> <p>Muchos mundos de alta tecnolog&iacute;a cuentan con sat&eacute;lites de comunicaciones que permiten que las se&ntilde;ales del comunicador lleguen a cualquier parte del planeta.</p>"
+    },
+    "Rope, Heavy (braided plastic)": {
+      "name": "Cuerda Gruesa (plástico trenzado)",
+      "description": "<p>Inflige Da&ntilde;o de Fuerza +2 cuando se usa en ataques de asfixia; 10 puntos corporales/1 nivel de herida; resistencia al da&ntilde;o total 5.</p>"
+    },
+    "Rope, Light (braided nylon)": {
+      "name": "Cuerda ligera (nylon trenzado)",
+      "description": "<p>Inflige Da&ntilde;o de Fuerza +1 cuando se usa en ataques de asfixia; 6 puntos corporales/1 nivel de herida; resistencia al da&ntilde;o total 3.</p>"
+    },
+    "Scholarchips": {
+      "name": "Chip de expansión (procesadores y ranuras de expansión)",
+      "description": "<p>Chips de computadora dise&ntilde;ados para usar tanto con unidades manuales como con terminales m&aacute;s grandes. Estos contienen informaci&oacute;n disponible sobre sectores, planetas, algunas especies ex&oacute;ticas, equipos, naves, datos personales, transacciones comerciales, etc.</p> <p>El uso de una computadora con un chip acad&eacute;mico est&aacute;ndar permite que el operador haga una tirada como si fuera un erudito o una habilidad adecuada basada en el conocimiento en el tema detallado en el chip.</p> <p>Por supuesto, cuanto m&aacute;s amplia sea la gama de informaci&oacute;n y cuanto m&aacute;s encriptada est&eacute;, m&aacute;s dif&iacute;cil ser&aacute; llegar a lo que necesita el personaje.</p> <p><strong>Coste:</strong> Muy F&aacute;cil para c&oacute;digo base de 1D, +1 al precio por cada +1D adicional.</p>"
+    },
+    "Shovel": {
+      "name": "Pala",
+      "description": "<p>Agregue +1D a los intentos de excavaci&oacute;n, o haga Da&ntilde;o de fuerza +2 en da&ntilde;o con ataques contundentes.</p>"
+    },
+    "Signal Locator": {
+      "name": "Localizador de señales",
+      "description": "<p>Este dispositivo, de distribuci&oacute;n restringida, monitorea las se&ntilde;ales de los dispositivos de rastreo.</p> <p>Incluye una peque&ntilde;a pantalla para mostrar la direcci&oacute;n del movimiento. Los m&aacute;s caros pueden se&ntilde;alar la ubicaci&oacute;n en un mapa electr&oacute;nico.</p>"
+    },
+    "Thermo-disk": {
+      "name": "Termo-Disco",
+      "description": "<p>Equipo &uacute;til cuando se viaja en un &aacute;rea salvaje, los discos t&eacute;rmicos son elementos de plastilina esferoide, aproximadamente del tama&ntilde;o del pu&ntilde;o de un humano promedio.</p> <p>Contienen acumuladores que, al encenderse, emiten calor en un radio de 25 metros. Como no proporcionan luz, pueden usarse en &aacute;reas hostiles sin traicionar la presencia.</p>"
+    },
+    "Tool Kit": {
+      "name": "Kit de herramientas",
+      "description": "<p>Contiene herramientas (y posiblemente piezas o contenedores de almacenamiento) necesarias para realizar tareas b&aacute;sicas relacionadas.</p> <p>Agregue +1D a los intentos de habilidad relevantes solo si el usuario tiene la habilidad apropiada (generalmente alguna versi&oacute;n de reparaci&oacute;n, pero investigaci&oacute;n en el caso de un kit de evidencia o arque&oacute;logo, estafa: disfraz en el caso de un kit de disfraz, o ciertas aplicaciones de artista o falsificaci&oacute;n con materiales art&iacute;sticos).</p>"
+    },
+    "Tracking Device": {
+      "name": "Dispositivo rastreador",
+      "description": "<p>Utilizado con un localizador de se&ntilde;al, este transmisor en miniatura permite que cualquier cosa que est&eacute; conectada a &eacute;l se localice electr&oacute;nicamente a distancia.</p> <p>Los dispositivos activos emiten una se&ntilde;al, mientras que los pasivos esperan que les llegue una se&ntilde;al antes de enviar una respuesta.</p>"
+    }
+  }
+}

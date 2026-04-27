@@ -1,0 +1,20 @@
+<form>
+    <div>
+        <div class="grid grid-2col">
+            <div class="flex-group-center">
+                <b>{{localize "OD6S.DICE"}}</b>
+            </div>
+            <div class="flex-group-center">
+                <b>{{localize "OD6S.PIPS"}}</b>
+            </div>
+            <div class="flex-group-center advancedice" data-dice="{{diceFromScore score}}">
+                <input type="number" id="dice" min=0 max=999 onfocus="this.value=''"
+                       data-dtype="Number" placeholder="{{diceFromScore score}}" value="{{diceFromScore score}}">
+            </div>
+            <div class="flex-group-center advancepips" data-pips="{{pipsFromScore score}}">
+                <input type="number" max=2 id="pips" min=0 onfocus="this.value=''"
+                       data-dtype="Number" placeholder="{{pipsFromScore score}}" value="{{pipsFromScore score}}">
+            </div>
+        </div>
+    </div>
+</form>

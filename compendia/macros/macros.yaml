@@ -1,0 +1,107 @@
+---
+name: Roll
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: game.od6s.simpleRoll()
+system:
+  description: Simple roll macro
+---
+name: Physical Resistance
+type: script
+img: icons/equipment/shield/Scutum-steel-worn.webp
+scope: global
+command: |
+    token ? token.actor.rollAction("pr") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's physical resistance.
+---
+name: Energy Resistance
+type: script
+img: icons/magic/lightning/bolt-beam-strike-blue.webp
+scope: global
+command: |
+    token ? token.actor.rollAction("er") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's energy resistance.
+---
+name: Dodge
+type: script
+img: icons/skills/movement/figure-running-gray.webp
+scope: global
+command: |
+    token ? token.actor.rollAction("dodge") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's dodge.
+---
+name: Block
+type: script
+img: icons/skills/melee/unarmed-punch-fist.webp
+scope: global
+command: |
+    token ? token.actor.rollAction("block") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's block.
+---
+name: Agility
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("agi") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Agility attribute.
+---
+name: Strength
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("str") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Strength attribute.
+---
+name: Mechanical
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("mec") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Mechanical attribute.
+---
+name: Knowledge
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("kno") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Knowledge attribute.
+---
+name: Perception
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("per") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Perception attribute.
+---
+name: Technical
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.rollAttribute("tec") : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll actor's Technical attribute.
+---
+name: Collision
+type: script
+img: icons/svg/dice-target.svg
+scope: global
+command: |
+    token ? token.actor.vehicleCollision() : ui.notifications.warn(game.i18n.localize('OD6S.NO_ACTOR_SELECTED'));
+system:
+  description: Roll vehicle collision daamage.

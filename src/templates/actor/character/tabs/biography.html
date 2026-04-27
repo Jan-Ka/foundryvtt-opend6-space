@@ -1,0 +1,34 @@
+<div class="tab biography" data-group="primary" data-tab="description">
+    <div class="flexrow">
+        <div class="grid grid-2col align-center">
+            <label for="actor.system.gender.content" class="align-right">{{localize actor.system.gender.label}}:</label>
+            <input title="{{localize actor.system.gender.label}}" name="system.gender.content" type="text"
+                   value="{{actor.system.gender.content}}" placeholder="{{localize actor.system.gender.label}}"
+                   data-dtype="{{actor.system.gender.type}}"/>
+        </div>
+        <div class="grid grid-2col align-center">
+            <label for="actor.system.age.content" class="align-right">{{localize actor.system.age.label}}:</label>
+            <input title="{{localize actor.system.age.label}}" name="system.age.content" type="text"
+                   value="{{actor.system.age.content}}" placeholder="{{localize actor.system.age.label}}"
+                   data-dtype="{{actor.system.gender.type}}"/>
+        </div>
+        <div class="grid grid-2col align-center">
+            <label for="actor.system.height.content" class="align-right">{{localize actor.system.height.label}}:</label>
+            <input title="{{localize actor.system.height.label}}" name="system.height.content" type="text"
+                   value="{{actor.system.height.content}}" placeholder="{{localize actor.system.height.label}}"
+                   data-dtype="{{actor.system.height.type}}"/>
+        </div>
+        <div class="grid grid-2col align-center">
+            <label for="actor.system.weight.content" class="align-right">{{localize actor.system.weight.label}}:</label>
+            <input title="{{localize actor.system.weight.label}}" name="system.weight.content" type="text"
+                   value="{{actor.system.weight.content}}" placeholder="{{localize actor.system.weight.label}}"
+                   data-dtype="{{actor.system.weight.label}}"/>
+        </div>
+    </div>
+    <label for="actor.system.personality.content" class="resource-label">{{localize actor.system.personality.label}}:</label>
+    <prose-mirror name="system.personality.content" value="{{actor.system.personality.content}}" {{#unless editable}}disabled{{/unless}}></prose-mirror>
+    <label for="actor.system.description.content" class="resource-label">{{localize actor.system.description.label}}:</label>
+    <prose-mirror name="system.description.content" value="{{actor.system.description.content}}" {{#unless editable}}disabled{{/unless}}></prose-mirror>
+    <label for="actor.system.background.content" class="resource-label">{{localize actor.system.background.label}}:</label>
+    <prose-mirror name="system.background.content" value="{{actor.system.background.content}}" {{#unless editable}}disabled{{/unless}}></prose-mirror>
+</div>

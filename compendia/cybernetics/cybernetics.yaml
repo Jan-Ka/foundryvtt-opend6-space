@@ -1,0 +1,173 @@
+---
+name: Cyber Arm
+type: cybernetic
+img: null
+system:
+  description: 'A cybernetic arm providing bonuses to melee, brawling, lift, and strength damage'
+  activeeffects: []
+  attribute: ''
+  skill: ''
+  value: ''
+  effect: ''
+  location: OD6S.RIGHT_ARM
+  slots: 0
+  label: OD6S.CHAR_CYBERNETICS
+effects:
+  - changes:
+      - key: data.melee.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    label: Melee Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.brawl.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    label: Brawl Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.strengthdamage.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    label: Strength Damage Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.parry.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+    label: Parry Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.block.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+    label: Block Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.customeffects.skills.Lift
+        mode: 2
+        value: '2'
+    disabled: false
+    duration:
+      startTime: 0
+    label: Lift Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+---
+name: Cyber Eye
+type: cybernetic
+img: null
+system:
+  description: "Adds +1D to perception and +1D to ranged attack rolls."
+  attribute: ''
+  skill: ''
+  value: ''
+  location: OD6S.HEAD
+  slots: 0
+  label: OD6S.CHAR_CYBERNETICS
+effects:
+  - changes:
+      - key: data.attributes.per.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    icon:
+    label: Perception
+    tint:
+    transfer: true
+    flags: {}
+  - changes:
+      - key: data.ranged.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    label: Ranged Attack Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+---
+name: Reflex Enhancer
+type: cybernetic
+img: null
+system:
+  description: 'Provides a 1D bonus to dodge and initiative'
+  attribute: ''
+  skill: ''
+  value: ''
+  location: OD6S.BODY
+  slots: 0
+  label: OD6S.CHAR_CYBERNETICS
+effects:
+  - changes:
+      - key: data.initiative.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+      startRound: 0
+      startTurn: 0
+    label: Initiative Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:
+  - changes:
+      - key: data.dodge.mod
+        mode: 2
+        value: '3'
+    disabled: false
+    duration:
+      startTime: 0
+    label: Dodge Bonus
+    transfer: true
+    flags: {}
+    icon:
+    tint:

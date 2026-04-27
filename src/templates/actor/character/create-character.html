@@ -1,0 +1,94 @@
+<div autocomplete="off" class="od6s create-character">
+    <div class="creation-form">
+        {{#if (eq step 1) }}
+            <div>
+                <b>{{localize 'OD6S.CREATE_CHARACTER_1'}}</b>
+            </div>
+            <div class="select-template" style="min-height:680px;">
+                <p>&nbsp;
+                    {{localize 'OD6S.CREATE_CHARACTER_1A'}}
+                </p>
+                <div class="template-dropdown-wrap">
+                    <label for="select-template">{{localize 'OD6S.TEMPLATES'}}:</label>
+                    <select class="template-dropdown" name="select-template" id="select-template" style="min-width: 100px;">
+                        {{#if (eq selectedTemplate '') }}
+                            <option value="" selected disabled hidden></option>
+                        {{/if}}
+                        {{#each characterTemplates as |itemTemplate|}}
+                            <option value="{{itemTemplate._id}}"
+                                    {{#if (eq itemTemplate._id ../selectedTemplate)}}selected{{/if}}>
+                                {{itemTemplate.name}}
+                            </option>
+                        {{/each}}
+                    </select>
+                </div>
+                {{> systems/od6s/templates/actor/character/create-character-template.html}}
+            </div>
+        {{/if}}
+        {{#if (eq step 2) }}
+            <div class="create-character-skills">
+                <b>{{localize 'OD6S.CREATE_CHARACTER_2'}}</b>
+                <br>{{localize 'OD6S.CREATE_CHARACTER_2A'}}
+                <br>{{localize 'OD6S.CREATE_CHARACTER_2B'}}
+                <br>{{localize 'OD6S.CREATE_CHARACTER_2C'}}
+            </div>
+            <div class="create-character-dice">
+                <div class="row">
+                    <div class="column">
+                        <div class="skill-dice-row grid grid-4col-attribute-dice">
+                            {{localize 'OD6S.REMAINING_SKILL_DICE'}}
+                            <input type="number" name="skill-dice"
+                                   id="skillDice" data-dtype="Boolean"
+                                   value="{{diceFromScore skillScore}}" disabled>
+                            D+
+                            <input type="number" name="skill-pips"
+                                   id="attributePips" data-dtype="Boolean"
+                                   min="0" max="{{maxPips}}"
+                                   value="{{pipsFromScore skillScore}}" disabled>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="spec-dice-row grid grid-5col-attribute-dice">
+                            {{localize 'OD6S.REMAINING_SPECIALIZATION_DICE'}}
+                            <input type="number" name="spec-dice"
+                                   id="specDice" data-dtype="Boolean"
+                                   value="{{diceFromScore specScore}}" disabled>
+                            D+
+                            <input type="number" name="spec-pips"
+                                   id="specPips" data-dtype="Boolean"
+                                   min="0" max="{{maxPips}}"
+                                   value="{{pipsFromScore specScore}}" disabled>
+                            {{#unless (specializationDice)}}
+                                <div class="flexrow flex-group-center">
+                                    <div class="add-spec-dice"
+                                         title="{{localize "OD6S.ADD_DICE"}}">
+                                        <a><i class="fas fa-plus-square"></i></a></div>
+                                    <div class="remove-spec-dice"
+                                         title="{{localize "OD6S.REMOVE_DICE"}}">
+                                        <a><i class="fas fa-minus-square"></i></a></div>
+                                </div>
+                            {{/unless}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{> systems/od6s/templates/actor/character/create-character-skills.html }}
+        {{/if}}
+        <footer class="flexrow flex-group-center buttons align-center-bottom character-create-button form-footer">
+            <br>
+            {{#if (eq step 2)}}
+                <button type="button" name="back" data-action="back">{{localize "OD6S.BACK"}}</button>
+                <button type="button" name="finish" data-action="finish"
+                        {{#if (ne done true)}}disabled{{/if}}>{{localize "OD6S.FINISH"}}</button>
+            {{else}}
+                {{#if (eq selectedTemplate '')}}
+                    <button disabled type="button" name="next">{{localize "OD6S.NEXT"}}</button>
+                {{else}}
+                    <button type="button" name="next" data-action="next" data-step="{{step}}">{{localize
+                            "OD6S.NEXT"}}</button>
+                {{/if}}
+            {{/if}}
+            <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+        </footer>
+    </div>
+</div>

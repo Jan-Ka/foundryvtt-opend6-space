@@ -1,0 +1,320 @@
+<div class="tab vehicle" data-group="primary" data-tab="vehicle">
+    <div class="row">
+        <div class="column">
+            <div class="grid grid-2col">
+                <div class="flexrow flex-group-left">
+                    <b>{{localize 'OD6S.VEHICLE_NAME'}}</b>
+                </div>
+                <div class="flexrow flex-group-left">
+                    {{actor.system.vehicle.name}}
+                </div>
+            </div>
+            <div class="flexrow flex-group-center">{{localize 'OD6S.VEHICLE_STATS'}}</div>
+            <div class="grid grid-4col">
+                <div class="flexrow flex-group-left">
+                    {{localize actor.system.vehicle.scale.label}}
+                </div>
+                <div class="flexrow flex-group-center">
+                    {{actor.system.vehicle.scale.score}}
+                </div>
+                <div class="flexrow flex-group-left">
+                    {{localize actor.system.vehicle.move.label}}
+                </div>
+                <div class="flexrow flex-group-center">
+                    {{actor.system.vehicle.move.value}}
+                </div>
+                <div class="flexrow flex-group-left">
+                    {{localize actor.system.vehicle.armor.label}}
+                </div>
+                <div class="flex-group-center">
+                    <b>{{diceFromScore actor.system.vehicle.armor.score}}</b>D+<b>{{pipsFromScore
+                        actor.system.vehicle.armor.score}}</b>
+                </div>
+                <div class="flex-group-left">{{ localize 'OD6S.DODGE' }}:</div>
+                <div class="flex-group-center">{{actor.system.vehicle.dodge.score}}</div>
+            </div>
+            <div class="grid grid-6col-vehicle-tab">
+                <div class="attribute flexrow flex-group-left {{#if
+                        (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                     title="{{localize actor.system.vehicle.maneuverability.label}}"
+                     data-type="vehiclemaneuverability"
+                     data-score="{{sumManeuverability actor actor.system.vehicle 'score'}}"
+                     data-label="{{localize actor.system.vehicle.maneuverability.label}}">
+                    <b>{{localize actor.system.vehicle.maneuverability.label}}</b>
+                </div>
+                <div
+                        class="flex-group-center"
+                        title="{{localize actor.system.vehicle.maneuverability.label}}"><b>{{diceFromScore
+                        actor.system.vehicle.maneuverability.score}}</b>D+<b>{{pipsFromScore
+                        actor.system.vehicle.maneuverability.score}}</b>
+                </div>
+                <div class="flex-group-center" title="{{sumManeuverability actor actor.system.vehicle 'skill'}}">
+                    <b>{{diceFromScore
+                            (sumManeuverability actor actor.system.vehicle 'skillScore')}}</b>D+<b>{{pipsFromScore
+                        (sumManeuverability actor actor.system.vehicle 'skillScore')}}</b>
+                </div>
+                <div class="flex-group-center {{#if
+                        (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}" title="{{localize 'OD6S.TOTAL'}}"
+                     data-type="vehiclemaneuverability"
+                     data-score="{{sumManeuverability actor actor.system.vehicle 'score'}}"
+                     data-label="{{localize actor.system.vehicle.maneuverability.label}}">
+                    <b>{{diceFromScore (sumManeuverability actor actor.system.vehicle 'score')}}</b>
+                    D+<b>{{pipsFromScore (sumManeuverability actor actor.system.vehicle 'score')}}</b>
+                </div>
+                <div class="attribute flexrow flex-group-left {{#if
+                        (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                     title="{{getToughnessName actor.system.vehicle.type}}"
+                     data-type="vehicletoughness"
+                     data-score="{{add actor.system.vehicle.toughness.score actor.system.vehicle.armor.score}}"
+                     data-label="{{getToughnessName actor.system.vehicle.type}}">
+                    <b>{{getToughnessName actor.system.vehicle.type}}</b>
+                </div>
+                <div class="flex-group-center {{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                     title="{{getToughnessName actor.system.vehicle.type}}"
+                     data-type="vehicletoughness"
+                     data-score="{{add actor.system.vehicle.toughness.score actor.system.vehicle.armor.score}}"
+                     data-label="{{getToughnessName actor.system.vehicle.type}}">
+                    <b>{{diceFromScore (add actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                    D+<b>{{pipsFromScore (add actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                </div>
+            </div>
+            {{#if (gt actor.system.vehicle.shields.value 0)}}
+                <h4 class="flexrow flex-group-center">{{localize 'OD6S.SHIELDS'}}:
+                    <div class="flex-group-center">{{localize 'OD6S.TOTAL'}}: <b>{{diceFromScore
+                            actor.system.vehicle.shields.value}}</b>D+<b>{{pipsFromScore
+                            actor.system.vehicle.shields.value}}</b></div>
+                    <div class="flex-group-center">{{localize 'OD6S.ALLOCATED'}}: <b>{{diceFromScore
+                            actor.system.vehicle.shields.allocated}}
+                    </b>D+<b>{{pipsFromScore actor.system.vehicle.shields.allocated}}</b></div>
+                </h4>
+                <div class="row">
+                    <div class="column">
+                        <div class="grid grid-shields">
+                            <div class="flexrow flex-group-left">{{localize
+                                    actor.system.vehicle.shields.arcs.front.label}}</div>
+                            <div title="{{localize 'OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="shields"
+                                 data-score="{{actor.system.vehicle.shields.arcs.front.value}}"
+                                 data-label="{{localize actor.system.vehicle.shields.arcs.front.label}} {{localize
+                                         actor.system.vehicle.shields.label}}">
+                                <b>{{diceFromScore actor.system.vehicle.shields.arcs.front.value}}
+                                </b>D+<b>{{pipsFromScore actor.system.vehicle.shields.arcs.front.value}}</b>
+                            </div>
+                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName actor.system.vehicle.type}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="vehicletoughness"
+                                 data-score="{{add actor.system.vehicle.shields.arcs.front.value actor.system.vehicle.toughness.score
+                                                   actor.system.vehicle.armor.score}}"
+                                 data-label="{{getToughnessName actor.system.vehicle.type}}">
+                                <b>{{diceFromScore
+                                        (add actor.system.vehicle.shields.arcs.front.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}
+                                </b>D+<b>{{pipsFromScore
+                                    (add actor.system.vehicle.shields.arcs.front.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                            </div>
+                            <div class="flexrow flex-group-center">
+                                <div class="c-arc" data-arc="front" data-direction="up"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-plus-square"></i>
+                                </div>
+                                <div class="c-arc" data-arc="front" data-direction="down"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-minus-square"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-shields">
+                            <div class="flexrow flex-group-left">{{localize actor.system.vehicle.shields.arcs.left.label}}</div>
+                            <div title="{{localize 'OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.vehicle.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="shields"
+                                 data-score="{{actor.system.vehicle.shields.arcs.left.value}}"
+                                 data-label="{{localize actor.system.vehicle.shields.arcs.left.label}} {{localize
+                                         actor.system.vehicle.shields.label}}">
+                                <b>{{diceFromScore actor.system.vehicle.shields.arcs.left.value}}
+                                </b>D+<b>{{pipsFromScore actor.system.vehicle.shields.arcs.left.value}}</b>
+                            </div>
+                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName actor.system.vehicle.type}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="vehicletoughness"
+                                 data-score="{{add actor.system.vehicle.shields.arcs.left.value actor.system.vehicle.toughness.score
+                                                   actor.system.vehicle.armor.score}}"
+                                 data-label="{{getToughnessName actor.system.vehicle.type}}">
+                                <b>{{diceFromScore
+                                        (add actor.system.vehicle.shields.arcs.left.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}
+                                </b>D+<b>{{pipsFromScore
+                                    (add actor.system.vehicle.shields.arcs.left.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                            </div>
+                            <div class="flexrow flex-group-center">
+                                <div class="c-arc" data-arc="left" data-direction="up"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-plus-square"></i>
+                                </div>
+                                <div class="c-arc" data-arc="left" data-direction="down"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-minus-square"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="grid grid-shields">
+                            <div class="flexrow flex-group-left">{{localize actor.system.vehicle.shields.arcs.rear.label}}</div>
+                            <div title="{{localize 'OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="shields"
+                                 data-score="{{actor.system.vehicle.shields.arcs.rear.value}}"
+                                 data-label="{{localize actor.system.vehicle.shields.arcs.rear.label}} {{localize
+                                         actor.system.vehicle.shields.label}}">
+                                <b>{{diceFromScore actor.system.vehicle.shields.arcs.rear.value}}
+                                </b>D+<b>{{pipsFromScore actor.system.vehicle.shields.arcs.rear.value}}</b>
+                            </div>
+                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName actor.system.vehicle.type}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="vehicletoughness"
+                                 data-score="{{add actor.system.vehicle.shields.arcs.rear.value actor.system.vehicle.toughness.score
+                                                   actor.system.vehicle.armor.score}}"
+                                 data-label="{{getToughnessName actor.system.vehicle.type}}">
+                                <b>{{diceFromScore
+                                        (add actor.system.vehicle.shields.arcs.rear.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}
+                                </b>D+<b>{{pipsFromScore
+                                    (add actor.system.vehicle.shields.arcs.rear.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                            </div>
+                            <div class="flexrow flex-group-center">
+                                <div class="c-arc" data-arc="rear" data-direction="up"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-plus-square"></i>
+                                </div>
+                                <div class="c-arc" data-arc="rear" data-direction="down"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-minus-square"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-shields">
+                            <div class="flexrow flex-group-left">{{localize
+                                    actor.system.vehicle.shields.arcs.right.label}}</div>
+                            <div title="{{localize 'OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="shields"
+                                 data-score="{{actor.system.vehicle.shields.arcs.right.value}}"
+                                 data-label="{{localize actor.system.vehicle.shields.arcs.right.label}} {{localize
+                                         actor.system.vehicle.shields.label}}">
+                                <b>{{diceFromScore actor.system.vehicle.shields.arcs.right.value}}
+                                </b>D+<b>{{pipsFromScore actor.system.vehicle.shields.arcs.right.value}}</b>
+                            </div>
+                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName actor.system.vehicle.type}}"
+                                 class="flex-group-center{{#if
+                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                 data-type="vehicletoughness"
+                                 data-score="{{add actor.system.vehicle.shields.arcs.right.value actor.system.vehicle.toughness.score
+                                                   actor.system.vehicle.armor.score}}"
+                                 data-label="{{getToughnessName actor.system.vehicle.type}}">
+                                <b>{{diceFromScore
+                                        (add actor.system.vehicle.shields.arcs.right.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}
+                                </b>D+<b>{{pipsFromScore
+                                    (add actor.system.vehicle.shields.arcs.right.value actor.system.vehicle.toughness.score actor.system.vehicle.armor.score)}}</b>
+                            </div>
+                            <div class="flexrow flex-group-center">
+                                <div class="c-arc" data-arc="right" data-direction="up"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-plus-square"></i>
+                                </div>
+                                <div class="c-arc" data-arc="right" data-direction="down"
+                                     data-uuid="{{actor.system.vehicle.uuid}}">
+                                    <i class="fas fa-minus-square"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+            {{#if (getSensorsConfig)}}
+                {{#if actor.system.vehicle.sensors.value }}
+                    <div class="flexrow flex-group-center">
+                        {{ localize 'OD6S.SENSORS' }}
+                    </div>
+                    <div class="grid grid-2col">
+                        {{#each actor.system.vehicle.sensors.types as |sensortype key|}}
+                            <div class="flexrow flex-group-center">
+                                <div>{{localize sensortype.label}}:</div>
+                                <div title="{{localize 'OD6S.RANGE'}}">{{sensortype.range}}</div>
+                                /
+                                <div title="{{localize 'OD6S.SCORE'}}"
+                                     class="flex-group-center{{#if
+                                             (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                     data-type="sensors"
+                                     data-score="{{getSensorTotal ../actor sensortype.score}}"
+                                     data-label="{{localize 'OD6S.SENSORS'}} {{localize sensortype.label}}">
+                                    <b>{{diceFromScore (getSensorTotal ../actor sensortype.score)}}
+                                    </b>D+<b>{{pipsFromScore (getSensorTotal ../actor sensortype.score)}}</b>
+                                </div>
+                            </div>
+                        {{/each}}
+                    </div>
+                {{/if}}
+            {{/if}}
+        </div>
+        <div class="column">
+            <div class="flexrow flex-group-center">{{localize 'OD6S.CREW'}}</div>
+            <div>
+                <ul class="crew-list">
+                    <div class="grid title-add-grid">
+                        {{#each actor.system.vehicle.crewmembers as |crewmember|}}
+                            <div class="flexrow flex-group-left">
+                                {{crewmember.name}}
+                            </div>
+                            {{#if (eq ../actor.uuid crewmember.uuid)}}
+                                <div class="flexrow flex-group-center">
+                                    <a data-crewId="{{crewmember.uuid}}"
+                                       data-vehicleId="{{ ../actor.system.vehicle.uuid}}"
+                                       data-type="crewmember"
+                                       class="item-control crew-delete small-font"
+                                       title="{{localize 'OD6S.REMOVE_FROM_VEHICLE'}}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            {{else}}
+                                <div></div>{{/if}}
+                        {{/each}}
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="flexrow flex-group-center">{{localize 'OD6S.WEAPONS'}}</div>
+    <div>
+        <ul class="weapons-list">
+            {{#each actor.system.vehicle.vehicle_weapons as |weapon|}}
+                {{#if weapon.system.equipped.value}}
+                    <li class="weapons item" data-item-id="{{weapon._id}}">
+                        <div class="inv-grid vehicle-ranged-weapon-grid-tab">
+                            <div class="flexrow flex-group-left"
+                                 title="{{weapon.description}}">{{weapon.name}}</div>
+                            <div class="flexrow flex-group-left"
+                                 title="{{localize 'OD6S.ARC'}}">
+                                {{localize weapon.system.arc.value}}</div>
+                            <div class="flexrow flex-group-center"
+                                 title="{{localize 'OD6S.RANGE'}}">
+                                {{weapon.system.range.short}}/{{weapon.system.range.medium}}
+                                /{{weapon.system.range.long}}</div>
+                            <div class="flexrow flex-group-center" title="{{localize 'OD6S.DAMAGE'}}">
+                                {{diceFromScore weapon.system.damage.score}}D+{{pipsFromScore
+                                    weapon.system.damage.score}}</div>
+                            <div class="flexrow flex-group-center" title="{{localize 'OD6S.FIRE_CONTROL'}}">
+                                {{diceFromScore weapon.system.fire_control.score}}D+{{pipsFromScore
+                                    weapon.system.fire_control.score}}</div>
+                        </div>
+                    </li>
+                {{/if}}
+            {{/each}}
+        </ul>
+    </div>
+</div>

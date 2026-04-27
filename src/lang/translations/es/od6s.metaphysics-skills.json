@@ -1,0 +1,20 @@
+{
+  "label": "Metaphysics Skills",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Channel": {
+      "name": "Canalización",
+      "description": "<p>Con esta habilidad, un PJ puede concentrar la energ&iacute;a dentro de s&iacute; mismo y de su entorno para da&ntilde;ar a otros o protegerse a s&iacute; mismo y a los dem&aacute;s del da&ntilde;o.</p> <p>Los efectos m&aacute;s comunes producidos con esta habilidad incluyen la modificaci&oacute;n del da&ntilde;o o valor de armadura o la generaci&oacute;n de un nuevo da&ntilde;o o valor de armadura.</p>"
+    },
+    "Sense": {
+      "name": "Sentir",
+      "description": "<p>Un personaje que ha aprendido esta habilidad puede detectar cualquier cosa existente, conocer su entorno y modificar e influir en las mentes.</p> <p>Algunos efectos incluyen:</p> <p>Modificar el conocimiento y los intentos generales de percepci&oacute;n; modificar las habilidades de negociaci&oacute;n, comando, estafa, investigaci&oacute;n, persuasi&oacute;n, b&uacute;squeda o relacionadas con el conocimiento existentes o incluidas, especialmente para descubrir/hallar informaci&oacute;n espec&iacute;fica.</p>"
+    },
+    "Transform": {
+      "name": "Transformar",
+      "description": "<p>Esta habilidad permite a los PJ alterar temporalmente a personas y cosas dentro del universo, incluido mover algo de un lugar a otro y cambiar las capacidades naturales de un objetivo.</p> <p>Algunos efectos incluyen:</p> <p>modificar una habilidad o atributo excepto los usos generales de Percepci&oacute;n, negociaci&oacute;n, mando, estafa, investigaci&oacute;n, persuasi&oacute;n, b&uacute;squeda, Conocimiento o habilidades relacionadas con el Conocimiento; agregar niveles adicionales de una habilidad especial que el objetivo ya tiene; dar a un objetivo una nueva Habilidad Especial, Desventaja o habilidad; colocar nuevas Limitaciones o Mejoras en una Habilidad Especial existente; objetivos en movimiento; y modificar el valor de movimiento de un objetivo.</p> <p>Para mover un objetivo, el total de la habilidad debe superar el valor del peso del objetivo. (Busque la masa del objetivo en la tabla <strong>Dificultades de levantar (cargas)</strong>&nbsp;en la p&aacute;gina 91).</p> <p>El objetivo puede resistir tirando su Fuerza o elevaci&oacute;n y a&ntilde;adi&eacute;ndola a su dificultad de peso (te&oacute;ricamente, intenta hacerse m&aacute;s dif&iacute;cil de agarrar para la manipulaci&oacute;n; resistirse no cuenta como una acci&oacute;n para el personaje objetivo). Si el total de transformaci&oacute;n es igual o superior a la dificultad de manipulaci&oacute;n modificada, el personaje se mueve. Esto tambi&eacute;n se aplica a la autotransportaci&oacute;n (aunque es probable que el personaje no se resista).</p>"
+    }
+  }
+}

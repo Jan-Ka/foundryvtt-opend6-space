@@ -1,0 +1,132 @@
+<div class="tab special-abilities" data-group="primary" data-tab="special-abilities">
+    {{#unless (hideAdvantagesDisadvantages)}}
+        <div class="row">
+            <div class="column">
+                <div>
+                    <div class="flex-group-center">
+                        <b>{{localize 'OD6S.CHAR_ADVANTAGES'}}</b>
+                    </div>
+                    <div>
+                        <ul class="advantages-list">
+                            {{#each actor.advantages as |advantage key|}}
+                                <li class="specialability item flexrow" data-item-id="{{advantage._id}}">
+                                    <div class="flexrow flex-group-left show-item-details"
+                                         data-item-name="{{item.name}}"
+                                         data-actor-id="{{../actor.id}}"
+                                         data-item-id="{{advantage._id}}">{{advantage.name}}</div>
+                                    <div class="item-controls flexrow flex-group-center"
+                                         data-item-id="{{advantage._id}}"
+                                         data-type="advantage">
+                                        <a class="item-control item-edit small-font" data-item-id="{{advantage._id}}"
+                                           title="Edit advantage">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a data-item-id="{{advantage._id}}"
+                                           data-type="advantage"
+                                           class="item-control item-delete small-font"
+                                           title="Delete advantage">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div>
+                    <div class="flex-group-center">
+                        <b>{{localize 'OD6S.CHAR_DISADVANTAGES'}}</b>
+                    </div>
+                </div>
+                <div>
+                    <ul class="disadvantages-list">
+                        {{#each actor.disadvantages as |disadvantage key|}}
+                            <li class="specialability item flexrow" data-item-id="{{disadvantage._id}}">
+                                <div class="flexrow flex-group-left show-item-details"
+                                     data-item-name="{{item.name}}" data-item-name="{{item.name}}"
+
+                                     data-actor-id="{{../actor.id}}"
+                                     data-item-id="{{disadvantage._id}}">{{disadvantage.name}}</div>
+                                <div class="item-controls flexrow flex-group-center"
+                                     data-item-id="{{disadvantage._id}}"
+                                     data-type="disadvantage">
+                                    <a class="item-control item-edit small-font" data-item-id="{{disadvantage._id}}"
+                                       title="Edit disadvantage">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a data-item-id="{{disadvantage._id}}"
+                                       data-type="disadvantage"
+                                       class="item-control item-delete small-font"
+                                       title="Delete advantage">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {{/unless}}
+    <p></p>
+    <div class="row">
+        <div class="column">
+            <div class="flex-group-center">
+                <b>{{localize 'OD6S.CHAR_SPECIAL_ABILITIES'}}</b>
+            </div>
+            <div>
+                <ul class="specialabilities-list">
+                    {{#each actor.specialabilities as |specialability key|}}
+                        <li class="specialability item flexrow" data-item-id="{{specialability._id}}">
+                            <div class="flexrow flex-group-left show-item-details"
+                                 data-item-name="{{item.name}}"
+                                 data-item-name="{{item.name}}"
+                                 data-actor-id="{{../actor.id}}"
+                                 data-item-id="{{specialability._id}}">{{specialability.name}}</div>
+                            <div class="item-controls flexrow flex-group-center"
+                                 data-item-id="{{specialability._id}}"
+                                 data-type="specialability">
+                                <a class="item-control item-edit small-font" data-item-id="{{specialability._id}}"
+                                   title="Edit Special Ability">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a data-item-id="{{specialability._id}}"
+                                   data-type="specialability"
+                                   class="item-control item-delete small-font"
+                                   title="Delete Special Ability">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <div class="column">
+            <div class="flex-group-center">
+                <b>{{localize 'OD6S.EFFECTS'}}</b>
+            </div>
+            <div>
+                <ul class="effects">
+                    <div class="grid grid-2col">
+                        {{#each actor.effects as |effect key|}}
+                            <li class="effect flexrow">
+                                <div class="flexrow flex-group-left edit-effect
+                                    {{#if effect.disabled}}disabled{{/if}}"
+                                     data-effect-id="{{effect.id}}"
+                                     {{#if effect.name}}
+                                        title="{{effect.name}}">{{effect.name}}
+                                     {{ else }}
+                                         title="{{effect.label}}">{{effect.label}}
+                                     {{/if}}
+                                </div>
+                            </li>
+                        {{/each}}
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

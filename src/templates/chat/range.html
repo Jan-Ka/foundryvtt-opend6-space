@@ -1,0 +1,33 @@
+<header class="message-header flexrow">
+    <h4 class="message-sender" data-message-id="{{message._id}}">{{alias}}</h4>
+    <span class="message-metadata">
+          <time class="message-timestamp">{{timeSince message.timestamp}}</time>
+        {{#if user.isGM}}
+            <a class="button message-delete"><i class="fas fa-trash"></i></a>
+        {{/if}}
+      </span>
+    {{#if message.flavor}}
+        <span class="flavor-text">{{{message.flavor}}}</span>
+    {{/if}}
+</header>
+<div class="message-content">
+    {{{message.content}}}
+</div>
+<div class="ranges grid-3col-labels">
+ {{#each (getRanges) as |range key|}}
+     <div>
+     {{localize range.name}}:
+     </div>
+     {{#if (eq range.name 'OD6S.RANGE_POINT_BLANK')}}
+         <div>&nbsp;</div>
+         <div>2</div>
+     {{else}}
+         <div>
+             {{ getStrRange ../message._id range.name 'origRange' }}
+         </div>
+        <div>
+            {{ getStrRange ../message._id range.name 'range' }}
+        </div>
+     {{/if}}
+ {{/each}}
+</div>

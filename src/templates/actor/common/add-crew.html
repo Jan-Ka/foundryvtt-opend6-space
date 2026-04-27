@@ -1,0 +1,16 @@
+<div class="od6s add-crew-dialog">
+    <div class="flexrow flex-group-left">
+        <label for="addcrew">{{localize "OD6S.ADD"}}:</label>
+        <select name="addcrew" id="addcrew">
+            {{#each object.targets as | target |}}
+                <option value="{{target.uuid}}">{{target.name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <input name="actor" type="hidden" value="{{object.actor}}">
+    <footer class="flexrow flex-group-center form-footer"
+            data-message-actor="{{object.actor}}">
+        <button type="submit" name="submit" value="submit">{{localize "OD6S.SUBMIT"}}</button>
+        <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+    </footer>
+</div>

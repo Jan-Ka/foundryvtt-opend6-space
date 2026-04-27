@@ -1,0 +1,37 @@
+<div class="od6s init-roll-dialog">
+    <p><b>{{ localize 'OD6S.ROLLING'}} {{title}}: {{dice}}D + {{pips}}</b></p>
+    <div class="flexrow flex-group-left usecharacterpoints">
+        <div data-characterpoints="{{characterpoints}}">{{ localize 'OD6S.USE_CHARACTER_POINTS'}}</div>
+        <div class="flexrow flex-group-center">
+            <div class="boxed" style="color:{{ cpcostcolor }};">{{characterpoints}}</div>
+            <div class="flex-group-center cpup">
+                <i class="fas fa-plus-square"></i>
+            </div>
+            <div class="flex-group-center cpdown">
+                <i class="fas fa-minus-square"></i>
+            </div>
+        </div>
+    </div>
+    {{#if showWildDie}}
+        <div class="flexrow flex-group-left showWildDie" data-wilddie="{{wilddie}}">
+            <label for="wilddie">{{localize 'OD6S.USE_WILD_DIE'}}</label>
+            <input type="checkbox" data-dtype="Boolean" id="wilddie" name="wilddie"
+                   {{#if wilddie}}checked{{/if}}>
+        </div>
+    {{/if}}
+    <div class="flexrow flex-group-left">
+        <div class="bonusdice flexrow flex-group-left usebonus">
+            <label for="bonusdice">{{localize 'OD6S.USE_BONUS_DICE'}}</label>
+            <input type="number" onfocus="this.value=''" data-dtype="Number"
+                   max="99" id="bonusdice" name="bonusdice" value="{{bonusdice}}">
+        </div>
+        <div class="bonuspips flexrow flex-group-left usebonus" data-bonuspips="{{bonuspips}}">
+            <label for="bonuspips">{{localize 'OD6S.USE_BONUS_PIPS'}}</label>
+            <input type="number" onfocus="this.value=''" data-dtype="Number"
+                   max="99" id="bonuspips" name="bonuspips" value="{{bonuspips}}">
+        </div>
+    </div>
+    <footer class="form-footer">
+        <button type="submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+    </footer>
+</div>

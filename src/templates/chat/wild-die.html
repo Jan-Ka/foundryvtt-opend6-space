@@ -1,0 +1,16 @@
+<div class="od6s wild-die-dialog">
+    <div class="flexrow flex-group-left">
+        <label for="wilddie">{{localize "OD6S.CHOOSE_WILD_EFFECT"}}:</label>
+        <select name="wilddie" id="wilddie">
+            <option value="0" {{#if (getWildDieDefault 'OD6S.WILD_DIE_NONE')}}selected{{/if}}>{{localize 'OD6S.WILD_DIE_NONE'}}</option>
+            <option value="1" {{#if (getWildDieDefault 'OD6S.REMOVE_HIGHEST_DIE')}}selected{{/if}}>{{localize 'OD6S.REMOVE_HIGHEST_DIE'}}</option>
+            <option value="2" {{#if (getWildDieDefault 'OD6S.COMPLICATIONS')}}selected{{/if}}>{{localize 'OD6S.COMPLICATION'}}</option>
+        </select>
+    </div>
+    <input name="messageId" type="hidden" value="{{messageId}}">
+    <footer class="flexrow flex-group-center form-footer"
+            data-message-id="{{messageId}}">
+        <button type="submit" name="submit" value="submit">{{localize "OD6S.SUBMIT"}}</button>
+        <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
+    </footer>
+</div>

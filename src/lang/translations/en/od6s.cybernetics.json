@@ -1,0 +1,20 @@
+{
+  "label": "Cybernetics",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Cyber Arm": {
+      "name": "Cyber Arm",
+      "description": "A cybernetic arm providing bonuses to melee, brawling, lift, and strength damage"
+    },
+    "Cyber Eye": {
+      "name": "Cyber Eye",
+      "description": "Adds +1D to perception and +1D to ranged attack rolls."
+    },
+    "Reflex Enhancer": {
+      "name": "Reflex Enhancer",
+      "description": "Provides a 1D bonus to dodge and initiative"
+    }
+  }
+}

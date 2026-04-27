@@ -1,0 +1,187 @@
+<div class="template-holder">
+    {{#unless (eq selectedTemplate "") }}
+        {{#if (eq selectedTemplate "custom") }}
+            <br>
+            <div class="create-custom-template-name grid grid-2col-type">
+                <label for="custom.name"><b>{{localize 'OD6S.TEMPLATE_NAME'}}</b>:</label>
+                <input title="{{localize 'OD6S.TEMPLATE_NAME'}}" name="custom.templateName" type="text"
+                       value="{{custom.templateName}}" placeholder="{{custom.templateName}}">
+            </div>
+            <div class="create-custom-template grid grid-4col">
+                <div class="create-custom-template character-points flexrow flex-group-left">
+                    <label for="custom.characterPoints"><b>{{localize 'OD6S.CHARACTER_POINTS'}}</b>:</label>
+                    <input title="{{localize 'OD6S.CHARACTER_POINTS'}}" name="custom.characterPoints" type="number"
+                           value="{{custom.characterPoints}}" placeholder="{{custom.characterPoints}}">
+                </div>
+                <div class="create-custom-template fate-points flexrow flex-group-left">
+                    <label for="custom.fatePoints"><b>{{getFatePointsShortName}}</b>:</label>
+                    <input title="{{getFatePointsShortName}}" name="custom.fatePoints" type="number"
+                           value="{{custom.fatePoints}}" placeholder="{{custom.fatePoints}}">
+                </div>
+                <div class="create-custom-template move flexrow flex-group-left">
+                    <label for="custom.move"><b>{{localize 'OD6S.CHAR_MOVE'}}</b>:</label>
+                    <input title="{{localize 'OD6S.CHAR_MOVE'}}" name="custom.move" type="number"
+                           value="{{custom.move}}" placeholder="{{custom.move}}">
+                </div>
+                <div class="create-custom-template me flexrow flex-group-center">
+                    <label for="custom.me">{{getMetaphysicsExtranormalName}}:</label>
+                    <input type="checkbox" name="custom.me"
+                           id="custom.me" data-dtype="Boolean"
+                           {{#if custom.me}}checked{{/if}}>
+                </div>
+            </div>
+            <div class="create-custom-template attribute-dice">
+                <div class="row">
+                    <div class="column">
+                        <div class="attribute-dice-row grid grid-4col-attribute-dice">
+                            {{localize 'OD6S.REMAINING_ATTRIBUTE_DICE'}}
+                            <input type="number" name="attribute-dice"
+                                   id="attributeDice" data-dtype="Boolean"
+                                   value="{{diceFromScore custom.attributeDice}}">
+                            D+
+                            <input type="number" name="custom.attributePips"
+                                   id="attributePips" data-dtype="Boolean"
+                                   min="0" max="{{maxPips}}"
+                                   value="{{pipsFromScore custom.attributeDice}}">
+                        </div>
+                    </div>
+                    <div class="column"></div>
+                </div>
+            </div>
+            {{localize 'OD6S.ATTRIBUTE_DICE_ALLOCATION_INSTRUCTIONS'}}
+            <div class="attributes">
+                <br><b>{{localize 'OD6S.ATTRIBUTES'}}</b>
+                <div class="row">
+                    <div class="column">
+                        {{#each custom.attributes as |value key|}}
+                            {{#if (eq (isEvenAttribute ../actor key) 0) }}
+                                {{> systems/od6s/templates/actor/character/create-attribute-column-custom.html
+                                        key=key value=value }}
+                            {{/if}}
+                        {{/each}}
+                        {{#if custom.me}}
+                            {{#unless (isMetaphysicsAttributeOptional)}}
+                                <li class="attributes" style="list-style: none;">
+                                    <div class="attributes grid-2col-attributes"
+                                         style="display: grid;
+                                 grid-column: span 2 / span 2;
+                                 grid-template-columns: 75% 20%;
+                                 border: 1px;
+                                 gap: 5px;
+                                 margin: 1px 0;
+                                 padding: 0;">
+                                        <div class="attribute flex-group-center">
+                                            <b>{{ getAttributeName "met" }}:</b>
+                                        </div>
+                                        <div class="flex-group-center">
+                                            <b>{{diceFromScore custom.attributes.met}}</b>D+<b>{{pipsFromScore
+                                                custom.attributes.met}}</b>
+                                        </div>
+                                    </div>
+                                </li>
+                            {{/unless}}
+                        {{/if}}
+                    </div>
+                    <div class="column">
+                        {{#each custom.attributes as |value key|}}
+                            {{#if (eq (isEvenAttribute ../actor key) 0) }}
+                                {{> systems/od6s/templates/actor/character/create-attribute-column-custom.html
+                                        key=key value=value }}
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        {{else}}
+            <div class="template-header" style="border-radius: 10px;
+                                        background: #ffffcc;padding: 10px;
+                                        width: 95%;
+                                        min-height: 80%;
+                                        overflow-y: auto;">
+                {{{ templateData.system.description }}}
+                <br>
+            </div>
+            <div style="border-radius: 10px;
+                                        background: #ffff66;padding: 10px;
+                                        width: 95%;
+                                        height: auto;
+                                        min-height: 80%;
+                                        ">
+                <div class="row">
+                    <div class="column">
+                        {{#each attrs as |attr|}}
+                            {{#if attr.active }}
+                                {{#if (isEvenAttribute attr.sort) }}
+                                {{> systems/od6s/templates/actor/character/create-attribute-column.html
+                                        key=attr.id value=attr.score skills=../skills}}
+                                {{/if}}
+                            {{/if}}
+                        {{/each}}
+                            {{#if templateData.system.me}}
+                                <li class="attributes" style="list-style: none;">
+                                    <div class="attributes grid-2col-attributes"
+                                         style="display: grid;
+                                 grid-column: span 2 / span 2;
+                                 grid-template-columns: 75% 20%;
+                                 border: 1px;
+                                 gap: 5px;
+                                 margin: 1px 0;
+                                 padding: 0;">
+                                        <div class="attribute flex-group-center">
+                                            <b>{{ getAttributeName "met" }}:</b>
+                                        </div>
+                                        {{#unless (isMetaphysicsAttributeOptional)}}
+                                            <div class="flex-group-center">
+                                                <b>{{diceFromScore
+                                                        templateData.system.attributes.met}}</b>D+<b>{{pipsFromScore
+                                                    templateData.system.attributes.met}}</b>
+                                            </div>
+                                        {{/unless}}
+                                    </div>
+                                    <div>
+                                        <ul class="skill-list" style="list-style: none;">
+                                            {{#each skills as |skill|}}
+                                                {{#if (eq skill.system.attribute 'met') }}
+                                                    <li class="item skills">
+                                                        <div class="flex-group-left" data-tooltip="{{skill.system.description}}">
+                                                            {{skill.name}}
+                                                        </div>
+                                                    </li>
+                                                {{/if}}
+                                            {{/each}}
+                                        </ul>
+                                    </div>
+                                </li>
+                            {{/if}}
+                    </div>
+                    <div class="column">
+                        {{#each attrs as |attr key|}}
+                            {{#if attr.active }}
+                                {{#unless (isEvenAttribute attr.sort) }}
+                                {{> systems/od6s/templates/actor/character/create-attribute-column.html
+                                        key=attr.id value=attr.score skills=../skills}}
+                                {{/unless}}
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            <div style="border-radius: 10px;
+                                        background: #ffff66;padding: 10px;
+                                        width: 95%;
+                                        height: auto;
+                                        min-height: 80%;
+                                        ">
+                <span>{{localize 'OD6S.MOVE'}}:&nbsp{{templateData.system.move}}</span>
+                <span>{{getFatePointsShortName}}:&nbsp{{templateData.system.fp}}</span>
+                <span>{{localize 'OD6S.CHARACTER_POINTS'}}:&nbsp{{templateData.system.cp}}</span>
+                {{#if templateData.system.me}}
+                    <span>{{getMetaphysicsExtranormalName}}:<input type="checkbox" name="me" disabled
+                                                                   data-dtype="boolean"
+                           {{#if templateData.system.me}}checked{{/if}}>
+                    </span>
+                {{/if}}
+            </div>
+        {{/if}}
+    {{/unless}}
+</div>

@@ -1,0 +1,15 @@
+<header class="message-header flexrow">
+    <h4>{{localize "OD6S.OPPOSED_ROLL"}}</h4>
+    <span class="message-metadata">
+          <time class="message-timestamp">{{timeSince message.timestamp}}</time>
+        {{#if user.isGM}}
+            <a class="button message-delete"><i class="fas fa-trash"></i></a>
+        {{/if}}
+      </span>
+    {{#if message.flavor}}
+        <span class="flavor-text">{{{message.flavor}}}</span>
+    {{/if}}
+</header>
+<div class="message-content">
+    {{{message.content}}}
+</div>

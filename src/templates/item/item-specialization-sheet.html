@@ -1,0 +1,89 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"
+             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+        </div>
+    </header>
+
+    <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.SPECIALIZATION"}}</div>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize 'OD6S.DESCRIPTION'}}</a>
+        <a class="item" data-tab="attributes">{{localize 'OD6S.ATTRIBUTES'}}</a>
+        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="editor"><prose-mirror name="system.description" value="{{item.system.description}}" {{#unless editable}}disabled{{/unless}}></prose-mirror></div>
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{!-- As you add new fields, add them in here! --}}
+            <div class="flexrow flex-group-left">
+                <div class="flexrow data-attribute="{{item.system.attribute}}">
+                <label for="item.system.attribute">{{localize 'OD6S.ATTRIBUTE'}}:</label>
+                <select name="system.attribute" id="item.system.attribute" style="width: 70px;">
+                    
+                        {{#each (getAttributes) as |attribute key|}}
+                            {{#if attribute.active }}
+                            <option value="{{ key }}" {{#if (eq key item.system.attribute)}}selected{{/if}}>
+                                {{localize attribute.name}}
+                            </option>
+                            {{/if}}
+                        {{/each}}
+                    
+                </select>
+            </div>
+            <div class="flexrow flex-group-left">
+                <label for="item.system.skill">{{localize 'OD6S.SKILL'}}:</label>
+                <input title="{{localize 'OD6S.SKILL'}}" name="system.skill"
+                       type="text" value="{{item.system.skill}}" data-dtype="String"/>
+            </div>
+        </div>
+        {{#unless (flatSkills)}}
+            <div class="flexrow flex-group-left">
+                <div class="flexrow flex-group-left">
+                    <div class="flexrow flex-group-left editspecialization"
+                         data-item-id="{{item.id}}" data-score="{{item.system.score}}"
+                         data-base="{{item.system.base}}">
+                        <label for="item.system.die.dice">{{localize 'OD6S.DICE'}}</label>
+                        <input title="{{localize 'OD6S.DICE'}}" id="system.die.dice" name="system.die.dice" type="text"
+                               value="{{diceFromScore item.system.base}}" data-dtype="Number"/>
+                    </div>
+                    <div class="flexrow flex-group-left editspecialization"
+                         data-item-id="{{item.id}}" data-score="{{item.system.score}}"
+                         data-base="{{item.system.base}}">
+                        <label for="item.system.die.pips">{{localize 'OD6S.PIPS'}}</label>
+                        <input title="{{localize 'OD6S.PIPS'}}" name="system.die.pips" type="text"
+                               id="system.die.pips"
+                               value="{{pipsFromScore item.system.base}}"
+                               data-base="{{item.system.base}}" data-dtype="Number"/>
+                    </div>
+                </div>
+            </div>
+        {{else}}
+            <div class="flex flex-group-left"
+                 data-item-id="{{item.id}}" data-score="{{item.system.score}}" data-base="{{item.system.base}}">
+                <label for="item.system.base">{{localize 'OD6S.SCORE'}}:</label>
+                <input title="{{localize 'OD6S.SCORE'}}" name="system.base" type="text" value="{{item.system.base}}"
+                       data-base="{{item.system.base}}" data-dtype="Number"/>
+            </div>
+        {{/unless}}
+        <div class="flex flex-group-left editmod">
+            <label for=item.system.mod">{{localize 'OD6S.MODIFIER'}}</label>
+            <input title="{{localize 'OD6S.MODIFIER'}}" name="system.mod" type=number data-dtype="Number"
+                   value="{{item.system.mod}}"/>
+        </div>
+
+        {{!--Labels Tab --}}
+        {{> systems/od6s/templates/item/item-labels-tags.html }}
+    </section>
+</form>

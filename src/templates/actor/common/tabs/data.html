@@ -1,0 +1,177 @@
+<div class="tab data" data-group="primary" data-tab="data">
+    <div class="row">
+        <div class="column">
+            <h2 class="flex-group-center">{{localize 'OD6S.ACTOR_ID'}}: {{actor.id}}</h2>
+            {{#if (eq actor.type 'character')}}
+            <label for="actor.system.created.value">{{localize 'OD6S.CREATED'}}:</label>
+                <input id="actor.system.created.value" name="system.created.value" type="checkbox"
+                       data-dtype="Boolean" {{#if actor.system.created.value}}checked{{/if}}/>
+            {{/if}}
+            <h2>{{localize 'OD6S.ATTRIBUTES'}}</h2>
+            <div class="grid data-attribute-grid">
+                {{#each actor.system.attributes as |attribute key|}}
+                    <div class="flexrow flex-group-left">
+                        {{localize attribute.label}}
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        {{localize 'OD6S.BASE'}}:{{attribute.base}}
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        <label for="actor.system.attributes.{{key}}.mod">
+                            {{localize 'OD6S.MOD'}}:
+                        </label>
+                        <input name="system.attributes.{{key}}.mod" id="actor.system.attributes.{{key}}.mod" type="number"
+                               data-dtype="Number" value="{{attribute.mod}}" disabled/>
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        {{localize 'OD6S.TOTAL'}}:{{attribute.score}}
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        <label for="actor.system.attributes.{{key}}.min">
+                            {{localize 'OD6S.MIN'}}:
+                        </label>
+                        <input name="system.attributes.{{key}}.min" id="actor.system.attributes.{{key}}.min" type="number"
+                               data-dtype="Number" value="{{attribute.min}}"/>
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        <label for="actor.system.attributes.{{key}}.max">
+                            {{localize 'OD6S.MAX'}}:
+                        </label>
+                        <input name="system.attributes.{{key}}.max" id="actor.system.attributes.{{key}}.max" type="number"
+                               data-dtype="Number" value="{{attribute.max}}"/>
+                    </div>
+                {{/each}}
+            </div>
+            <div class="grid grid-3col">
+                <div class="flexrow flex-group-left">
+                    {{ localize 'OD6S.SCALE'}}
+                </div>
+                <div class="flexrow flex-group-left">
+                    <label for="actor.system.scale.mod">
+                        {{localize 'OD6S.MOD'}}:
+                    </label>
+                    <input name="system.scale.mod" id="actor.system.scale.mod" type="number"
+                           data-dtype="Number" value="{{actor.system.scale.mod}}"/>
+                </div>
+            </div>
+            <h2>{{localize 'OD6S.COMBAT'}}</h2>
+            <div class="grid data-combat-defense-grid">
+                {{#each (getConfig 'data_tab' 'defense') as |label key|}}
+                    <div class="flexrow flex-group-left">
+                        {{localize label}}
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        <label for="actor.system.{{key}}.mod">
+                            {{ localize 'OD6S.MOD'}}:
+                        </label>
+                        <input name="system.{{key}}.mod" id="actor.system.{{key}}.mod" type="number" disabled
+                               data-dtype="Number" value="{{#with (lookup ../actor.system [key])~}}{{mod}}{{/with}}"/>
+                    </div>
+                    <div class="flexrow flex-group-left">
+                    </div>
+                {{/each}}
+                {{#each (getConfig 'data_tab' 'offense') as |label key|}}
+                    <div class="flexrow flex-group-left">
+                        {{localize label}}
+                    </div>
+                    <div class="flexrow flex-group-left">
+                        <label for="actor.system.{{key}}.mod">
+                            {{ localize 'OD6S.MOD'}}:
+                        </label>
+                        <input name="system.{{key}}.mod" id="actor.system.{{key}}.mod" type="number" disabled
+                               data-dtype="Number" value="{{#with (lookup ../actor.system [key])~}}{{mod}}{{/with}}"/>
+                    </div>
+                    <div class="flexrow flex-group-left">
+                    </div>
+                {{/each}}
+                <div class="flexrow flex-group-left">
+                    <label for="actor.system.stuns.value">{{ localize 'OD6S.CHAR_STUNS' }}</label>
+                    <input name="system.stuns.value" id="actor.system.stuns.value" type="number"
+                        data-dtype="Number" value="{{actor.system.stuns.value}}">
+                </div>
+                <div class="flexrow flex-group-left">
+                    <label for="actor.system.stuns.current">{{ localize 'OD6S.CHAR_STUN_CURRENT' }}</label>
+                    <input name="system.stuns.current" id="actor.system.stuns.current" type="number"
+                           data-dtype="Number" value="{{actor.system.stuns.current}}">D
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="flexrow flex-group-left alpha-item-sorting">
+                <span>{{ localize 'OD6S.ITEM_ALPHA_SORT' }}</span>
+                <button class="alpha-item-sort-button" type="button" name="alpha-sort">{{ localize 'OD6S.SORT' }}</button>
+            </div>
+            <div class="flexrow flex-group-left use-wild-die">
+                <label for="actor.system.use_wild_die">{{localize "OD6S.CONFIG_USE_WILD_DIE"}}</label>
+                <input type="checkbox" data-dtype="Boolean" id="actor.system.use_wild_die" name="system.use_wild_die" {{ checked actor.system.use_wild_die }}
+                    {{#unless (showWildDie)}}disabled{{/unless}}>
+            </div>
+            <h2>{{localize 'OD6S.ACTOR_FLAGS'}}</h2>
+            <ul class="flags-list">
+                {{#each actor.flags.od6s as |value key|}}
+                    <li class="flag" data-flag="{{key}}" data-value="{{value}}">
+                        <div class="grid grid-2col">
+                            <div class="flexrow flex-group-left" title="{{key}}">
+                                {{key}}
+                            </div>
+                            <div class="flexrow flex-group-left">
+                                {{value}}
+                            </div>
+                        </div>
+                    </li>
+                {{/each}}
+            </ul>
+
+            <button class="vehicle-exit">{{localize 'OD6S.REMOVE_FROM_VEHICLE'}}</button>
+
+            <h2>{{localize 'OD6S.ACTOR_EFFECTS'}}</h2>
+            <ul class="effects-list">
+                {{#each actor.effects as |effect key|}}
+                <li class="actor-effect" data-effect-id="effect.id">
+                    <div class="grid data-grid">
+                        <div class="flexrow flex-group-left" title="{{effect.description}}">{{effect.name}}</div>
+                        <div class="item-controls flexrow flex-group-center"
+                             data-effect-id="{{effect.id}}"
+                             data-type="item">
+                            <a class="item-control effect-edit small-font" data-effect-id="{{effect.id}}"
+                               title="{{localize 'OD6S.EDIT_EFFECT'}}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a data-effect-id="{{effect.id}}"
+                               data-type="item"
+                               class="item-control effect-delete small-font"
+                               title="{{localize 'OD6S.DELETE_EFFECT'}}">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+            <h2>{{localize 'OD6S.ITEMS'}}</h2>
+            <ul class="items-list">
+                {{#each actor.items as |item key|}}
+                    <li class="item-data" data-item-id="{{item.id}}">
+                        <div class="grid data-grid">
+                            <div class="flexrow flex-group-left" title="{{item.system.description}}">{{item.name}}</div>
+                            <div class="item-controls flexrow flex-group-center"
+                                 data-item-id="{{item.id}}"
+                                 data-type="item">
+                                <a class="item-control item-edit small-font" data-item-id="{{item.id}}"
+                                   title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a data-item-id="{{item.id}}"
+                                   data-type="item"
+                                   class="item-control item-delete small-font"
+                                   title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>

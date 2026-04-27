@@ -1,0 +1,4 @@
+<li class="chat-message message flexcol {{cssClass}} {{message._id}}" data-message-id="{{message._id}}"
+    {{#if borderColor}}style="border-color:{{borderColor}}"{{/if}}>
+    {{> (getChatTemplate message._id) }}
+</li>

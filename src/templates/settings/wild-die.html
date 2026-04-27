@@ -1,0 +1,48 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+    {{#each settings as |setting s|}}
+        {{#if (eq setting.key 'use_wild_die')}}
+            <div class="form-group">
+                <label for="{{setting.key}}">{{localize setting.name}}</label>
+                <div class="form-fields use_wild_die">
+                    <input type="checkbox" name="{{setting.key}}" data-dtype="{{setting.type.name}}"
+                           {{#if ../show}}checked{{/if}}>
+                </div>
+                <p class="notes">{{{localize setting.hint}}}</p>
+            </div>
+        {{else}}
+            {{#if ../show}}
+                <div class="form-group">
+                    <label for="{{setting.key}}">{{localize setting.name}}</label>
+                    <div class="form-fields">
+                        {{#if setting.choice}}
+                            <select name="{{setting.key}}" id="{{setting.key}}">
+                                {{selectOptions setting.choices selected=setting.value localize=true}}
+                            </select>
+                        {{else}}
+                            {{#if (eq setting.filePicker "image")}}
+                                <input type="{{setting.inputType}}" name="{{setting.key}}"
+                                       data-dtype="{{setting.type.name}}"
+                                       value="{{setting.value}}">
+                                <file-picker name="{{setting.key}}" value="{{setting.value}}" type="image"></file-picker>
+                            {{else}}
+                                {{#if (eq setting.inputType "checkbox")}}
+                                    <input type="checkbox" name="{{setting.key}}"
+                                           data-dtype="{{setting.type.name}}"
+                                           {{#if setting.value}}checked{{/if}}>
+                                {{else}}
+                                    <input type="{{setting.inputType}}" name="{{setting.key}}"
+                                           data-dtype="{{setting.type.name}}"
+                                           value="{{setting.value}}">
+                                {{/if}}
+                            {{/if}}
+                        {{/if}}
+                    </div>
+                    <p class="notes">{{{localize setting.hint}}}</p>
+                </div>
+            {{/if}}
+        {{/if}}
+    {{/each}}
+    <div class="submit">
+        <button type="submit" name="close" data-action="closeForm">{{localize "Submit"}}</button>
+    </div>
+</form>

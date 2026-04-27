@@ -1,0 +1,20 @@
+{
+  "label": "Character Templates",
+  "mapping": {
+    "description": "system.description"
+  },
+  "entries": {
+    "Communications/Cultures Expert": {
+      "name": "Communications/Cultures Expert",
+      "description": "With a shoulder that never quite worked correctly, you focused on the softer side of life, learning how find common ground with anyone, no matter what part of the galaxy they’re from."
+    },
+    "Con Artist": {
+      "name": "Con Artist",
+      "description": "Life is an opportunity to be exploited to its fullest. You like to think of yourself as wandering the universe, revealing the wonders of the ages to the uniformed, hoping to move happiness from one corner of the galaxy to another."
+    },
+    "Security Expert": {
+      "name": "Security Expert",
+      "description": "You’ve always had a knack for breaking and entering — and preventing others from doing the same. Unfortunately, ever since you stumbled across someone’s deep, dark secret, you always get nervous before attempting any security procedures."
+    }
+  }
+}

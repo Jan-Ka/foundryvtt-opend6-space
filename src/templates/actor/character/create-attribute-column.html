@@ -1,0 +1,32 @@
+<li class="attributes" style="list-style: none;">
+    {{#if (ne key "met") }}
+        <div class="attributes grid-2col-attributes"
+             style="display: grid;
+                grid-column: span 2 / span 2;
+                grid-template-columns: 75% 20%;
+                border: 1px;
+                gap: 5px;
+                margin: 1px 0;
+                padding: 0;">
+            <div class="attribute flex-group-center">
+                <b>{{ getAttributeName key }}:</b>
+            </div>
+            <div class="flex-group-center">
+                <b>{{diceFromScore value}}</b>D+<b>{{pipsFromScore value}}</b>
+            </div>
+        </div>
+        <div>
+            <ul class="skill-list" style="list-style: none;">
+                {{#each skills as |skill|}}
+                    {{#if (eq skill.system.attribute ../key) }}
+                        <li class="item skills">
+                            <div class="flex-group-left" data-tooltip="{{skill.system.description}}">
+                                {{skill.name}}
+                            </div>
+                        </li>
+                    {{/if}}
+                {{/each}}
+            </ul>
+        </div>
+    {{/if}}
+</li>

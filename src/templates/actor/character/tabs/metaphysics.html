@@ -1,0 +1,165 @@
+<div class="tab meta" data-group="primary" data-tab="metaphysics">
+    <div class="row">
+        <div class="column">
+            {{#if (isMetaphysicsAttributeOptional)}}
+                <div class="flexrow flex-group-center">
+                    <b>{{getMetaphysicsName}}</b>
+                </div>
+            {{else}}
+                <div{{#if (eq actor.system.sheetmode.value "normal")}} class="attributes grid grid-2col-attributes"
+                {{else}} class="attributes grid grid-3col-attributes"
+                {{/if}}>
+                    <div class="attributedialog flexrow flex-group-center{{#if
+                            (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                         data-type="attribute"
+                         data-score="{{actor.system.attributes.met.score}}"
+                         data-label="{{getMetaphysicsName}}">
+                        <b>{{getMetaphysicsName}}</b>
+                    </div>
+                    <div class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                         data-type="attribute"
+                         data-score="{{actor.system.attributes.met.score}}"
+                         data-label="{{getMetaphysicsName}}">
+                        <b>{{diceFromScore actor.system.attributes.met.score}}</b>D+<b>
+                        {{pipsFromScore actor.system.attributes.met.score}}</b>
+                    </div>
+                    {{#if (eq actor.system.sheetmode.value "advance")}}
+                        <div class="advancedialog flexrow flex-group-center"
+                             data-type="attribute"
+                             data-label="{{getMetaphysicsName}}"
+                             data-freeadvance="false"
+                             data-attrname="met">
+                            <a><i class="fas fa-plus-square"></i></a>
+                        </div>{{/if}}
+                    {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                        <div class="attribute-edit flexrow flex-group-center"
+                             data-type="attribute"
+                             data-label="{{getMetaphysicsName}}"
+                             data-freeadvance="true"
+                             data-attrname="met">
+                            <a><i class="fas fa-edit"></i></a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/if}}
+            <div>
+                <ul class="skill-list">
+                    {{#each actor.skills as |skill skillkey|}}
+                        {{#if (eq skill.system.attribute "met") }}
+                            <li class="item skills" data-item-id="{{skill._id}}">
+                                <div {{#if (eq ../actor.system.sheetmode.value "normal")}}
+                                class="item skills grid-2col-attributes"
+                                {{else}} class="skills grid grid-3col-attributes"
+                                {{/if}}>
+                                    <div class="skilldialog flex-group-left{{#if
+                                            (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                         data-item-id="{{skill._id}}"
+                                         data-type="skill"
+                                         data-score="{{skill.system.score}}"
+                                         data-label="{{skill.name}}">
+                                        {{skill.name}}:
+                                    </div>
+                                    <div class="flex-group-center{{#if
+                                            (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                         data-item-id="{{skill._id}}"
+                                         data-type="skill"
+                                         data-score="{{skill.system.score}}"
+                                         data-label="{{skill.name}}">
+                                        <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
+                                            skill.system.score}}</b>
+                                    </div>
+                                    {{#if (eq ../actor.system.sheetmode.value "advance")}}
+                                        <div class="item item-controls flexrow flex-group-center"
+                                             data-item-id="{{skill._id}}">
+                                            <a class="advancedialog"
+                                               title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                               data-item-id="{{skill._id}}"
+                                               data-type="skill"
+                                               data-score="{{skill.system.score}}"
+                                               data-label="{{skill.name}}"
+                                               data-freeadvance="false">
+                                                <i class="fas fa-plus-square"></i></a>
+                                        </div>{{/if}}
+                                    {{#if (eq ../actor.system.sheetmode.value "freeedit")}}
+                                        <div class="item item-controls flexrow flex-group-center"
+                                             data-item-id="{{skill._id}}"
+                                             data-type="skill"
+                                             data-score="{{skill.system.score}}"
+                                             data-label="{{skill.name}}"
+                                             data-freeadvance="true">
+                                            <a class="item-control item-edit" title="Edit Skill"><i
+                                                    class="fas fa-edit"></i></a>
+                                            <a data-item-id="{{skill._id}}"
+                                               data-type="skill"
+                                               class="item-control item-delete"
+                                               title="Delete Skill">
+                                                <i class="fas fa-trash"></i></a>
+                                        </div>{{/if}}
+                                </div>
+                            </li>
+                        {{/if}}
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <div class="column">
+            <div>
+                <div class="flexrow flex-group-center"><b>{{getManifestationsName}}</b></div>
+            </div>
+            <div class="manifestations">
+                <ul class="manifestations-list">
+                    {{#each actor.manifestations as |item key|}}
+                        <li class="item manifestations">
+                            {{#if item.system.activate}}
+			    <div class="item-list manifestation grid grid-3col-manifestations" draggable="true">
+                                <div class="attributes flexrow flex-group-center active-checkbox
+                                            {{#if item.system.active}}manifestation-active{{/if}}"
+                                     title="{{localize 'OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
+                                    <a data-item-id="{{item._id}}" class="item-control">
+                                        {{#if item.system.active}}
+                                            <i class="far fa-check-circle manifestation-active"></i>
+                                        {{else}}
+                                            <i class="far fa-circle"></i>
+                                        {{/if}}
+                                    </a>
+                                </div>
+                            {{else}}
+                                {{#if item.system.attack}}
+                                    <div class="skills grid grid-3col-manifestations">
+                                        <div class="attributes flexrow flex-group-center active-checkbox
+                                             title="{{localize 'OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
+                                        <a data-item-id="{{item._id}}" class="item-control">
+                                            <i class="fas fa-circle"></i>
+                                        </a>
+                                    </div>
+                                {{else}}
+                                <div class="skills grid grid-2col-manifestations">
+                                {{/if}}
+                            {{/if}}
+                            <div class="flexrow flex-group-left show-item-details"
+                                 data-item-name="{{item.name}}"
+                                 data-actor-id="{{../actor.id}}"
+                                 data-item-id="{{item._id}}">
+                                {{item.name}}
+                            </div>
+                            <div class="item item-controls flexrow flex-group-center"
+                                 data-item-id="{{item._id}}"
+                                 data-type="manifestation"
+                                 title="{{localize "OD6S.EDIT"}}"
+                                 data-label="{{item.name}}">
+                                <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
+                                        class="fas fa-edit"></i></a>
+                                <a data-item-id="{{item._id}}"
+                                   data-type="manifestation"
+                                   class="item-control item-delete"
+                                   title="{{localize 'OD6S.DELETE'}}">
+                                    <i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

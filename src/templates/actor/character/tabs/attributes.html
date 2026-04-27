@@ -1,0 +1,136 @@
+<div class="tab attributes" data-group="primary" data-tab="attributes">
+    <div class="row">
+        <div class="column">
+            <ul class="attribute-list">
+                {{#each attrs as |attr|}}
+                    {{#if (isAttributeActive attr.id) }}
+                        {{#if (isEvenAttribute attr.sort) }}
+                            {{> systems/od6s/templates/actor/common/tabs/attribute-column.html
+                                    actor=../actor key=attr.id attribute=attr system=../system}}
+                        {{/if}}
+                    {{/if}}
+                {{/each}}
+                {{!-- Handle metaphysics differently --}}
+                {{#if (showMetaphysics actor.system.sheetmode.value) }}
+                    <li class="attributes">
+                        <div>
+                            <div {{#if (eq actor.system.sheetmode.value "normal")}}
+                                 class="attributes grid-2col-attributes"
+                                 {{else}} class="attributes grid grid-3col-attributes"
+                            {{/if}}>
+                                <div class="attributedialog flex-group-center" data-type="attribute"
+                                     data-score="{{actor.system.attributes.met.score}}"
+                                     data-label="{{getMetaphysicsName}}">
+                                    <b>{{getMetaphysicsName}}</b>
+                                </div>
+                                <div class="flex-group-center" data-type="attribute"
+                                     data-score="{{actor.system.attributes.met.score}}"
+                                     data-base="{{actor.system.attributes.met.base}}"
+                                     data-label="{{getMetaphysicsName}}">
+                                    <b>{{diceFromScore actor.system.attributes.met.score}}</b>D+<b>
+                                    {{pipsFromScore actor.system.attributes.met.score}}</b></div>
+                                {{#if (eq actor.system.sheetmode.value "advance")}}
+                                    <div class="advancedialog flexrow flex-group-center"
+                                         data-type="attribute"
+                                         data-score="{{actor.system.attributes.met.score}}"
+                                         data-label="{{getMetaphysicsName}}"
+                                         data-base="{{actor.system.attributes.met.base}}"
+                                         data-freeadvance="false"
+                                         data-attrname="met">
+                                        <a><i class="fas fa-plus-square"></i></a>
+                                    </div>{{/if}}
+                                {{#if (eq actor.system.sheetmode.value "freeedit")}}
+                                    <div class="attribute-edit flexrow flex-group-center"
+                                         data-type="attribute"
+                                         data-score="{{actor.system.attributes.met.score}}"
+                                         data-base="{{actor.system.attributes.met.base}}"
+                                         data-label="{{getMetaphysicsName}}"
+                                         data-freeadvance="true"
+                                         data-attrname="met">
+                                        <a><i class="fas fa-edit"></i></a>
+                                    </div>{{/if}}
+                            </div>
+                        </div>
+                    </li>
+                    <ul class="skill-list">
+                        {{#each actor.skills as |skill skillkey|}}
+                            {{#if (eq skill.system.attribute 'met') }}
+                                <li class="item skills" data-item-id="{{skill._id}}">
+                                    <div {{#if (eq ../actor.system.sheetmode.value "normal")}}
+                                    class="item skills grid-2col-attributes"
+                                    {{else}} class="skills grid grid-3col-attributes"
+                                    {{/if}}>
+                                        <div class="skilldialog flex-group-left{{#if
+                                                (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                             data-item-id="{{skill._id}}"
+                                             data-type="skill"
+                                             data-score="{{skill.system.score}}"
+                                             data-base="{{skill.system.base}}"
+                                             data-label="{{skill.name}}">
+                                            {{skill.name}}
+                                        </div>
+                                        <div class="flex-group-center{{#if
+                                                (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                                            {{getModColor skill.system.mod}}"
+                                             data-item-id="{{skill._id}}"
+                                             data-type="skill"
+                                             data-score="{{skill.system.score}}"
+                                             data-base="{{skill.system.base}}"
+                                             data-label="{{skill.name}}">
+                                            {{#unless (flatSkills)}}
+                                                <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
+                                                    skill.system.score}}</b>
+                                            {{else}}
+                                                {{ skill.system.base }}
+                                            {{/unless}}</div>
+                                        {{#if (eq ../actor.system.sheetmode.value "advance")}}
+                                            <div class="item item-controls flexrow flex-group-center"
+                                                 data-item-id="{{skill._id}}">
+                                                <a class="advancedialog"
+                                                   title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                                   data-item-id="{{skill._id}}"
+                                                   data-type="skill"
+                                                   data-score="{{skill.system.score}}"
+                                                   data-base="{{skill.system.base}}"
+                                                   data-label="{{skill.name}}"
+                                                   data-freeadvance="false">
+                                                    <i class="fas fa-plus-square"></i></a>
+                                            </div>{{/if}}
+                                        {{#if (eq ../actor.system.sheetmode.value "freeedit")}}
+                                            <div class="item item-controls flexrow flex-group-center"
+                                                 data-item-id="{{skill._id}}"
+                                                 data-type="skill"
+                                                 data-score="{{skill.system.score}}"
+                                                 data-base="{{skill.system.base}}"
+                                                 data-label="{{skill.name}}"
+                                                 data-freeadvance="true">
+                                                <a class="item-control item-edit" title="Edit Skill"><i
+                                                        class="fas fa-edit"></i></a>
+                                                <a data-item-id="{{skill._id}}"
+                                                   data-type="skill"
+                                                   class="item-control item-delete"
+                                                   title={{localize 'OD6S.DELETE_SKILL'}}>
+                                                    <i class="fas fa-trash"></i></a>
+                                            </div>{{/if}}
+                                    </div>
+                                </li>
+                            {{/if}}
+                        {{/each}}
+                    </ul>
+                {{/if}}
+            </ul>
+        </div>
+        <div class="column">
+            <ul class="attribute-list">
+                {{#each attrs as |attr|}}
+                    {{#if (isAttributeActive attr.id) }}
+                        {{#unless (isEvenAttribute attr.sort) }}
+                            {{> systems/od6s/templates/actor/common/tabs/attribute-column.html
+                                    actor=../actor attribute=attr key=attr.id system=../system}}
+                        {{/unless}}
+                    {{/if}}
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>
