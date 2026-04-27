@@ -38,7 +38,7 @@
   },
   "packageManager": "pnpm@10.33.1",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.22.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
