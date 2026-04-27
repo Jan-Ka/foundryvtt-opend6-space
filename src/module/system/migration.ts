@@ -1,7 +1,17 @@
 /**
  * System data migration for world upgrades.
  * Runs once per version bump via the system version stored in world settings.
+ *
+ * To audit before/after document state, persist the debug flag *before*
+ * reloading the world (otherwise migrations fire on the `ready` hook before
+ * you can touch the console):
+ *
+ *   localStorage.od6sDebug = '["migration"]'
+ *
+ * Each touched actor will then log a `[before]` and `[after]` snapshot.
  */
+
+import { debug, isDebugEnabled } from "./logger";
 
 const CURRENT_MIGRATION_VERSION = "2.2.0";
 
@@ -16,6 +26,14 @@ export async function migrateWorld() {
   if (!foundry.utils.isNewerVersion(CURRENT_MIGRATION_VERSION, lastMigration)) return;
 
   ui.notifications.info("OpenD6 Space: Migrating world data — please be patient.", { permanent: true });
+
+  debug("migration", "starting", {
+    from: lastMigration,
+    to: CURRENT_MIGRATION_VERSION,
+    actors: game.actors.size,
+    items: game.items.size,
+    scenes: game.scenes.size,
+  });
 
   try {
     // Run all migrations in order
@@ -67,7 +85,9 @@ async function migrateStatusEffectIcons() {
       }
     }
     if (updates.length > 0) {
+      logActorBefore("icons", actor);
       await (actor as any).updateEmbeddedDocuments("ActiveEffect", updates);
+      logActorAfter("icons", actor);
       count += updates.length;
     }
   }
@@ -82,13 +102,25 @@ async function migrateStatusEffectIcons() {
         }
       }
       if (updates.length > 0) {
+        logActorBefore("icons", token.actor, ` (token in ${(scene as any).name})`);
         await token.actor.updateEmbeddedDocuments("ActiveEffect", updates);
+        logActorAfter("icons", token.actor, ` (token in ${(scene as any).name})`);
         count += updates.length;
       }
     }
   }
 
   console.log(`od6s | Updated ${count} status effect icons.`);
+}
+
+/** Snapshot an actor's full document state (deep-cloned via toObject) for audit logs. */
+function logActorBefore(step: string, actor: any, suffix = "") {
+  if (!isDebugEnabled("migration")) return;
+  debug("migration", `[${step}:before] ${actor.name}${suffix}`, actor.toObject());
+}
+function logActorAfter(step: string, actor: any, suffix = "") {
+  if (!isDebugEnabled("migration")) return;
+  debug("migration", `[${step}:after]  ${actor.name}${suffix}`, actor.toObject());
 }
 
 /**
@@ -115,7 +147,9 @@ async function migrateExplosiveTemplateFlags() {
       }
     }
     if (updates.length > 0) {
+      logActorBefore("explosive-flags", actor);
       await (actor as any).updateEmbeddedDocuments("Item", updates);
+      logActorAfter("explosive-flags", actor);
       count += updates.length;
     }
   }
