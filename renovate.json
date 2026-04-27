@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "automerge": false,
   "timezone": "Europe/Berlin",
   "schedule": [
     "before 6am on monday"
