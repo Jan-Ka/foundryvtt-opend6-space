@@ -58,11 +58,14 @@
             <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
         </select>
 
-        {{!-- Reset-Session button — only visible in non-normal modes since
-             it's a GM/edit-mode tool. The metaphysics toggle stays in the
-             header so it's visible whenever the character has it enabled. --}}
-        {{#if (ne actor.system.sheetmode.value "normal")}}
-            <button type="button" class="session-reset-button">Reset Session</button>
+        {{!-- Reset-Session button — only meaningful when the skill-used
+             rule is on AND we're in a non-normal mode (it's a GM/edit-mode
+             tool). The metaphysics toggle stays in the header so it remains
+             visible whenever the character has it enabled. --}}
+        {{#if (skillUsed)}}
+            {{#if (ne actor.system.sheetmode.value "normal")}}
+                <button type="button" class="session-reset-button">Reset Session</button>
+            {{/if}}
         {{/if}}
     </div>
 </section>

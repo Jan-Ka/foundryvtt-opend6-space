@@ -54,6 +54,7 @@
                         {{else}} class="skills grid grid-3col-attributes"
                         {{/if}}>
                         <div class="skills-grid">
+                            {{#if (skillUsed)}}
                             <input type="checkbox" class="skill-used-checkbox"
                                    {{#if skill.system.used.value}}
                                    title="{{localize 'OD6S.SKILL_USED'}}"
@@ -63,6 +64,7 @@
                                    data-item-id="{{skill._id}}" name="skill-used-{{skill._id}}"
                                    id="skill-used-{{skill._id}}" data-dtype="Boolean"
                                    {{#if skill.system.used.value}}checked{{/if}}>
+                            {{/if}}
                             <div class="skilldialog flex-group-left{{#if
                                     (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-item-id="{{skill._id}}"
@@ -137,10 +139,12 @@
                                     {{else}} class="item specialization grid grid-3col-attributes"
                                     {{/if}}>
                                     <div class="skills-grid">
+                                        {{#if (skillUsed)}}
                                         <input type="checkbox" class="spec-used-checkbox"
                                                data-item-id="{{spec._id}}" name="spec-used-{{spec._id}}"
                                                id="spec-used-{{spec._id}}" data-dtype="Boolean"
                                                {{#if spec.system.used.value}}checked{{/if}}>
+                                        {{/if}}
                                         <div class="specdialog indent flex-row flex-group-left{{#if
                                                 (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                              data-item-id="{{spec._id}}"

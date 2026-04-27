@@ -9,10 +9,14 @@ export function registerSkillHelpers() {
         return actor.specializations.filter((s: any) => s.system.skill === skill.name).length > 0;
     })
 
-    Handlebars.registerHelper('skillUsed', function (_item) {
-        if (OD6S.skillUsed) {
-            // noop
-        }
+    /**
+     * Returns the world-level "skill used" rule flag. Templates use this to
+     * conditionally render the per-skill / per-spec "used this session"
+     * checkbox and the Reset Session button. When the rule is disabled, the
+     * controls hide and `system.used.value` is not written to anywhere.
+     */
+    Handlebars.registerHelper('skillUsed', function () {
+        return OD6S.skillUsed;
     });
 
     Handlebars.registerHelper('specializationDice', function () {

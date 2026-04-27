@@ -277,7 +277,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                             rollData.actor.system.attributes[item.system.attribute].score).dice * OD6S.pipsPerDice;
                     }
                 }
-                if(OD6S.autoSkillUsed) {
+                if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                     await item.update({'system.used.value': true});
                 }
             } else if (item.type === "skill") {
@@ -285,7 +285,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                     rollMin = od6sutilities.getDiceFromScore(item.system.score +
                         rollData.actor.system.attributes[item.system.attribute].score).dice * OD6S.pipsPerDice;
                 }
-                if(OD6S.autoSkillUsed) {
+                if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                     await item.update({'system.used.value': true});
                 }
             } else if (item.type === "weapon") {
@@ -302,7 +302,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                                 rollMin = od6sutilities.getDiceFromScore(spec.system.score +
                                     rollData.actor.system.attributes[skill.system.attribute].score).dice * OD6S.pipsPerDice;
                             }
-                            if(OD6S.autoSkillUsed) {
+                            if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                                 await spec.update({'system.used.value': true});
                             }
                         }
@@ -317,7 +317,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                             rollMin = od6sutilities.getDiceFromScore(skill.system.score +
                                 rollData.actor.system.attributes[skill.system.attribute].score).dice * OD6S.pipsPerDice;
                         }
-                        if(OD6S.autoSkillUsed) {
+                        if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                             await skill.update({'system.used.value': true});
                         }
                     }
