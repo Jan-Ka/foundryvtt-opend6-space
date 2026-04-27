@@ -64,8 +64,10 @@ The probes are documented in [docs/test-runbook.md](docs/test-runbook.md).
 - Templates in `src/templates/` use only v2-compatible Handlebars
   helpers (`{{selectOptions}}`, `{{#if X}}checked{{/if}}`, `<file-picker>`,
   `<prose-mirror>`).
-- See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for an architecture deep-dive — module
-  layout, sheet patterns, conventions.
+- AI coding tool files (`CLAUDE.md`, `.cursor/`, etc.) are gitignored
+  intentionally — personal dev environment files, like `.vscode/`, are not
+  project concerns. Regenerate `CLAUDE.md` with `/init` in Claude Code if
+  needed.
 
 ## Commits
 

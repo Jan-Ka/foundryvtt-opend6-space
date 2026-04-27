@@ -49,6 +49,8 @@ playwright/.cache/
 .env.1password
 
 # AI coding tool workspace files (local only, never commit)
+# These are personal dev environment files — like .vscode/ — not project concerns.
+# Anyone who wants CLAUDE.md can regenerate it with /init in Claude Code.
 .claude/
 CLAUDE.md
 .cursor/
