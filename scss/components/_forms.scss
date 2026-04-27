@@ -231,21 +231,35 @@
   }
 
   .sheet-mode {
-    width: 220px;
+    // Sit at the bottom of the form's flex column without being squeezed by
+    // the scrollable .sheet-body above. Auto-sized to its contents so the
+    // mode dropdown's options remain readable.
+    flex: 0 0 auto;
+    align-self: flex-start;
     margin-top: 6px;
 
     .sheetmode {
-      gap: 6px;
-      padding: 4px 8px;
+      gap: 8px;
+      padding: 4px 10px;
       background: $c-panel;
       border: 1px solid $c-border;
       border-radius: 3px;
+      width: max-content;
 
       label {
         color: $c-text-muted;
         font-size: 0.78em;
         text-transform: uppercase;
         letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+
+      // The template hard-codes width: 70px on the select inline, which
+      // truncates "advance" / "freeedit" — override so all options read
+      // correctly when the dropdown is closed.
+      select {
+        width: auto !important;
+        min-width: 110px;
       }
     }
   }
