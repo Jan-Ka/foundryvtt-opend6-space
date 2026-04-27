@@ -166,13 +166,23 @@
   }
 
   // ── Sheet body scroll plumbing ───────────────────────────────────────────
-  // The form is flexcol; we let the header + tabs + sheet-mode size to content
-  // and grant the sheet-body the remaining vertical space with internal scroll.
-  > form {
+  // .od6s lives on the application root; the form is a grandchild via
+  // .window-content. Make window-content a flex column that constrains the
+  // form's height, then let the form's flex column give sheet-body the
+  // remaining vertical space with internal scroll.
+  .window-content {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    overflow: hidden;
     min-height: 0;
+  }
+
+  form.flexcol {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
   }
 
   .sheet-body {
