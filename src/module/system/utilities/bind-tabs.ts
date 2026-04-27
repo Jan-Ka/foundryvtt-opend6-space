@@ -17,12 +17,23 @@ interface AppWithTabGroups {
 export function bindPrimaryTabs(app: AppWithTabGroups, root: HTMLElement): void {
     if (!root.querySelector(".sheet-tabs")) return;
 
-    const firstTab = root
-        .querySelector<HTMLElement>(".sheet-tabs .item[data-tab]")
-        ?.dataset.tab;
+    // Collect every data-tab declared in the rendered nav. We use this to
+    // (a) supply a fallback when no tab has been previously selected and
+    // (b) validate any persisted selection — conditional tabs (e.g.
+    // metaphysics, vehicle) can disappear when actor flags toggle, leaving
+    // tabGroups.primary pointing at a tab that no longer exists.
+    const availableTabs = Array.from(
+        root.querySelectorAll<HTMLElement>(".sheet-tabs .item[data-tab]"),
+    )
+        .map((el) => el.dataset.tab)
+        .filter((t): t is string => !!t);
+
+    const firstTab = availableTabs[0] ?? "";
 
     const tabGroups = app.tabGroups ?? {};
-    tabGroups.primary ??= firstTab ?? "";
+    if (!tabGroups.primary || !availableTabs.includes(tabGroups.primary)) {
+        tabGroups.primary = firstTab;
+    }
     app.tabGroups = tabGroups;
 
     new foundry.applications.ux.Tabs({
