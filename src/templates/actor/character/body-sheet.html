@@ -58,25 +58,11 @@
             <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
         </select>
 
-        {{!-- Metaphysics extranormal toggle. Always visible in non-normal
-             modes; in normal mode only shown (read-only) when already on. --}}
+        {{!-- Reset-Session button — only visible in non-normal modes since
+             it's a GM/edit-mode tool. The metaphysics toggle stays in the
+             header so it's visible whenever the character has it enabled. --}}
         {{#if (ne actor.system.sheetmode.value "normal")}}
-            <label class="metaphysics-toggle" title="{{getMetaphysicsExtranormalName}}">
-                <input type="checkbox" name="system.metaphysicsextranormal.value"
-                       data-dtype="Boolean"
-                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
-                <span>{{getMetaphysicsExtranormalName}}</span>
-            </label>
             <button type="button" class="session-reset-button">Reset Session</button>
-        {{else}}
-            {{#if actor.system.metaphysicsextranormal.value}}
-                <label class="metaphysics-toggle" title="{{getMetaphysicsExtranormalName}}">
-                    <input type="checkbox" name="system.metaphysicsextranormal.value"
-                           data-dtype="Boolean" disabled
-                        {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
-                    <span>{{getMetaphysicsExtranormalName}}</span>
-                </label>
-            {{/if}}
         {{/if}}
     </div>
 </section>

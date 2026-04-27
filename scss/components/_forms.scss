@@ -259,34 +259,9 @@
         min-width: 110px;
       }
 
-      // Metaphysics-extranormal toggle moved here from the header in
-      // non-normal modes. Render as a tidy checkbox + label pair.
-      .metaphysics-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 0 4px;
-        border-left: 1px solid $c-border;
-        color: $c-text-muted;
-        font-size: 0.78em;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        white-space: nowrap;
-        cursor: pointer;
-
-        input[type="checkbox"] {
-          margin: 0;
-        }
-
-        &:has(input:disabled) {
-          opacity: 0.6;
-          cursor: default;
-        }
-      }
-
       // Reset-Session sits alongside the mode controls in non-normal modes.
       .session-reset-button {
-        margin-left: auto;
+        margin-left: 4px;
       }
     }
   }
