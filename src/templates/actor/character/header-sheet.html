@@ -156,27 +156,8 @@
             </div>
         {{/if}}
         {{> (getWoundsTemplate)}}
-        {{#if (ne actor.system.sheetmode.value "normal") }}
-            <div class="flexrow flex-group-center">
-                <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
-                <input type="checkbox" name="system.metaphysicsextranormal.value"
-                       id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean"
-                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
-            </div>
-        <div>
-            <!--Session Reset Button-->
-            <button class="session-reset-button">Reset Session</button>
-        </div>
-        {{ else }}
-            {{#if actor.system.metaphysicsextranormal.value}}
-            <div class="flexrow flex-group-center">
-                <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
-                <input type="checkbox" name="system.metaphysicsextranormal.value"
-                       id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean" disabled
-                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
-            </div>
-            {{/if}}
-        {{/if}}
+        {{!-- Metaphysics-extranormal toggle and Reset-Session button moved to
+             the footer next to the mode selector — see body-sheet.html. --}}
         {{#if (eq actor.system.created.value false)}}
             <div class="flexrow flex-group-center creation">
                 <button class="create-character">{{localize 'OD6S.CREATE'}}</button>

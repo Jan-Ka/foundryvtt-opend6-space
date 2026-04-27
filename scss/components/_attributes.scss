@@ -140,16 +140,87 @@
     padding: 1px 0;
   }
 
-  // Item controls (advance/edit/delete buttons) on skill/spec rows
-  .item-list .item-controls {
-    a {
+  // ── Action icon group on skill / spec rows ──────────────────────────────
+  // Templates emit `<div class="item item-controls flexrow flex-group-center">`
+  // containing 1–3 anchors (advance / specialize / edit / delete). Style as a
+  // tidy icon row with consistent hit areas, no jumping between modes.
+  .item-list .item-controls,
+  .skill-list .item-controls,
+  .specialization-list .item-controls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 0 4px;
+
+    > a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
       color: $c-text-muted;
-      transition: color 0.15s ease, text-shadow 0.15s ease;
+      border-radius: 2px;
+      transition: color 0.15s ease, background-color 0.15s ease;
+      cursor: pointer;
+
+      i {
+        font-size: 0.85em;
+      }
 
       &:hover {
         color: $c-accent-bright;
-        text-shadow: 0 0 6px rgba(201, 162, 39, 0.45);
+        background-color: rgba(201, 162, 39, 0.12);
+      }
+
+      &.item-delete:hover {
+        color: $c-bad;
+        background-color: rgba(226, 95, 99, 0.12);
       }
     }
+  }
+
+  // ── Attribute-header action buttons (add skill / edit attribute) ─────────
+  // Sit in the third column of the attribute banner row in advance/freeedit.
+  // Make them match the gold banner styling instead of looking like loose
+  // misaligned glyphs.
+  .attribute-list > li.attributes > div > .flex-group-center > .item-add,
+  .attribute-list > li.attributes > div > .flex-group-center > .attribute-edit,
+  .attribute-list > li.attributes > div > .advancedialog,
+  .attribute-list > li.attributes > div > .attribute-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    border-radius: 2px;
+    color: $c-accent;
+    transition: color 0.15s ease, background-color 0.15s ease;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: inherit;
+
+      i { font-size: 0.92em; }
+    }
+
+    &:hover {
+      background-color: rgba(201, 162, 39, 0.18);
+      color: $c-accent-bright;
+    }
+  }
+
+  // The flex-group-center wrapping the freeedit attribute action buttons
+  // should center its contents and reserve a stable width.
+  .attribute-list > li.attributes > div > .flex-group-center.flexrow {
+    gap: 4px;
+    justify-content: center;
   }
 }

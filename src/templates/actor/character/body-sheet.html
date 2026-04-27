@@ -52,12 +52,31 @@
 <section class="sheet-mode">
     <div class="flexrow flex-group-left sheetmode">
         <label for="actor.system.sheetmode.value">{{localize 'OD6S.SHEETMODE'}}:</label>
-        <select name="system.sheetmode.value" style="width: 70px;">
-            
-                <option value="normal" {{#if (eq "normal" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_NORMAL'}}</option>
-                <option value="advance" {{#if (eq "advance" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_ADVANCE'}}</option>
-                <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
-            
+        <select name="system.sheetmode.value">
+            <option value="normal" {{#if (eq "normal" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_NORMAL'}}</option>
+            <option value="advance" {{#if (eq "advance" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_ADVANCE'}}</option>
+            <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
         </select>
+
+        {{!-- Metaphysics extranormal toggle. Always visible in non-normal
+             modes; in normal mode only shown (read-only) when already on. --}}
+        {{#if (ne actor.system.sheetmode.value "normal")}}
+            <label class="metaphysics-toggle" title="{{getMetaphysicsExtranormalName}}">
+                <input type="checkbox" name="system.metaphysicsextranormal.value"
+                       data-dtype="Boolean"
+                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
+                <span>{{getMetaphysicsExtranormalName}}</span>
+            </label>
+            <button type="button" class="session-reset-button">Reset Session</button>
+        {{else}}
+            {{#if actor.system.metaphysicsextranormal.value}}
+                <label class="metaphysics-toggle" title="{{getMetaphysicsExtranormalName}}">
+                    <input type="checkbox" name="system.metaphysicsextranormal.value"
+                           data-dtype="Boolean" disabled
+                        {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
+                    <span>{{getMetaphysicsExtranormalName}}</span>
+                </label>
+            {{/if}}
+        {{/if}}
     </div>
 </section>

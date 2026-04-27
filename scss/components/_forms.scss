@@ -239,14 +239,15 @@
     margin-top: 6px;
 
     .sheetmode {
-      gap: 8px;
+      gap: 12px;
       padding: 4px 10px;
       background: $c-panel;
       border: 1px solid $c-border;
       border-radius: 3px;
       width: max-content;
+      align-items: center;
 
-      label {
+      > label {
         color: $c-text-muted;
         font-size: 0.78em;
         text-transform: uppercase;
@@ -254,12 +255,38 @@
         white-space: nowrap;
       }
 
-      // The template hard-codes width: 70px on the select inline, which
-      // truncates "advance" / "freeedit" — override so all options read
-      // correctly when the dropdown is closed.
       select {
-        width: auto !important;
         min-width: 110px;
+      }
+
+      // Metaphysics-extranormal toggle moved here from the header in
+      // non-normal modes. Render as a tidy checkbox + label pair.
+      .metaphysics-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 4px;
+        border-left: 1px solid $c-border;
+        color: $c-text-muted;
+        font-size: 0.78em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        cursor: pointer;
+
+        input[type="checkbox"] {
+          margin: 0;
+        }
+
+        &:has(input:disabled) {
+          opacity: 0.6;
+          cursor: default;
+        }
+      }
+
+      // Reset-Session sits alongside the mode controls in non-normal modes.
+      .session-reset-button {
+        margin-left: auto;
       }
     }
   }
