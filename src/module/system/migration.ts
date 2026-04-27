@@ -25,7 +25,12 @@ export async function migrateWorld() {
   const lastMigration = game.settings.get("od6s", "migrationVersion") ?? "0";
   if (!foundry.utils.isNewerVersion(CURRENT_MIGRATION_VERSION, lastMigration)) return;
 
-  ui.notifications.info("OpenD6 Space: Migrating world data — please be patient.", { permanent: true });
+  // V14 returns a Notification object with a bound .remove(); the project's
+  // type stubs predate this, so cast through unknown.
+  const inProgress = ui.notifications.info(
+    "OpenD6 Space: Migrating world data — please be patient.",
+    { permanent: true },
+  ) as unknown as { remove?: () => void } | undefined;
 
   debug("migration", "starting", {
     from: lastMigration,
@@ -51,6 +56,8 @@ export async function migrateWorld() {
   } catch (err) {
     console.error("od6s | Migration failed:", err);
     ui.notifications.error("OpenD6 Space: Migration failed. Check the console for details.");
+  } finally {
+    inProgress?.remove?.();
   }
 }
 
