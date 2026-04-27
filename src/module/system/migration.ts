@@ -3,7 +3,7 @@
  * Runs once per version bump via the system version stored in world settings.
  */
 
-const CURRENT_MIGRATION_VERSION = "2.0.0";
+const CURRENT_MIGRATION_VERSION = "2.2.0";
 
 /**
  * Check if migration is needed and run it.
@@ -22,6 +22,9 @@ export async function migrateWorld() {
     if (foundry.utils.isNewerVersion("2.0.0", lastMigration)) {
       await migrateExplosiveTemplateFlags();
       await migrateChatMessageFlags();
+    }
+    if (foundry.utils.isNewerVersion("2.2.0", lastMigration)) {
+      await migrateStatusEffectIcons();
     }
 
     // Record completion
@@ -45,6 +48,47 @@ export function registerMigrationSetting() {
     type: String,
     default: "0",
   });
+}
+
+/**
+ * Update active effect icons that still reference old .png paths to .svg equivalents.
+ * Affects any effect whose img ends with a known renamed icon.
+ */
+async function migrateStatusEffectIcons() {
+  console.log("od6s | Migrating status effect icons from .png to .svg...");
+  let count = 0;
+
+  for (const actor of game.actors) {
+    const updates = [];
+    for (const effect of (actor as any).effects) {
+      const img: string = effect.img ?? "";
+      if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+        updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
+      }
+    }
+    if (updates.length > 0) {
+      await (actor as any).updateEmbeddedDocuments("ActiveEffect", updates);
+      count += updates.length;
+    }
+  }
+
+  for (const scene of game.scenes) {
+    for (const token of (scene as any).tokens) {
+      const updates = [];
+      for (const effect of token.actor?.effects ?? []) {
+        const img: string = effect.img ?? "";
+        if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+          updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
+        }
+      }
+      if (updates.length > 0) {
+        await token.actor.updateEmbeddedDocuments("ActiveEffect", updates);
+        count += updates.length;
+      }
+    }
+  }
+
+  console.log(`od6s | Updated ${count} status effect icons.`);
 }
 
 /**
