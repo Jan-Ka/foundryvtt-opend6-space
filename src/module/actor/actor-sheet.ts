@@ -12,6 +12,7 @@ import {registerEffectListeners} from "./sheet-listeners/effects";
 import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
+import {computeSkillDisplayScore} from "./actor-helpers/skill-score";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
     onDropCharacterTemplate, onDropSpeciesTemplate, onDropItemGroup,
@@ -121,19 +122,32 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             if (i.type === "gear") {
                 gear.push(i);
             } else if (i.type === "skill") {
-                if (!OD6S.flatSkills
-                    && typeof i.system.score !== "undefined"
-                    && typeof i.system.attribute !== "undefined") {
-                    if (!i.system.isAdvancedSkill) {
-                        i.system.score = (+i.system.score)
-                            + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                    }
+                // Compute the display score *idempotently* from base/mod/attribute.
+                // Reading + writing `i.system.score` here used to compound across
+                // re-renders because prepareDerivedData() only resets score on
+                // actor re-prepare, not on every sheet render.
+                if (typeof i.system.attribute !== "undefined") {
+                    i.system.score = computeSkillDisplayScore({
+                        base: i.system.base,
+                        mod: i.system.mod,
+                        isAdvancedSkill: i.system.isAdvancedSkill,
+                        attributeScore:
+                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
+                        flatSkills: OD6S.flatSkills,
+                    });
                 }
                 skills.push(i);
             } else if (i.type === "specialization") {
-                if (!OD6S.flatSkills) {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
+                // Specializations always roll on the linked attribute; no
+                // advanced-skill exemption applies.
+                if (typeof i.system.attribute !== "undefined") {
+                    i.system.score = computeSkillDisplayScore({
+                        base: i.system.base,
+                        mod: i.system.mod,
+                        attributeScore:
+                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
+                        flatSkills: OD6S.flatSkills,
+                    });
                 }
                 specializations.push(i);
             } else if (i.type === "weapon") {
