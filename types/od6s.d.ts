@@ -108,6 +108,8 @@ interface OD6SVehicleSystem {
     embedded_pilot: { value: boolean };
     crewmembers: Array<{ uuid: string; name?: string }>;
     crew: { value: number };
+    /** Vehicle/starship damage state — wound-table key. */
+    damage: { value: string };
     roll_mod: number;
     use_wild_die: boolean;
 }
