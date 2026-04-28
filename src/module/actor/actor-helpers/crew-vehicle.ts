@@ -1,9 +1,7 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 
-declare const foundry: any;
-
-export async function addEmbeddedPilot(actor: any, pilotActor: any): Promise<void> {
+export async function addEmbeddedPilot(actor: Actor, pilotActor: Actor): Promise<void> {
     /* Copy attributes and items to vehicle */
     const update = {};
 
@@ -14,7 +12,7 @@ export async function addEmbeddedPilot(actor: any, pilotActor: any): Promise<voi
     await actor.update(update);
 }
 
-export async function addToCrew(actor: any, vehicleId: any): Promise<any> {
+export async function addToCrew(actor: Actor, vehicleId: string): Promise<unknown> {
     if (actor.isCrewMember()) {
         const currentVehicle = await fromUuid(await actor.getFlag('od6s', 'crew'));
         const newVehicle = await fromUuid(vehicleId);
@@ -40,7 +38,7 @@ export async function addToCrew(actor: any, vehicleId: any): Promise<any> {
     }
 }
 
-export async function _verifyAddToCrew(actor: any, currentVehicleId: any, newVehicleId: any): Promise<void> {
+export async function _verifyAddToCrew(actor: Actor, currentVehicleId: string, newVehicleId: string): Promise<void> {
     const oldVehicle = await fromUuid(currentVehicleId);
     let oldActor;
     if (oldVehicle.documentName === "Token") {
@@ -61,7 +59,7 @@ export async function _verifyAddToCrew(actor: any, currentVehicleId: any, newVeh
     await newActor.sheet.linkCrew(actor.uuid);
 }
 
-export async function removeFromCrew(actor: any, vehicleID: any): Promise<void> {
+export async function removeFromCrew(actor: Actor, vehicleID: string): Promise<void> {
     if (actor.getFlag('od6s', 'crew') !== vehicleID) {
         ui.notifications.warn(game.i18n.localize('OD6S.NOT_CREW_MEMBER'))
     } else {
@@ -73,41 +71,42 @@ export async function removeFromCrew(actor: any, vehicleID: any): Promise<void> 
     }
 }
 
-export async function forceRemoveCrewmember(actor: any, crewID: any): Promise<void> {
-    const crewMembers = actor.system.crewmembers.filter((e: any) => e.uuid !== crewID);
+export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promise<void> {
+    const crewMembers = (actor.system as OD6SVehicleSystem).crewmembers.filter((e) => e.uuid !== crewID);
     const update: any = {};
     update.system = {};
     update.system.crewmembers = crewMembers;
     await actor.update(update);
 }
 
-export function isCrewMember(actor: any): any {
-    return actor.getFlag('od6s', 'crew');
+export function isCrewMember(actor: Actor): boolean {
+    return !!actor.getFlag('od6s', 'crew');
 }
 
-export async function sendVehicleData(actor: any, uuid: any): Promise<void> {
+export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
     const data: any = {};
+    const sys = actor.system as OD6SVehicleSystem & Record<string, any>;
     data.uuid = actor.uuid;
     data.name = actor.name;
     data.type = actor.type;
-    data.move = actor.system.move;
-    data.maneuverability = actor.system.maneuverability;
-    data.toughness = actor.system.toughness;
-    data.crewmembers = actor.system.crewmembers;
+    data.move = sys.move;
+    data.maneuverability = sys.maneuverability;
+    data.toughness = sys.toughness;
+    data.crewmembers = sys.crewmembers;
     data.items = actor.items;
-    data.attribute = actor.system.attribute;
-    data.skill = actor.system.skill;
-    data.specialization = actor.system.specialization;
-    data.damage = actor.system.damage;
-    data.shields = actor.system.shields;
-    data.scale = actor.system.scale;
-    data.sensors = actor.system.sensors;
-    data.armor = actor.system.armor;
-    data.dodge = actor.system.dodge;
-    data.ranged = actor.system.ranged;
-    data.ranged_damage = actor.system.ranged_damage;
-    data.ram = actor.system.ram;
-    data.ram_damage = actor.system.ram_damage;
+    data.attribute = sys.attribute;
+    data.skill = sys.skill;
+    data.specialization = sys.specialization;
+    data.damage = sys.damage;
+    data.shields = sys.shields;
+    data.scale = sys.scale;
+    data.sensors = sys.sensors;
+    data.armor = sys.armor;
+    data.dodge = sys.dodge;
+    data.ranged = sys.ranged;
+    data.ranged_damage = sys.ranged_damage;
+    data.ram = sys.ram;
+    data.ram_damage = sys.ram_damage;
     data.vehicle_weapons = [];
     for (let i = 0; i < data.items.size; i++) {
         if (actor.items.contents[i].type === "vehicle-weapon" || actor.items.contents[i].type === "starship-weapon") {
@@ -141,11 +140,11 @@ export async function sendVehicleData(actor: any, uuid: any): Promise<void> {
     }
 }
 
-export async function modifyShields(actor: any, update: any): Promise<void> {
+export async function modifyShields(actor: Actor, update: any): Promise<void> {
     await OD6S.socket.executeAsGM("modifyShields", update);
 }
 
-export async function vehicleCollision(actor: any): Promise<void> {
+export async function vehicleCollision(actor: Actor): Promise<void> {
     if (actor.type !== 'vehicle' && actor.type !== 'starship') {
         ui.notifications.warn(game.i18n.localize('OD6S.WARN_ACTOR_NOT_VEHICLE'));
         return;
@@ -254,7 +253,7 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
     }
 }
 
-export async function onCargoHoldItemCreate(actor: any, event: any): Promise<any> {
+export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise<unknown> {
     event.preventDefault();
 
     const documentName = 'Item';

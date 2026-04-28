@@ -89,16 +89,14 @@ export class OD6SItem extends Item {
             if (this.actor) {
                 let score = this.actor.system.attributes[this.system.stats.attribute.toLowerCase()].score;
                 const spec = this.actor.items.find(i => i.name === this.system.stats.specialization && i.type === 'specialization');
-                // @ts-expect-error
-                if (typeof spec !== 'undefined' && spec !== '') {
+                if (typeof spec !== 'undefined') {
                     if (typeof this.system.fire_control !== 'undefined' && this.system.fire_control?.score !== '') {
                         score = score + this.system.fire_control.score;
                     }
                     return score + spec.system.score;
                 } else {
                     const skill = this.actor.items.find(i => i.name === this.system.stats.skill && i.type === 'skill');
-                    // @ts-expect-error
-                    if (typeof skill !== 'undefined' && skill !== '') {
+                    if (typeof skill !== 'undefined') {
                         if (typeof this.system.fire_control !== 'undefined' && this.system.fire_control?.score !== '') {
                             score = score + this.system.fire_control.score;
                         }
@@ -122,14 +120,12 @@ export class OD6SItem extends Item {
             if (this.actor) {
                 if (this.system.stats.parry_specialization !== '') {
                     const spec = this.actor.items.find(s => s.name === this.system.stats.parry_specialization && s.type === 'specialization');
-                    // @ts-expect-error
-                    if (typeof spec !== 'undefined' && spec !== '') return spec!.getScoreText();
+                    if (typeof spec !== 'undefined') return spec.getScoreText();
                 }
                 if (this.system.stats.parry_skill !== '') {
                     if(this.actor) {
                         const skill = this.actor.items.find(s=>s.name === this.system.stats.parry_skill && s.type === 'skill' );
-                        // @ts-expect-error
-                        if (typeof skill !== 'undefined' && skill !== '') return skill!.getScoreText();
+                        if (typeof skill !== 'undefined') return skill.getScoreText();
                     }
                 }
                 return this.actor.getActionScoreText('parry')
@@ -212,8 +208,9 @@ export class OD6SItem extends Item {
     async roll(parry = false) {
         // Basic template rendering data
         const item = this;
-        const actor = this.actor ? this.actor : {};
-        const actorData = (this.actor?.system ?? {}) as OD6SCharacterSystem & Record<string, any>;
+        if (!this.actor) return;
+        const actor = this.actor;
+        const actorData = actor.system as OD6SCharacterSystem & Record<string, any>;
         const itemData = item.system;
         let flatPips = 0;
 
@@ -244,12 +241,12 @@ export class OD6SItem extends Item {
                 if (parry && game.settings.get('od6s','parry_skills')) {
                     let skill;
                     if(typeof(this.system.stats.parry_specialization) !== "undefined" && this.system.stats.parry_specialization !== "") {
-                        skill = (actor as any).items.find((skill: any) => skill.name === this.system.stats.parry_specialization && skill.type === 'specialization');
+                        skill = actor.items.find((skill: Item) => skill.name === this.system.stats.parry_specialization && skill.type === 'specialization');
                     }
                     else if(typeof(this.system.stats.parry_skill) !== "undefined" && this.system.stats.parry_skill !== "") {
-                    	skill = (actor as any).items.find((skill: any) => skill.name === this.system.stats.parry_skill && skill.type === 'skill');
+                    	skill = actor.items.find((skill: Item) => skill.name === this.system.stats.parry_skill && skill.type === 'skill');
                      } else {
-                    	skill = (actor as any).items.find((skill: any) => skill.name === game.i18n.localize(OD6S.actions.parry.skill) && skill.type === 'skill');
+                    	skill = actor.items.find((skill: Item) => skill.name === game.i18n.localize(OD6S.actions.parry.skill) && skill.type === 'skill');
                     }
                     if (skill) {
                         if(OD6S.flatSkills) {
@@ -265,7 +262,7 @@ export class OD6SItem extends Item {
                 }
 
                 if (!found && itemData.stats.specialization !== null) {
-                    const spec = (actor as any).items.find((spec: any) => spec.name === itemData.stats.specialization && spec.type === 'specialization');                    if (spec) {
+                    const spec = actor.items.find((spec: Item) => spec.name === itemData.stats.specialization && spec.type === 'specialization');                    if (spec) {
                         if(OD6S.flatSkills) {
                             rollData.score = (+actorData.attributes[spec.system.attribute.toLowerCase()].score);
                             flatPips = (+spec.system.score);
@@ -277,7 +274,7 @@ export class OD6SItem extends Item {
                 }
                 if (!found) {
                     // See if the actor has the associated skill
-                    const skill = (actor as any).items.find((skill: any) => skill.name === itemData.stats.skill && skill.type === 'skill');
+                    const skill = actor.items.find((skill: Item) => skill.name === itemData.stats.skill && skill.type === 'skill');
                     let attr = actorData.attributes[itemData.stats.attribute.toLowerCase()];
                     if(typeof(attr?.score) === "undefined" || attr === null) {
                         // See if it maps to the "shortname" of a custom attribute label
@@ -311,8 +308,8 @@ export class OD6SItem extends Item {
                 let name = '';
                 if ((itemData.subtype === 'rangedattack' || itemData.subtype === 'meleeattack') && itemData.itemId !== '') {
                     // Roll is linked to an inventory item, roll that instead
-                    const targetItem = (actor as any).items.find((i: any) => i.id === itemData.itemId);
-                    return targetItem.roll(parry);
+                    const targetItem = actor.items.find((i: Item) => i.id === itemData.itemId);
+                    return targetItem?.roll(parry);
                 }
 
                 if (itemData.subtype === 'dodge' || itemData.subtype === 'parry' || itemData.subtype === 'block') {
@@ -322,9 +319,9 @@ export class OD6SItem extends Item {
                             name = 'OD6S.DODGE';
                             break;
                         case 'parry':
-                            if ((actor as any).items.find((i: any) => i.id === itemData.itemId)) {
-                                const targetItem = (actor as any).items.find((i: any) => i.id === itemData.itemId);
-                                return targetItem.roll(true);
+                            if (actor.items.find((i: Item) => i.id === itemData.itemId)) {
+                                const targetItem = actor.items.find((i: Item) => i.id === itemData.itemId);
+                                return targetItem?.roll(true);
                             } else {
                                 name = OD6S.actions.parry.skill;
                             }
@@ -343,9 +340,9 @@ export class OD6SItem extends Item {
                     //let name = item.name;
                     name = game.i18n.localize(name);
                     if (typeof (itemData.itemId) !== 'undefined' && itemData.itemId !== '') {
-                        skill = (actor as any).items.find((i: any) => i.type === itemData.subtype && i.id === itemData.itemId);
+                        skill = actor.items.find((i: Item) => i.type === itemData.subtype && i.id === itemData.itemId);
                     } else {
-                        skill = (actor as any).items.find((i: any) => i.name === name);
+                        skill = actor.items.find((i: Item) => i.name === name);
                     }
                     if (skill !== null && typeof (skill) !== 'undefined' && typeof ((skill as any).system.score) !== 'undefined') {
                         if(OD6S.flatSkills) {
@@ -372,8 +369,7 @@ export class OD6SItem extends Item {
                                 // Cannot find, use defaults for the type
                                 for (const a in OD6S.actions) {
                                     if (OD6S.actions[a].type === itemData.subtype) {
-                                        // @ts-expect-error
-                                        rollData.score = (+this!.actor.system.attributes[OD6S.actions[a].base].score);
+                                        rollData.score = (+actorData.attributes[OD6S.actions[a].base].score);
                                         break;
                                     }
                                 }

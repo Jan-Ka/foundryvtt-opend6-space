@@ -158,8 +158,7 @@ export function registerInventoryListeners(html: any, sheet: any): void {
     el.querySelectorAll('.show-item-details').forEach((elem: any) =>
         elem.addEventListener('click', async (ev: any) => {
             ev.preventDefault();
-            // @ts-expect-error
-            let item = game!.actors.get(ev.currentTarget.dataset.actorId).items.get(ev.currentTarget.dataset.itemId);
+            let item = game!.actors.get(ev.currentTarget.dataset.actorId)?.items.get(ev.currentTarget.dataset.itemId);
             if (typeof (item) !== 'undefined') {
                 new OD6SItemInfo(item).render(true);
             } else {
@@ -185,11 +184,9 @@ export function registerInventoryListeners(html: any, sheet: any): void {
                 return;
             }
             if (OD6S.cost === '0') {
-                // @ts-expect-error
-                await sheet.rollPurchase(ev, game!.user.character.id);
+                await sheet.rollPurchase(ev, game!.user.character!.id);
             } else {
-                // @ts-expect-error
-                await sheet._onPurchase(ev.currentTarget.dataset.itemId, game!.user.character.id);
+                await sheet._onPurchase(ev.currentTarget.dataset.itemId, game!.user.character!.id);
             }
         }));
 

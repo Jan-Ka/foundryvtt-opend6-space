@@ -13,13 +13,13 @@ import * as opposedUtils from "./utilities/opposed";
 import * as miscUtils from "./utilities/misc";
 
 export const od6sutilities = {
-    accessDeepProp(obj: any, path: any) {
+    accessDeepProp(obj: Record<string, unknown>, path: string) {
         return converterUtils.accessDeepProp(obj, path);
     },
-    async getWeaponRange(actor: any, item: any) {
+    async getWeaponRange(actor: Actor, item: Item) {
         return weaponUtils.getWeaponRange(actor, item);
     },
-    lookupAttributeKey(id: any) {
+    lookupAttributeKey(id: string) {
         return miscUtils.lookupAttributeKey(id);
     },
     async scatterExplosive(range: any, origin: any, regionId: any) {
@@ -37,22 +37,22 @@ export const od6sutilities = {
     getBlastRadius(item: any, range: any) {
         return explosiveUtils.getBlastRadius(item, range);
     },
-    getDiceFromScore(score: any) {
+    getDiceFromScore(score: number) {
         return diceUtils.getDiceFromScore(score, OD6S.pipsPerDice);
     },
-    getTextFromDice(dice: any) {
+    getTextFromDice(dice: { dice: number; pips: number }) {
         return diceUtils.getTextFromDice(dice);
     },
-    getScoreFromDice(dice: any, pips: any) {
+    getScoreFromDice(dice: number, pips: number) {
         return diceUtils.getScoreFromDice(dice, pips, OD6S.pipsPerDice);
     },
-    async getDifficultyFromLevel(level: any) {
+    async getDifficultyFromLevel(level: string) {
         return difficultyUtils.getDifficultyFromLevel(level);
     },
-    getWoundPenalty(actor: any) {
+    getWoundPenalty(actor: Actor) {
         return woundUtils.getWoundPenalty(actor);
     },
-    getWoundLevel(value: any, actor: any) {
+    getWoundLevel(value: number, actor: Actor) {
         return woundUtils.getWoundLevel(value, actor);
     },
     getDifficultyLevelSelect() {
@@ -64,82 +64,82 @@ export const od6sutilities = {
     getActiveAttributesSelect() {
         return actorUtils.getActiveAttributesSelect();
     },
-    async getSkillsFromTemplate(items: any) {
+    async getSkillsFromTemplate(items: Item[]) {
         return itemUtils.getSkillsFromTemplate(items);
     },
-    async _getItemFromCompendiumId(id: any) {
+    async _getItemFromCompendiumId(id: string) {
         return itemUtils._getItemFromCompendiumId(id);
     },
-    async _getItemFromCompendium(itemName: any) {
+    async _getItemFromCompendium(itemName: string) {
         return itemUtils._getItemFromCompendium(itemName);
     },
-    async _getItemFromWorld(itemName: any) {
+    async _getItemFromWorld(itemName: string) {
         return itemUtils._getItemFromWorld(itemName);
     },
-    async getItemByName(itemName: any) {
+    async getItemByName(itemName: string) {
         return itemUtils.getItemByName(itemName);
     },
-    getItemsFromCompendiumByType(itemType: any) {
+    getItemsFromCompendiumByType(itemType: OD6SItemType) {
         return itemUtils.getItemsFromCompendiumByType(itemType);
     },
-    getItemsFromWorldByType(itemType: any) {
+    getItemsFromWorldByType(itemType: OD6SItemType) {
         return itemUtils.getItemsFromWorldByType(itemType);
     },
-    getAllItemsByType(itemType: any) {
+    getAllItemsByType(itemType: OD6SItemType) {
         return itemUtils.getAllItemsByType(itemType);
     },
     mergeByProperty(target: any, source: any, prop: any) {
         return itemUtils.mergeByProperty(target, source, prop);
     },
-    async getActorFromUuid(uuid: any) {
+    async getActorFromUuid(uuid: string) {
         return actorUtils.getActorFromUuid(uuid);
     },
-    async getTokenFromUuid(uuid: any) {
+    async getTokenFromUuid(uuid: string) {
         return actorUtils.getTokenFromUuid(uuid);
     },
-    getScoreFromSkill(actor: any, spec: any, skill: any, attribute: any) {
+    getScoreFromSkill(actor: Actor, spec: string, skill: string, attribute: string) {
         return skillUtils.getScoreFromSkill(actor, spec, skill, attribute);
     },
-    getSensorTotal(actor: any, score: any) {
+    getSensorTotal(actor: Actor, score: number) {
         return skillUtils.getSensorTotal(actor, score);
     },
-    async autoOpposeRoll(msg: any) {
+    async autoOpposeRoll(msg: ChatMessage) {
         return opposedUtils.autoOpposeRoll(msg);
     },
     async handleOpposedRoll() {
         return opposedUtils.handleOpposedRoll();
     },
-    async generateOpposedRoll(token: any, msg: any) {
+    async generateOpposedRoll(token: TokenDocument, msg: ChatMessage) {
         return opposedUtils.generateOpposedRoll(token, msg);
     },
-    getActorOwner(actor: any) {
+    getActorOwner(actor: Actor) {
         return actorUtils.getActorOwner(actor);
     },
-    getInjury(damage: any, actorType: any) {
+    getInjury(damage: number, actorType: OD6SActorType | "system") {
         return woundUtils.getInjury(damage, actorType);
     },
-    waitFor3DDiceMessage(targetMessageId: any) {
+    waitFor3DDiceMessage(targetMessageId: string) {
         return miscUtils.waitFor3DDiceMessage(targetMessageId);
     },
-    async handleEffectChange(effect: any) {
+    async handleEffectChange(effect: ActiveEffect) {
         return effectUtils.handleEffectChange(effect);
     },
-    getTemplateFromMessage(message: any) {
+    getTemplateFromMessage(message: ChatMessage) {
         return miscUtils.getTemplateFromMessage(message);
     },
-    async wait(ms: any) {
+    async wait(ms: number) {
         return converterUtils.wait(ms);
     },
-    getMeleeDamage(actor: any, weapon: any) {
+    getMeleeDamage(actor: Actor, weapon: Item) {
         return weaponUtils.getMeleeDamage(actor, weapon);
     },
-    evaluateChange(change: any, caller: any) {
+    evaluateChange(change: ActiveEffectChange, caller: Actor | Item) {
         return effectUtils.evaluateChange(change, caller);
     },
-    applyDerivedEffect(obj: any, change: any) {
+    applyDerivedEffect(obj: Actor, change: ActiveEffectChange) {
         return effectUtils.applyDerivedEffect(obj, change);
     },
-    boolCheck(value: any) {
+    boolCheck(value: unknown) {
         return converterUtils.boolCheck(value);
     },
 };

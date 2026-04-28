@@ -96,6 +96,13 @@ declare namespace foundry {
             function HandlebarsApplicationMixin<T extends new (...args: any[]) => any>(
                 base: T
             ): T & typeof ApplicationV2;
+
+            class DialogV2 {
+                static input(options: any): Promise<any>;
+                static confirm(options: any): Promise<boolean>;
+                static prompt(options: any): Promise<any>;
+                static wait(options: any): Promise<any>;
+            }
         }
 
         namespace sheets {
@@ -144,6 +151,7 @@ declare namespace foundry {
 
         namespace handlebars {
             function loadTemplates(paths: string[] | Record<string, string>): Promise<Function[]>;
+            function renderTemplate(path: string, data?: object): Promise<string>;
         }
     }
 

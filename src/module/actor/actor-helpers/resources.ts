@@ -8,8 +8,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
     }
     const rollString = "1d6x6[CP]";
     const roll = await new Roll(rollString).evaluate();
-    // @ts-expect-error
-    if (game.modules.get('dice-so-nice') && game!.modules.get('dice-so-nice').active) {
+    if (game.modules.get('dice-so-nice')?.active) {
         game.dice3d.showForRoll(roll, game.user, true, false, false);
     }
 

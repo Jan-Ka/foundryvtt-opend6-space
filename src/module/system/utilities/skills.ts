@@ -30,9 +30,10 @@ export function getScoreFromSkill(actor: Actor, spec: string, skill: string, att
 export function getSensorTotal(actor: Actor, score: number): number {
     let skillName = '';
     if (actor.getFlag('od6s', 'crew')) {
-        if (typeof (actor.system.vehicle.sensors.skill) !== 'undefined'
-            && actor.system.vehicle.sensors.skill !== '') {
-            skillName = actor.system.vehicle.sensors.skill
+        const sys = actor.system as OD6SCharacterSystem & { vehicle: { sensors?: { skill?: string } } };
+        if (typeof (sys.vehicle.sensors?.skill) !== 'undefined'
+            && sys.vehicle.sensors.skill !== '') {
+            skillName = sys.vehicle.sensors.skill;
         }
     }
     if (skillName === '') {

@@ -25,9 +25,9 @@ async function triggerRoll(type: string, actorId: string) {
     if (!actor) return;
     if (type === 'mortally_wounded') {
         if (actor.hasPlayerOwner && actor.isOwner && !game.user.isGM) {
-            (actor as any).triggerMortallyWoundedCheck();
+            actor.triggerMortallyWoundedCheck();
         } else if (!actor.hasPlayerOwner && game.user.isGM) {
-            (actor as any).triggerMortallyWoundedCheck();
+            actor.triggerMortallyWoundedCheck();
         }
     }
 }
@@ -35,7 +35,7 @@ async function triggerRoll(type: string, actorId: string) {
 async function triggerRollAction(type: string, actorId: string) {
     const actor = game.actors.get(actorId);
     if (!actor) return;
-    return await (actor as any).rollAction(type);
+    return await actor.rollAction(type);
 }
 
 export async function updateExplosiveRegion(data: any) {
@@ -68,7 +68,7 @@ export async function deleteExplosiveRegion(data: any) {
 async function checkCrewStatus(actorId: string) {
     const actor = await od6sutilities.getActorFromUuid(actorId);
     if (!actor) return false;
-    return (actor as any).isCrewMember();
+    return actor.isCrewMember();
 }
 
 /**
@@ -119,7 +119,7 @@ async function unlinkCrew(crewId: string, vehicleId: string) {
 async function addToVehicle(vehicleId: string, crewId: string) {
     const actor = await od6sutilities.getActorFromUuid(crewId);
     if (!actor) return;
-    return await (actor as any).addToCrew(vehicleId);
+    return await actor.addToCrew(vehicleId);
 }
 
 /**
@@ -167,7 +167,7 @@ export async function promptResistanceRolls(msg: any) {
         if (typeof (target) !== 'undefined' && target) {
             if (target.actor.type === 'starship' || target.actor.type === 'vehicle') {
                 if(!target.actor.isOwner) return;
-                const crew = await od6sutilities.getActorFromUuid(target.actor.system.crewmembers[0].uuid);
+                const crew = await od6sutilities.getActorFromUuid((target.actor.system as OD6SVehicleSystem).crewmembers[0].uuid);
                 if (typeof (crew) !== 'undefined' || crew !== null) {
                     if (crew?.hasPlayerOwner && crew?.isOwner) {
                         return crew.rollAction('vehicletoughness', msg);

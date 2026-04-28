@@ -36,8 +36,7 @@ export function registerChatLogListeners() {
             } else {
                 content!.style.display = "block";
             }
-            // @ts-expect-error
-            game!.messages.get(ev.currentTarget.dataset.messageId).render();
+            game!.messages.get(ev.currentTarget.dataset.messageId)?.render();
         })
 
         delegateEvent(html, "click", ".damage-modifiers-button", async (ev: any) => {
@@ -47,8 +46,7 @@ export function registerChatLogListeners() {
             } else {
                 content!.style.display = "block";
             }
-            // @ts-expect-error
-            game!.messages.get(ev.currentTarget.dataset.messageId).render();
+            game!.messages.get(ev.currentTarget.dataset.messageId)?.render();
         })
 
         delegateEvent(html, "click", ".apply-damage-button", async (ev: any) => {
@@ -65,7 +63,7 @@ export function registerChatLogListeners() {
             const stunEffect = msg!.getFlag('od6s', 'stunEffect');
 
             if ((actor.type !== 'vehicle' && actor.type !== 'starship') && (isVehicle === true || isVehicle === 'true')) {
-                actor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
+                actor = await od6sutilities.getActorFromUuid((actor.system as OD6SCharacterSystem).vehicle.uuid);
             }
 
             if (od6sutilities.boolCheck(stun)) {
@@ -78,12 +76,12 @@ export function registerChatLogListeners() {
                         const update: any = {}
                         update[`system.stuns.current`] = 1;
                         update[`system.stuns.rounds`] = 1;
-                        update[`system.stuns.value`] = (+actor!.system.stuns.value) + 1;
+                        update[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
                         await actor!.update(update);
                     } else if (stunEffect === '-2D') {
                         (update as any)[`system.stuns.current`] = 2;
                         (update as any)[`system.stuns.rounds`] = 1;
-                        (update as any)[`system.stuns.value`] = (+actor!.system.stuns.value) + 1;
+                        (update as any)[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
                         await actor!.update(update);
                     }
                     if(!actor!.effects.contents.find(
@@ -103,7 +101,7 @@ export function registerChatLogListeners() {
                         await actor!.applyWounds(result);
                     }
                 } else {
-                    let bp = actor!.system.wounds.body_points.current - result;
+                    let bp = (actor!.system as OD6SCharacterSystem).wounds.body_points.current - result;
                     if (bp < 0) bp = 0;
                     (update as any)['system.wounds.body_points.current'] = bp;
                     if (game.settings.get('od6s', 'bodypoints') === 1) await actor!.setWoundLevelFromBodyPoints(bp);
@@ -121,9 +119,9 @@ export function registerChatLogListeners() {
 
         delegateEvent(html, 'click', '.remove-template-button', async (ev: any) => {
             const message =  await game.messages.get(ev.currentTarget.dataset.messageId);
-            const actor = message!.speaker.token === null ?
-                // @ts-expect-error
-                game.actors.get(message!.speaker.actor) : game!.scenes.active.tokens.get(message!.speaker.token).actor;
+            const actor = message!.speaker.token === null
+                ? game.actors.get(message!.speaker.actor)
+                : game!.scenes.active.tokens.get(message!.speaker.token)?.actor;
             const item = actor!.items.get(message!.getFlag('od6s','itemId'));
             const regionId = item!.getFlag('od6s','explosiveTemplate');
             const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
@@ -353,11 +351,9 @@ export function registerChatLogListeners() {
 
         delegateEvent(html, "change", ".explosive-target-zone", async (ev: any) => {
             const message = game.messages.get(ev.currentTarget.dataset.messageId);
-            const targets = Array.from(message!.getFlag('od6s','targets'));
+            const targets = Array.from(message!.getFlag('od6s','targets')) as Array<{ id: string; zone?: number }>;
             for (const t in targets) {
-                // @ts-expect-error
                 if(ev.currentTarget.dataset.targetId === targets[t].id) {
-                    // @ts-expect-error
                     targets[t].zone = parseInt(ev.target.value);
                 }
             }
@@ -390,7 +386,7 @@ export function registerChatLogListeners() {
             await message!.setFlag('od6s', 'isKnown', true);
             if(message!.getFlag('od6s','isExplosive') && game.settings.get('od6s','auto_explosive')) {
                 // Reveal the explosive region
-                const region = od6sutilities.getTemplateFromMessage(message).template;
+                const region = od6sutilities.getTemplateFromMessage(message!).template;
                 if(region) {
                     await region.update({ visibility: 2 }); // Make visible to all
                 }

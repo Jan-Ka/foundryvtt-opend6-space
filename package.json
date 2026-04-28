@@ -1,6 +1,6 @@
 {
   "name": "opend6-space",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "description": "OpenD6 Space system for Foundry VTT v14. Uses the rules from the OpenD6 Project SRD.",
   "scripts": {
@@ -14,7 +14,7 @@
     "watch": "pnpm run build:css && pnpm run watch:ts & pnpm run watch:css",
     "watch:ts": "esbuild src/module/od6s.ts --bundle --format=esm --outfile=src/module/od6s.js --sourcemap --watch",
     "watch:css": "sass scss/od6s.scss src/css/od6s.css --style=expanded --no-source-map --watch",
-    "lint": "eslint --max-warnings 1700 src/",
+    "lint": "eslint --max-warnings 1100 src/",
     "lint:fix": "eslint src/ --fix",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --project unit",
@@ -64,7 +64,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "eslint --max-warnings 1700 --fix"
+      "eslint --max-warnings 1100 --fix"
     ]
   }
 }

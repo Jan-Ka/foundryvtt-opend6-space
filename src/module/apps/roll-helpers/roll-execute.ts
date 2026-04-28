@@ -7,6 +7,7 @@ import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-
 import {applyDifficultyModifiers} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
+import {computeHighHitDamage, computeWildDieReduction} from "./roll-execute-math";
 import {debug} from "../../system/logger";
 
 export async function executeRollAction(rollData: RollData): Promise<unknown> {
@@ -40,7 +41,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     let difficulty;
 
     if (actor.type !== 'vehicle' && actor.type !== 'starship') {
-        strModDice = od6sutilities.getDiceFromScore(rollData.actor.system.strengthdamage.score);
+        strModDice = od6sutilities.getDiceFromScore((rollData.actor.system as OD6SCharacterSystem).strengthdamage.score);
     }
 
     rollData.isknown = true;
@@ -102,14 +103,15 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     // Apply costs
-    if ((rollData.characterpoints > 0) && (actor.system.characterpoints.value > 0)) {
+    const charSys = actor.system as OD6SCharacterSystem;
+    if ((rollData.characterpoints > 0) && (charSys.characterpoints.value > 0)) {
         doUpdate = true;
-        actor.system.characterpoints.value -= rollData.characterpoints;
+        charSys.characterpoints.value -= rollData.characterpoints;
     }
 
-    if (rollData.fatepoint && (actor.system.fatepoints.value > 0)) {
+    if (rollData.fatepoint && (charSys.fatepoints.value > 0)) {
         doUpdate = true;
-        actor.system.fatepoints.value -= 1;
+        charSys.fatepoints.value -= 1;
     }
 
     if (typeof (rollData.target) !== 'undefined') {
@@ -150,7 +152,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     });
 
     if (rollData.subtype === 'brawlattack') {
-        damageScore = actor.system.strengthdamage.score;
+        damageScore = charSys.strengthdamage.score;
         damageType = 'p';
     }
 
@@ -397,29 +399,19 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     if (rollData.actor.type === 'character' && OD6S.highHitDamage && flags.success) {
-        let extra;
-        const difference = roll.total - difficulty;
-
-        if (OD6S.highHitDamageRound) {
-            extra = Math.floor(difference / OD6S.highHitDamageMultiplier);
-        } else {
-            extra = Math.ceil(difference / OD6S.highHitDamageMultiplier);
-        }
-
-        if (OD6S.highHitDamagePipsOrDice) {
-            flags.damageModifiers.push({
-                "name": 'OD6S.HIGH_HIT_DAMAGE',
-                "value": extra,
-                "pips": 0
-            });
-            flags.damageDice.dice += extra;
-        } else {
-            flags.damageModifiers.push({
-                "name": 'OD6S.HIGH_HIT_DAMAGE',
-                "value": 0,
-                "pips": extra
-            });
+        const { extra, asPips } = computeHighHitDamage({
+            rollTotal: roll.total,
+            difficulty,
+            multiplier: OD6S.highHitDamageMultiplier,
+            roundDown: OD6S.highHitDamageRound,
+            asPips: !OD6S.highHitDamagePipsOrDice,
+        });
+        if (asPips) {
+            flags.damageModifiers.push({ "name": 'OD6S.HIGH_HIT_DAMAGE', "value": 0, "pips": extra });
             flags.damageDice.pips += extra;
+        } else {
+            flags.damageModifiers.push({ "name": 'OD6S.HIGH_HIT_DAMAGE', "value": extra, "pips": 0 });
+            flags.damageDice.dice += extra;
         }
     }
 
@@ -455,15 +447,13 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));
-        let highest = 0;
-        for (let i = 0; i < replacementRoll.terms[0].results.length; i++) {
-            replacementRoll.terms[0].results[i].result >
-            replacementRoll.terms[0].results[highest].result ?
-                highest = i : {}
-        }
-        replacementRoll.terms[0].results[highest].discarded = true;
-        replacementRoll.terms[0].results[highest].active = false;
-        replacementRoll.total -= (+replacementRoll.terms[0].results[highest].result) + 1;
+        const { discardedIndex, newTotal } = computeWildDieReduction(
+            replacementRoll.terms[0].results,
+            replacementRoll.total,
+        );
+        replacementRoll.terms[0].results[discardedIndex].discarded = true;
+        replacementRoll.terms[0].results[discardedIndex].active = false;
+        replacementRoll.total = newTotal;
         flags.total = replacementRoll.total;
         const rollMessageUpdate: { content?: number; rolls?: unknown[]; flags?: { od6s?: Partial<RollMessageFlags> } } = {};
         rollMessageUpdate.content = replacementRoll.total;
@@ -539,9 +529,9 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     if (rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block') {
         doUpdate = true;
         if (rollData.fulldefense) {
-            actor.system[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
+            charSys[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
         } else {
-            actor.system[rollData.subtype].score = +(flags.total ?? 0);
+            charSys[rollData.subtype].score = +(flags.total ?? 0);
         }
     }
 
@@ -550,7 +540,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if (rollData.actor.type === 'vehicle' || rollData.actor.type === 'starship') {
             vehicle = rollData.actor;
         } else {
-            vehicle = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
+            vehicle = await od6sutilities.getActorFromUuid(charSys.vehicle.uuid);
         }
         const dodgeScore = rollData.fulldefense
             ? (+roll.total + baseAttackDifficulty)
@@ -565,18 +555,18 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if (game.user.isGM) {
             await vehicle?.update(vehicleUpdate);
         } else {
-            await OD6S.socket.executeAsGM('updateVehicle', actor.system.vehicle.uuid, vehicleUpdate);
+            await OD6S.socket.executeAsGM('updateVehicle', charSys.vehicle.uuid, vehicleUpdate);
         }
     }
 
     if (doUpdate) {
         const update = {
             system: {
-                fatepoints: actor.system.fatepoints,
-                characterpoints: actor.system.characterpoints,
-                dodge: { score: actor.system.dodge.score },
-                parry: { score: actor.system.parry.score },
-                block: { score: actor.system.block.score },
+                fatepoints: charSys.fatepoints,
+                characterpoints: charSys.characterpoints,
+                dodge: { score: charSys.dodge.score },
+                parry: { score: charSys.parry.score },
+                block: { score: charSys.block.score },
             },
         };
         await actor.update(update);

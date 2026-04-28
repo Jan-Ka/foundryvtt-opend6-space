@@ -59,9 +59,9 @@ export async function autoOpposeRoll(msg: ChatMessage): Promise<void> {
 }
 
 export async function handleOpposedRoll(): Promise<void> {
-    let type: any;
-    let winner: any;
-    let loser: any;
+    let type: string;
+    let winner: ChatMessage;
+    let loser: ChatMessage;
     let result: any;
     let damageFlavor;
     let stunned = false;
@@ -69,10 +69,10 @@ export async function handleOpposedRoll(): Promise<void> {
     data.flags = {};
     let collision: any;
     let passengerDamage = '';
-    const message1 = await game.messages.get(getOpposedQueueEntry(0).messageId);
-    const message2 = await game.messages.get(getOpposedQueueEntry(1).messageId);
-    const messageType1 = message1!.getFlag('od6s', 'type');
-    const messageType2 = message2!.getFlag('od6s', 'type');
+    const message1 = (await game.messages.get(getOpposedQueueEntry(0).messageId))!;
+    const message2 = (await game.messages.get(getOpposedQueueEntry(1).messageId))!;
+    const messageType1 = message1.getFlag('od6s', 'type');
+    const messageType2 = message2.getFlag('od6s', 'type');
     clearOpposedQueue();
 
     if (((messageType1 === 'damage' || messageType1 === 'explosive') && message2!.getFlag('od6s', 'type') === 'resistance') ||
@@ -124,7 +124,7 @@ export async function handleOpposedRoll(): Promise<void> {
                 loser = message1;
             }
         } else {
-            const targetId =  message1!.speaker.token !== null ? message1!.speaker.token : (message1 as any).speaker.actor;
+            const targetId = message1!.speaker.token !== null ? message1!.speaker.token : message1!.speaker.actor;
             const damage = message2!.getFlag('od6s', 'targets').find((t: any) =>t.id === targetId).damage;
             const resistance = message1!.rolls[0].total;
             if (damage > resistance) {
@@ -148,11 +148,11 @@ export async function handleOpposedRoll(): Promise<void> {
     const stun = await message1!.getFlag('od6s', 'stun') || await message2!.getFlag('od6s', 'stun');
     let stunEffect = 'unconscious';
 
-    const diff = (+(winner as any).rolls[0].total) - (+(loser as any).rolls[0].total);
+    const diff = (+winner.rolls[0].total) - (+loser.rolls[0].total);
 
     if (type === "damageresult") {
 
-        if ((loser as any).actorType === "vehicle" || (loser as any).actorType === "starship") {
+        if (loser.actorType === "vehicle" || loser.actorType === "starship") {
             damageFlavor = game.i18n.localize('OD6S.DAMAGES');
         } else {
             if (boolCheck(data.stun)) {
@@ -162,14 +162,14 @@ export async function handleOpposedRoll(): Promise<void> {
             }
         }
 
-        if ((winner as any).getFlag('od6s', 'type') === "damage" || (winner as any).getFlag('od6s', 'type') === 'explosive') {
+        if (winner.getFlag('od6s', 'type') === "damage" || winner.getFlag('od6s', 'type') === 'explosive') {
             if (boolCheck(stun)) {
-                data.content = (winner as any).alias + " " + damageFlavor + " " + (loser as any).flavorName;
+                data.content = winner.alias + " " + damageFlavor + " " + loser.flavorName;
                 stunned = true;
                 if (OD6S.stunScaling) {
-                    if ((winner as any).rolls[0].total >= (3 * (loser as any).rolls[0].total)) {
+                    if (winner.rolls[0].total >= (3 * loser.rolls[0].total)) {
                         stunEffect = 'unconscious';
-                    } else if ((winner as any).rolls[0].total >= (2 * (loser as any).rolls[0].total)) {
+                    } else if (winner.rolls[0].total >= (2 * loser.rolls[0].total)) {
                         stunEffect = '-2D';
                     } else {
                         stunEffect = '-1D';
@@ -179,10 +179,10 @@ export async function handleOpposedRoll(): Promise<void> {
                 if (stunEffect === 'unconscious') {
                     if (OD6S.stunDice) {
                         const roll = await new Roll("2d6").evaluate();
-                        result = (loser as any).flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
+                        result = loser.flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
                             roll.total + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
                     } else {
-                        result = (loser as any).flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
+                        result = loser.flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
                             diff + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
                     }
                 } else {
@@ -193,19 +193,19 @@ export async function handleOpposedRoll(): Promise<void> {
                     }
                 }
             } else {
-                data.content = (winner as any).alias + " " + damageFlavor + " " + (loser as any).flavorName;
-                if (OD6S.woundConfig > 0 && (loser as any).actorType !== 'vehicle' && (loser as any).actorType !== 'starship') {
+                data.content = winner.alias + " " + damageFlavor + " " + loser.flavorName;
+                if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
                     result = diff;
                 } else {
-                    result = getInjury(diff, (loser as any).actorType);
+                    result = getInjury(diff, loser.actorType!);
                 }
             }
         } else {
-            data.content = (winner as any).alias + " " + game.i18n.localize("OD6S.RESISTS") + " " + (loser as any).alias;
-            if ((winner as any).actorType === "vehicle" || (winner as any).actorType === "starship") {
+            data.content = winner.alias + " " + game.i18n.localize("OD6S.RESISTS") + " " + loser.alias;
+            if (winner.actorType === "vehicle" || winner.actorType === "starship") {
                 result = 'OD6S.NO_DAMAGE';
             } else {
-                if (OD6S.woundConfig > 0 && (loser as any).actorType !== 'vehicle' && (loser as any).actorType !== 'starship') {
+                if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
                     result = 0;
                 } else {
                     result = 'OD6S.NO_INJURY';
@@ -213,17 +213,17 @@ export async function handleOpposedRoll(): Promise<void> {
             }
         }
     } else {
-        data.flavor = (message1 as any).alias + " " + game.i18n.localize("OD6S.VS") + " " + (message2 as any).alias;
-        data.content = (winner as any).alias + " " + game.i18n.localize("OD6S.WINS");
+        data.flavor = message1!.alias + " " + game.i18n.localize("OD6S.VS") + " " + message2!.alias;
+        data.content = winner.alias + " " + game.i18n.localize("OD6S.WINS");
     }
 
-    let loserId = (loser as any).speaker.token;
-    if ((loser as any).actorType === "vehicle" || (loser as any).actorType === "starship") {
-        const token = await getTokenFromUuid((loser as any).getFlag('od6s','vehicle'));
+    let loserId: string | Actor | undefined = loser.speaker.token;
+    if (loser.actorType === "vehicle" || loser.actorType === "starship") {
+        const token = await getTokenFromUuid(loser.getFlag('od6s','vehicle'));
         if (typeof (token) !== 'undefined') {
             loserId = token.id;
         } else {
-            loserId = await getActorFromUuid((loser as any).getFlag('od6s', 'vehicle'));
+            loserId = await getActorFromUuid(loser.getFlag('od6s', 'vehicle'));
         }
         if (OD6S.passengerDamageDice) {
             passengerDamage = OD6S.vehicle_damage[result].passenger_damage_dice + "D";
@@ -233,7 +233,7 @@ export async function handleOpposedRoll(): Promise<void> {
     }
 
     let apply = false;
-    if (OD6S.woundConfig > 0 && (loser as any).actorType !== 'vehicle' && (loser as any).actorType !== 'starship') {
+    if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
         if (result > 0 || stunned) apply = true;
     } else if (result !== 'OD6S.NO_INJURY' && result !== 'OD6S.NO_DAMAGE') {
         apply = true;
@@ -248,7 +248,7 @@ export async function handleOpposedRoll(): Promise<void> {
         "applied": false,
         "stun": boolCheck(stun),
         "stunEffect": stunEffect,
-        "loserIsVehicle": (loser as any).actorType === 'vehicle' || (loser as any).actorType === 'starship',
+        "loserIsVehicle": loser.actorType === 'vehicle' || loser.actorType === 'starship',
         "loserId": loserId,
         "isCollision": collision,
         "passengerDamage": passengerDamage
@@ -261,11 +261,12 @@ export async function generateOpposedRoll(token: TokenDocument, msg: ChatMessage
         if (msg.getFlag('od6s', 'type') === 'damage' || msg.getFlag('od6s','type') === 'explosive') {
             const type = msg.getFlag('od6s', 'damageType');
             if (token.actor.type === 'vehicle' || token.actor.type === 'starship') {
-                if (token.actor.system.embedded_pilot.value || token.actor.system.crewmembers.length < 1) {
+                const sys = token.actor.system as OD6SVehicleSystem;
+                if (sys.embedded_pilot.value || sys.crewmembers.length < 1) {
                     await token.actor.rollAction('vehicletoughness', msg);
                     return;
                 } else {
-                    const actor = await getActorFromUuid(token.actor.system.crewmembers[0].uuid);
+                    const actor = await getActorFromUuid(sys.crewmembers[0].uuid);
                     await actor!.rollAction('vehicletoughness', msg);
                     return;
                 }

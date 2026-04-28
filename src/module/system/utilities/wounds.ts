@@ -66,7 +66,7 @@ export function getWoundPenalty(actor: Actor): number {
             : 'deadliness';
         deadlinessLevel = game.settings.get('od6s', settingKey) as number;
     }
-    return lookupWoundPenalty(OD6S.deadliness[deadlinessLevel], actor.system.wounds.value);
+    return lookupWoundPenalty(OD6S.deadliness[deadlinessLevel], (actor.system as OD6SCharacterSystem).wounds.value);
 }
 
 export function getWoundLevel(value: number, actor: Actor): string {

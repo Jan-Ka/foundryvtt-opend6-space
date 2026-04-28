@@ -20,7 +20,7 @@ export class od6sroll {
         const actor = (this as any).actor as Actor;
         const item = actor.items.find((i: Item) => i.id === (event.currentTarget as HTMLElement).dataset.itemId);
         if (!item) return;
-        if ((actor.type === 'vehicle' || actor.type === 'starship') && actor.system.embedded_pilot) {
+        if ((actor.type === 'vehicle' || actor.type === 'starship') && (actor.system as OD6SVehicleSystem).embedded_pilot) {
             return item.roll();
         }
         if (item.system?.subtype.includes("vehicle")) {
@@ -108,7 +108,7 @@ export class od6sroll {
 
         const actions = Object.keys(skills).length;
         const actionpenalty = (+actions) + ((actor as any).actions.length) - 1;
-        const stunnedpenalty = actor.system.stuns.current;
+        const stunnedpenalty = (actor.system as OD6SCharacterSystem).stuns.current;
 
         this.rollData = {
             title: item.name,
