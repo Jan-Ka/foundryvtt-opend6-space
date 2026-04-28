@@ -15,7 +15,14 @@
 import {Page, expect} from "@playwright/test";
 
 const USER = process.env.FOUNDRY_USER ?? "Gamemaster";
-const PASSWORD = process.env.FOUNDRY_PASSWORD ?? "";
+// `FOUNDRY_GM_PASSWORD` is the per-user join password for the smoke
+// world's Gamemaster — separate from `FOUNDRY_PASSWORD` (the
+// foundryvtt.com website password used by `task foundry:start` for
+// license activation) and `FOUNDRY_ADMIN_KEY` (the server admin password
+// used to enter /setup). A fresh smoke world's GM has no password, so
+// the default of empty is correct.
+const PASSWORD = process.env.FOUNDRY_GM_PASSWORD ?? "";
+const SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "od6s-smoke";
 
 declare global {
     interface Window {
@@ -39,25 +46,51 @@ declare global {
  * (the page reports `game.ready`), this short-circuits.
  */
 export async function loginAndWaitReady(page: Page): Promise<void> {
-    await page.goto("/");
-    // Foundry redirects to either /join (user select) or /game (loaded)
-    await page.waitForLoadState("domcontentloaded");
+    // Use `networkidle`, not `domcontentloaded` — Foundry's join page
+    // populates the user dropdown via JS after initial HTML lands.
+    // selectOption against an unpopulated <select> silently picks the
+    // empty default option, which Foundry then rejects.
+    await page.goto("/", {waitUntil: "networkidle"});
 
     const url = page.url();
     if (url.includes("/join")) {
-        // user-select page
-        await page.locator('select[name="userid"]').waitFor({state: "visible"});
-        await page.selectOption('select[name="userid"]', {label: USER});
-        if (PASSWORD) {
-            await page.fill('input[name="password"]', PASSWORD);
-        }
-        await page.click('button[name="join"]');
+        // user-select page. Scope all selectors to #join-game-form — the
+        // page also contains a "Return to Setup" form whose submit button
+        // would otherwise match.
+        const form = page.locator('#join-game-form');
+        await form.locator('select[name="userid"]').waitFor({state: "visible"});
+        await form.locator('select[name="userid"]').selectOption({label: USER});
+        await form.locator('input[name="password"]').fill(PASSWORD);
+        await form.locator('button[type="submit"]').click();
+        // Foundry's join form is a GET to /join — confirm we navigated
+        // away. If we didn't, the password was wrong; surface the error
+        // with the notification text instead of a 30 s game.ready timeout.
+        await page.waitForURL((u) => !u.pathname.startsWith("/join"), {timeout: 10_000})
+            .catch(async () => {
+                const notif = await page.locator("#notifications .notification").allTextContents();
+                throw new Error(
+                    `[smoke] /join submit did not navigate away. URL=${page.url()}, notifications=${JSON.stringify(notif)}\n` +
+                    `  → If the GM has a password, set FOUNDRY_GM_PASSWORD.`,
+                );
+            });
     }
 
     // Wait for game.ready in the page context
     await page.waitForFunction(() => (window as any).game?.ready === true, null, {
         timeout: 30_000,
     });
+
+    // Identity guard — refuse to run specs against an unexpected world.
+    // Catches: developer ran a single spec without globalSetup, world id
+    // changed but a spec wasn't updated, manual Foundry session left
+    // pointed at the wrong world.
+    const worldId = await page.evaluate(() => (window as any).game?.world?.id);
+    if (worldId !== SMOKE_WORLD) {
+        throw new Error(
+            `[smoke] running against world '${worldId}' but expected '${SMOKE_WORLD}'.\n` +
+            `  → Set FOUNDRY_SMOKE_WORLD or launch the correct world via globalSetup.`,
+        );
+    }
 }
 
 /**
