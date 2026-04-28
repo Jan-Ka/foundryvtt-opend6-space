@@ -5,21 +5,22 @@
 import type {RollData} from "./roll-data";
 
 export function getEffectMod(type: string, name: string, actor: Actor): number {
+    const sys = actor.system as OD6SCharacterSystem;
     if (type === 'skill') {
-        if (typeof (actor.system.customeffects?.skills[name]) !== 'undefined') {
-            return actor.system.customeffects.skills[name];
+        if (typeof (sys.customeffects?.skills[name]) !== 'undefined') {
+            return sys.customeffects.skills[name];
         }
     }
 
     if (type === 'specialization') {
-        if (typeof (actor.system.customeffects?.specializations[name]) !== 'undefined') {
-            return actor.system.customeffects.specializations[name];
+        if (typeof (sys.customeffects?.specializations[name]) !== 'undefined') {
+            return sys.customeffects.specializations[name];
         }
 
         const spec = actor.items.filter((i: Item) => i.type === type && i.name === name)[0];
         if (typeof (spec) !== 'undefined') {
-            if (typeof (actor.system.customeffects.skills[spec.system.skill]) !== 'undefined') {
-                return actor.system.customeffects.skills[spec.system.skill];
+            if (typeof (sys.customeffects.skills[spec.system.skill]) !== 'undefined') {
+                return sys.customeffects.skills[spec.system.skill];
             }
         }
     }

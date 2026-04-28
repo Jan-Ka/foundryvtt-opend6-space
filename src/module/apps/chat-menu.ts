@@ -16,7 +16,7 @@ export class OD6SChat {
                     if (message!.getFlag('od6s', 'canUseCp') &&
                         (game.user.isGM || actor!.isOwner) &&
                         (actor!.type === "character"||actor!.type === "npc") &&
-                        actor!.system.characterpoints.value > 0) {
+                        (actor!.system as OD6SCharacterSystem).characterpoints.value > 0) {
                         return true;
                     }
                 }

@@ -167,7 +167,7 @@ export async function promptResistanceRolls(msg: any) {
         if (typeof (target) !== 'undefined' && target) {
             if (target.actor.type === 'starship' || target.actor.type === 'vehicle') {
                 if(!target.actor.isOwner) return;
-                const crew = await od6sutilities.getActorFromUuid(target.actor.system.crewmembers[0].uuid);
+                const crew = await od6sutilities.getActorFromUuid((target.actor.system as OD6SVehicleSystem).crewmembers[0].uuid);
                 if (typeof (crew) !== 'undefined' || crew !== null) {
                     if (crew?.hasPlayerOwner && crew?.isOwner) {
                         return crew.rollAction('vehicletoughness', msg);

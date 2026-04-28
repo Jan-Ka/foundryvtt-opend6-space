@@ -65,7 +65,7 @@ export function registerChatLogListeners() {
             const stunEffect = msg!.getFlag('od6s', 'stunEffect');
 
             if ((actor.type !== 'vehicle' && actor.type !== 'starship') && (isVehicle === true || isVehicle === 'true')) {
-                actor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
+                actor = await od6sutilities.getActorFromUuid((actor.system as OD6SCharacterSystem).vehicle.uuid);
             }
 
             if (od6sutilities.boolCheck(stun)) {
@@ -78,12 +78,12 @@ export function registerChatLogListeners() {
                         const update: any = {}
                         update[`system.stuns.current`] = 1;
                         update[`system.stuns.rounds`] = 1;
-                        update[`system.stuns.value`] = (+actor!.system.stuns.value) + 1;
+                        update[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
                         await actor!.update(update);
                     } else if (stunEffect === '-2D') {
                         (update as any)[`system.stuns.current`] = 2;
                         (update as any)[`system.stuns.rounds`] = 1;
-                        (update as any)[`system.stuns.value`] = (+actor!.system.stuns.value) + 1;
+                        (update as any)[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
                         await actor!.update(update);
                     }
                     if(!actor!.effects.contents.find(
@@ -103,7 +103,7 @@ export function registerChatLogListeners() {
                         await actor!.applyWounds(result);
                     }
                 } else {
-                    let bp = actor!.system.wounds.body_points.current - result;
+                    let bp = (actor!.system as OD6SCharacterSystem).wounds.body_points.current - result;
                     if (bp < 0) bp = 0;
                     (update as any)['system.wounds.body_points.current'] = bp;
                     if (game.settings.get('od6s', 'bodypoints') === 1) await actor!.setWoundLevelFromBodyPoints(bp);

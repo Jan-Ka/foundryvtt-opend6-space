@@ -14,9 +14,9 @@ import {useCharacterPointOnRoll as useCharacterPointOnRollHelper} from "./actor-
  */
 export class OD6SActor extends Actor {
 
-    get visible() {
+    get visible(): boolean {
         if (this.type === "container" && !game.user.isGM) {
-            return this.system.visible;
+            return !!(this.system as OD6SCharacterSystem).visible;
         } else {
             return super.visible;
         }
@@ -108,15 +108,16 @@ export class OD6SActor extends Actor {
     }
 
     getVehicleActionScore(action: any) {
-        let vehicle;
-        let pilot;
+        let vehicle: any;
+        let pilot: Actor | null;
 
         if(this.type === 'character' || this.type === 'npc' || this.type === 'creature') {
-            vehicle = this.system.vehicle
+            vehicle = (this.system as OD6SCharacterSystem).vehicle;
             pilot = this;
         } else {
-            vehicle = this.system;
-            if (this.system.embedded_pilot.value) {
+            const sys = this.system as OD6SVehicleSystem;
+            vehicle = sys;
+            if (sys.embedded_pilot.value) {
                 pilot = this;
             } else {
                 pilot = null;

@@ -79,8 +79,18 @@ interface OD6SCharacterSystem {
     initiative: { score: number; mod: number; formula: string };
     use_wild_die: boolean;
     roll_mod: number;
+    characterpoints: { value: number };
+    fatepoints: { value: number };
+    customeffects: {
+        skills: Record<string, number>;
+        specializations: Record<string, number>;
+    };
     /** Crewmember actors carry a reference back to their vehicle. */
     vehicle: { uuid: string; name?: string; scale?: OD6SScoreField; vehicle_weapons?: any[] };
+    /** Container actors expose a per-player visibility flag. */
+    visible?: boolean;
+    /** Created marker on character actors. */
+    created?: { value: boolean };
 }
 
 /** System data for vehicle and starship actor types. */
@@ -97,6 +107,7 @@ interface OD6SVehicleSystem {
     ram_damage: OD6SScoreField;
     embedded_pilot: { value: boolean };
     crewmembers: Array<{ uuid: string; name?: string }>;
+    crew: { value: number };
     roll_mod: number;
     use_wild_die: boolean;
 }
@@ -138,7 +149,7 @@ interface Actor {
      * Typed union of character/vehicle system shapes. Use `actor.type` to
      * narrow before accessing type-specific fields (e.g. `vehicle.crewmembers`).
      */
-    system: (OD6SCharacterSystem | OD6SVehicleSystem) & Record<string, any>;
+    system: OD6SCharacterSystem | OD6SVehicleSystem;
 
     /** Roll an action defined in OD6S.actions (or vehicle/starship actions). */
     rollAction(actionId: string, msg?: ChatMessage | any): Promise<unknown>;

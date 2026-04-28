@@ -52,7 +52,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         let item = data.actor.items.get(data.itemId);
         if(typeof(item) === 'undefined') {
             if (data.type === 'action' && data.subtype === 'vehiclerangedweaponattack') {
-                item = data.actor.system.vehicle.vehicle_weapons.find((i: any) =>i.id === data.itemId);
+                item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!.find((i: any) =>i.id === data.itemId);
             }
         }
         if (item?.system.subtype?.toLowerCase() === 'explosive') {
@@ -90,7 +90,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         if (data.actor.type === 'vehicle' || data.actor.type === 'starship') {
             vehicle = data.actor.uuid;
         } else {
-            vehicle = data.actor.system.vehicle.uuid;
+            vehicle = (data.actor.system as OD6SCharacterSystem).vehicle.uuid;
         }
     }
 
@@ -146,7 +146,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         if (data.subtype === 'meleeattack') {
             damageScore = od6sutilities.getMeleeDamage(data.actor, weapon);
             if (stunDamageScore > 0) {
-                stunDamageScore = weapon.system.damage.str ? stunDamageScore + data.actor.system.strengthdamage.score : stunDamageScore;
+                stunDamageScore = weapon.system.damage.str ? stunDamageScore + (data.actor.system as OD6SCharacterSystem).strengthdamage.score : stunDamageScore;
             }
         }
         if (weapon.system.scale.score) attackerScale = weapon.system.scale.score;
@@ -189,7 +189,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         if (weapon.system.damage.muscle) {
             const strmod = {
                 "name": 'OD6S.STRENGTH_DAMAGE_BONUS',
-                "value": data.actor.system.strengthdamage.score
+                "value": (data.actor.system as OD6SCharacterSystem).strengthdamage.score
             }
             damageModifiers.push(strmod);
         }
@@ -214,19 +214,19 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (data.subtype === 'vehiclerangedweaponattack') {
         let vehicleWeapon: Item | undefined;
         if (data.actor.type === 'vehicle') {
-            if (data.actor.system.embedded_pilot) {
+            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot) {
                 vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
             } else {
                 vehicleWeapon = (data.actor as any).vehicle_weapons.filter((i: Item) => i._id === data.itemId)[0];
             }
         } else if (data.actor.type === 'starship') {
-            if (data.actor.system.embedded_pilot) {
+            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot) {
                 vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
             } else {
                 vehicleWeapon = (data.actor as any).starship_weapons.filter((i: Item) => i._id === data.itemId)[0];
             }
         } else {
-            vehicleWeapon = data.actor.system.vehicle.vehicle_weapons?.filter((i: Item) => i.id === data.itemId)[0];
+            vehicleWeapon = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons?.filter((i: Item) => i.id === data.itemId)[0];
         }
 
         isAttack = true;
@@ -238,15 +238,15 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             if (vehicleWeapon.system.mods.attack !== 0) bonusmod += vehicleWeapon.system.mods.attack;
             if (vehicleWeapon.system.scale.score) {
                 attackerScale = vehicleWeapon.system.scale.score;
-            } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || data.actor.system?.embedded_pilot) {
+            } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || (data.actor.system as OD6SVehicleSystem)?.embedded_pilot) {
                 attackerScale = data.actor.system.scale.score;
             } else {
-                attackerScale = data.actor.system.vehicle.scale.score;
+                attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
             }
         } else {
             damageScore = data.damage ?? 0;
             damageType = data.damage_type ?? '';
-            attackerScale = data.actor.system.vehicle.scale.score;
+            attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
         }
         damageSource = data.name;
     }
@@ -255,22 +255,22 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         damageType = 'p';
         damageSource = 'OD6S.COLLISION';
         isAttack = true;
-        const vehicle = (data.actor.type === 'vehicle' || data.actor.type === 'starship') ? data.actor.system : data.actor.system.vehicle
-        if (vehicle.ram_damage.score > 0) {
+        const vehicle: any = (data.actor.type === 'vehicle' || data.actor.type === 'starship') ? data.actor.system : (data.actor.system as OD6SCharacterSystem).vehicle;
+        if (vehicle.ram_damage?.score > 0) {
             const rangedmod = {
                 "name": 'OD6S.ACTIVE_EFFECTS',
                 "value": vehicle.ram_damage.score
             }
             damageModifiers.push(rangedmod);
         }
-        if (vehicle.ram.score > 0) {
+        if (vehicle.ram?.score > 0) {
             bonusmod += (+vehicle.ram.score);
         }
     }
 
     if (data.type === 'brawlattack' || data.subtype === 'brawlattack') {
         damageType = 'p';
-        damageScore = data.actor.system.strengthdamage.score;
+        damageScore = (data.actor.system as OD6SCharacterSystem).strengthdamage.score;
         isAttack = true;
         canStun = true;
         stunDamageScore = damageScore;
@@ -286,10 +286,10 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (targets.length === 1) {
         if (!attackerScale && isAttack) {
             if (typeof (data.subtype) !== 'undefined' && data.subtype.includes('vehicle')) {
-                if (data.actor.system.crew.value) {
+                if ((data.actor.system as OD6SVehicleSystem).crew?.value) {
                     attackerScale = data.actor.system.scale.score;
                 } else {
-                    attackerScale = data.actor.system.vehicle.scale.score;
+                    attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
                 }
             } else {
                 if (typeof (data.actor.system.scale.score) === 'undefined') {
@@ -383,7 +383,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     let stunnedPenalty = 0;
     if (data.actor.type === 'character' || data.actor.type === 'npc' || data.actor.type === 'creature') {
-        stunnedPenalty = data.actor.system.stuns.current ? data.actor.system.stuns.current : 0;
+        const sys = data.actor.system as OD6SCharacterSystem;
+        stunnedPenalty = sys.stuns.current ? sys.stuns.current : 0;
     }
 
     let actionPenalty = ((+data.actor.itemTypes.action.length) > 0) ? (+data.actor.itemTypes.action.length) - 1 : 0;
@@ -465,7 +466,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         data.subtype === "meleeattack" &&
         data.name === game.i18n.localize('OD6S.ACTION_MELEE_ATTACK')) {
         miscMod += 5;
-        damageScore = data.actor.system.strengthdamage.score;
+        damageScore = (data.actor.system as OD6SCharacterSystem).strengthdamage.score;
     }
 
     if (data.subtype === 'rangedattack' ||
@@ -518,10 +519,12 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         }
 
         if (data.subtype.startsWith('vehicle')) {
-            if (data.actor.system?.embedded_pilot?.value && typeof ((data.actor.system?.ranged as OD6SScoreField)?.score) !== 'undefined') {
-                bonusmod += (+(data.actor.system.ranged as OD6SScoreField).score);
-            } else if (typeof (data.actor.system?.vehicle?.ranged?.score) !== 'undefined') {
-                bonusmod += (+data.actor.system.vehicle.ranged.score);
+            const vehSys = data.actor.system as OD6SVehicleSystem;
+            const charSys = data.actor.system as OD6SCharacterSystem & { vehicle: { ranged?: { score?: number } } };
+            if (vehSys?.embedded_pilot?.value && typeof ((vehSys?.ranged as OD6SScoreField)?.score) !== 'undefined') {
+                bonusmod += (+(vehSys.ranged as OD6SScoreField).score);
+            } else if (typeof (charSys?.vehicle?.ranged?.score) !== 'undefined') {
+                bonusmod += (+charSys.vehicle.ranged.score);
             }
         } else {
             bonusmod += (+(data.actor.system.ranged as OD6SModField).mod);
@@ -529,35 +532,36 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     }
 
     if (data.subtype === 'vehicleramattack') {
-        const vehicle = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
-            ? data.actor.system : data.actor.system.vehicle
-        if (typeof (vehicle.ram.score) !== 'undefined') {
+        const vehicle: any = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
+            ? data.actor.system : (data.actor.system as OD6SCharacterSystem).vehicle;
+        if (typeof (vehicle.ram?.score) !== 'undefined') {
             bonusmod += (+vehicle.ram.score);
         }
     }
 
+    const charSys = data.actor.system as OD6SCharacterSystem;
     if (data.subtype === 'meleeattack') {
-        bonusmod += (+data.actor.system.melee.mod);
+        bonusmod += (+charSys.melee.mod);
     }
 
     if (data.subtype === 'brawlattack') {
-        bonusmod += (+data.actor.system.brawl.mod);
+        bonusmod += (+charSys.brawl.mod);
         canStun = true;
-        damageScore = data.actor.system.strengthdamage.score;
+        damageScore = charSys.strengthdamage.score;
         stunDamageScore = damageScore;
         stunDamageType = 'p';
     }
 
     if (data.subtype === 'dodge') {
-        bonusmod += (+data.actor.system.dodge.mod);
+        bonusmod += (+charSys.dodge.mod);
     }
 
     if (data.subtype === 'parry') {
-        bonusmod += (+data.actor.system.parry.mod);
+        bonusmod += (+charSys.parry.mod);
     }
 
     if (data.subtype === 'block') {
-        bonusmod += (+data.actor.system.block.mod);
+        bonusmod += (+charSys.block.mod);
     }
 
     if (OD6S.flatSkills) {

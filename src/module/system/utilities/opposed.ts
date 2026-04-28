@@ -261,11 +261,12 @@ export async function generateOpposedRoll(token: TokenDocument, msg: ChatMessage
         if (msg.getFlag('od6s', 'type') === 'damage' || msg.getFlag('od6s','type') === 'explosive') {
             const type = msg.getFlag('od6s', 'damageType');
             if (token.actor.type === 'vehicle' || token.actor.type === 'starship') {
-                if (token.actor.system.embedded_pilot.value || token.actor.system.crewmembers.length < 1) {
+                const sys = token.actor.system as OD6SVehicleSystem;
+                if (sys.embedded_pilot.value || sys.crewmembers.length < 1) {
                     await token.actor.rollAction('vehicletoughness', msg);
                     return;
                 } else {
-                    const actor = await getActorFromUuid(token.actor.system.crewmembers[0].uuid);
+                    const actor = await getActorFromUuid(sys.crewmembers[0].uuid);
                     await actor!.rollAction('vehicletoughness', msg);
                     return;
                 }

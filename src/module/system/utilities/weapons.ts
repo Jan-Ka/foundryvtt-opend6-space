@@ -112,7 +112,7 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
 
 export function getMeleeDamage(actor: Actor, weapon: Item): number {
     if (weapon.system.damage.str) {
-        return (+actor.system.strengthdamage.score) + (+weapon.system.damage.score);
+        return (+(actor.system as OD6SCharacterSystem).strengthdamage.score) + (+weapon.system.damage.score);
     } else {
         return (+weapon.system.damage.score);
     }

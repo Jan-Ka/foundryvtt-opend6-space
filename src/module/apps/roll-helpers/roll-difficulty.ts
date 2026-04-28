@@ -32,34 +32,38 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
             } else {
                 return await od6sutilities.getDifficultyFromLevel(rollData.vehicleterraindifficulty)
             }
-        case 'vehicleramattack':
+        case 'vehicleramattack': {
+            const targetDodge = target ? (rollData.target!.actor.system as OD6SCharacterSystem).dodge?.score ?? 0 : 0;
             if (OD6S.vehicleDifficulty) {
-                if (target && (+rollData.target!.actor.system.dodge.score) > 0) {
-                    return (+rollData.target!.actor.system.dodge.score) + (+OD6S.vehicle_speeds[rollData.vehiclespeed].mod);
+                if (targetDodge > 0) {
+                    return (+targetDodge) + (+OD6S.vehicle_speeds[rollData.vehiclespeed].mod);
                 } else {
                     return (+OD6S.vehicle_speeds[rollData.vehiclespeed].mod);
                 }
             } else {
-                if (target && (+rollData.target!.actor.system.dodge.score) > 0) {
-                    return (+rollData.target!.actor.system.dodge.score) + (await od6sutilities.getDifficultyFromLevel(rollData.vehicleterraindifficulty));
+                if (targetDodge > 0) {
+                    return (+targetDodge) + (await od6sutilities.getDifficultyFromLevel(rollData.vehicleterraindifficulty));
                 } else {
                     return await od6sutilities.getDifficultyFromLevel(rollData.vehicleterraindifficulty);
                 }
             }
+        }
         case 'vehiclerangedattack':
         case 'vehiclerangedweaponattack':
-        case 'rangedattack':
-            if (target && (+rollData.target!.actor.system.dodge.score) > 0) {
-                return (+rollData.target!.actor.system.dodge.score);
+        case 'rangedattack': {
+            const targetDodge = target ? (rollData.target!.actor.system as OD6SCharacterSystem).dodge?.score ?? 0 : 0;
+            if (targetDodge > 0) {
+                return (+targetDodge);
             } else {
                 if (OD6S.mapRange) {
                     return await od6sutilities.getDifficultyFromLevel(OD6S.ranges[rollData.modifiers.range].map);
                 }
                 return OD6S.baseRangedAttackDifficulty;
             }
+        }
         case 'meleeattack':
             if (target) {
-                const targetData = rollData.target!.actor.system;
+                const targetData = rollData.target!.actor.system as OD6SCharacterSystem;
 
                 if (OD6S.defenseLock) {
                     if (targetData.parry.score === 0) {
@@ -104,7 +108,7 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
             }
         case 'brawlattack':
             if (target) {
-                const targetData = rollData.target!.actor.system;
+                const targetData = rollData.target!.actor.system as OD6SCharacterSystem;
 
                 if (OD6S.defenseLock) {
                     if (targetData.block.score === 0) {
