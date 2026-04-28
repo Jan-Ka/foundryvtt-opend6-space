@@ -89,7 +89,7 @@ export class OD6SActor extends Actor {
         prepareBaseActorData(this);
     }
 
-    getActionScoreText(action: any) {
+    getActionScoreText(action: string) {
         if (['character', 'creature', 'npc'].includes(this.type)) {
             const actionData = OD6S.actions[action];
             if(typeof actionData === 'undefined') {
@@ -107,7 +107,7 @@ export class OD6SActor extends Actor {
         }
     }
 
-    getVehicleActionScore(action: any) {
+    getVehicleActionScore(action: string) {
         let vehicle: any;
         let pilot: Actor | null;
 
@@ -158,7 +158,7 @@ export class OD6SActor extends Actor {
         }
     }
 
-    getVehicleActionScoreText(action: any) {
+    getVehicleActionScoreText(action: string) {
         const dice = od6sutilities.getDiceFromScore(this.getVehicleActionScore(action));
         if (typeof dice.dice === 'undefined' || isNaN(dice.dice)) return;
         return `${dice.dice}D+${dice.pips}`;
@@ -180,7 +180,7 @@ export class OD6SActor extends Actor {
         return setInitiativeHelper(this);
     }
 
-    async rollAttribute(attribute: any) {
+    async rollAttribute(attribute: string) {
         const data = {
             "actor": this,
             "itemId": "",
@@ -191,7 +191,7 @@ export class OD6SActor extends Actor {
         await od6sroll._onRollDialog(data);
     }
 
-    async rollAction(actionId: any, msg?: any) {
+    async rollAction(actionId: string, msg?: ChatMessage) {
         return resolveRollAction(this, actionId, msg);
     }
 
@@ -227,35 +227,35 @@ export class OD6SActor extends Actor {
         return calculateNewWoundLevelHelper(this, wound);
     }
 
-    getWoundLevelFromBodyPoints(bp: any) {
+    getWoundLevelFromBodyPoints(bp?: number) {
         return getWoundLevelFromBodyPointsHelper(this, bp);
     }
 
-    async setWoundLevelFromBodyPoints(bp: any) {
+    async setWoundLevelFromBodyPoints(bp: number) {
         return setWoundLevelFromBodyPointsHelper(this, bp);
     }
 
-    setResistance(type: any) {
+    setResistance(type: string) {
         return setResistanceHelper(this, type);
     }
 
-    async addEmbeddedPilot(pilotActor: any) {
+    async addEmbeddedPilot(pilotActor: Actor) {
         return addEmbeddedPilotHelper(this, pilotActor);
     }
 
-    async addToCrew(vehicleId: any) {
+    async addToCrew(vehicleId: string) {
         return addToCrewHelper(this, vehicleId);
     }
 
-    async _verifyAddToCrew(currentVehicleId: any, newVehicleId: any) {
+    async _verifyAddToCrew(currentVehicleId: string, newVehicleId: string) {
         return _verifyAddToCrewHelper(this, currentVehicleId, newVehicleId);
     }
 
-    async removeFromCrew(vehicleID: any) {
+    async removeFromCrew(vehicleID: string) {
         return removeFromCrewHelper(this, vehicleID);
     }
 
-    async forceRemoveCrewmember(crewID: any) {
+    async forceRemoveCrewmember(crewID: string) {
         return forceRemoveCrewmemberHelper(this, crewID);
     }
 
@@ -263,7 +263,7 @@ export class OD6SActor extends Actor {
         return isCrewMemberHelper(this);
     }
 
-    async useCharacterPointOnRoll(message: any) {
+    async useCharacterPointOnRoll(message: ChatMessage) {
         return useCharacterPointOnRollHelper(this, message);
     }
 
@@ -271,7 +271,7 @@ export class OD6SActor extends Actor {
         return modifyShieldsHelper(this, update);
     }
 
-    async sendVehicleData(uuid?: any) {
+    async sendVehicleData(uuid?: string) {
         return sendVehicleDataHelper(this, uuid);
     }
 
