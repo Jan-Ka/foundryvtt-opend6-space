@@ -386,7 +386,7 @@ export function registerChatLogListeners() {
             await message!.setFlag('od6s', 'isKnown', true);
             if(message!.getFlag('od6s','isExplosive') && game.settings.get('od6s','auto_explosive')) {
                 // Reveal the explosive region
-                const region = od6sutilities.getTemplateFromMessage(message).template;
+                const region = od6sutilities.getTemplateFromMessage(message!).template;
                 if(region) {
                     await region.update({ visibility: 2 }); // Make visible to all
                 }
