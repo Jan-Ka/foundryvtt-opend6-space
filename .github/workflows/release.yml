@@ -84,10 +84,10 @@ jobs:
         run: |
           set -eu
           cd build/artifacts
-          cosign sign-blob --output-signature od6s.zip.sig         --output-certificate od6s.zip.pem         od6s.zip
-          cosign sign-blob --output-signature sbom.cdx.json.sig    --output-certificate sbom.cdx.json.pem    sbom.cdx.json
+          cosign sign-blob --new-bundle-format=false --output-signature od6s.zip.sig         --output-certificate od6s.zip.pem         od6s.zip
+          cosign sign-blob --new-bundle-format=false --output-signature sbom.cdx.json.sig    --output-certificate sbom.cdx.json.pem    sbom.cdx.json
           cd "$GITHUB_WORKSPACE"
-          cosign sign-blob --output-signature src/system.json.sig  --output-certificate src/system.json.pem  src/system.json
+          cosign sign-blob --new-bundle-format=false --output-signature src/system.json.sig  --output-certificate src/system.json.pem  src/system.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3
