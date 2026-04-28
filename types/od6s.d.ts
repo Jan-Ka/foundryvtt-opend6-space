@@ -248,7 +248,7 @@ interface Item {
  */
 interface ChatMessage {
     /** Type of the speaking actor (set during opposed-roll handling). */
-    actorType?: string;
+    actorType?: OD6SActorType | "system";
 
     /** Display name for the speaker, swapped to vehicle name in vehicle rolls. */
     flavorName?: string;

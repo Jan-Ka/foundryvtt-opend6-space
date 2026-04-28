@@ -78,7 +78,7 @@ export function registerVehicleListeners(html: any, sheet: any): void {
             if (game.user.isGM) {
                 // Filter out tokens who are already crew members in a vehicle
                 // @ts-expect-error
-                tokens = tokens.filter((t: any) => !(t.actor as any).isCrewMember());
+                tokens = tokens.filter((t: any) => !t.actor.isCrewMember());
             } else {
                 // If a player, filter out hostile/neutral tokens
                 // @ts-expect-error
