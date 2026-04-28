@@ -175,9 +175,21 @@ tasks:
 
   # ── Foundry VTT Test Instance ───────────────────────────────────
 
+  foundry:init-config:
+    internal: true
+    cmds:
+      - mkdir -p "{{.FOUNDRY_DATA}}/Config"
+      - |
+        node -e "
+          const fs = require('fs');
+          const p = '{{.FOUNDRY_DATA}}/Config/options.json';
+          const existing = fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : {};
+          fs.writeFileSync(p, JSON.stringify({ ...existing, telemetry: false }, null, 2) + '\n');
+        "
+
   foundry:start:
     desc: Start a Foundry VTT v14 container for testing
-    deps: [build]
+    deps: [build, foundry:init-config]
     preconditions:
       - sh: test -f .env
         msg: ".env not found. Run 'task setup:secrets' or copy .env.example to .env"
@@ -198,6 +210,7 @@ tasks:
         --env FOUNDRY_PASSWORD="${FOUNDRY_PASSWORD}"
         --env FOUNDRY_LICENSE_KEY="${FOUNDRY_LICENSE_KEY}"
         --env FOUNDRY_ADMIN_KEY="${FOUNDRY_ADMIN_KEY}"
+        --env FOUNDRY_TELEMETRY=false
         --publish {{.FOUNDRY_PORT}}:30000/tcp
         --volume "{{.FOUNDRY_DATA}}:/data"
         --volume "{{.ROOT_DIR}}/src:/data/Data/systems/od6s"
@@ -309,9 +322,9 @@ tasks:
         msg: "Working directory must be clean"
       - sh: git diff --quiet HEAD origin/main
         msg: "Local main must be up to date with origin"
-      - sh: grep -q '"version": "{{.NEXT_VERSION}}"' src/system.json
+      - sh: "grep -q '\"version\": \"{{.NEXT_VERSION}}\"' src/system.json"
         msg: 'src/system.json version must be "{{.NEXT_VERSION}}" before tagging'
-      - sh: grep -q '"version": "{{.NEXT_VERSION}}"' package.json
+      - sh: "grep -q '\"version\": \"{{.NEXT_VERSION}}\"' package.json"
         msg: 'package.json version must be "{{.NEXT_VERSION}}" before tagging'
     cmds:
       - echo "{{.LATEST_TAG}} → {{.NEXT_TAG}}"

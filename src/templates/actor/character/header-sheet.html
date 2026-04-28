@@ -156,6 +156,10 @@
             </div>
         {{/if}}
         {{> (getWoundsTemplate)}}
+        {{!-- Reset-Session button moved to the footer next to the mode
+             selector — see body-sheet.html. The metaphysics-extranormal
+             toggle stays here so it remains visible at a glance whenever
+             the character has metaphysics enabled. --}}
         {{#if (ne actor.system.sheetmode.value "normal") }}
             <div class="flexrow flex-group-center">
                 <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
@@ -163,18 +167,14 @@
                        id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean"
                     {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
             </div>
-        <div>
-            <!--Session Reset Button-->
-            <button class="session-reset-button">Reset Session</button>
-        </div>
-        {{ else }}
+        {{else}}
             {{#if actor.system.metaphysicsextranormal.value}}
-            <div class="flexrow flex-group-center">
-                <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
-                <input type="checkbox" name="system.metaphysicsextranormal.value"
-                       id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean" disabled
-                    {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
-            </div>
+                <div class="flexrow flex-group-center">
+                    <label for="actor.system.metaphysicsextranormal.value">{{getMetaphysicsExtranormalName}}:</label>
+                    <input type="checkbox" name="system.metaphysicsextranormal.value"
+                           id="actor.system.metaphysicsextranormal.value" data-dtype="Boolean" disabled
+                        {{#if actor.system.metaphysicsextranormal.value}}checked{{/if}}>
+                </div>
             {{/if}}
         {{/if}}
         {{#if (eq actor.system.created.value false)}}

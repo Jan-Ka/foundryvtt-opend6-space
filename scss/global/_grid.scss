@@ -85,13 +85,18 @@
   align-items: center;
 }
 
+// `grid-2col-attributes` / `grid-2col-combat` are emitted by the templates in
+// Normal mode; their 3-col counterparts below are used in Advance / Free-Edit.
+// Both variants intentionally share the same column template so that switching
+// modes does not shift the dice column horizontally — the third column is just
+// empty in Normal mode.
 .grid-2col-attributes,
 .grid-2col-combat {
   display: grid;
-  grid-column: span 2 / span 2;
-  grid-template-columns: 75% 20%;
+  grid-column: span 3 / span 3;
+  grid-template-columns: 65% 20% 14%;
   border: 1px;
-  gap: 5px;
+  gap: 1px;
   margin: 1px 0;
   padding: 0;
 }
@@ -291,6 +296,25 @@
 .flex-group-right {
   justify-content: flex-end;
   text-align: right;
+}
+
+// Strip Foundry's default 1px #999 cell outlines inside our sheets — we
+// reintroduce intentional surfaces in the component layer instead.
+.od6s {
+  .flex-group-center,
+  .flex-group-left,
+  .flex-group-right {
+    border: none;
+    padding: 2px 4px;
+  }
+
+  .row {
+    gap: 12px;
+  }
+
+  .column {
+    padding: 0;
+  }
 }
 
 .inv-grid {

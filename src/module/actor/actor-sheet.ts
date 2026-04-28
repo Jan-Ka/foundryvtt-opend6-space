@@ -12,6 +12,8 @@ import {registerEffectListeners} from "./sheet-listeners/effects";
 import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
+import {computeSkillDisplayScore} from "./actor-helpers/skill-score";
+import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
     onDropCharacterTemplate, onDropSpeciesTemplate, onDropItemGroup,
@@ -121,19 +123,32 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             if (i.type === "gear") {
                 gear.push(i);
             } else if (i.type === "skill") {
-                if (!OD6S.flatSkills
-                    && typeof i.system.score !== "undefined"
-                    && typeof i.system.attribute !== "undefined") {
-                    if (!i.system.isAdvancedSkill) {
-                        i.system.score = (+i.system.score)
-                            + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                    }
+                // Compute the display score *idempotently* from base/mod/attribute.
+                // Reading + writing `i.system.score` here used to compound across
+                // re-renders because prepareDerivedData() only resets score on
+                // actor re-prepare, not on every sheet render.
+                if (typeof i.system.attribute !== "undefined") {
+                    i.system.score = computeSkillDisplayScore({
+                        base: i.system.base,
+                        mod: i.system.mod,
+                        isAdvancedSkill: i.system.isAdvancedSkill,
+                        attributeScore:
+                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
+                        flatSkills: OD6S.flatSkills,
+                    });
                 }
                 skills.push(i);
             } else if (i.type === "specialization") {
-                if (!OD6S.flatSkills) {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
+                // Specializations always roll on the linked attribute; no
+                // advanced-skill exemption applies.
+                if (typeof i.system.attribute !== "undefined") {
+                    i.system.score = computeSkillDisplayScore({
+                        base: i.system.base,
+                        mod: i.system.mod,
+                        attributeScore:
+                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
+                        flatSkills: OD6S.flatSkills,
+                    });
                 }
                 specializations.push(i);
             } else if (i.type === "weapon") {
@@ -265,9 +280,13 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     async _onRender(context: object, options: object): Promise<void> {
         await super._onRender(context, options);
-        if (!this.isEditable) return;
 
         const root = this.element as HTMLElement;
+
+        bindPrimaryTabs(this as any, root);
+
+        if (!this.isEditable) return;
+
         const html = [root];
 
         root.querySelectorAll(".alpha-item-sort-button").forEach((elem) =>
@@ -307,6 +326,18 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                     content: `<p>${game.i18n.localize("OD6S.CONFIRM_SPECIES_TEMPLATE_CLEAR")}</p>`,
                 });
                 if (ok) await this._onClearSpeciesTemplate();
+            }));
+
+        // Sheet-mode dropdown: explicit change handler. The template wraps
+        // the body in its own <form> nested inside the application's root
+        // form (which is itself a <form> via DocumentSheetV2's tag:"form"),
+        // and HTML's nested-form parsing prematurely closes the outer form
+        // — so the auto submitOnChange listener doesn't see the select.
+        // Update the actor directly here.
+        root.querySelectorAll<HTMLSelectElement>('select[name="system.sheetmode.value"]')
+            .forEach((el) => el.addEventListener("change", async (ev) => {
+                const value = (ev.target as HTMLSelectElement).value;
+                await this.document.update({"system.sheetmode.value": value});
             }));
 
         // Existing listener modules accept html[0]; pass [root] for compatibility.

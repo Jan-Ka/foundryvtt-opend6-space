@@ -2,20 +2,39 @@
 
 .window-app {
   font-family: $font-primary;
+  color: $c-text-primary;
 }
 
+// ── Sheet body wash ───────────────────────────────────────────────────────
+// Subtle radial glow + hairline interior frame so the sheet feels intentional
+// rather than a transparent overlay on the Foundry background.
+.od6s.sheet {
+  // Interior atmosphere — soft vignette toward the bottom
+  .window-content,
+  & {
+    background:
+      radial-gradient(ellipse at top, rgba(201, 162, 39, 0.05) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(8, 12, 18, 0.35) 0%, rgba(8, 12, 18, 0.55) 100%);
+  }
+}
+
+// ── Interactive elements ─────────────────────────────────────────────────
 .rollable,
 .highlight {
+  transition: color 0.15s ease, text-shadow 0.15s ease, background-color 0.15s ease;
+  border-radius: 3px;
+
   &:hover,
   &:focus {
-    color: #000;
-    text-shadow: 0 0 10px red;
+    color: $c-accent-bright;
+    background-color: $c-hover-bg;
+    text-shadow: 0 0 6px rgba(201, 162, 39, 0.5);
     cursor: pointer;
   }
 }
 
 .damaged {
-   color: #8B0000; 
+  color: $c-bad;
 }
 
 .modifier-button {
@@ -39,23 +58,27 @@
 .show-item-details,
 .choose-target,
 .crew-member {
+  transition: color 0.15s ease, text-shadow 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+  border-radius: 3px;
+
   &:hover,
   &:focus {
-    color: #000;
-    text-shadow: 0 0 10px red;
+    color: $c-accent-bright;
+    background-color: $c-hover-bg;
+    text-shadow: 0 0 6px rgba(201, 162, 39, 0.5);
     cursor: pointer;
   }
 }
 
 .wilddie {
-  color: #f00;
+  color: $c-bad;
 }
 
 .wilddiegm {
-  color: #f00;
+  color: $c-bad;
   &:hover,
   &:focus {
-    color: #f00;
+    color: $c-bad;
     text-shadow: 0 0 10px black;
     cursor: pointer;
   }

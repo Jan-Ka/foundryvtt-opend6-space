@@ -1,2 +1,50 @@
 $c-white: #fff;
 $c-black: #000;
+
+// ── Core palette ────────────────────────────────────────────────────────────
+$c-accent:        #c9a227;      // signature gold
+$c-accent-bright: #e8c349;      // hover/active gold
+$c-accent-deep:   #8a6d12;      // pressed/border gold
+$c-accent-dim:    rgba(201, 162, 39, 0.13);
+$c-accent-border: rgba(201, 162, 39, 0.4);
+$c-accent-strong: rgba(201, 162, 39, 0.7);
+
+// Surface tones — built on near-black with cool undertone
+$c-bg-deep:    #080b11;
+$c-panel:      rgba(8, 12, 18, 0.55);
+$c-panel-deep: rgba(4, 7, 12, 0.78);
+$c-raised:     rgba(255, 255, 255, 0.045);
+$c-row-alt:    rgba(255, 255, 255, 0.028);
+$c-row-hover:  rgba(201, 162, 39, 0.07);
+
+// Borders & rules
+$c-border:        rgba(255, 255, 255, 0.12);
+$c-border-strong: rgba(255, 255, 255, 0.22);
+$c-rule:          rgba(201, 162, 39, 0.22);
+
+// Text
+$c-text-primary: #d6dae4;
+$c-text-muted:   #7a8499;
+$c-text-dim:     #4f586c;
+
+// Status
+$c-good:    #4ec97a;
+$c-warning: #e8a740;
+$c-bad:     #e25f63;
+$c-mod-up:   rgba(78, 201, 122, 0.55);
+$c-mod-down: rgba(226, 95, 99, 0.55);
+
+// Effects
+$c-hover-bg:     rgba(201, 162, 39, 0.13);
+$c-glow-accent:  0 0 12px rgba(201, 162, 39, 0.45);
+$c-glow-soft:    0 0 6px rgba(201, 162, 39, 0.3);
+$c-shadow-deep:  0 4px 18px rgba(0, 0, 0, 0.55);
+$c-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+
+// Gradients
+$grad-banner:      linear-gradient(180deg, rgba(201, 162, 39, 0.32) 0%, rgba(201, 162, 39, 0.12) 100%);
+$grad-banner-deep: linear-gradient(180deg, rgba(8, 12, 18, 0.85) 0%, rgba(20, 24, 32, 0.85) 100%);
+$grad-pill:        linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(20, 18, 8, 0.55) 100%);
+$grad-button-go:   linear-gradient(180deg, #2e7a44 0%, #154d27 100%);
+$grad-button-stop: linear-gradient(180deg, #b14040 0%, #6b1f1f 100%);
+$grad-rule:        linear-gradient(90deg, transparent 0%, rgba(201, 162, 39, 0.55) 50%, transparent 100%);

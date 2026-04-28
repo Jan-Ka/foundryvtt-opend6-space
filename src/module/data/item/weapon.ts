@@ -14,6 +14,16 @@ function blastZoneSchema() {
 }
 
 export default class WeaponData extends foundry.abstract.TypeDataModel {
+  static migrateData(source: Record<string, unknown>) {
+    if (source.range && typeof source.range === "object") {
+      const range = source.range as Record<string, unknown>;
+      for (const key of ["short", "medium", "long"]) {
+        if (typeof range[key] !== "number") range[key] = Number(range[key]) || 0;
+      }
+    }
+    return super.migrateData(source);
+  }
+
   static defineSchema() {
     return {
       ...baseSchema(),

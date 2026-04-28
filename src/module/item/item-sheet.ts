@@ -1,4 +1,5 @@
 import {od6sutilities} from "../system/utilities";
+import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import OD6S from "../config/config-od6s";
 
 declare const foundry: any;
@@ -59,8 +60,11 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     async _onRender(context: object, options: object): Promise<void> {
         await super._onRender(context, options);
 
-        if (!this.isEditable) return;
         const root = this.element as HTMLElement;
+
+        bindPrimaryTabs(this as any, root);
+
+        if (!this.isEditable) return;
         const $ = (sel: string): NodeListOf<HTMLElement> => root.querySelectorAll(sel);
 
         $(".editskill").forEach((el) => el.addEventListener("change", this._editSkill.bind(this)));

@@ -1,9 +1,38 @@
 /**
  * System data migration for world upgrades.
  * Runs once per version bump via the system version stored in world settings.
+ *
+ * To audit before/after document state, persist the debug flag *before*
+ * reloading the world (otherwise migrations fire on the `ready` hook before
+ * you can touch the console):
+ *
+ *   localStorage.od6sDebug = '["migration"]'
+ *
+ * Each touched actor will then log a `[before]` and `[after]` snapshot.
  */
 
-const CURRENT_MIGRATION_VERSION = "2.0.0";
+import { debug, isDebugEnabled } from "./logger";
+
+/**
+ * Migration steps in version order. Each entry runs when the world's stored
+ * `migrationVersion` is older than `since`. Add new steps to the end; the
+ * highest `since` becomes the recorded `migrationVersion` after a clean run.
+ */
+const MIGRATION_STEPS: Array<{ since: string; run: () => Promise<void> }> = [
+  {
+    since: "2.0.0",
+    run: async () => {
+      await migrateExplosiveTemplateFlags();
+      await migrateChatMessageFlags();
+    },
+  },
+  {
+    since: "2.2.0",
+    run: () => migrateStatusEffectIcons(),
+  },
+];
+
+const CURRENT_MIGRATION_VERSION = MIGRATION_STEPS[MIGRATION_STEPS.length - 1]!.since;
 
 /**
  * Check if migration is needed and run it.
@@ -15,13 +44,26 @@ export async function migrateWorld() {
   const lastMigration = game.settings.get("od6s", "migrationVersion") ?? "0";
   if (!foundry.utils.isNewerVersion(CURRENT_MIGRATION_VERSION, lastMigration)) return;
 
-  ui.notifications.info("OpenD6 Space: Migrating world data — please be patient.", { permanent: true });
+  // V14 returns a Notification object with a bound .remove(); the project's
+  // type stubs predate this, so cast through unknown.
+  const inProgress = ui.notifications.info(
+    "OpenD6 Space: Migrating world data — please be patient.",
+    { permanent: true },
+  ) as unknown as { remove?: () => void } | undefined;
+
+  debug("migration", "starting", {
+    from: lastMigration,
+    to: CURRENT_MIGRATION_VERSION,
+    actors: game.actors.size,
+    items: game.items.size,
+    scenes: game.scenes.size,
+  });
 
   try {
-    // Run all migrations in order
-    if (foundry.utils.isNewerVersion("2.0.0", lastMigration)) {
-      await migrateExplosiveTemplateFlags();
-      await migrateChatMessageFlags();
+    for (const step of MIGRATION_STEPS) {
+      if (foundry.utils.isNewerVersion(step.since, lastMigration)) {
+        await step.run();
+      }
     }
 
     // Record completion
@@ -30,6 +72,8 @@ export async function migrateWorld() {
   } catch (err) {
     console.error("od6s | Migration failed:", err);
     ui.notifications.error("OpenD6 Space: Migration failed. Check the console for details.");
+  } finally {
+    inProgress?.remove?.();
   }
 }
 
@@ -45,6 +89,61 @@ export function registerMigrationSetting() {
     type: String,
     default: "0",
   });
+}
+
+/**
+ * Update active effect icons that still reference old .png paths to .svg equivalents.
+ * Affects any effect whose img is under systems/od6s/ and ends with .png.
+ */
+async function migrateStatusEffectIcons() {
+  console.log("od6s | Migrating status effect icons from .png to .svg...");
+  let count = 0;
+
+  for (const actor of game.actors) {
+    const updates = [];
+    for (const effect of (actor as any).effects) {
+      const img: string = effect.img ?? "";
+      if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+        updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
+      }
+    }
+    if (updates.length > 0) {
+      logActorBefore("icons", actor);
+      await (actor as any).updateEmbeddedDocuments("ActiveEffect", updates);
+      logActorAfter("icons", actor);
+      count += updates.length;
+    }
+  }
+
+  for (const scene of game.scenes) {
+    for (const token of (scene as any).tokens) {
+      const updates = [];
+      for (const effect of token.actor?.effects ?? []) {
+        const img: string = effect.img ?? "";
+        if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+          updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
+        }
+      }
+      if (updates.length > 0) {
+        logActorBefore("icons", token.actor, ` (token in ${(scene as any).name})`);
+        await token.actor.updateEmbeddedDocuments("ActiveEffect", updates);
+        logActorAfter("icons", token.actor, ` (token in ${(scene as any).name})`);
+        count += updates.length;
+      }
+    }
+  }
+
+  console.log(`od6s | Updated ${count} status effect icons.`);
+}
+
+/** Snapshot an actor's full document state (deep-cloned via toObject) for audit logs. */
+function logActorBefore(step: string, actor: any, suffix = "") {
+  if (!isDebugEnabled("migration")) return;
+  debug("migration", `[${step}:before] ${actor.name}${suffix}`, actor.toObject());
+}
+function logActorAfter(step: string, actor: any, suffix = "") {
+  if (!isDebugEnabled("migration")) return;
+  debug("migration", `[${step}:after]  ${actor.name}${suffix}`, actor.toObject());
 }
 
 /**
@@ -71,7 +170,9 @@ async function migrateExplosiveTemplateFlags() {
       }
     }
     if (updates.length > 0) {
+      logActorBefore("explosive-flags", actor);
       await (actor as any).updateEmbeddedDocuments("Item", updates);
+      logActorAfter("explosive-flags", actor);
       count += updates.length;
     }
   }
