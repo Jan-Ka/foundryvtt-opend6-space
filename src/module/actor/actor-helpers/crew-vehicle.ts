@@ -80,7 +80,7 @@ export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promi
 }
 
 export function isCrewMember(actor: Actor): boolean {
-    return actor.getFlag('od6s', 'crew');
+    return !!actor.getFlag('od6s', 'crew');
 }
 
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
