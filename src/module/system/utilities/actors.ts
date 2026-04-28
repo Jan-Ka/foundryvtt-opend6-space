@@ -35,8 +35,7 @@ export async function getTokenFromUuid(uuid: string): Promise<TokenDocument | un
 }
 
 export function getActorOwner(actor: Actor): User | undefined {
-    // @ts-expect-error getProperty is a Foundry VTT global
-    const permissionObject = getProperty(actor ?? {}, "ownership") ?? {};
+    const permissionObject = foundry.utils.getProperty(actor ?? {}, "ownership") ?? {};
 
     const playerOwners = Object.entries(permissionObject)
         .filter(

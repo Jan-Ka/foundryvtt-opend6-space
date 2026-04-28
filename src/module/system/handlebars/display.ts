@@ -141,8 +141,7 @@ export function registerDisplayHelpers() {
 
     Handlebars.registerHelper('isGmOrOwner', function (id) {
         if (game.user.isGM) return true;
-        // @ts-expect-error
-        return game!.actors.find(a => a.id === id).isOwner;
+        return game!.actors.find(a => a.id === id)?.isOwner;
     })
 
     Handlebars.registerHelper('isKnown', function (isKnown) {
@@ -202,12 +201,10 @@ export function registerDisplayHelpers() {
     })
 
     Handlebars.registerHelper('getCharacterInventoryForContainer', function () {
-        // @ts-expect-error
-        return game!.user.character.items.filter(i => OD6S.equippable.includes(i.type));
+        return game!.user.character?.items.filter(i => OD6S.equippable.includes(i.type));
     })
 
     Handlebars.registerHelper('getCharacterActorId', function () {
-        // @ts-expect-error
-        return game!.user.character.id;
+        return game!.user.character?.id;
     })
 }

@@ -60,28 +60,23 @@ export function registerVehicleListeners(html: any, sheet: any): void {
             const data: any = {};
             data.crew = [];
             if (typeof (game.scenes.active) === 'undefined') return;
-            let tokens = game.scenes.active.tokens;
-
-            // @ts-expect-error
-            tokens = tokens.filter((t: any) => typeof (t.actor) !== "undefined" && t.actor !== '' && t.actor !== null);
+            let tokens: TokenDocument[] = game.scenes.active.tokens.filter(
+                (t: any) => typeof (t.actor) !== "undefined" && t.actor !== '' && t.actor !== null,
+            );
 
             if (tokens.length === 0) {
-                // @ts-expect-error
-                !ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
+                ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
                 return;
             }
 
             // Filter out tokens who are a vehicle
-            // @ts-expect-error
             tokens = tokens.filter((t: any) => t.actor.type !== "vehicle" && t.actor.type !== "starship");
 
             if (game.user.isGM) {
                 // Filter out tokens who are already crew members in a vehicle
-                // @ts-expect-error
                 tokens = tokens.filter((t: any) => !t.actor.isCrewMember());
             } else {
                 // If a player, filter out hostile/neutral tokens
-                // @ts-expect-error
                 tokens = tokens.filter((t: any) => t.disposition === CONST.TOKEN_DISPOSITIONS.FRIENDLY);
 
                 // Filter out already-crewed tokens
@@ -92,13 +87,11 @@ export function registerVehicleListeners(html: any, sheet: any): void {
                     }
                 }
 
-                // @ts-expect-error
                 tokens = tokens.filter((e: any) => !crewed.includes(e));
             }
 
             if (tokens.length === 0) {
-                // @ts-expect-error
-                !ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
+                ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
                 return;
             }
 

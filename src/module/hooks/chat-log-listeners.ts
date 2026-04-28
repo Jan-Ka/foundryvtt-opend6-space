@@ -36,8 +36,7 @@ export function registerChatLogListeners() {
             } else {
                 content!.style.display = "block";
             }
-            // @ts-expect-error
-            game!.messages.get(ev.currentTarget.dataset.messageId).render();
+            game!.messages.get(ev.currentTarget.dataset.messageId)?.render();
         })
 
         delegateEvent(html, "click", ".damage-modifiers-button", async (ev: any) => {
@@ -47,8 +46,7 @@ export function registerChatLogListeners() {
             } else {
                 content!.style.display = "block";
             }
-            // @ts-expect-error
-            game!.messages.get(ev.currentTarget.dataset.messageId).render();
+            game!.messages.get(ev.currentTarget.dataset.messageId)?.render();
         })
 
         delegateEvent(html, "click", ".apply-damage-button", async (ev: any) => {
@@ -121,9 +119,9 @@ export function registerChatLogListeners() {
 
         delegateEvent(html, 'click', '.remove-template-button', async (ev: any) => {
             const message =  await game.messages.get(ev.currentTarget.dataset.messageId);
-            const actor = message!.speaker.token === null ?
-                // @ts-expect-error
-                game.actors.get(message!.speaker.actor) : game!.scenes.active.tokens.get(message!.speaker.token).actor;
+            const actor = message!.speaker.token === null
+                ? game.actors.get(message!.speaker.actor)
+                : game!.scenes.active.tokens.get(message!.speaker.token)?.actor;
             const item = actor!.items.get(message!.getFlag('od6s','itemId'));
             const regionId = item!.getFlag('od6s','explosiveTemplate');
             const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
@@ -353,11 +351,9 @@ export function registerChatLogListeners() {
 
         delegateEvent(html, "change", ".explosive-target-zone", async (ev: any) => {
             const message = game.messages.get(ev.currentTarget.dataset.messageId);
-            const targets = Array.from(message!.getFlag('od6s','targets'));
+            const targets = Array.from(message!.getFlag('od6s','targets')) as Array<{ id: string; zone?: number }>;
             for (const t in targets) {
-                // @ts-expect-error
                 if(ev.currentTarget.dataset.targetId === targets[t].id) {
-                    // @ts-expect-error
                     targets[t].zone = parseInt(ev.target.value);
                 }
             }

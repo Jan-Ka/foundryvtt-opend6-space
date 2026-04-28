@@ -89,16 +89,14 @@ export class OD6SItem extends Item {
             if (this.actor) {
                 let score = this.actor.system.attributes[this.system.stats.attribute.toLowerCase()].score;
                 const spec = this.actor.items.find(i => i.name === this.system.stats.specialization && i.type === 'specialization');
-                // @ts-expect-error
-                if (typeof spec !== 'undefined' && spec !== '') {
+                if (typeof spec !== 'undefined') {
                     if (typeof this.system.fire_control !== 'undefined' && this.system.fire_control?.score !== '') {
                         score = score + this.system.fire_control.score;
                     }
                     return score + spec.system.score;
                 } else {
                     const skill = this.actor.items.find(i => i.name === this.system.stats.skill && i.type === 'skill');
-                    // @ts-expect-error
-                    if (typeof skill !== 'undefined' && skill !== '') {
+                    if (typeof skill !== 'undefined') {
                         if (typeof this.system.fire_control !== 'undefined' && this.system.fire_control?.score !== '') {
                             score = score + this.system.fire_control.score;
                         }
@@ -122,14 +120,12 @@ export class OD6SItem extends Item {
             if (this.actor) {
                 if (this.system.stats.parry_specialization !== '') {
                     const spec = this.actor.items.find(s => s.name === this.system.stats.parry_specialization && s.type === 'specialization');
-                    // @ts-expect-error
-                    if (typeof spec !== 'undefined' && spec !== '') return spec!.getScoreText();
+                    if (typeof spec !== 'undefined') return spec.getScoreText();
                 }
                 if (this.system.stats.parry_skill !== '') {
                     if(this.actor) {
                         const skill = this.actor.items.find(s=>s.name === this.system.stats.parry_skill && s.type === 'skill' );
-                        // @ts-expect-error
-                        if (typeof skill !== 'undefined' && skill !== '') return skill!.getScoreText();
+                        if (typeof skill !== 'undefined') return skill.getScoreText();
                     }
                 }
                 return this.actor.getActionScoreText('parry')

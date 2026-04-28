@@ -178,7 +178,8 @@ export async function setWoundLevelFromBodyPoints(actor: any, bp: any): Promise<
     update.id = actor.id;
     await actor.update(update);
     update[`system.wounds.value`] =
-        // @ts-expect-error
-        Object.keys(Object.fromEntries(Object.entries(OD6S.deadliness[3]).filter(([_k, v]) => v!.description === actor.getWoundLevelFromBodyPoints())))[0];
+        Object.keys(Object.fromEntries(Object.entries(OD6S.deadliness[3]).filter(
+            ([_k, v]) => (v as { description?: string }).description === actor.getWoundLevelFromBodyPoints(),
+        )))[0];
     await actor.update(update);
 }
