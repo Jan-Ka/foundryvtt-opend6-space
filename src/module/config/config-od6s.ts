@@ -3,6 +3,21 @@ import deadliness from "./deadliness";
 import statusEffects from "./status-effects";
 import { actions, vehicleActions } from "./actions";
 import { armorDamage, damage, damageTypes, vehicleDamage, weaponDamage } from "./damage";
+import {
+    weaponTypes,
+    weaponTypeKeys,
+    meleeDifficulties,
+    rangedAttackOptions,
+    meleeAttackOptions,
+    brawlAttackOptions,
+    ranges,
+} from "./weapons";
+import {
+    actorTypeLabels,
+    itemLabels,
+    templateItemTypes,
+    allowedItemTypes,
+} from "./labels";
 
 const OD6S: Record<string, any> = {};
 
@@ -214,45 +229,9 @@ OD6S.collision_types = {
     }
 }
 
-OD6S.weaponTypes = [
-    "OD6S.RANGED",
-    "OD6S.MELEE",
-    "OD6S.MISSILE",
-    "OD6S.THROWN",
-    "OD6S.EXPLOSIVE"
-]
-
-OD6S.weaponTypeKeys = [
-    {
-        "key": "OD6S.RANGED",
-        "name": "Ranged"
-    },
-    {
-        "key": "OD6S.MELEE",
-        "name": "Melee"
-    },
-    {
-        "key": "OD6S.MISSILE",
-        "name": "Missile"
-    },
-    {
-        "key": "OD6S.THROWN",
-        "name": "Thrown"
-    },
-    {
-        "key": "OD6S.EXPLOSIVE",
-        "name": "Explosive"
-    }
-]
-
-OD6S.meleeDifficulties = [
-    "OD6S.DIFFICULTY_VERY_EASY",
-    "OD6S.DIFFICULTY_EASY",
-    "OD6S.DIFFICULTY_MODERATE",
-    "OD6S.DIFFICULTY_DIFFICULT",
-    "OD6S.DIFFICULTY_VERY_DIFFICULT",
-    "OD6S.DIFFICULTY_HEROIC",
-]
+OD6S.weaponTypes = weaponTypes;
+OD6S.weaponTypeKeys = weaponTypeKeys;
+OD6S.meleeDifficulties = meleeDifficulties;
 
 OD6S.actions = actions;
 
@@ -492,122 +471,13 @@ OD6S.misc = {
 // attack: subtraction or addition to hit difficulty (negative numbers are in effect a bonus)
 // damage: bonus or penalty to damage
 // multi: whether an attack needs a ROF selection by the character for number of shots in a round
-OD6S.rangedAttackOptions = {
-    "OD6S.ATTACK_STANDARD": {
-        "attack": 0,
-        "damage": 0,
-        "multi": false
-    },
-    "OD6S.ATTACK_RANGED_SINGLE_FIRE_AS_MULTI": {
-        "attack": -3,
-        "damage": +3,
-        "multi": true
-    },
-    "OD6S.ATTACK_RANGED_FULL_AUTO": {
-        "attack": -6,
-        "damage": 6,
-        "multi": false
-    },
-    "OD6S.ATTACK_RANGED_SWEEP": {
-        "attack": -6,
-        "damage": -9,
-        "multi": false
-    },
-    "OD6S.ATTACK_RANGED_BURST_FIRE_AS_SINGLE": {
-        "attack": 0,
-        "damage": -6,
-        "multi": false
-    }
-}
-
-OD6S.meleeAttackOptions = {
-    "OD6S.ATTACK_STANDARD": {
-        "attack": 0,
-        "damage": 0,
-        "multi": false
-    },
-    "OD6S.ATTACK_ALL_OUT": {
-        "attack": -6,
-        "damage": 3
-    },
-    "OD6S.ATTACK_LUNGE": {
-        "attack": 3,
-        "damage": -3
-    },
-    "OD6S.ATTACK_KNOCKDOWN_TRIP": {
-        "attack": 6,
-        "damage": 0
-    },
-    "OD6S.ATTACK_PUSH": {
-        "attack": 3,
-        "damage": 0
-    }
-}
-
-OD6S.brawlAttackOptions = {
-    "OD6S.ATTACK_STANDARD": {
-        "attack": 0,
-        "damage": 0,
-        "multi": false
-    },
-    "OD6S.ATTACK_ALL_OUT": {
-        "attack": -6,
-        "damage": 3
-    },
-    "OD6S.ATTACK_GRAB": {
-        "attack": 9,
-        "damage": 0
-    },
-    "OD6S.ATTACK_LUNGE": {
-        "attack": 3,
-        "damage": -3
-    },
-    "OD6S.ATTACK_KNOCKDOWN_TRIP": {
-        "attack": 6,
-        "damage": 0
-    },
-    "OD6S.ATTACK_PUSH": {
-        "attack": 3,
-        "damage": 0
-    },
-    "OD6S.ATTACK_SWEEP": {
-        "attack": -6,
-        "damage": -9
-    },
-    "OD6S.ATTACK_TACKLE": {
-        "attack": 3,
-        "damage": 0
-    }
-}
+OD6S.rangedAttackOptions = rangedAttackOptions;
+OD6S.meleeAttackOptions = meleeAttackOptions;
+OD6S.brawlAttackOptions = brawlAttackOptions;
 
 OD6S.attributes = attributes;
 
-OD6S.ranges = {
-    "OD6S.RANGE_POINT_BLANK_SHORT": {
-        "name": "OD6S.RANGE_POINT_BLANK",
-        "difficulty": -5,
-        "map": "OD6S.DIFFICULTY_VERY_EASY",
-        "item": "pb"
-    },
-    "OD6S.RANGE_SHORT_SHORT": {
-        "name": "OD6S.RANGE_SHORT",
-        "difficulty": 0,
-        "map": "OD6S.DIFFICULTY_EASY",
-        "item": "short"
-    },
-    "OD6S.RANGE_MEDIUM_SHORT": {
-        "name": "OD6S.RANGE_MEDIUM",
-        "difficulty": 5,
-        "map": "OD6S.DIFFICULTY_MODERATE",
-        "item": "medium"
-    },
-    "OD6S.RANGE_LONG_SHORT": {
-        "name": "OD6S.RANGE_LONG",
-        "difficulty": 10,
-        "map": "OD6S.DIFFICULTY_DIFFICULT",
-        "item": "long"
-    }
-}
+OD6S.ranges = ranges;
 
 OD6S.damageTypes = damageTypes;
 
@@ -620,120 +490,10 @@ OD6S.cyberneticsLocations = [
     "OD6S.LEFT_LEG"
 ]
 
-OD6S.allowedItemTypes = {
-    "container": [
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic",
-        "vehicle-weapon",
-        "vehicle-gear",
-        "starship-weapon",
-        "starship-gear"
-    ],
-    "character": [
-        "skill",
-        "specialization",
-        "advantage",
-        "disadvantage",
-        "specialability",
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic",
-        "manifestation",
-        "character-template",
-        "species-template",
-    ],
-    "npc": [
-        "skill",
-        "specialization",
-        "advantage",
-        "disadvantage",
-        "specialability",
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic",
-        "species-template",
-    ],
-    "creature": [
-        "skill",
-        "specialization",
-        "advantage",
-        "disadvantage",
-        "specialability",
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic"
-    ],
-    "vehicle": [
-        "vehicle-weapon",
-        "vehicle-gear"
-    ],
-    "starship": [
-        "starship-weapon",
-        "starship-gear"
-    ]
-}
-
-OD6S.actorTypeLabels = {
-    "character": "ACTOR.TypeCharacter",
-    "creature": "ACTOR.TypeCreature",
-    "npc": "ACTOR.TypeNpc",
-    "starship": "ACTOR.TypeStarship",
-    "vehicle": "ACTOR.TypeVehicle"
-}
-
-OD6S.templateItemTypes = {
-    "character-template": [
-        "skill",
-        "specialability",
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic",
-        "manifestation"
-    ],
-    "species-template": [
-        "specialability"
-    ],
-    "item-group": [
-        "skill",
-        "specialability",
-        "armor",
-        "weapon",
-        "gear",
-        "cybernetic",
-        "manifestation",
-        "vehicle-weapon",
-        "vehicle-gear",
-        "starship-weapon",
-        "starship-gear"
-    ]
-}
-
-OD6S.itemLabels = {
-    "skill": "OD6S.SKILL",
-    "specialization": "OD6S.SPECIALIZATION",
-    "advantage": "OD6S.ADVANTAGE",
-    "disadvantage": "OD6S.DISADVANTAGE",
-    "specialability": "OD6S.SPECIAL_ABILITY",
-    "armor": "OD6S.ARMOR",
-    "weapon": "OD6S.WEAPON",
-    "gear": "OD6S.GEAR",
-    "cybernetic": "OD6S.CYBERNETICS",
-    "vehicle": "OD6S.VEHICLE",
-    "manifestation": "OD6S.MANIFESTATION",
-    "character-template": "OD6S.CHARACTER_TEMPLATE",
-    "action": "OD6S.ACTION",
-    "species-template": "ITEM.TypeSpecies-template",
-    "starship-gear": "ITEM.TypeStarship-gear",
-    "starship-weapon": "ITEM.TypeStarship-weapon",
-    "vehicle-gear": "ITEM.TypeVehicle-gear",
-    "vehicle-weapon": "ITEM.TypeVehicle-weapon"
-}
+OD6S.allowedItemTypes = allowedItemTypes;
+OD6S.actorTypeLabels = actorTypeLabels;
+OD6S.templateItemTypes = templateItemTypes;
+OD6S.itemLabels = itemLabels;
 
 OD6S.chatTemplates = {
     "generic": OD6S.chatPath + "generic.html",
