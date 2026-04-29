@@ -549,6 +549,21 @@ declare class Macro extends FoundryDocument {
     static create(data: any): Promise<Macro>;
 }
 
+/** Compendium pack (subset of CompendiumCollection used by OD6S code). */
+interface CompendiumPack {
+    metadata: {
+        packageName: string;
+        name: string;
+        label: string;
+        type: string;
+    };
+    documentName: string;
+    index: Collection<{ _id: string; name: string; type: string }>;
+    getIndex(): Promise<Collection<{ _id: string; name: string; type: string }>>;
+    getDocument(id: string): Promise<FoundryDocument | null>;
+    _formatFolderSelectOptions(): Array<{value: string; label: string}>;
+}
+
 /** Folder document */
 declare class Folder extends FoundryDocument {
     type: string;
@@ -845,7 +860,7 @@ interface Game {
     od6s: any;
     system: GameSystem;
     version: string;
-    packs: Collection<any>;
+    packs: Collection<CompendiumPack>;
     folders: Collection<Folder>;
     collections: GameCollections;
     documentTypes: Record<string, string[]>;
