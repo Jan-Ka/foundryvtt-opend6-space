@@ -10,17 +10,17 @@ export function getScoreFromSkill(actor: Actor, spec: string, skill: string, att
     if (typeof (spec) !== "undefined" && spec !== '') {
         const foundSpec = actor.items.find((s: Item) => s.name === spec && s.type === 'specialization');
         if (foundSpec) {
-            score = foundSpec.system.score;
+            score = (foundSpec.system as OD6SSpecializationItemSystem).score;
             found = true;
         }
     }
     if (!found && typeof (skill) !== "undefined" && skill !== '') {
         const foundSkill = actor.items.find((s: Item) => s.name === skill && s.type === 'skill');
         if (foundSkill) {
-            score = foundSkill.system.score;
+            score = (foundSkill.system as OD6SSkillItemSystem).score;
         }
     }
-    score += actor.system.attributes[attribute.toLowerCase()].score;
+    score += (actor.system as OD6SCharacterSystem).attributes[attribute.toLowerCase()].score;
     return score;
 }
 

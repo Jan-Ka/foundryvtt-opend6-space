@@ -19,8 +19,9 @@ export function getEffectMod(type: string, name: string, actor: Actor): number {
 
         const spec = actor.items.filter((i: Item) => i.type === type && i.name === name)[0];
         if (typeof (spec) !== 'undefined') {
-            if (typeof (sys.customeffects.skills[spec.system.skill]) !== 'undefined') {
-                return sys.customeffects.skills[spec.system.skill];
+            const specSys = spec.system as OD6SSpecializationItemSystem;
+            if (typeof (sys.customeffects.skills[specSys.skill]) !== 'undefined') {
+                return sys.customeffects.skills[specSys.skill];
             }
         }
     }

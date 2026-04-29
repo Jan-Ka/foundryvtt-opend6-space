@@ -120,7 +120,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
             case "weapon":
                 if (item.type === "specialization") {
-                    this.item.system.stats.specialization = item.system.name;
+                    (this.item.system as OD6SWeaponItemSystem).stats.specialization = (item as Item).name;
                     await this.item.update(this.item.system, {diff: true});
                 }
         }
@@ -379,9 +379,9 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         }
 
         const item = await od6sutilities.getItemByName(name);
-        const description = item ? item.system.description : "";
+        const description = item ? (item.system as { description?: string }).description ?? "" : "";
         const newItem = {name, type, description};
-        itemSheet.item.system.items.push(newItem);
+        (itemSheet.item.system as { items: unknown[] }).items.push(newItem);
         await itemSheet.item.update(
             {id: itemSheet.id, system: itemSheet.item.system},
             {diff: true});

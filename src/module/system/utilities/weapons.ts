@@ -20,20 +20,23 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
     foundRange.medium = '';
     foundRange.long = '';
 
+    // Range values are declared NumberField in schema, but legacy data can carry
+    // string values like "AGI+2" — treat as Record<string, any> at the access site.
+    const itemRange = (item.system as OD6SWeaponItemSystem).range as unknown as Record<string, any>;
     const range: any = {};
-    range.short = item.system.range.short;
-    range.medium = item.system.range.medium;
-    range.long = item.system.range.long;
+    range.short = itemRange.short;
+    range.medium = itemRange.medium;
+    range.long = itemRange.long;
 
     let baseDice;
 
-    if (regex.test(item.system.range.short) ||
-        regex.test(item.system.range.medium) ||
-        regex.test(item.system.range.long)) {
+    if (regex.test(itemRange.short) ||
+        regex.test(itemRange.medium) ||
+        regex.test(itemRange.long)) {
         // There is a non-numeric value, extract it and find the attribute
-        for (const range in item.system.range) {
+        for (const range in itemRange) {
             for (const attr in OD6S.attributes) {
-                if (item.system.range[range].toLowerCase().includes(attr)) {
+                if (itemRange[range].toLowerCase().includes(attr)) {
                     foundRange[range] = attr;
                     break;
                 }
@@ -111,9 +114,10 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
 }
 
 export function getMeleeDamage(actor: Actor, weapon: Item): number {
-    if (weapon.system.damage.str) {
-        return (+(actor.system as OD6SCharacterSystem).strengthdamage.score) + (+weapon.system.damage.score);
+    const wsys = weapon.system as OD6SWeaponItemSystem;
+    if (wsys.damage.str) {
+        return (+(actor.system as OD6SCharacterSystem).strengthdamage.score) + (+wsys.damage.score);
     } else {
-        return (+weapon.system.damage.score);
+        return (+wsys.damage.score);
     }
 }

@@ -63,10 +63,10 @@ export async function addItem(sheet: any, ev: any, caller?: any) {
     const cEntries = od6sutilities.getItemsFromCompendiumByType(data.type);
 
     if (data.type === 'skill') {
-        worldItems = worldItems.filter((i: any) => i.system.attribute === data.attrname);
+        worldItems = worldItems.filter((i: Item) => (i.system as OD6SSkillItemSystem).attribute === data.attrname);
         for (const i of cEntries) {
             const item = await od6sutilities._getItemFromCompendium((i as any).name);
-            if (item && item.system.attribute === data.attrname) {
+            if (item && (item.system as OD6SSkillItemSystem).attribute === data.attrname) {
                 compendiumItems.push(item);
             }
         }

@@ -211,7 +211,7 @@ export async function detonateExplosive(data: any): Promise<any> {
     msgData.flags.od6s.targets = [];
     msgData.flags.od6s.item = item!.id;
     msgData.flags.od6s.isOpposable = true;
-    msgData.flags.od6s.damageType = item!.system.damage.type;
+    msgData.flags.od6s.damageType = (item!.system as OD6SWeaponItemSystem).damage.type;
     msgData.flags.od6s.stun = data.stun;
     msgData.flags.od6s.attackMessage = data.messageId;
 
@@ -231,9 +231,10 @@ export async function detonateExplosive(data: any): Promise<any> {
     let rollString;
 
     if(game.settings.get('od6s','explosive_zones')) {
+        const wsys = item!.system as OD6SWeaponItemSystem;
         // Separate rolls for each zone; damage score represents whole dice
-        for (const i in item!.system.blast_radius) {
-            const zone = item!.system.blast_radius[i];
+        for (const i in wsys.blast_radius) {
+            const zone = wsys.blast_radius[i as "1" | "2" | "3" | "4"];
             const zoneTargets = targets.filter((target: any) => target.zone === (+i));
             if (zoneTargets.length < 1) continue;
             if (zone.damage < 1) {
@@ -287,16 +288,17 @@ export async function detonateExplosive(data: any): Promise<any> {
         }
     } else {
         msgData.flags.od6s.targets = targets;
+        const wsys = item!.system as OD6SWeaponItemSystem;
         // One roll, with a fraction for zones > 1
-        const dice = (boolCheck(data.stun)) ? getDiceFromScore(item!.system.stun.score, OD6S.pipsPerDice)
-            : getDiceFromScore(item!.system.damage.score, OD6S.pipsPerDice);
+        const dice = (boolCheck(data.stun)) ? getDiceFromScore(wsys.stun.score, OD6S.pipsPerDice)
+            : getDiceFromScore(wsys.damage.score, OD6S.pipsPerDice);
         if (boolCheck(data.stun)) {
-            if (item!.system.stun.score === 0 || item!.system.stun.score === '') {
+            if (wsys.stun.score === 0 || (wsys.stun.score as unknown) === '') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
                 return;
             }
         } else {
-            if (item!.system.damage.score === 0 || item!.system.damage.score === '') {
+            if (wsys.damage.score === 0 || (wsys.damage.score as unknown) === '') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
                 return;
             }

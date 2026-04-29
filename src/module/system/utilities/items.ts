@@ -116,7 +116,7 @@ export function getItemsFromWorldByType(itemType: OD6SItemType): unknown[] {
                 _id: game.items.contents[i]._id,
                 name: game.items.contents[i].name,
                 type: game.items.contents[i].type,
-                description: game.items.contents[i].system.description
+                description: (game.items.contents[i].system as { description?: string }).description ?? ''
             }
             searchResult.push(item);
         }

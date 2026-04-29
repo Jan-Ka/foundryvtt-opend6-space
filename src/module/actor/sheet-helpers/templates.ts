@@ -128,8 +128,8 @@ export async function templateItems(sheet: any, itemList: any) {
         }
 
         // Metaphysics skills get 1D if the attribute is not used
-        if (templateItem.type === 'skill' && templateItem.system.attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
-            templateItem.system.base = OD6S.pipsPerDice;
+        if (templateItem.type === 'skill' && (templateItem.system as OD6SSkillItemSystem).attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+            (templateItem.system as OD6SSkillItemSystem).base = OD6S.pipsPerDice;
         }
 
         result.push(templateItem);

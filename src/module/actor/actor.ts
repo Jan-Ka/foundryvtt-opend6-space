@@ -131,14 +131,14 @@ export class OD6SActor extends Actor {
                 const spec = pilot.items.find(i => i.type === "specialization" &&
                     i.name === vehicle.specialization.value);
                 if (typeof spec !== 'undefined') {
-                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[vehicle.attribute.value].score)
+                    score = (+score) + (+(spec.system as OD6SSpecializationItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score)
                     found = true;
                 }
 
                 if (!found) {
                     const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill.value);
                     if (typeof (skill) !== 'undefined') {
-                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                        score = (+score) + (+(skill.system as OD6SSkillItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score);
                         found = true;
                     }
                 }
