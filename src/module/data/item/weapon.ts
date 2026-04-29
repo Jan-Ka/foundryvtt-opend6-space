@@ -18,7 +18,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
     if (source.range && typeof source.range === "object") {
       const range = source.range as Record<string, unknown>;
       for (const key of ["short", "medium", "long"]) {
-        if (typeof range[key] !== "number") range[key] = Number(range[key]) || 0;
+        if (typeof range[key] !== "string") range[key] = String(range[key] ?? "0");
       }
     }
     return super.migrateData(source);
@@ -43,9 +43,9 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         parry_specialization: new fields.StringField({ initial: "" }),
       }),
       range: new fields.SchemaField({
-        short: new fields.NumberField({ initial: 0 }),
-        medium: new fields.NumberField({ initial: 0 }),
-        long: new fields.NumberField({ initial: 0 }),
+        short: new fields.StringField({ initial: "0" }),
+        medium: new fields.StringField({ initial: "0" }),
+        long: new fields.StringField({ initial: "0" }),
       }),
       damage: new fields.SchemaField({
         type: new fields.StringField({ initial: "" }),

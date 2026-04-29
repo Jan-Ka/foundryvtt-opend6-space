@@ -20,9 +20,7 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
     foundRange.medium = '';
     foundRange.long = '';
 
-    // Range values are declared NumberField in schema, but legacy data can carry
-    // string values like "AGI+2" — treat as Record<string, any> at the access site.
-    const itemRange = (item.system as OD6SWeaponItemSystem).range as unknown as Record<string, any>;
+    const itemRange = (item.system as OD6SWeaponItemSystem).range;
     const range: any = {};
     range.short = itemRange.short;
     range.medium = itemRange.medium;
@@ -34,7 +32,7 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
         regex.test(itemRange.medium) ||
         regex.test(itemRange.long)) {
         // There is a non-numeric value, extract it and find the attribute
-        for (const range in itemRange) {
+        for (const range of ['short', 'medium', 'long'] as const) {
             for (const attr in OD6S.attributes) {
                 if (itemRange[range].toLowerCase().includes(attr)) {
                     foundRange[range] = attr;
