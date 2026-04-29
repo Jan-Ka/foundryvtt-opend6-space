@@ -8,11 +8,14 @@ export async function deleteItem(sheet: any, ev: Event) {
     const ct = ev.currentTarget as HTMLElement;
     // If this is a skill, deny if there are existing specializations.
     if (ct.dataset.type === "skill") {
-        for (const i in sheet.document.items) {
-            const docItem = sheet.document.items[i] as Item & { skill?: string };
-            if (docItem.type === "specialization" && docItem.skill === ct.dataset.itemId) {
-                ui.notifications.error(game.i18n.localize("OD6S.ERR_SKILL_HAS_SPEC"));
-                return;
+        const skillId = ct.dataset.itemId;
+        const skillItem = skillId ? sheet.document.items.get(skillId) as Item | undefined : undefined;
+        if (skillItem) {
+            for (const docItem of sheet.document.items as Iterable<Item & { system?: { skill?: string } }>) {
+                if (docItem.type === "specialization" && docItem.system?.skill === skillItem.name) {
+                    ui.notifications.error(game.i18n.localize("OD6S.ERR_SKILL_HAS_SPEC"));
+                    return;
+                }
             }
         }
     }

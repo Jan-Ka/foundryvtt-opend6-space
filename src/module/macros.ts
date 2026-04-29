@@ -10,7 +10,7 @@ import OD6S from "./config/config-od6s";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createOD6SMacro(data: any, slot: number) {
 
-    if (data.type !== "Item" || data.type !== 'availableaction') return;
+    if (data.type !== "Item") return;
     if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.'))return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NOT_OWNED'));
     const item = await Item.fromDropData(data);
 
