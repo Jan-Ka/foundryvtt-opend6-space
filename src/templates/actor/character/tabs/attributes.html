@@ -64,7 +64,7 @@
                                                 (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                              data-item-id="{{skill._id}}"
                                              data-type="skill"
-                                             data-score="{{skill.system.score}}"
+                                             data-score="{{skill.system.total}}"
                                              data-base="{{skill.system.base}}"
                                              data-label="{{skill.name}}">
                                             {{skill.name}}
@@ -74,12 +74,12 @@
                                             {{getModColor skill.system.mod}}"
                                              data-item-id="{{skill._id}}"
                                              data-type="skill"
-                                             data-score="{{skill.system.score}}"
+                                             data-score="{{skill.system.total}}"
                                              data-base="{{skill.system.base}}"
                                              data-label="{{skill.name}}">
                                             {{#unless (flatSkills)}}
-                                                <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
-                                                    skill.system.score}}</b>
+                                                <b>{{diceFromScore skill.system.total}}</b>D+<b>{{pipsFromScore
+                                                    skill.system.total}}</b>
                                             {{else}}
                                                 {{ skill.system.base }}
                                             {{/unless}}</div>
@@ -90,7 +90,7 @@
                                                    title="{{localize "OD6S.ADVANCE_SKILL"}}"
                                                    data-item-id="{{skill._id}}"
                                                    data-type="skill"
-                                                   data-score="{{skill.system.score}}"
+                                                   data-score="{{skill.system.total}}"
                                                    data-base="{{skill.system.base}}"
                                                    data-label="{{skill.name}}"
                                                    data-freeadvance="false">
@@ -100,7 +100,7 @@
                                             <div class="item item-controls flexrow flex-group-center"
                                                  data-item-id="{{skill._id}}"
                                                  data-type="skill"
-                                                 data-score="{{skill.system.score}}"
+                                                 data-score="{{skill.system.total}}"
                                                  data-base="{{skill.system.base}}"
                                                  data-label="{{skill.name}}"
                                                  data-freeadvance="true">
