@@ -55,6 +55,7 @@ OD6S.fatePointClimactic = false;
 OD6S.woundConfig = 0;
 OD6S.bodyPointsName = "OD6S.BODY_POINTS";
 OD6S.highHitDamage = false;
+OD6S.weaponArmorDamage = false;
 OD6S.autoOpposed = false;
 OD6S.autoPromptPlayerResistance = false;
 OD6S.autoSkillUsed = false;

@@ -218,6 +218,8 @@ export function updateConfig() {
 
     OD6S.highHitDamage = game.settings.get('od6s', 'highhitdamage');
 
+    OD6S.weaponArmorDamage = game.settings.get('od6s', 'weapon_armor_damage');
+
     OD6S.autoOpposed = game.settings.get('od6s', 'auto_opposed');
 
     OD6S.autoPromptPlayerResistance = game.settings.get('od6s','auto_prompt_player_resistance');
