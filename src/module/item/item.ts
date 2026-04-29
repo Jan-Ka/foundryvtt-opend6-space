@@ -361,27 +361,27 @@ export class OD6SItem extends Item {
                     } else {
                         skill = actor.items.find((i: Item) => i.name === name);
                     }
-                    if (skill !== null && typeof (skill) !== 'undefined' && typeof ((skill as any).system.score) !== 'undefined') {
+                    const skillSys = skill?.system as OD6SSkillItemSystem | undefined;
+                    if (skill !== null && typeof (skill) !== 'undefined' && typeof (skillSys?.score) !== 'undefined') {
                         if(OD6S.flatSkills) {
-                            rollData.score = (+actorData.attributes[(skill as any).system.attribute.toLowerCase()].score);
-                            flatPips = (+(skill as any).system.score);
+                            rollData.score = (+actorData.attributes[skillSys!.attribute.toLowerCase()].score);
+                            flatPips = (+skillSys!.score);
                         } else {
                             if((this.system as OD6SSkillItemSystem).isAdvancedSkill) {
-                                rollData.score = (+(skill as any).system.score);
+                                rollData.score = (+skillSys!.score);
                             } else {
-                                rollData.score = (+(skill as any).system.score) + (+actorData.attributes[(skill as any).system.attribute.toLowerCase()].score);
+                                rollData.score = (+skillSys!.score) + (+actorData.attributes[skillSys!.attribute.toLowerCase()].score);
                             }
                         }
                     } else {
                         // Search compendia for the skill and use the attribute
-                        // rollData.score = (+actorData.attributes['agi'].score);
-                        skill = await od6sutilities._getItemFromWorld(name) as any;
+                        skill = (await od6sutilities._getItemFromWorld(name)) as Item | undefined;
                         if (skill !== null && typeof (skill) !== 'undefined') {
-                            rollData.score = (+actorData.attributes[(skill as any).system.attribute.toLowerCase()].score);
+                            rollData.score = (+actorData.attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score);
                         } else {
-                            skill = await od6sutilities._getItemFromCompendium(name) as any;
+                            skill = (await od6sutilities._getItemFromCompendium(name)) as Item | undefined;
                             if (skill !== null && typeof (skill) !== 'undefined') {
-                                rollData.score = (+actorData.attributes[(skill as any).system.attribute.toLowerCase()].score);
+                                rollData.score = (+actorData.attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score);
                             } else {
                                 // Cannot find, use defaults for the type
                                 for (const a in OD6S.actions) {
