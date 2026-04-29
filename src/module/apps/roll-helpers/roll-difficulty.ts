@@ -93,9 +93,10 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
                         });
                     }
                 } else {
-                    const vehicleDefense = (rollData.target!.actor.system as OD6SVehicleSystem).maneuverability.score;
+                    const vehSys = rollData.target!.actor.system as OD6SVehicleSystem;
+                    const vehicleDefense = vehSys.maneuverability.score;
                     if (vehicleDefense === 0) {
-                        if(OD6S.meleeDifficulty) {
+                        if (OD6S.meleeDifficulty) {
                             return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
                         } else {
                             return OD6S.baseMeleeAttackDifficulty;
@@ -138,7 +139,8 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
                         });
                     }
                 } else {
-                    const vehicleDefense = (rollData.target!.actor.system as OD6SVehicleSystem).maneuverability.score;
+                    const vehSys = rollData.target!.actor.system as OD6SVehicleSystem;
+                    const vehicleDefense = vehSys.maneuverability.score;
                     if (vehicleDefense === 0) {
                         return OD6S.baseBrawlAttackDifficulty;
                     } else {
