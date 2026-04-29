@@ -16,7 +16,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.agi.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.agi.active = value)
     })
 
     game.settings.register("od6s", "customize_str_active", {
@@ -27,7 +27,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.str.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.str.active = value)
     })
 
     game.settings.register("od6s", "customize_mec_active", {
@@ -38,7 +38,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.mec.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.mec.active = value)
     })
 
     game.settings.register("od6s", "customize_kno_active", {
@@ -49,7 +49,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.kno.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.kno.active = value)
     })
 
     game.settings.register("od6s", "customize_per_active", {
@@ -60,7 +60,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.per.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.per.active = value)
     })
 
     game.settings.register("od6s", "customize_tec_active", {
@@ -71,7 +71,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.tec.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.tec.active = value)
     })
 
     game.settings.register("od6s", "customize_ca1_active", {
@@ -82,7 +82,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.ca1.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.ca1.active = value)
     })
 
     game.settings.register("od6s", "customize_ca2_active", {
@@ -93,7 +93,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.ca2.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.ca2.active = value)
     })
 
     game.settings.register("od6s", "customize_ca3_active", {
@@ -104,7 +104,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.ca3.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.ca3.active = value)
     })
 
     game.settings.register("od6s", "customize_ca4_active", {
@@ -115,7 +115,7 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.ca4.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.ca4.active = value)
     })
 
     game.settings.register("od6s", "customize_met_active", {
@@ -126,6 +126,6 @@ export function registerAttributeSettings() {
         type: Boolean,
         default: true,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.attributes.met.active = value)
+        onChange: (value: boolean) => (OD6S.attributes.met.active = value)
     })
 }

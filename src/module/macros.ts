@@ -1,7 +1,5 @@
 import OD6S from "./config/config-od6s";
 
-declare const foundry: any;
-
 /**
  * Create a Macro from an Item drop.
  * Get an existing item macro if one exists, otherwise create a new one.
@@ -9,7 +7,8 @@ declare const foundry: any;
  * @param {number} slot     The hotbar slot to use
  * @returns {Promise}
  */
-export async function createOD6SMacro(data: any, slot: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createOD6SMacro(data: any, slot: number) {
 
     if (data.type !== "Item" || data.type !== 'availableaction') return;
     if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.'))return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NOT_OWNED'));
@@ -29,7 +28,7 @@ export async function createOD6SMacro(data: any, slot: any) {
 
     // Create the macro command
     const command = `game.od6s.rollItemMacro("${item._id}");`;
-    let macro = game.macros.find(m => (m.name === item.name) && ((m as any).command === command));
+    let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
     if (!macro) {
         macro = await Macro.create({
             name: item.name,
@@ -49,12 +48,12 @@ export async function createOD6SMacro(data: any, slot: any) {
  * @param {string} itemId
  * @return {Promise}
  */
-export function rollItemMacro(itemId: any) {
+export function rollItemMacro(itemId: string) {
     const speaker = ChatMessage.getSpeaker();
     let actor;
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
-    const item = actor ? actor.items.find((i: any) => i.id === itemId) : null;
+    const item = actor ? actor.items.find((i: Item) => i.id === itemId) : null;
     if (!item) return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_ITEM_ID') + " " + itemId);
 
     // Trigger the item roll
@@ -66,13 +65,13 @@ export function rollItemMacro(itemId: any) {
  * @param {string} name
  * @return {Promise}
  */
-export function rollItemNameMacro(name: any) {
+export function rollItemNameMacro(name: string) {
     name = game.i18n.localize(name);
     const speaker = ChatMessage.getSpeaker();
     let actor;
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
-    const item = actor ? actor.items.find((i: any) => i.name === name) : null;
+    const item = actor ? actor.items.find((i: Item) => i.name === name) : null;
     if (!item) return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_ITEM_NAME') + " " + name);
 
     // Trigger the item roll
@@ -84,7 +83,7 @@ export function rollItemNameMacro(name: any) {
  * @param attribute
  * @returns {string}
  */
-export function getAttributeName(attribute: any) {
+export function getAttributeName(attribute: string) {
     attribute = attribute.toLowerCase();
     if (typeof (OD6S.attributes[attribute]) === "undefined") {
         const warnString = game.i18n.localize('OD6S.ERROR_ATTRIBUTE_KEY') + ": " + attribute;
@@ -99,7 +98,7 @@ export function getAttributeName(attribute: any) {
  * @param attribute
  * @returns {string}
  */
-export function getAttributeShortName(attribute: any) {
+export function getAttributeShortName(attribute: string) {
     attribute = attribute.toLowerCase();
     return OD6S.attributes[attribute].shortName;
 }
@@ -118,11 +117,19 @@ export async function simpleRoll() {
     await runSimpleRoll(result);
 }
 
-async function runSimpleRoll(result: any): Promise<void> {
+interface SimpleRollResult {
+    dice: number;
+    pips: number;
+    wilddie?: boolean;
+    damageroll?: boolean;
+    damagetype?: string;
+}
+
+async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     let wild = false;
     let rollString = "";
-    let rollMode: any = 0;
-    let dice: any = result.dice;
+    let rollMode = 0;
+    let dice = result.dice;
     const pips = result.pips;
     const damageRoll = !!result.damageroll;
     const damageType = result.damagetype;
@@ -145,11 +152,11 @@ async function runSimpleRoll(result: any): Promise<void> {
     let label = game.i18n.localize("OD6S.ROLLING");
     if (damageRoll) {
         label += " " + game.i18n.localize("OD6S.DAMAGE") + "("
-            + game.i18n.localize(OD6S.damageTypes[damageType]) + ")";
+            + game.i18n.localize(OD6S.damageTypes[damageType!]) + ")";
     }
     const roll = await new Roll(rollString).evaluate();
 
-    let flags: any = {
+    let flags: Record<string, unknown> = {
         type: "simple",
         wild: false,
         wildHandled: false,
@@ -168,7 +175,7 @@ async function runSimpleRoll(result: any): Promise<void> {
     }
 
     if (game.settings.get("od6s", "use_wild_die")) {
-        const WildDie = roll.terms.find((d: any) => game.i18n.localize("OD6S.WILD_DIE_FLAVOR").includes(d.flavor));
+        const WildDie = roll.terms.find((d: { flavor: string }) => game.i18n.localize("OD6S.WILD_DIE_FLAVOR").includes(d.flavor));
         if (WildDie!.total === 1) {
             flags.wild = true;
             if (OD6S.wildDieOneDefault > 0 && OD6S.wildDieOneAuto === 0) flags.wildHandled = true;
@@ -197,7 +204,7 @@ async function runSimpleRoll(result: any): Promise<void> {
         replacementRoll.terms[0].results[highest].discarded = true;
         replacementRoll.terms[0].results[highest].active = false;
         replacementRoll.total -= (+replacementRoll.terms[0].results[highest].result);
-        const rollMessageUpdate: any = {
+        const rollMessageUpdate: Record<string, unknown> = {
             system: {},
             content: replacementRoll.total,
             id: rollMessage.id,

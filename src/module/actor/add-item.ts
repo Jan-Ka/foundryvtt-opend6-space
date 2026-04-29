@@ -1,7 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
 import {od6sutilities} from "../system/utilities";
 import {OD6SItem} from "../item/item";
 
-declare const foundry: any;
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 

@@ -1,7 +1,7 @@
 import OD6S from "../config-od6s";
 import {od6sutilities} from "../../system/utilities";
 
-export async function updateRerollInitiative(value: any) {
+export async function updateRerollInitiative(value: boolean) {
     if (value) {
         OD6S.initiative.reroll_character = game.settings.get('od6s', 'auto_reroll_character');
         OD6S.initiative.reroll_npc = game.settings.get('od6s', 'auto_reroll_npc');
@@ -24,7 +24,7 @@ export function registerCombatSettings() {
         default: 'per',
         requiresReload: true,
         choices: od6sutilities.getActiveAttributesSelect(),
-        onChange: (value: any) => (OD6S.initiative.attribute = value)
+        onChange: (value: string) => (OD6S.initiative.attribute = value)
     })
 
     game.settings.register("od6s", "reroll_initiative", {
@@ -36,7 +36,7 @@ export function registerCombatSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (updateRerollInitiative(value))
+        onChange: (value: boolean) => (updateRerollInitiative(value))
     })
 
     game.settings.register("od6s", "auto_reroll_npc", {
@@ -48,7 +48,7 @@ export function registerCombatSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.initiative.reroll_npc = value : false)
+        onChange: (value: boolean) => (value ? OD6S.initiative.reroll_npc = value : false)
     })
 
     game.settings.register("od6s", "auto_reroll_character", {
@@ -60,7 +60,7 @@ export function registerCombatSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.initiative.reroll_character = value : false)
+        onChange: (value: boolean) => (value ? OD6S.initiative.reroll_character = value : false)
     })
 
     game.settings.register("od6s", "auto_init_dsn", {
@@ -72,7 +72,7 @@ export function registerCombatSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.initiative.dsn = value : false)
+        onChange: (value: boolean) => (value ? OD6S.initiative.dsn = value : false)
     })
 
     game.settings.register("od6s", "brawl_attribute", {
@@ -118,7 +118,7 @@ export function registerCombatSettings() {
         od6sRules: true,
         type: Boolean,
         default: false,
-        onChange: (value: any) => OD6S.defenseLock = value
+        onChange: (value: boolean) => OD6S.defenseLock = value
     })
 
     game.settings.register("od6s", "fate_point_round", {
@@ -130,7 +130,7 @@ export function registerCombatSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => OD6S.fatePointRound = value
+        onChange: (value: boolean) => OD6S.fatePointRound = value
     })
 
     game.settings.register("od6s", "fate_point_climactic", {
@@ -141,6 +141,6 @@ export function registerCombatSettings() {
         od6sRules: true,
         type: Boolean,
         default: false,
-        onChange: (value: any) => OD6S.fatePointClimactic = value
+        onChange: (value: boolean) => OD6S.fatePointClimactic = value
     })
 }

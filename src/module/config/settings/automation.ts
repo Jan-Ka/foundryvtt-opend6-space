@@ -10,7 +10,7 @@ export function registerAutomationSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.autoOpposed = value : true)
+        onChange: (value: boolean) => (value ? OD6S.autoOpposed = value : true)
     })
 
     game.settings.register("od6s", "auto_explosive", {
@@ -22,7 +22,7 @@ export function registerAutomationSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.autoPromptPlayerResistance = value : true)
+        onChange: (value: boolean) => (value ? OD6S.autoPromptPlayerResistance = value : true)
     })
 
     game.settings.register("od6s", "auto_prompt_player_resistance", {
@@ -34,7 +34,7 @@ export function registerAutomationSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.autoPromptPlayerResistance = value : true)
+        onChange: (value: boolean) => (value ? OD6S.autoPromptPlayerResistance = value : true)
     })
 
     /*
@@ -92,7 +92,7 @@ export function registerAutomationSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.autoOpposed = value : true)
+        onChange: (value: boolean) => (value ? OD6S.autoOpposed = value : true)
     })
 
     game.settings.register("od6s", "auto_skill_used", {
@@ -104,6 +104,6 @@ export function registerAutomationSettings() {
         type: Boolean,
         default: false,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.autoSkillUsed = value : true)
+        onChange: (value: boolean) => (value ? OD6S.autoSkillUsed = value : true)
     })
 }

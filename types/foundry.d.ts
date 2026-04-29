@@ -545,6 +545,7 @@ declare class User extends FoundryDocument {
 
 /** Macro document */
 declare class Macro extends FoundryDocument {
+    command: string;
     static create(data: any): Promise<Macro>;
 }
 

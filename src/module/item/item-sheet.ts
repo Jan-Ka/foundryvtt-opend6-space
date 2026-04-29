@@ -1,8 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
 import {od6sutilities} from "../system/utilities";
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import OD6S from "../config/config-od6s";
 
-declare const foundry: any;
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
 const ItemSheetV2 = foundry.applications.sheets.ItemSheetV2;
