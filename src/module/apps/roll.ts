@@ -20,7 +20,7 @@ export class od6sroll {
         const actor = (this as any).actor as Actor;
         const item = actor.items.find((i: Item) => i.id === (event.currentTarget as HTMLElement).dataset.itemId);
         if (!item) return;
-        if ((actor.type === 'vehicle' || actor.type === 'starship') && (actor.system as OD6SVehicleSystem).embedded_pilot) {
+        if ((actor.type === 'vehicle' || actor.type === 'starship') && (actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
             return item.roll();
         }
         const sys = item.system as OD6SActionItemSystem;

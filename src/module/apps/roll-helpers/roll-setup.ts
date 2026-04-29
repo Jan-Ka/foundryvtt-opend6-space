@@ -214,13 +214,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (data.subtype === 'vehiclerangedweaponattack') {
         let vehicleWeapon: Item | undefined;
         if (data.actor.type === 'vehicle') {
-            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot) {
+            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
                 vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
             } else {
                 vehicleWeapon = (data.actor as any).vehicle_weapons.filter((i: Item) => i._id === data.itemId)[0];
             }
         } else if (data.actor.type === 'starship') {
-            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot) {
+            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
                 vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
             } else {
                 vehicleWeapon = (data.actor as any).starship_weapons.filter((i: Item) => i._id === data.itemId)[0];
@@ -239,7 +239,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             if (vwSys.mods.attack !== 0) bonusmod += vwSys.mods.attack;
             if (vwSys.scale.score) {
                 attackerScale = vwSys.scale.score;
-            } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || (data.actor.system as OD6SVehicleSystem)?.embedded_pilot) {
+            } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || (data.actor.system as OD6SVehicleSystem)?.embedded_pilot?.value) {
                 attackerScale = data.actor.system.scale.score;
             } else {
                 attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
