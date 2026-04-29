@@ -3,26 +3,26 @@ import OD6S from "../../config/config-od6s";
 /**
  * Delete an item from the actor, with confirmation dialog.
  */
-export async function deleteItem(sheet: any, ev: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function deleteItem(sheet: any, ev: Event) {
+    const ct = ev.currentTarget as HTMLElement;
     // If this is a skill, deny if there are existing specializations.
-    if (ev.currentTarget.dataset.type === "skill") {
+    if (ct.dataset.type === "skill") {
         for (const i in sheet.document.items) {
-            if (sheet.document.items[i].type === "specialization") {
-                if (sheet.document.items[i].skill === ev.currentTarget.dataset.itemId) {
-                    ui.notifications.error(game.i18n.localize("OD6S.ERR_SKILL_HAS_SPEC"));
-                    return;
-                }
+            const docItem = sheet.document.items[i] as Item & { skill?: string };
+            if (docItem.type === "specialization" && docItem.skill === ct.dataset.itemId) {
+                ui.notifications.error(game.i18n.localize("OD6S.ERR_SKILL_HAS_SPEC"));
+                return;
             }
         }
     }
-    if (ev.currentTarget.dataset.confirm !== "false") {
+    if (ct.dataset.confirm !== "false") {
         let itemId;
-        if (typeof (ev.currentTarget.dataset.itemId) !== 'undefined' &&
-            ev.currentTarget.dataset.itemId !== '') {
-            itemId = ev.currentTarget.dataset.itemId
+        if (typeof ct.dataset.itemId !== 'undefined' && ct.dataset.itemId !== '') {
+            itemId = ct.dataset.itemId;
         } else {
-            const li = ev.currentTarget.closest(".item");
-            itemId = li?.dataset?.itemId;
+            const li = ct.closest<HTMLElement>(".item");
+            itemId = li?.dataset.itemId;
         }
         const confirmText = "<p>" + game.i18n.localize("OD6S.DELETE_CONFIRM") + "</p>";
         await Dialog.prompt({
@@ -34,7 +34,7 @@ export async function deleteItem(sheet: any, ev: any) {
             }
         })
     } else {
-        await sheet.document.deleteEmbeddedDocuments('Item', [ev.currentTarget.dataset.itemId]);
+        await sheet.document.deleteEmbeddedDocuments('Item', [ct.dataset.itemId]);
         sheet.render(false);
     }
 }
@@ -42,51 +42,58 @@ export async function deleteItem(sheet: any, ev: any) {
 /**
  * Add an item to the actor using the add-item dialog.
  */
-export async function addItem(sheet: any, ev: any, caller?: any) {
+export async function addItem(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sheet: any,
+    ev: Event,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    caller?: any,
+) {
     // Lazy-import to avoid circular dependency
     const {OD6SAddItem} = await import("../add-item.js");
     const {od6sutilities} = await import("../../system/utilities.js");
 
     caller = caller ?? sheet;
-    const data: any = {};
-    data.type = ev.currentTarget.dataset.type;
-    data.attrname = ev.currentTarget.dataset.attrname;
-    data.new = !(typeof (ev.currentTarget.dataset.new) !== 'undefined' && ev.currentTarget.dataset.new === 'false');
-    let worldItems: any = {};
-    let compendiumItems = [];
+    const ct = ev.currentTarget as HTMLElement;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: Record<string, any> = {};
+    data.type = ct.dataset.type!;
+    data.attrname = ct.dataset.attrname;
+    data.new = !(typeof ct.dataset.new !== 'undefined' && ct.dataset.new === 'false');
+    let worldItems: Item[] = [];
+    let compendiumItems: Item[] = [];
 
-    data.type = ev.currentTarget.dataset.type;
     data.label = game.i18n.localize('OD6S.ADD') + " " + game.i18n.localize(OD6S.itemLabels[data.type])
     data.label_empty = game.i18n.localize('OD6S.ADD_EMPTY') + " " + game.i18n.localize(OD6S.itemLabels[data.type])
 
-    worldItems = game.items.filter((i: any) => i.type === data.type);
+    worldItems = game.items.filter((i: Item) => i.type === data.type);
     const cEntries = od6sutilities.getItemsFromCompendiumByType(data.type);
 
     if (data.type === 'skill') {
         worldItems = worldItems.filter((i: Item) => (i.system as OD6SSkillItemSystem).attribute === data.attrname);
         for (const i of cEntries) {
-            const item = await od6sutilities._getItemFromCompendium((i as any).name);
+            const item = await od6sutilities._getItemFromCompendium((i as Item).name);
             if (item && (item.system as OD6SSkillItemSystem).attribute === data.attrname) {
                 compendiumItems.push(item);
             }
         }
     } else {
         for (const i of cEntries) {
-            const item = await od6sutilities._getItemFromCompendium((i as any).name);
+            const item = await od6sutilities._getItemFromCompendium((i as Item).name);
             if (item) compendiumItems.push(item);
         }
     }
 
     //if it is a skill, do not include skills the actor already has
     if (data.type === 'skill') {
-        worldItems = worldItems.filter((i: any) => !sheet.document.items.find((r: any) => r.name === i.name));
-        compendiumItems = compendiumItems.filter((i: any) => !sheet.document.items.find((r: any) => r.name === i.name));
+        worldItems = worldItems.filter((i: Item) => !sheet.document.items.find((r: Item) => r.name === i.name));
+        compendiumItems = compendiumItems.filter((i: Item) => !sheet.document.items.find((r: Item) => r.name === i.name));
     }
 
     // Prefer world items
-    compendiumItems = compendiumItems.filter((i: any) => !worldItems.find((r: any) => r.name === i.name));
+    compendiumItems = compendiumItems.filter((i: Item) => !worldItems.find((r: Item) => r.name === i.name));
 
-    data.items = [...worldItems, ...compendiumItems].sort(function (a: any, b: any) {
+    data.items = [...worldItems, ...compendiumItems].sort((a: Item, b: Item) => {
         const x = a.name.toUpperCase();
         const y = b.name.toUpperCase();
         return x === y ? 0 : x > y ? 1 : -1;
@@ -114,21 +121,24 @@ export async function addItem(sheet: any, ev: any, caller?: any) {
 /**
  * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset.
  */
-export function onItemCreate(sheet: any, event: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function onItemCreate(sheet: any, event: Event) {
     event.preventDefault();
-    const header = event.currentTarget;
+    const header = event.currentTarget as HTMLElement;
     // Get the type of item to create.
-    const type = header.dataset.type;
+    const type = header.dataset.type!;
+    // String.prototype.capitalize is provided by Foundry at runtime.
+    const capType = (type as string & {capitalize?: () => string}).capitalize?.() ?? type;
 
     // Grab any data associated with this control.
     const data = foundry.utils.deepClone(header.dataset);
     // Initialize a default name.
-    const name = game.i18n.localize('OD6S.NEW') + ' ' + game.i18n.localize('ITEM.Type' + type.capitalize());
+    const name = game.i18n.localize('OD6S.NEW') + ' ' + game.i18n.localize('ITEM.Type' + capType);
     // Prepare the item object.
-    const itemData = {
-        name: name,
-        type: type,
-        data: data
+    const itemData: { name: string; type: string; data: Record<string, string | undefined> } = {
+        name,
+        type,
+        data,
     };
     // Remove the type from the dataset since it's in the itemData.type prop.
     delete itemData.data["type"];
