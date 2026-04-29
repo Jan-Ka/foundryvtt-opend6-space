@@ -22,8 +22,6 @@
  * See settings-v2.html.
  */
 
-declare const foundry: any;
-
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
 export default class od6sRulesConfiguration extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -61,8 +59,8 @@ export default class od6sRulesConfiguration extends HandlebarsApplicationMixin(A
 
     async _prepareContext(_options?: object): Promise<object> {
         const settings = Array.from(game.settings.settings)
-            .filter((s: any) => s[1].od6sRules)
-            .map((i: any) => i[1]);
+            .filter((s) => s[1].od6sRules)
+            .map((i) => i[1]);
 
         for (const s of settings) {
             s.inputType = s.type === Boolean ? "checkbox" : "text";
@@ -77,7 +75,7 @@ export default class od6sRulesConfiguration extends HandlebarsApplicationMixin(A
         this: od6sRulesConfiguration,
         _event: Event,
         _form: HTMLFormElement,
-        formData: any,
+        formData: { object: Record<string, unknown> },
     ): Promise<void> {
         const data = formData.object;
         for (const setting in data) {

@@ -8,7 +8,9 @@
  * (e.g. "attributes") that may not exist on every sheet template.
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const foundry: any;
+
 
 interface AppWithTabGroups {
     tabGroups?: Record<string, string>;

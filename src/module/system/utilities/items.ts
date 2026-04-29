@@ -1,12 +1,15 @@
 /**
  * Merge two arrays by element property
  */
-export function mergeByProperty(target: any, source: any, prop: any): void {
-    source.forEach((sourceElement: any) => {
-        const targetElement = target.find((targetElement: any) => {
-            return sourceElement[prop] === targetElement[prop];
-        })
-        targetElement ? Object.assign(targetElement, sourceElement) : target.push(sourceElement);
+export function mergeByProperty<T extends Record<string, unknown>>(
+    target: T[],
+    source: T[],
+    prop: keyof T,
+): void {
+    source.forEach((sourceElement) => {
+        const targetElement = target.find((te) => sourceElement[prop] === te[prop]);
+        if (targetElement) Object.assign(targetElement, sourceElement);
+        else target.push(sourceElement);
     })
 }
 
@@ -25,19 +28,17 @@ export async function getSkillsFromTemplate(items: Item[]): Promise<Item[]> {
  * Search for and get an item from compendia by id
  */
 export async function _getItemFromCompendiumId(id: string): Promise<Item | null> {
-    let itemList: any = '';
-    let packs: any;
-    game.packs.keys();
+    let packs: CompendiumPack[];
     if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = await game.packs.filter(p => p.metadata.packageName !== 'od6s')
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s');
     } else {
-        packs = await game.packs;
+        packs = game.packs.contents;
     }
     for (const p of packs) {
-        await (p as any).getIndex().then((index: any) => itemList = index);
-        const searchResult = (itemList as any).find((t: any) => t._id === id);
+        const index = await p.getIndex();
+        const searchResult = index.find((t) => t._id === id);
         if (searchResult) {
-            return await (p as any).getDocument(searchResult._id);
+            return await p.getDocument(searchResult._id) as Item | null;
         }
     }
     return null;
@@ -47,19 +48,17 @@ export async function _getItemFromCompendiumId(id: string): Promise<Item | null>
  * Search for and get an item from compendia by name
  */
 export async function _getItemFromCompendium(itemName: string): Promise<Item | null> {
-    let itemList: any = '';
-    let packs: any;
-    game.packs.keys();
+    let packs: CompendiumPack[];
     if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = await game.packs.filter(p => p.metadata.packageName !== 'od6s')
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s');
     } else {
-        packs = await game.packs;
+        packs = game.packs.contents;
     }
     for (const p of packs) {
-        await (p as any).getIndex().then((index: any) => itemList = index);
-        const searchResult = (itemList as any).find((t: any) => t.name === itemName);
+        const index = await p.getIndex();
+        const searchResult = index.find((t) => t.name === itemName);
         if (searchResult) {
-            return await (p as any).getDocument(searchResult._id);
+            return await p.getDocument(searchResult._id) as Item | null;
         }
     }
     return null;
@@ -86,19 +85,18 @@ export async function getItemByName(itemName: string): Promise<Item | undefined>
 /**
  * Get all items of a certain type from compendia
  */
-export function getItemsFromCompendiumByType(itemType: OD6SItemType): unknown[] {
-    let searchResult: any[] = [];
-    let packs: any;
-    game.packs.keys();
+export function getItemsFromCompendiumByType(itemType: OD6SItemType): Array<{_id: string; name: string; type: string}> {
+    let searchResult: Array<{_id: string; name: string; type: string}> = [];
+    let packs: CompendiumPack[];
     if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter(p => p.metadata.packageName !== 'od6s' && p.documentName === 'Item')
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
     } else {
-        packs = game.packs.filter(p => p.documentName === 'Item');
+        packs = game.packs.filter((p) => p.documentName === 'Item');
     }
 
     for (const p of packs) {
-        const items = p.index.filter((i: any) => i.type === itemType);
-        searchResult = (searchResult as any).concat(items);
+        const items = p.index.filter((i) => i.type === itemType);
+        searchResult = searchResult.concat(items);
     }
 
     searchResult.sort((a, b) => a.name.localeCompare(b.name));
@@ -108,17 +106,16 @@ export function getItemsFromCompendiumByType(itemType: OD6SItemType): unknown[] 
 /**
  * Get all items of a certain type from the world
  */
-export function getItemsFromWorldByType(itemType: OD6SItemType): unknown[] {
-    const searchResult = [];
-    for (let i = 0; i < game.items.contents.length; i++) {
-        if (game.items.contents[i].type === itemType) {
-            const item = {
-                _id: game.items.contents[i]._id,
-                name: game.items.contents[i].name,
-                type: game.items.contents[i].type,
-                description: game.items.contents[i].system.description
-            }
-            searchResult.push(item);
+export function getItemsFromWorldByType(itemType: OD6SItemType): Array<{_id: string; name: string; type: string; description: string}> {
+    const searchResult: Array<{_id: string; name: string; type: string; description: string}> = [];
+    for (const it of game.items.contents) {
+        if (it.type === itemType) {
+            searchResult.push({
+                _id: it._id,
+                name: it.name,
+                type: it.type,
+                description: (it.system as { description?: string }).description ?? '',
+            });
         }
     }
     return searchResult;
@@ -127,12 +124,12 @@ export function getItemsFromWorldByType(itemType: OD6SItemType): unknown[] {
 /**
  * Get all items from both compendium and world by type, preferring world to compendia
  */
-export function getAllItemsByType(itemType: OD6SItemType): unknown[] {
+export function getAllItemsByType(itemType: OD6SItemType): Array<{_id: string; name: string; type: string}> {
     const cItems = getItemsFromCompendiumByType(itemType);
     const wItems = getItemsFromWorldByType(itemType);
-    const allItems = cItems.map((x) => x);
+    const allItems: Array<{_id: string; name: string; type: string}> = cItems.map((x) => x);
     // Prefer world items over compendium items
-    mergeByProperty(allItems, wItems, 'name');
-    allItems.sort((a, b) => (a as any).name.localeCompare((b as any).name));
+    mergeByProperty(allItems as Array<Record<string, unknown>>, wItems as Array<Record<string, unknown>>, 'name');
+    allItems.sort((a, b) => a.name.localeCompare(b.name));
     return allItems;
 }

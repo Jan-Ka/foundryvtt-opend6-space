@@ -23,10 +23,11 @@ export class od6sroll {
         if ((actor.type === 'vehicle' || actor.type === 'starship') && (actor.system as OD6SVehicleSystem).embedded_pilot) {
             return item.roll();
         }
-        if (item.system?.subtype.includes("vehicle")) {
-            if (item.system.subtype === 'vehiclerangedweaponattack') {
-                return actor.rollAction(item.system.itemId);
-            } else if (item.system.subtype === 'vehiclesensors') {
+        const sys = item.system as OD6SActionItemSystem;
+        if (sys?.subtype?.includes("vehicle")) {
+            if (sys.subtype === 'vehiclerangedweaponattack') {
+                return actor.rollAction(sys.itemId);
+            } else if (sys.subtype === 'vehiclesensors') {
                 if (game.settings.get('od6s', 'sensors')) {
                     if (item.name.includes(game.i18n.localize('OD6S.SENSORS_PASSIVE'))) {
                         return actor.rollAction('vehiclesensorspassive');
@@ -39,7 +40,7 @@ export class od6sroll {
                     }
                 }
             } else {
-                return actor.rollAction(item.system.subtype);
+                return actor.rollAction(sys.subtype);
             }
         } else {
             return item.roll();

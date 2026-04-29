@@ -10,7 +10,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 2,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.skill = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.skill = value : 2)
     })
 
     game.settings.register("od6s", "character_points_attribute_limit", {
@@ -22,7 +22,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 2,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.attribute = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.attribute = value : 2)
     })
 
     game.settings.register("od6s", "character_points_specialization_limit", {
@@ -34,7 +34,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.specialization = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.specialization = value : 2)
     })
 
     game.settings.register("od6s", "character_points_dodge_limit", {
@@ -46,7 +46,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.dodge = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.dodge = value : 2)
     })
 
     game.settings.register("od6s", "character_points_parry_limit", {
@@ -58,7 +58,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.parry = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.parry = value : 2)
     })
 
     game.settings.register("od6s", "character_points_block_limit", {
@@ -70,7 +70,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.block = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.block = value : 2)
     })
 
     game.settings.register("od6s", "character_points_dr_limit", {
@@ -82,7 +82,7 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.dr = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.dr = value : 2)
     })
 
     game.settings.register("od6s", "character_points_init_limit", {
@@ -94,6 +94,6 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: any) => (value ? OD6S.characterPointLimits.init = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.init = value : 2)
     })
 }

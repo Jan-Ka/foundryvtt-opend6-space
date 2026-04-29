@@ -36,18 +36,21 @@ export async function onDrop(sheet: any, event: any) {
                     return onDropItemGroup(sheet, event, item, data);
                 case "species-template":
                     return onDropSpeciesTemplate(sheet, event, item, data);
-                case "skill":
-                    if (typeof (item.system.attribute) === 'undefined' || item.system.attribute === '') {
+                case "skill": {
+                    const sys = item.system as OD6SSkillItemSystem;
+                    if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;
                     } else {
                         return onDropItem(sheet, event, data);
                     }
-                case "specialization":
-                    if (typeof (item.system.attribute) === 'undefined' || item.system.attribute === '') {
+                }
+                case "specialization": {
+                    const sys = item.system as OD6SSpecializationItemSystem;
+                    if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;
-                    } else if (typeof (item.system.attribute) === 'undefined' || item.system.skill === '') {
+                    } else if (typeof (sys.attribute) === 'undefined' || sys.skill === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_SKILL'))
                         return;
                     } else if (!(actor.items.find((i: any) => i.type === 'specialization' && i.name === item.name))) {
@@ -56,6 +59,7 @@ export async function onDrop(sheet: any, event: any) {
                     } else {
                         return onDropItem(sheet, event, data);
                     }
+                }
                 default:
                     return onDropItem(sheet, event, data);
             }

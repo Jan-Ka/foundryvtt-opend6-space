@@ -15,7 +15,7 @@ export function registerRulesSettings() {
             "2": game.i18n.localize("OD6S.CONFIG_USE_BODY_ONLY")
         },
         requiresReload: true,
-        onChange: (value: any) => (OD6S.woundConfig = value)
+        onChange: (value: number) => (OD6S.woundConfig = value)
     })
 
     game.settings.register("od6s", "stun_damage_increment", {
@@ -27,7 +27,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.stunDamageIncrement = value)
+        onChange: (value: boolean) => (OD6S.stunDamageIncrement = value)
     })
 
     game.settings.register("od6s", "highhitdamage", {
@@ -39,7 +39,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.highHitDamage = value)
+        onChange: (value: boolean) => (OD6S.highHitDamage = value)
     })
 
     game.settings.register("od6s", "weapon_armor_damage", {
@@ -51,7 +51,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.highHitDamage = value)
+        onChange: (value: boolean) => (OD6S.highHitDamage = value)
     })
 
     game.settings.register("od6s", "track_stuns", {
@@ -63,7 +63,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => (OD6S.trackStuns = value)
+        onChange: (value: boolean) => (OD6S.trackStuns = value)
     })
 
     /* TODO
@@ -125,7 +125,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.specializationDice = value
+        onChange: (value: boolean) => OD6S.specializationDice = value
     })
 
     game.settings.register("od6s", "strength_damage", {
@@ -179,7 +179,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.vehicleDifficulty = value
+        onChange: (value: boolean) => OD6S.vehicleDifficulty = value
     })
 
     game.settings.register("od6s", "stun_dice", {
@@ -190,7 +190,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: false,
         type: Boolean,
-        onChange: (value: any) => OD6S.passengerDamageDice = value
+        onChange: (value: boolean) => OD6S.passengerDamageDice = value
     })
 
     game.settings.register("od6s", "passenger_damage_dice", {
@@ -201,7 +201,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: false,
         type: Boolean,
-        onChange: (value: any) => OD6S.passengerDamageDice = value
+        onChange: (value: boolean) => OD6S.passengerDamageDice = value
     })
 
     game.settings.register("od6s", "dice_for_grenades", {
@@ -213,7 +213,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.grenadeDamageDice = value
+        onChange: (value: boolean) => OD6S.grenadeDamageDice = value
     })
 
     game.settings.register("od6s", "explosive_end_of_round", {
@@ -234,7 +234,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: true,
         type: Boolean,
-        onChange: (value: any) => OD6S.hideExplosiveTemplates = value
+        onChange: (value: boolean) => OD6S.hideExplosiveTemplates = value
     })
 
     game.settings.register("od6s", "explosive_zones", {
@@ -255,7 +255,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: false,
         type: Boolean,
-        onChange: (value: any) => OD6S.mapRange = value
+        onChange: (value: boolean) => OD6S.mapRange = value
     })
 
     game.settings.register("od6s", "melee_difficulty", {
@@ -267,7 +267,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.meleeDifficulty = value
+        onChange: (value: boolean) => OD6S.meleeDifficulty = value
     })
 
     game.settings.register("od6s", "cost", {
@@ -282,7 +282,7 @@ export function registerRulesSettings() {
             "0": game.i18n.localize("OD6S.CONFIG_COST_PRICE"),
             "1": game.i18n.localize("OD6S.CONFIG_COST_COST"),
         },
-        onChange: (value: any) => OD6S.cost = value
+        onChange: (value: string) => OD6S.cost = value
     })
 
     game.settings.register("od6s", "funds_fate", {
@@ -294,7 +294,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.fundsWild = value
+        onChange: (value: boolean) => OD6S.fundsWild = value
     })
 
     game.settings.register("od6s", "random_hit_locations", {
@@ -305,7 +305,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: false,
         type: Boolean,
-        onChange: (value: any) => OD6S.randomHitLocations = value
+        onChange: (value: boolean) => OD6S.randomHitLocations = value
     })
 
     game.settings.register("od6s", "pip_per_dice", {
@@ -316,7 +316,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: 3,
         type: Number,
-        onChange: (value: any) => OD6S.pipsPerDice = value
+        onChange: (value: number) => OD6S.pipsPerDice = value
     })
 
     game.settings.register("od6s", "flat_skills", {
@@ -328,7 +328,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.flatSkills = value
+        onChange: (value: boolean) => OD6S.flatSkills = value
     })
 
     game.settings.register("od6s", "skill_used", {
@@ -340,7 +340,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.flatSkills = value
+        onChange: (value: boolean) => OD6S.flatSkills = value
     })
 
     game.settings.register("od6s", "spec_link", {
@@ -352,7 +352,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.flatSkills = value
+        onChange: (value: boolean) => OD6S.flatSkills = value
     })
 
     game.settings.register("od6s", "initial_attributes", {
@@ -363,7 +363,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: OD6S.initialAttributes,
         type: Number,
-        onChange: (value: any) => OD6S.initialAttributes = value
+        onChange: (value: number) => OD6S.initialAttributes = value
     })
 
     game.settings.register("od6s", "initial_skills", {
@@ -375,7 +375,7 @@ export function registerRulesSettings() {
         default: OD6S.initialSkills,
         type: Number,
         requiresReload: true,
-        onChange: (value: any) => OD6S.initialSkills = value
+        onChange: (value: number) => OD6S.initialSkills = value
     })
 
     game.settings.register("od6s", "initial_character_points", {
@@ -386,7 +386,7 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: OD6S.initialCharacterPoints,
         type: Number,
-        onChange: (value: any) => OD6S.initialCharacterPoints = value
+        onChange: (value: number) => OD6S.initialCharacterPoints = value
     })
 
     game.settings.register("od6s", "initial_fate_points", {
@@ -398,7 +398,7 @@ export function registerRulesSettings() {
         default: OD6S.initialFatePoints,
         type: Number,
         requiresReload: true,
-        onChange: (value: any) => OD6S.initialFatePoints = value
+        onChange: (value: number) => OD6S.initialFatePoints = value
     })
 
     game.settings.register("od6s", "initial_move", {
@@ -409,6 +409,6 @@ export function registerRulesSettings() {
         od6sRules: true,
         default: OD6S.initialMove,
         type: Number,
-        onChange: (value: any) => OD6S.initialMove = value
+        onChange: (value: number) => OD6S.initialMove = value
     })
 }

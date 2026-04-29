@@ -6,127 +6,115 @@ import {od6sattributeedit} from "../attribute-edit";
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 
+interface DiceScore { dice: number; pips: number }
+
+/**
+ * Build an updated score for an "edit-X" two-input control: one input changes
+ * dice while the other holds pips (or vice versa). Returns the new total score.
+ */
+function recalcScoreFromInput(
+    target: HTMLInputElement,
+    diceInputId: string,
+    pipsInputId: string,
+    oldScore: DiceScore,
+): number {
+    const newScore: DiceScore = {dice: 0, pips: 0};
+    if (target.id === diceInputId) {
+        newScore.pips = oldScore.pips;
+        newScore.dice = +target.value;
+    } else if (target.id === pipsInputId) {
+        newScore.dice = oldScore.dice;
+        newScore.pips = +target.value;
+    } else {
+        return od6sutilities.getScoreFromDice(oldScore.dice, oldScore.pips);
+    }
+    return od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
+}
+
 /**
  * Register score-related event listeners (attributes, skills, specializations,
  * advances, funds, toughness, maneuverability, body points, etc.) on the actor sheet.
  */
-export function registerScoreListeners(html: any, sheet: any): void {
+export function registerScoreListeners(
+    html: HTMLElement[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sheet: any,
+): void {
     const el = html[0];
 
     // Rollable abilities.
     const rollDialog = new (od6sroll);
-    el.querySelectorAll('.rolldialog').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.rolldialog').forEach((elem) =>
         elem.addEventListener('click', rollDialog._onRollEvent.bind(sheet)));
-    el.querySelectorAll('.initrolldialog').forEach((elem: any) =>
-        elem.addEventListener('click', od6sInitRoll._onInitRollDialog.bind(sheet)));
-    el.querySelectorAll('.actionroll').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.initrolldialog').forEach((elem) =>
+        elem.addEventListener('click', od6sInitRoll._onInitRollDialog.bind(sheet) as unknown as EventListener));
+    el.querySelectorAll<HTMLElement>('.actionroll').forEach((elem) =>
         elem.addEventListener('click', rollDialog._onRollItem.bind(sheet)));
 
     // Attribute/skill advances
     const advanceDialog = new (od6sadvance);
-    el.querySelectorAll('.advancedialog').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.advancedialog').forEach((elem) =>
         elem.addEventListener('click', advanceDialog._onAdvance.bind(sheet)));
 
     // Attribute context menu (no-op handlers preserved)
-    el.querySelectorAll('.attributedialog').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.attributedialog').forEach((elem) =>
         elem.addEventListener('contextmenu', () => {}));
 
     // Skill context menu (no-op handlers preserved)
-    el.querySelectorAll('.skilldialog').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.skilldialog').forEach((elem) =>
         elem.addEventListener('contextmenu', () => {}));
 
     // Skill specialization
     const specializeDialog = new (od6sspecialize);
-    el.querySelectorAll('.specializedialog').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.specializedialog').forEach((elem) =>
         elem.addEventListener('click', specializeDialog._onSpecialize.bind(sheet)));
 
     // Free edit attribute
     const attributeEditDialog = new od6sattributeedit();
-    el.querySelectorAll('.attribute-edit').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.attribute-edit').forEach((elem) =>
         elem.addEventListener('click', attributeEditDialog._onAttributeEdit.bind(sheet)));
 
     // Edit funds
-    el.querySelectorAll('.edit-funds').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const newScore: any = {};
-            newScore.dice = 0;
-            newScore.pips = 0;
-            let updateScore = 0;
+    el.querySelectorAll<HTMLElement>('.edit-funds').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.funds.score);
-            if (ev.target.id === 'funds-dice') {
-                newScore.pips = oldScore.pips;
-                newScore.dice = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            } else if (ev.target.id === 'funds-pips') {
-                newScore.dice = oldScore.dice;
-                newScore.pips = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            }
-            const update: any = {};
-            update.id = sheet.document.id;
-            update[`system.funds.score`] = updateScore;
-            await sheet.document.update(update);
+            const updateScore = recalcScoreFromInput(target, 'funds-dice', 'funds-pips', oldScore);
+            await sheet.document.update({id: sheet.document.id, 'system.funds.score': updateScore});
             sheet.render();
         }));
 
     // Edit maneuverability
-    el.querySelectorAll('.edit-maneuverability').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const newScore: any = {};
-            newScore.dice = 0;
-            newScore.pips = 0;
-            let updateScore = 0;
+    el.querySelectorAll<HTMLElement>('.edit-maneuverability').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.maneuverability.score);
-            if (ev.target.id === 'maneuverability-dice') {
-                newScore.pips = oldScore.pips;
-                newScore.dice = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            } else if (ev.target.id === 'maneuverability-pips') {
-                newScore.dice = oldScore.dice;
-                newScore.pips = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            }
-            const update: any = {};
-            update.id = sheet.document.id;
-            update[`system.maneuverability.score`] = updateScore;
-            await sheet.document.update(update);
+            const updateScore = recalcScoreFromInput(target, 'maneuverability-dice', 'maneuverability-pips', oldScore);
+            await sheet.document.update({id: sheet.document.id, 'system.maneuverability.score': updateScore});
             sheet.render();
         }));
 
     // Edit toughness
-    el.querySelectorAll('.edit-toughness').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const newScore: any = {};
-            newScore.dice = 0;
-            newScore.pips = 0;
-            let updateScore = 0;
+    el.querySelectorAll<HTMLElement>('.edit-toughness').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.toughness.score);
-            if (ev.target.id === 'toughness-dice') {
-                newScore.pips = oldScore.pips;
-                newScore.dice = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            } else if (ev.target.id === 'toughness-pips') {
-                newScore.dice = oldScore.dice;
-                newScore.pips = (+ev.target.value);
-                updateScore = od6sutilities.getScoreFromDice(newScore.dice, newScore.pips);
-            }
-            const update: any = {};
-            update.id = sheet.document.id;
-            update[`system.toughness.score`] = updateScore;
-            await sheet.document.update(update);
+            const updateScore = recalcScoreFromInput(target, 'toughness-dice', 'toughness-pips', oldScore);
+            await sheet.document.update({id: sheet.document.id, 'system.toughness.score': updateScore});
             sheet.render();
         }));
 
     // Edit body points
-    el.querySelectorAll('.editbodypoints').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            await (sheet.document as any).setWoundLevelFromBodyPoints(ev.target.value);
+    el.querySelectorAll<HTMLElement>('.editbodypoints').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const target = ev.target as HTMLInputElement;
+            await sheet.document.setWoundLevelFromBodyPoints(+target.value);
             sheet.render();
         }));
 
     // Roll Body Points
-    el.querySelectorAll('.rollbodypoints').forEach((elem: any) =>
-        elem.addEventListener('click', async (_ev: any) => {
+    el.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
+        elem.addEventListener('click', async () => {
             const confirmText = "<p>" + game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS") + "</p>";
             await Dialog.prompt({
                 title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName),
@@ -138,32 +126,33 @@ export function registerScoreListeners(html: any, sheet: any): void {
         }));
 
     // Edit active effect (score-related effects)
-    el.querySelectorAll('.edit-effect').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
+    el.querySelectorAll<HTMLElement>('.edit-effect').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
             await sheet._editEffect(ev);
         }));
 
     // Event listener for skill usage checkboxes
-    el.querySelectorAll('.skill-used-checkbox, .spec-used-checkbox').forEach((elem: any) =>
-        elem.addEventListener('change', async (event: any) => {
-            const itemId = event.currentTarget.dataset.itemId;
+    el.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox').forEach((elem) =>
+        elem.addEventListener('change', async (event: Event) => {
+            const ct = event.currentTarget as HTMLInputElement;
+            const itemId = ct.dataset.itemId;
             const item = sheet.document.items.get(itemId);
 
             if (item) {
-                await item.update({'system.used.value': event.currentTarget.checked})
-                    .catch((err: any) => console.error('Failed to update item used status:', err));
+                await item.update({'system.used.value': ct.checked})
+                    .catch((err: unknown) => console.error('Failed to update item used status:', err));
             }
         }));
 
     // Event listener for Session Reset button
-    el.querySelectorAll('.session-reset-button').forEach((elem: any) =>
-        elem.addEventListener('click', (_event: any) => {
-            const checkboxes = el.querySelectorAll('.skill-used-checkbox, .spec-used-checkbox');
-            checkboxes.forEach((checkbox: any) => {
+    el.querySelectorAll<HTMLElement>('.session-reset-button').forEach((elem) =>
+        elem.addEventListener('click', () => {
+            const checkboxes = el.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox');
+            checkboxes.forEach((checkbox) => {
                 const itemId = checkbox.dataset.itemId;
                 const item = sheet.document.items.get(itemId);
                 if (item) {
-                    item.update({'system.used.value': false}).catch((err: any) => console.error(err));
+                    item.update({'system.used.value': false}).catch((err: unknown) => console.error(err));
                     checkbox.checked = false;
                 } else {
                     console.error("Item not found for reset: ", itemId);

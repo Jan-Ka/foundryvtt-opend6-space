@@ -25,15 +25,15 @@ export class OD6SActor extends Actor {
     /**
      * Augment the basic actor data with additional dynamic data.
      */
-    async _preCreate(data: any, options: any, user: any) {
+    async _preCreate(data: object, options: object, user: User) {
         await super._preCreate(data, options, user);
     }
 
-    async _onCreate(data: any, options: any, user: any) {
+    async _onCreate(data: object, options: object, user: User) {
         await super._onCreate(data, options, user);
         if (game.user.isGM || this.isOwner) {
             if (this.type === 'character') {
-                const update: any = {};
+                const update: Record<string, unknown> = {};
                 update.system = {
                     'created.value': false
                 }
@@ -63,7 +63,7 @@ export class OD6SActor extends Actor {
                     actorLink: true,
                     disposition: 0
                 });
-                const update: any = {};
+                const update: Record<string, unknown> = {};
                 update.id = this.id;
                 update[`ownership.default`] = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
                 await this.update(update);
@@ -108,6 +108,7 @@ export class OD6SActor extends Actor {
     }
 
     getVehicleActionScore(action: string) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let vehicle: any;
         let pilot: Actor | null;
 
@@ -131,14 +132,14 @@ export class OD6SActor extends Actor {
                 const spec = pilot.items.find(i => i.type === "specialization" &&
                     i.name === vehicle.specialization.value);
                 if (typeof spec !== 'undefined') {
-                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[vehicle.attribute.value].score)
+                    score = (+score) + (+(spec.system as OD6SSpecializationItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score)
                     found = true;
                 }
 
                 if (!found) {
                     const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill.value);
                     if (typeof (skill) !== 'undefined') {
-                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                        score = (+score) + (+(skill.system as OD6SSkillItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score);
                         found = true;
                     }
                 }
@@ -195,15 +196,15 @@ export class OD6SActor extends Actor {
         return resolveRollAction(this, actionId, msg);
     }
 
-    async applyDamage(damage: any) {
+    async applyDamage(damage: string) {
         return applyDamageHelper(this, damage);
     }
 
-    calculateNewDamageLevel(damage: any) {
+    calculateNewDamageLevel(damage: string) {
         return calculateNewDamageLevelHelper(this, damage);
     }
 
-    async applyWounds(wound: any) {
+    async applyWounds(wound: string) {
         return applyWoundsHelper(this, wound);
     }
 
@@ -219,11 +220,11 @@ export class OD6SActor extends Actor {
         return applyIncapacitatedFailureHelper(this);
     }
 
-    findFirstWoundLevel(table: any, wound: any) {
+    findFirstWoundLevel(table: Record<string, { core: string; description?: string; penalty?: number }>, wound: string) {
         return findFirstWoundLevelHelper(this, table, wound);
     }
 
-    calculateNewWoundLevel(wound: any) {
+    calculateNewWoundLevel(wound: string) {
         return calculateNewWoundLevelHelper(this, wound);
     }
 
@@ -267,7 +268,7 @@ export class OD6SActor extends Actor {
         return useCharacterPointOnRollHelper(this, message);
     }
 
-    async modifyShields(update: any) {
+    async modifyShields(update: Record<string, unknown>) {
         return modifyShieldsHelper(this, update);
     }
 
@@ -279,7 +280,7 @@ export class OD6SActor extends Actor {
         return vehicleCollisionHelper(this);
     }
 
-    async onCargoHoldItemCreate(event: any) {
+    async onCargoHoldItemCreate(event: Event) {
         return onCargoHoldItemCreateHelper(this, event);
     }
 }

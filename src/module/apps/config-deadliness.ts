@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const foundry: any;
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;

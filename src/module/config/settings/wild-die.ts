@@ -27,7 +27,7 @@ export function registerWildDieSettings() {
             "3": game.i18n.localize("OD6S.CONFIG_WILD_DIE_3")
         },
         requiresReload: true,
-        onChange: (value: any) => (OD6S.wildDieOneDefault = value)
+        onChange: (value: number) => (OD6S.wildDieOneDefault = value)
     })
 
     game.settings.register("od6s", "default_wild_die_one_handle", {
@@ -43,7 +43,7 @@ export function registerWildDieSettings() {
             "0": game.i18n.localize("OD6S.CONFIG_WILD_DIE_HANDLE_0"),
             "1": game.i18n.localize("OD6S.CONFIG_WILD_DIE_HANDLE_1")
         },
-        onChange: (value: any) => (OD6S.wildDieOneAuto = value)
+        onChange: (value: number) => (OD6S.wildDieOneAuto = value)
     })
 
     game.settings.register("od6s", "wild_die_one_face", {

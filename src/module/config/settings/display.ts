@@ -76,7 +76,7 @@ export function registerDisplaySettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.highlightEffects = value
+        onChange: (value: boolean) => OD6S.highlightEffects = value
     })
 
     game.settings.register("od6s", "show_skill_specialization", {
@@ -87,7 +87,7 @@ export function registerDisplaySettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: any) => OD6S.showSkillSpecialization = value
+        onChange: (value: boolean) => OD6S.showSkillSpecialization = value
     })
 
     game.settings.register("od6s", "show_metaphysics_attributes", {

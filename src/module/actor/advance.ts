@@ -4,7 +4,7 @@ import {AdvanceDialog} from "./advance-dialog";
 
 export class od6sadvance {
 
-    activateListeners(html: any)
+    activateListeners(html: HTMLElement | JQuery)
     {
         // @ts-expect-error super reference in mixin-style class
         super.activateListeners(html);
@@ -13,12 +13,12 @@ export class od6sadvance {
     async _onAdvance(event: Event) {
         event.preventDefault();
         const element = event.currentTarget as HTMLElement;
-        const dataset = (element as any).dataset;
+        const dataset = element.dataset;
         let originalScore = 0;
         const cpcost = 0;
         const base = dataset.base;
         const freeAdvance = Boolean(false);
-        let itemid = 0;
+        let itemid: string | number = 0;
         let used = false;
         let metaPhysicsSkill = false;
         const metaphysicsteacher = false;
@@ -38,10 +38,10 @@ export class od6sadvance {
             if (skill.system.attribute === 'met') {
                 metaPhysicsSkill = true;
             }
-            itemid = dataset.itemId;
+            itemid = dataset.itemId!;
             used = skill.system.used.value;
         } else if (dataset.type === "attribute") {
-            const attrname = dataset.attrname;
+            const attrname = dataset.attrname!;
             originalScore = actorData.attributes[attrname].base;
         } else if (dataset.type === "specialization") {
             const spec = (this as any).actor.getEmbeddedDocument("Item", dataset.itemId);
@@ -54,7 +54,7 @@ export class od6sadvance {
                         originalScore += (+actorData.attributes[attribute].base)
                 }
             }
-            itemid = dataset.itemId;
+            itemid = dataset.itemId!;
         }
 
         /* Structure to pass to dialog */
@@ -99,18 +99,18 @@ export class od6sadvance {
         }
     }
 
-    static async advanceAction(actor: any, advanceData: any, event: Event, dice?: any, pips?: any) {
+    static async advanceAction(actor: Actor, advanceData: any, event: Event, dice?: number, pips?: number) {
 
-        const actorData = actor.system;
+        const actorData = actor.system as OD6SCharacterSystem;
         const actorUpdate: any = {};
         const updates: any[] = [];
         actorUpdate.system = {};
-        let specs: any[] = [];
+        let specs: Item[] = [];
 
         /* freeadvance was checked, use form data instead */
         if (advanceData.freeadvance) {
             OD6S.flatSkills ? advanceData.score = advanceData.base :
-                advanceData.score = od6sutilities.getScoreFromDice(dice, pips);
+                advanceData.score = od6sutilities.getScoreFromDice(dice!, pips!);
         }
 
         /* Character Point cost is too high. */
@@ -121,20 +121,22 @@ export class od6sadvance {
             }
         }
 
+        const dataset = (event.currentTarget as HTMLElement).dataset;
+
         /* Determine item or attribute */
-        if ((event.currentTarget as any).dataset.type === "attribute") {
+        if (dataset.type === "attribute") {
             actorUpdate.system.attributes = {};
-            actorUpdate.system.attributes[(event.currentTarget as any).dataset.attrname] = {};
-            actorUpdate.system.attributes[(event.currentTarget as any).dataset.attrname].base = advanceData.score;
+            actorUpdate.system.attributes[dataset.attrname!] = {};
+            actorUpdate.system.attributes[dataset.attrname!].base = advanceData.score;
         }
 
-        if((event.currentTarget as any).dataset.type === "skill") {
+        if(dataset.type === "skill") {
             const skill = actor.items.get(advanceData.itemid);
 
             if(OD6S.specLink) {
                 /* Also advance any specializations derived from this skill */
-                specs = actor.items.filter((i: any) => i.type === 'specialization' &&
-                    i.system.skill === skill.name);
+                specs = actor.items.filter((i: Item) => i.type === 'specialization' &&
+                    (i.system as OD6SSpecializationItemSystem).skill === skill?.name);
             }
 
             /* Add/subtract to item score, not displayed/aggregate score */
@@ -157,7 +159,7 @@ export class od6sadvance {
                     let newSpecScore;
                     if (!OD6S.flatSkills) {
                         newSpecScore = (+newScore) +
-                            (+specs[spec].system.base);
+                            (+(specs[spec].system as OD6SSpecializationItemSystem).base);
                     }
                     updates.push({
                         _id: specs[spec]._id,
@@ -167,7 +169,7 @@ export class od6sadvance {
             }
         }
 
-        if((event.currentTarget as any).dataset.type === "specialization") {
+        if(dataset.type === "specialization") {
             /* Add/subtract to item score, not displayed/aggregate score */
             let newScore;
             OD6S.flatSkills ? newScore = advanceData.base : newScore = advanceData.score - advanceData.originalscore;

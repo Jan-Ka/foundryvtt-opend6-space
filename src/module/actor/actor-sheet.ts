@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
 import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
@@ -23,7 +25,6 @@ import {
 import {onDrop, onDropItem, onDropActor} from "./sheet-helpers/drops";
 import {onSortItem, onSortCrew, onSortCargoItem, onSortContainerItem} from "./sheet-helpers/sorting";
 
-declare const foundry: any;
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
 const ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;

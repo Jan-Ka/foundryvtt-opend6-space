@@ -5,32 +5,39 @@ import OD6S from "../../config/config-od6s";
 /**
  * Register inventory-related event listeners on the actor sheet.
  */
-export function registerInventoryListeners(html: any, sheet: any): void {
+export function registerInventoryListeners(
+    html: HTMLElement[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sheet: any,
+): void {
     const el = html[0];
 
     // Edit item quantity
-    el.querySelectorAll('.edit-quantity').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const item = await sheet.document.items.get(ev.currentTarget.dataset.itemId);
-            const update = {};
-            (update as any)[`system.quantity`] = ev.target.value
-            await item!.update(update);
+    el.querySelectorAll<HTMLElement>('.edit-quantity').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.get(ct.dataset.itemId);
+            await item!.update({
+                'system.quantity': (ev.target as HTMLInputElement).value,
+            });
         }));
 
     // Use a consumable
-    el.querySelectorAll('.use-consumable').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
-            const item = await sheet.document.items.get(ev.currentTarget.dataset.itemId);
-            const update: any = {};
-            update.id = item!._id;
-            update[`system.quantity`] = item!.system.quantity - 1;
-            await item!.update(update);
+    el.querySelectorAll<HTMLElement>('.use-consumable').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.get(ct.dataset.itemId);
+            const itemSys = item!.system as OD6SEquipment;
+            await item!.update({
+                id: item!._id,
+                'system.quantity': itemSys.quantity - 1,
+            });
 
             const actorEffectsList = sheet.document.getEmbeddedCollection('ActiveEffect');
 
             if (actorEffectsList.size > 0) {
-                const actorUpdate: any[] = [];
-                actorEffectsList.forEach((e: any) => {
+                const actorUpdate: Array<Record<string, unknown>> = [];
+                actorEffectsList.forEach((e: ActiveEffect) => {
                     const parts = e.origin?.split(".") ?? [];
                     const parentType = parts[0];
                     let documentType = parts[2];
@@ -40,14 +47,9 @@ export function registerInventoryListeners(html: any, sheet: any): void {
                         documentId = parts[5];
                     }
                     if (documentType === "Item") {
-                        const effectItem = sheet.document.items.find((i: any) => i.id === documentId);
-                        if (effectItem) {
-                            if (e.disabled === true) {
-                                const effectUpdate: any = {};
-                                effectUpdate._id = e.id;
-                                effectUpdate.disabled = false;
-                                actorUpdate.push(effectUpdate);
-                            }
+                        const effectItem = sheet.document.items.find((i: Item) => i.id === documentId);
+                        if (effectItem && e.disabled === true) {
+                            actorUpdate.push({_id: e.id, disabled: false});
                         }
                     }
                 })
@@ -56,22 +58,23 @@ export function registerInventoryListeners(html: any, sheet: any): void {
         }));
 
     // Equip an item
-    el.querySelectorAll('.equip-checkbox').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const item = sheet.document.items.find((i: any) => i.id === ev.currentTarget.dataset.itemId);
+    el.querySelectorAll<HTMLElement>('.equip-checkbox').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.find((i: Item) => i.id === ct.dataset.itemId);
 
             if (item) {
-                const update: any = {};
-                update.id = item.id;
-                update['system.equipped.value'] = !item.system.equipped.value;
-
-                await item.update(update);
+                const itemSys = item.system as OD6SEquip;
+                await item.update({
+                    id: item.id,
+                    'system.equipped.value': !itemSys.equipped.value,
+                });
                 const actorEffectsList = sheet.document.getEmbeddedCollection('ActiveEffect');
 
                 if (actorEffectsList.size > 0) {
-                    const actorUpdate: any[] = [];
-                    const itemUpdates: any[] = [];
-                    actorEffectsList.forEach((e: any) => {
+                    const actorUpdate: Array<Record<string, unknown>> = [];
+                    const itemUpdates: Array<Record<string, unknown>> = [];
+                    actorEffectsList.forEach((e: ActiveEffect) => {
                         const parts = e.origin?.split(".") ?? [];
                         const parentType = parts[0];
                         let documentType = parts[2];
@@ -81,38 +84,32 @@ export function registerInventoryListeners(html: any, sheet: any): void {
                             documentId = parts[5];
                         }
                         if (documentType === "Item") {
-                            const effectItem = sheet.document.items.find((i: any) => i.id === documentId);
-                            if (effectItem && !effectItem.system.consumable &&
-                                OD6S.equippable.includes(effectItem.type)) {
-                                if (e.disabled === effectItem.system.equipped.value) {
-                                    if (!effectItem.system.equipped.value) {
-                                        for (let i = 0; i < e.changes.length; i++) {
-                                            const c = e.changes[i];
-                                            if (c.key.startsWith('system.items.skills')) {
-                                                if (c.mode === 2) {
-                                                    const t = c.key.split('.');
-                                                    const foundItem = sheet.document.items.find((i: any) => i.name === t[3]);
-                                                    const itemUpdate: any = {};
-                                                    itemUpdate.id = foundItem!.id;
-                                                    itemUpdate.system = {};
-                                                    itemUpdate.system.mod = 0;
-                                                    itemUpdates.push(itemUpdate);
-                                                }
-                                            }
-                                        }
+                            const effectItem = sheet.document.items.find((i: Item) => i.id === documentId);
+                            if (!effectItem || !OD6S.equippable.includes(effectItem.type)) return;
+                            const effSys = effectItem.system as OD6SEquip & {consumable?: boolean};
+                            if (effSys.consumable || e.disabled !== effSys.equipped.value) return;
+                            if (!effSys.equipped.value) {
+                                for (const c of e.changes) {
+                                    if (c.key.startsWith('system.items.skills') && c.mode === 2) {
+                                        const t = c.key.split('.');
+                                        const foundItem = sheet.document.items.find((i: Item) => i.name === t[3]);
+                                        itemUpdates.push({
+                                            id: foundItem!.id,
+                                            system: {mod: 0},
+                                        });
                                     }
-                                    const effectUpdate: any = {};
-                                    effectUpdate._id = e.id;
-                                    effectUpdate.disabled = !item.system.equipped.value;
-                                    actorUpdate.push(effectUpdate);
                                 }
                             }
+                            actorUpdate.push({
+                                _id: e.id,
+                                disabled: !itemSys.equipped.value,
+                            });
                         }
                     })
                     await sheet.document.updateEmbeddedDocuments('ActiveEffect', actorUpdate);
-                    for (let u = 0; u < itemUpdates.length; u++) {
-                        const a = sheet.document.items.find((i: any) => i.id === itemUpdates[u].id);
-                        await a!.update(itemUpdates[u]);
+                    for (const u of itemUpdates) {
+                        const a = sheet.document.items.find((i: Item) => i.id === u.id);
+                        await a!.update(u);
                     }
                 }
             }
@@ -120,49 +117,50 @@ export function registerInventoryListeners(html: any, sheet: any): void {
         }));
 
     // Update Inventory Item
-    el.querySelectorAll('.item-edit').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
+    el.querySelectorAll<HTMLElement>('.item-edit').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
             let itemId;
-            if (typeof (ev.currentTarget.dataset.itemId) !== 'undefined' &&
-                ev.currentTarget.dataset.itemId !== '') {
-                itemId = ev.currentTarget.dataset.itemId
+            if (typeof ct.dataset.itemId !== 'undefined' && ct.dataset.itemId !== '') {
+                itemId = ct.dataset.itemId;
             } else {
-                const li = ev.currentTarget.closest(".item");
-                itemId = li?.dataset?.itemId;
+                const li = ct.closest<HTMLElement>(".item");
+                itemId = li?.dataset.itemId;
             }
             const item = sheet.document.items.get(itemId);
             item!.sheet.render(true);
         }));
 
     // Delete Inventory Item
-    el.querySelectorAll('.item-delete').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
+    el.querySelectorAll<HTMLElement>('.item-delete').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             await sheet.deleteItem(ev);
         }));
 
     // Add Inventory Item
-    el.querySelectorAll('.item-create').forEach((elem: any) =>
+    el.querySelectorAll<HTMLElement>('.item-create').forEach((elem) =>
         elem.addEventListener('click', sheet._onItemCreate.bind(sheet)));
-    el.querySelectorAll('.cargo-hold-add').forEach((elem: any) =>
-        elem.addEventListener('click', (sheet.document as any).onCargoHoldItemCreate.bind(sheet.document)));
+    el.querySelectorAll<HTMLElement>('.cargo-hold-add').forEach((elem) =>
+        elem.addEventListener('click', sheet.document.onCargoHoldItemCreate.bind(sheet.document)));
 
     // Add Item to actor using a button
-    el.querySelectorAll('.item-add').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
+    el.querySelectorAll<HTMLElement>('.item-add').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             await sheet.addItem(ev);
         }));
 
     // Show item details
-    el.querySelectorAll('.show-item-details').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
+    el.querySelectorAll<HTMLElement>('.show-item-details').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
-            let item = game!.actors.get(ev.currentTarget.dataset.actorId)?.items.get(ev.currentTarget.dataset.itemId);
-            if (typeof (item) !== 'undefined') {
+            const ct = ev.currentTarget as HTMLElement;
+            let item = game.actors.get(ct.dataset.actorId!)?.items.get(ct.dataset.itemId!);
+            if (typeof item !== 'undefined') {
                 new OD6SItemInfo(item).render(true);
             } else {
-                const itemName = ev.currentTarget.dataset.itemName;
+                const itemName = ct.dataset.itemName!;
                 item = await od6sutilities._getItemFromWorld(itemName);
                 if (item) {
                     new OD6SItemInfo(item.data).render(true);
@@ -177,64 +175,61 @@ export function registerInventoryListeners(html: any, sheet: any): void {
         }));
 
     // Purchase click event
-    el.querySelectorAll('.item-purchase').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
-            if (typeof (game.user.character) === 'undefined') {
+    el.querySelectorAll<HTMLElement>('.item-purchase').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            if (typeof game.user.character === 'undefined') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
                 return;
             }
+            const ct = ev.currentTarget as HTMLElement;
             if (OD6S.cost === '0') {
-                await sheet.rollPurchase(ev, game!.user.character!.id);
+                await sheet.rollPurchase(ev, game.user.character!.id);
             } else {
-                await sheet._onPurchase(ev.currentTarget.dataset.itemId, game!.user.character!.id);
+                await sheet._onPurchase(ct.dataset.itemId, game.user.character!.id);
             }
         }));
 
     // Transfer click event
-    el.querySelectorAll('.item-transfer').forEach((elem: any) =>
-        elem.addEventListener('click', async (ev: any) => {
-            if (typeof (game.user.character) === 'undefined') {
+    el.querySelectorAll<HTMLElement>('.item-transfer').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            if (typeof game.user.character === 'undefined') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
                 return;
             }
-            await sheet._onTransfer(ev.currentTarget.dataset.itemId,
-                ev.currentTarget.dataset.senderId,
-                ev.currentTarget.dataset.recId);
+            const ct = ev.currentTarget as HTMLElement;
+            await sheet._onTransfer(ct.dataset.itemId, ct.dataset.senderId, ct.dataset.recId);
         }));
 
     // Merchant owner edit quantity
-    el.querySelectorAll('.merchant-quantity-owner').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const item = sheet.document.items.get(ev.currentTarget.dataset.itemId);
-            const update: any = {};
-            update._id = item!.id;
-            update.system = {};
-            update.system.quantity = ev.target.value;
-
-            await sheet.document.updateEmbeddedDocuments('Item', [update]);
+    el.querySelectorAll<HTMLElement>('.merchant-quantity-owner').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.get(ct.dataset.itemId);
+            await sheet.document.updateEmbeddedDocuments('Item', [{
+                _id: item!.id,
+                system: {quantity: (ev.target as HTMLInputElement).value},
+            }]);
         }));
 
     // Merchant owner edit cost
-    el.querySelectorAll('.merchant-cost-owner').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const item = sheet.document.items.get(ev.currentTarget.dataset.itemId);
-            const update: any = {};
-            update._id = item!.id;
-            update.system = {};
-            update.system.cost = ev.target.value;
-
-            await sheet.document.updateEmbeddedDocuments('Item', [update]);
+    el.querySelectorAll<HTMLElement>('.merchant-cost-owner').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.get(ct.dataset.itemId);
+            await sheet.document.updateEmbeddedDocuments('Item', [{
+                _id: item!.id,
+                system: {cost: (ev.target as HTMLInputElement).value},
+            }]);
         }));
 
     // Merchant owner edit price
-    el.querySelectorAll('.merchant-price-owner').forEach((elem: any) =>
-        elem.addEventListener('change', async (ev: any) => {
-            const item = sheet.document.items.get(ev.currentTarget.dataset.itemId);
-            const update: any = {};
-            update._id = item!.id;
-            update.system = {};
-            update.system.price = ev.target.value;
-
-            await sheet.document.updateEmbeddedDocuments('Item', [update]);
+    el.querySelectorAll<HTMLElement>('.merchant-price-owner').forEach((elem) =>
+        elem.addEventListener('change', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const item = sheet.document.items.get(ct.dataset.itemId);
+            await sheet.document.updateEmbeddedDocuments('Item', [{
+                _id: item!.id,
+                system: {price: (ev.target as HTMLInputElement).value},
+            }]);
         }));
 }

@@ -7,9 +7,15 @@ import {OD6SChooseTarget} from "../apps/choose-target";
 import {OD6SHandleWildDieForm} from "../apps/handle-wild-die";
 
 // Delegated event helper: attaches a listener on a parent that fires when a child matching selector is the target
-function delegateEvent(parent: any, eventType: any, selector: any, handler: any) {
-    parent.addEventListener(eventType, (ev: any) => {
-        const target = ev.target.closest(selector);
+function delegateEvent(
+    parent: HTMLElement,
+    eventType: string,
+    selector: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handler: (ev: any) => void,
+) {
+    parent.addEventListener(eventType, (ev: Event) => {
+        const target = (ev.target as Element | null)?.closest(selector);
         if (target && parent.contains(target)) {
             // Make ev.currentTarget behave like jQuery delegation
             Object.defineProperty(ev, 'currentTarget', { value: target, configurable: true });

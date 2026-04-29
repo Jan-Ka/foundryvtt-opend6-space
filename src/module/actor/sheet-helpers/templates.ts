@@ -8,7 +8,7 @@ export async function onDropCharacterTemplate(sheet: any, event: any, item: any,
     if (!sheet.document.isOwner) return false;
     if (sheet.document.type !== 'character') return false;
     // Check if a template has already been assigned to this actor
-    if (sheet.document.items.find((E: any) => E.type === 'character-template')) {
+    if (sheet.document.items.find((E: Item) => E.type === 'character-template')) {
         ui.notifications.error(game.i18n.localize("OD6S.ERROR_TEMPLATE_ALREADY_ASSIGNED"));
         return false;
     } else {
@@ -25,7 +25,7 @@ export async function onDropSpeciesTemplate(sheet: any, event: any, item: any, _
 
     if (!sheet.document.isOwner) return false;
     if (sheet.document.type !== 'character' && sheet.document.type !== 'npc') return false;
-    if (sheet.document.items.find((E: any) => E.type === 'species-template')) {
+    if (sheet.document.items.find((E: Item) => E.type === 'species-template')) {
         ui.notifications.error(game.i18n.localize("OD6S.ERROR_SPECIES_TEMPLATE_ALREADY_ASSIGNED"));
         return false;
     }
@@ -122,14 +122,14 @@ export async function templateItems(sheet: any, itemList: any) {
         // Filter out duplicate skills/specializations by name
         if (i.type === 'skill' || i.type === 'specialization' || i.type === 'specialability' ||
             i.type === 'disadvantage' || i.type === 'advanatage') {
-            if (sheet.document.items.filter((e: any) => e.type === i.type && e.name === i.name).length) {
+            if (sheet.document.items.filter((e: Item) => e.type === i.type && e.name === i.name).length) {
                 continue;
             }
         }
 
         // Metaphysics skills get 1D if the attribute is not used
-        if (templateItem.type === 'skill' && templateItem.system.attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
-            templateItem.system.base = OD6S.pipsPerDice;
+        if (templateItem.type === 'skill' && (templateItem.system as OD6SSkillItemSystem).attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+            (templateItem.system as OD6SSkillItemSystem).base = OD6S.pipsPerDice;
         }
 
         result.push(templateItem);
@@ -142,7 +142,7 @@ export async function templateItems(sheet: any, itemList: any) {
  */
 export async function onClearCharacterTemplate(sheet: any) {
     // Find the template
-    const item = sheet.document.items.find((E: any) => E.type === 'character-template');
+    const item = sheet.document.items.find((E: Item) => E.type === 'character-template');
     if (item) {
         const itemData = item.system;
         const update: any = {};
@@ -154,7 +154,7 @@ export async function onClearCharacterTemplate(sheet: any) {
         }
 
         update.system['chartype.content'] = "";
-        const speciesTemplate = sheet.document.items.find((E: any) => E.type === 'species-template');
+        const speciesTemplate = sheet.document.items.find((E: Item) => E.type === 'species-template');
         if (!speciesTemplate) update.system['species.content'] = "";
         update.system['fatepoints.value'] = 0;
         update.system['characterpoints.value'] = 0;
@@ -168,7 +168,7 @@ export async function onClearCharacterTemplate(sheet: any) {
 
         if (itemData.items !== null && typeof(itemData.items !== 'undefined')) {
             for (const templateItem of itemData.items) {
-                const actorItem = sheet.document.items.find((I: any) => I.name === templateItem.name);
+                const actorItem = sheet.document.items.find((I: Item) => I.name === templateItem.name);
                 if (typeof (actorItem) !== 'undefined') {
                     await sheet.document.deleteEmbeddedDocuments('Item', [actorItem.id]);
                 }
@@ -192,7 +192,7 @@ export async function onClearSpeciesTemplate(sheet: any) {
     const update: any = {};
     update.system = {};
 
-    const item = sheet.document.items.find((E: any) => E.type === 'species-template');
+    const item = sheet.document.items.find((E: Item) => E.type === 'species-template');
     if (item) {
         const itemData = item.system;
 
@@ -206,7 +206,7 @@ export async function onClearSpeciesTemplate(sheet: any) {
         }
 
         // Clear the species name from the template; check if a character template is applied and replace it from there
-        const characterTemplate = sheet.document.items.find((E: any) => E.type === 'character-template');
+        const characterTemplate = sheet.document.items.find((E: Item) => E.type === 'character-template');
         if (characterTemplate) {
             update[`system.species.content`] = characterTemplate.system.species;
         } else {
@@ -216,7 +216,7 @@ export async function onClearSpeciesTemplate(sheet: any) {
         // Remove items
         if (itemData.items !== null && typeof(itemData.items !== 'undefined')) {
             for (const templateItem of itemData.items) {
-                const actorItem = sheet.document.items.find((I: any) => I.name === templateItem.name);
+                const actorItem = sheet.document.items.find((I: Item) => I.name === templateItem.name);
                 if (typeof (actorItem) !== 'undefined') {
                     await sheet.document.deleteEmbeddedDocuments('Item', [actorItem.id]);
                 }

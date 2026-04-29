@@ -55,9 +55,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                 item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!.find((i: any) =>i.id === data.itemId);
             }
         }
-        if (item?.system.subtype?.toLowerCase() === 'explosive') {
+        if ((item?.system as OD6SWeaponItemSystem | undefined)?.subtype?.toLowerCase() === 'explosive') {
             isExplosive = true;
-            if (!item.getFlag('od6s','explosiveSet')) {
+            if (!item!.getFlag('od6s','explosiveSet')) {
                 const exdata = {
                     options: OD6S.explosives,
                     item: item!,
@@ -231,13 +231,14 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
         isAttack = true;
         if (typeof (vehicleWeapon) !== 'undefined') {
-            damageScore = vehicleWeapon.system.damage.score;
-            damageType = vehicleWeapon.system.damage.type;
-            if (vehicleWeapon.system.mods.damage !== 0) damageScore += vehicleWeapon.system.mods.damage;
-            if (vehicleWeapon.system.mods.difficulty !== 0) miscMod += vehicleWeapon.system.mods.difficulty;
-            if (vehicleWeapon.system.mods.attack !== 0) bonusmod += vehicleWeapon.system.mods.attack;
-            if (vehicleWeapon.system.scale.score) {
-                attackerScale = vehicleWeapon.system.scale.score;
+            const vwSys = vehicleWeapon.system as OD6SVehicleWeaponItemSystem;
+            damageScore = vwSys.damage.score;
+            damageType = vwSys.damage.type;
+            if (vwSys.mods.damage !== 0) damageScore += vwSys.mods.damage;
+            if (vwSys.mods.difficulty !== 0) miscMod += vwSys.mods.difficulty;
+            if (vwSys.mods.attack !== 0) bonusmod += vwSys.mods.attack;
+            if (vwSys.scale.score) {
+                attackerScale = vwSys.scale.score;
             } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || (data.actor.system as OD6SVehicleSystem)?.embedded_pilot) {
                 attackerScale = data.actor.system.scale.score;
             } else {
@@ -341,11 +342,11 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                     && i.name === game.i18n.localize('OD6S.MELEE_COMBAT'));
                 if (typeof (skill) !== 'undefined') {
                     if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[skill.system.attribute.toLowerCase()].score;
-                        flatPips = skill.system.score;
+                        data.score = (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
+                        flatPips = (skill.system as OD6SSkillItemSystem).score;
                     } else {
-                        data.score = skill.system.score +
-                            data.actor.system.attributes[skill.system.attribute.toLowerCase()].score;
+                        data.score = (skill.system as OD6SSkillItemSystem).score +
+                            (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
                     }
                 } else {
                     data.score = data.actor.system.attributes.agi.score;
@@ -357,11 +358,11 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                     && i.name === game.i18n.localize('OD6S.BRAWL'));
                 if (typeof (skill) !== 'undefined') {
                     if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[skill.system.attribute.toLowerCase()].score;
-                        flatPips = skill.system.score;
+                        data.score = (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
+                        flatPips = (skill.system as OD6SSkillItemSystem).score;
                     } else {
-                        data.score = skill.system.score +
-                            data.actor.system.attributes[skill.system.attribute.toLowerCase()].score;
+                        data.score = (skill.system as OD6SSkillItemSystem).score +
+                            (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
                     }
                 } else {
                     const bAttr = game.settings.get('od6s', 'brawl_attribute')
@@ -417,7 +418,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     if ((data.type === 'skill') || (data.type === 'specialization')) {
         isVisible = !game.settings.get('od6s', 'hide-skill-cards');
-        attribute = data.actor.items.filter((i: Item) => i.id === data.itemId)[0].system.attribute.toLowerCase();
+        attribute = (data.actor.items.filter((i: Item) => i.id === data.itemId)[0].system as OD6SSkillItemSystem).attribute.toLowerCase();
         if (typeof (attribute) === 'undefined') {
             attribute = null;
         } else {
@@ -599,10 +600,11 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             const item = data.actor.items.get(data.itemId!);
             if (typeof (item) !== 'undefined') {
                 if (item.type === 'specialization') {
-                    specSkill = item.system.skill;
+                    specSkill = (item.system as OD6SSpecializationItemSystem).skill;
                 } else {
-                    if (data.name === item.system.stats.specialization) {
-                        specSkill = item.system.stats.skill;
+                    const wsys = item.system as OD6SWeaponItemSystem;
+                    if (data.name === wsys.stats.specialization) {
+                        specSkill = wsys.stats.skill;
                     }
                 }
             }
@@ -612,8 +614,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (data.type === 'damage') {
         if (data.itemId) {
             const item = data.actor.items.get(data.itemId);
-            if (item?.system.damaged > 0) {
-                const score = od6sutilities.getScoreFromDice(rollValues.dice, rollValues.pips) - OD6S.weaponDamage[item!.system.damaged].penalty;
+            const wsys = item?.system as OD6SWeaponItemSystem | undefined;
+            if (wsys && wsys.damaged > 0) {
+                const score = od6sutilities.getScoreFromDice(rollValues.dice, rollValues.pips) - OD6S.weaponDamage[wsys.damaged].penalty;
                 rollValues.dice = od6sutilities.getDiceFromScore(score).dice;
                 rollValues.pips = od6sutilities.getDiceFromScore(score).pips;
             }

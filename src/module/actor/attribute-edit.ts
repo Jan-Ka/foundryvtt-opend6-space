@@ -1,6 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
 import {od6sutilities} from "../system/utilities";
 
-declare const foundry: any;
 
 export class od6sattributeedit {
 
