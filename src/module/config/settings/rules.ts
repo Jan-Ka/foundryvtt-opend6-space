@@ -51,7 +51,7 @@ export function registerRulesSettings() {
         default: false,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: boolean) => (OD6S.highHitDamage = value)
+        onChange: (value: boolean) => (OD6S.weaponArmorDamage = value)
     })
 
     game.settings.register("od6s", "track_stuns", {
@@ -340,7 +340,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: boolean) => OD6S.flatSkills = value
+        onChange: (value: boolean) => OD6S.skillUsed = value
     })
 
     game.settings.register("od6s", "spec_link", {
@@ -352,7 +352,7 @@ export function registerRulesSettings() {
         default: true,
         type: Boolean,
         requiresReload: true,
-        onChange: (value: boolean) => OD6S.flatSkills = value
+        onChange: (value: boolean) => OD6S.specLink = value
     })
 
     game.settings.register("od6s", "initial_attributes", {

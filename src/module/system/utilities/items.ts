@@ -30,9 +30,9 @@ export async function getSkillsFromTemplate(items: Item[]): Promise<Item[]> {
 export async function _getItemFromCompendiumId(id: string): Promise<Item | null> {
     let packs: CompendiumPack[];
     if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s');
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
     } else {
-        packs = game.packs.contents;
+        packs = game.packs.filter((p) => p.documentName === 'Item');
     }
     for (const p of packs) {
         const index = await p.getIndex();
@@ -50,9 +50,9 @@ export async function _getItemFromCompendiumId(id: string): Promise<Item | null>
 export async function _getItemFromCompendium(itemName: string): Promise<Item | null> {
     let packs: CompendiumPack[];
     if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s');
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
     } else {
-        packs = game.packs.contents;
+        packs = game.packs.filter((p) => p.documentName === 'Item');
     }
     for (const p of packs) {
         const index = await p.getIndex();

@@ -57,12 +57,13 @@ export function registerCombatActionListeners(
             await sheet.document.setFlag('od6s', 'fatepointeffect', !inEffect);
             inEffect = sheet.document.getFlag('od6s', 'fatepointeffect');
             if (inEffect) {
+                const newValue = sheet.document.system.fatepoints.value - 1;
                 const update: Record<string, unknown> = {
                     id: sheet.document.id,
                     _id: sheet.document._id,
                     system: {
                         fatepoints: {
-                            value: sheet.document.system.fatepoints.value -= 1,
+                            value: newValue,
                         },
                     },
                 };
