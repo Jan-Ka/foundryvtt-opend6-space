@@ -25,7 +25,17 @@ export default defineConfig({
     expect: {timeout: 10_000},
     fullyParallel: false,
     workers: 1,
-    reporter: process.env.CI ? "list" : [["list"]],
+    // Reporters: stdout `list` for humans, plus persisted `json` (under
+    // test-results/) and `html` (under playwright-report/, separate folder
+    // because the HTML reporter wipes its output dir before regenerating
+    // and would otherwise clobber traces/screenshots in test-results/).
+    // The `task test:smoke` wrapper also tees raw stdout/stderr to
+    // test-results/smoke.log.
+    reporter: [
+        ["list"],
+        ["json", {outputFile: "test-results/smoke-report.json"}],
+        ["html", {outputFolder: "playwright-report", open: "never"}],
+    ],
     retries: 0,
     globalSetup: "./tests/smoke/global-setup.ts",
     globalTeardown: "./tests/smoke/global-teardown.ts",
