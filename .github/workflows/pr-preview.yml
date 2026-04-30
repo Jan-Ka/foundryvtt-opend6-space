@@ -1,0 +1,114 @@
+name: PR preview build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Stamp preview version into system.json
+        run: |
+          set -eu
+          PR="${{ github.event.pull_request.number }}"
+          SHA="${GITHUB_SHA::7}"
+          PREVIEW="0.0.0-pr${PR}+${SHA}"
+          sed -i "s|\"version\":.*|\"version\": \"${PREVIEW}\",|" src/system.json
+
+      - run: pnpm run build
+
+      - name: Package zip
+        run: |
+          set -eu
+          mkdir -p build/artifacts
+          cp -r src build/od6s
+          (cd build && zip -r artifacts/od6s.zip od6s/)
+          (cd build/artifacts && sha256sum od6s.zip > od6s.zip.sha256)
+
+      - name: Upload preview artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: |
+            build/artifacts/od6s.zip
+            build/artifacts/od6s.zip.sha256
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Post / update preview comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WIKI_URL: ${{ github.server_url }}/${{ github.repository }}/wiki
+          ARTIFACT_NAME: od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+          MARKER='<!-- pr-preview-build -->'
+          BODY_FILE="$(mktemp)"
+          {
+            echo "$MARKER"
+            echo "### Preview build ready"
+            echo
+            echo "**Download:** [Workflow artifacts](${RUN_URL}#artifacts) — artifact name \`${ARTIFACT_NAME}\`"
+            echo
+            echo "- Commit: \`${HEAD_SHA}\`"
+            echo "- Stamped version: \`0.0.0-pr${PR_NUMBER}\` (+sha)"
+            echo "- Retention: 14 days (GitHub login required to download)"
+            echo
+            echo "#### Install into Foundry"
+            echo
+            echo "1. **Back up your world** before testing a preview build."
+            echo "2. Sign in to GitHub and click the artifact link above to download the artifact zip."
+            echo "3. Unzip it. Inside you'll find \`od6s.zip\` and a \`.sha256\` checksum."
+            echo "4. Quit Foundry. In your Foundry user data folder, locate \`Data/systems/\`."
+            echo "   - If \`od6s\` already exists there, rename or remove it first (this preview will replace it)."
+            echo "5. Extract \`od6s.zip\` into \`Data/systems/\` so you end up with \`Data/systems/od6s/system.json\`."
+            echo "6. Start Foundry. The system should appear as **OpenD6 Space** with the preview version stamped above."
+            echo
+            echo "> Foundry's *Install System → Manifest URL* flow does **not** work for PR previews — artifacts require a logged-in download, so manual extraction is the only path. Stable installs will continue to use the manifest URL from tagged releases."
+            echo
+            echo "More detail / troubleshooting: see the [project wiki](${WIKI_URL})."
+            echo
+            echo "_This comment is updated automatically on every push._"
+          } > "$BODY_FILE"
+
+          # Find an existing sticky comment by marker.
+          COMMENT_ID="$(
+            gh api --paginate "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+              --jq ".[] | select(.body | startswith(\"${MARKER}\")) | .id" \
+              | head -n1
+          )"
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/${REPO}/issues/comments/${COMMENT_ID}" \
+              -F body=@"$BODY_FILE" >/dev/null
+            echo "Updated comment ${COMMENT_ID}."
+          else
+            gh api --method POST "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+              -F body=@"$BODY_FILE" >/dev/null
+            echo "Created new preview comment."
+          fi
