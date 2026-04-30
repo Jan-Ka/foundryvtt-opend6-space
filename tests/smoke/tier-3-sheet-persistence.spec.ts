@@ -112,10 +112,13 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
     });
 
     test("attribute-edit form serializes dice/pips values", async ({page}) => {
-        // Drives the DialogV2.input() form data path: a <form> wrapping the
-        // template should produce a FormData snapshot containing dice and
-        // pips. Without `name=` attributes the snapshot is empty and the
-        // characteristic update silently no-ops.
+        // Drives the DialogV2.input() form data path. DialogV2 wraps
+        // `options.content` inside its own <form class="dialog-form">,
+        // so the template itself must NOT carry a <form> wrapper —
+        // otherwise the inputs end up nested and parsing rules drop
+        // them. This test mirrors that arrangement: parse the template
+        // into a plain <div>, then put that <div> inside a fresh
+        // <form> (the role DialogV2 plays) and read FormData.
         await loginAndWaitReady(page);
 
         const data = await evalInWorld(page, async () => {
@@ -123,14 +126,26 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
                 "systems/od6s/templates/actor/common/attribute-edit.html",
                 {score: 5},
             );
+            const content = document.createElement("div");
+            content.innerHTML = html;
+            // Asserting the template itself is form-free guards against
+            // a regression that would re-introduce the nested-<form>
+            // pattern this PR exists to remove.
+            const innerForms = content.querySelectorAll("form");
             const form = document.createElement("form");
-            form.innerHTML = html;
+            form.appendChild(content);
             (form.querySelector("#dice") as HTMLInputElement).value = "3";
             (form.querySelector("#pips") as HTMLInputElement).value = "2";
             const fd = new FormData(form);
-            return {dice: fd.get("dice"), pips: fd.get("pips")};
+            return {
+                dice: fd.get("dice"),
+                pips: fd.get("pips"),
+                templateHasInnerForm: innerForms.length > 0,
+            };
         });
 
+        expect(data.templateHasInnerForm, "attribute-edit template must not wrap content in <form>")
+            .toBe(false);
         expect(data.dice).toBe("3");
         expect(data.pips).toBe("2");
     });
