@@ -49,13 +49,33 @@ LevelDB packs in `src/packs/`. The `starships` pack is intentionally empty.
 pnpm run test:smoke
 ```
 
-Requires a running Foundry world at `localhost:30000`. Configure via env:
+Requires a running Foundry process at `localhost:30000` with the `od6s`
+system installed. Configure via env:
 
 ```
 FOUNDRY_URL=http://localhost:30000
 FOUNDRY_USER=Gamemaster
-FOUNDRY_PASSWORD=          # leave blank for passwordless GM
+FOUNDRY_GM_PASSWORD=            # per-user GM join password (blank for fresh worlds)
+FOUNDRY_ADMIN_KEY=              # server admin password gating /setup (blank if Foundry has none)
+FOUNDRY_SMOKE_WORLD=od6s-smoke  # world id the suite owns
+FOUNDRY_SYSTEM_ID=od6s          # system to use when creating the world
 ```
+
+Note: `FOUNDRY_PASSWORD` is intentionally *not* read by the smoke harness —
+it is reserved for the foundryvtt.com website password that
+`task foundry:start` uses to activate the container's license.
+
+A `globalSetup` orchestrates the world lifecycle:
+
+- If Foundry sits at `/auth`, submits the admin password.
+- If Foundry sits at `/setup`, launches `od6s-smoke` if it exists; creates
+  it (system: `od6s`) and launches it if it doesn't.
+- If Foundry is already at `/join` or `/game`, attaches.
+
+Each spec then asserts `game.world.id === FOUNDRY_SMOKE_WORLD` via
+`loginAndWaitReady`, so a misconfigured run can't trample a developer's
+personal campaign on the same Foundry instance. Suite fails fast (≈3 s)
+with an actionable message on every failure mode.
 
 Expected: **18/18 tests pass** with a `[smoke teardown]` line listing removed
 actors/items. Any failure prints a screenshot path and trace zip for
