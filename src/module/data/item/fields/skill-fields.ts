@@ -4,10 +4,13 @@ const fields = foundry.data.fields;
  * Skill / specialization shared progression fields.
  *
  * Score-field convention (consumers must follow):
- *   - `base + mod`     → own progression in pips. Persisted; reset by
- *                        `applyMods()`.
- *   - `score`          → derived `base + mod`. Roll-formula consumers read
- *                        this and add the linked attribute themselves.
+ *   - `base`, `mod`    → persisted progression inputs in pips. `base` carries
+ *                        any persisted advances; `mod` stores temporary
+ *                        adjustments. Both are written to the document.
+ *   - `score`          → derived `base + mod`, recomputed by `applyMods()`.
+ *                        Not an independent input — never edit directly.
+ *                        Roll-formula consumers read this and add the linked
+ *                        attribute themselves.
  *   - `system.total`   → derived display value (`base + mod + attribute`,
  *                        respecting flatSkills + advanced-skill rules).
  *                        Populated by `prepareDerivedActorData()` via
