@@ -4,7 +4,7 @@
  * State machine over the four pages Foundry can land on when Playwright
  * navigates to "/":
  *
- *   /auth   — admin password gate. Submit FOUNDRY_ADMIN_PASSWORD (or empty).
+ *   /auth   — admin password gate. Submit FOUNDRY_ADMIN_KEY (or empty).
  *   /setup  — world manager. Either launch our smoke world if it exists,
  *             or create + launch one if it doesn't.
  *   /join   — world is launched, awaiting a user pick. Caller takes over.
@@ -142,7 +142,7 @@ async function driveAuth(page: Page, adminKey: string): Promise<void> {
         const msg = notif.find((n) => /administrator password/i.test(n)) ?? notif[0];
         throw new Error(
             `[setup-driver] admin auth failed: ${msg ?? "(no notification text)"}\n` +
-            `  → Set FOUNDRY_ADMIN_PASSWORD to your Foundry server admin password.`,
+            `  → Set FOUNDRY_ADMIN_KEY to your Foundry server admin password.`,
         );
     }
 }

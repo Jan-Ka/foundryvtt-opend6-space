@@ -55,11 +55,15 @@ system installed. Configure via env:
 ```
 FOUNDRY_URL=http://localhost:30000
 FOUNDRY_USER=Gamemaster
-FOUNDRY_PASSWORD=               # leave blank for passwordless GM
-FOUNDRY_ADMIN_PASSWORD=         # leave blank if Foundry has no admin password
+FOUNDRY_GM_PASSWORD=            # per-user GM join password (blank for fresh worlds)
+FOUNDRY_ADMIN_KEY=              # server admin password gating /setup (blank if Foundry has none)
 FOUNDRY_SMOKE_WORLD=od6s-smoke  # world id the suite owns
 FOUNDRY_SYSTEM_ID=od6s          # system to use when creating the world
 ```
+
+Note: `FOUNDRY_PASSWORD` is intentionally *not* read by the smoke harness —
+it is reserved for the foundryvtt.com website password that
+`task foundry:start` uses to activate the container's license.
 
 A `globalSetup` orchestrates the world lifecycle:
 

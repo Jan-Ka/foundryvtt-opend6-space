@@ -7,9 +7,17 @@
  * browser context — the same scripts that ship in docs/test-runbook.md.
  *
  * Configuration via env:
- *   FOUNDRY_URL       (default http://localhost:30000)
- *   FOUNDRY_USER      (default "Gamemaster")
- *   FOUNDRY_PASSWORD  (default "" — most dev worlds have no GM password)
+ *   FOUNDRY_URL          (default http://localhost:30000)
+ *   FOUNDRY_USER         (default "Gamemaster")
+ *   FOUNDRY_GM_PASSWORD  (default "" — fresh smoke worlds have no GM password)
+ *   FOUNDRY_SMOKE_WORLD  (default "od6s-smoke" — the world id this harness
+ *                        is allowed to interact with; identity-guarded to
+ *                        avoid trampling a developer's personal campaign on
+ *                        the same Foundry instance)
+ *
+ * Note: `FOUNDRY_PASSWORD` is *not* read here — it's the foundryvtt.com
+ * website password used by `task foundry:start` for license activation,
+ * and is intentionally distinct from the per-user join password.
  */
 
 import {Page, expect} from "@playwright/test";
