@@ -173,6 +173,49 @@ tasks:
     cmds:
       - pnpm run typecheck
 
+  # ── Tests ────────────────────────────────────────────────────────
+
+  test:
+    desc: Run unit tests (vitest)
+    cmds:
+      - pnpm run test
+
+  test:domain:
+    desc: Run domain tests (vitest domain project)
+    cmds:
+      - pnpm run test:domain
+
+  test:smoke:
+    desc: Run Playwright smoke tests against the running Foundry container (logs to test-results/smoke.log)
+    preconditions:
+      - sh: '{{.CONTAINER_RT}} ps --format ''{{"{{.Names}}"}}'' 2>/dev/null | grep -q ''^{{.CONTAINER_NAME}}$'''
+        msg: "Foundry container is not running. Run 'task foundry:start' first."
+    cmds:
+      - mkdir -p test-results
+      - |
+        # Tee combined stdout+stderr to test-results/smoke.log while still
+        # streaming to the terminal. Preserves Playwright's exit code via
+        # PIPESTATUS so the task fails when tests fail.
+        set -o pipefail
+        pnpm run test:smoke 2>&1 | tee test-results/smoke.log
+      - echo ""
+      - echo "Logs   → test-results/smoke.log"
+      - echo "JSON   → test-results/smoke-report.json"
+      - echo "HTML   → test-results/html/index.html (npx playwright show-report test-results/html)"
+
+  test:smoke:ui:
+    desc: Run Playwright smoke tests in interactive UI mode
+    preconditions:
+      - sh: '{{.CONTAINER_RT}} ps --format ''{{"{{.Names}}"}}'' 2>/dev/null | grep -q ''^{{.CONTAINER_NAME}}$'''
+        msg: "Foundry container is not running. Run 'task foundry:start' first."
+    cmds:
+      - pnpm run test:smoke:ui
+
+  test:smoke:report:
+    desc: Open the most recent Playwright HTML report
+    cmds:
+      - pnpm exec playwright show-report test-results/html
+
   # ── Foundry VTT Test Instance ───────────────────────────────────
 
   foundry:init-config:
