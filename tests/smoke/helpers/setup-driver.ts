@@ -163,18 +163,70 @@ async function driveSetup(page: Page, opts: EnsureWorldOptions): Promise<void> {
     // Look for our world's tile. If present, launch it. If not, create.
     const tile = page.locator(SELECTORS.setup.worldTile(opts.worldId)).first();
     if (await tile.count()) {
-        const launchBtn = tile.locator(SELECTORS.setup.worldLaunch).first();
-        if (await launchBtn.count()) {
-            await launchBtn.click();
-        } else {
-            // Some Foundry layouts launch on tile click rather than a button
-            await tile.click();
+        // Foundry v14 renders `.control.play` with `visibility: hidden` —
+        // the buttons only un-hide on hover, and Playwright's actionability
+        // check rejects clicks on hidden elements (hover/force don't help).
+        // Dispatch the click via the DOM so it still flows through Foundry's
+        // delegated `data-action="worldLaunch"` handler, which is what
+        // actually invokes SetupApplication#launchWorld(pkg).
+        const launchSelector = SELECTORS.setup.worldLaunch;
+        const dispatched = await page.evaluate(
+            ({worldId, selector}) => {
+                const t = document.querySelector(
+                    `li.package.world[data-package-id="${worldId}"], [data-world-id="${worldId}"]`,
+                );
+                if (!t) return "no-tile";
+                const btn = t.querySelector(selector) as HTMLElement | null;
+                if (!btn) return "no-button";
+                btn.click();
+                return "clicked";
+            },
+            {worldId: opts.worldId, selector: launchSelector},
+        );
+        if (dispatched !== "clicked") {
+            throw new Error(
+                `[setup-driver] could not dispatch worldLaunch for "${opts.worldId}": ${dispatched}`,
+            );
         }
-        await page.waitForLoadState("domcontentloaded");
+
+        // SetupApplication#launchWorld opens a DialogV2 migration prompt
+        // when the world's coreVersion or systemVersion lags Foundry's.
+        // Confirm it. If the world is up-to-date, the dialog never
+        // appears and waitForURL fires first.
+        await Promise.race([
+            confirmMigrationIfShown(page),
+            page.waitForURL(/\/(join|game)\b/, {timeout: 60_000}).catch(() => undefined),
+        ]);
+        // Either path eventually navigates away from /setup; wait for it.
+        await page.waitForURL(/\/(join|game)\b/, {timeout: 60_000});
         return;
     }
 
     await createWorld(page, opts);
+}
+
+/**
+ * After a worldLaunch click, Foundry may open a DialogV2 confirmation
+ * prompt (`SETUP.WorldMigrationRequiredTitle`) if the world's
+ * coreVersion or systemVersion lags Foundry's. Click "Yes" so the
+ * launch can proceed. No-op when the dialog never appears (world is
+ * already current); resolves once the dialog is gone or after a short
+ * timeout — the caller wraps this in a Promise.race against the
+ * happy-path navigation, so a missing dialog is fine.
+ */
+async function confirmMigrationIfShown(page: Page): Promise<void> {
+    // DialogV2 in v14 renders as `<dialog class="dialog ...">` with a
+    // `.form-footer` containing the yes/no buttons. The "yes" button has
+    // `data-action="yes"`. Wait briefly for it to appear.
+    const yesBtn = page.locator(
+        'dialog.dialog button[data-action="yes"], dialog button[data-action="yes"]',
+    ).first();
+    try {
+        await yesBtn.waitFor({state: "visible", timeout: 5_000});
+    } catch {
+        return; // no dialog — happy path
+    }
+    await yesBtn.click({force: true});
 }
 
 async function dismissTours(page: Page): Promise<void> {
