@@ -201,7 +201,7 @@ tasks:
       - echo ""
       - echo "Logs   → test-results/smoke.log"
       - echo "JSON   → test-results/smoke-report.json"
-      - echo "HTML   → test-results/html/index.html (npx playwright show-report test-results/html)"
+      - echo "HTML   → playwright-report/index.html (npx playwright show-report playwright-report)"
 
   test:smoke:ui:
     desc: Run Playwright smoke tests in interactive UI mode
@@ -214,7 +214,7 @@ tasks:
   test:smoke:report:
     desc: Open the most recent Playwright HTML report
     cmds:
-      - pnpm exec playwright show-report test-results/html
+      - pnpm exec playwright show-report playwright-report
 
   # ── Foundry VTT Test Instance ───────────────────────────────────
 
