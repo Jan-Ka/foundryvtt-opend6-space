@@ -525,7 +525,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             }
         }
         if (region && !game.settings.get('od6s', 'explosive_end_of_round')) {
-            await region.update({hidden: false});
+            await region.update({ visibility: 2 });
         }
     }
 
