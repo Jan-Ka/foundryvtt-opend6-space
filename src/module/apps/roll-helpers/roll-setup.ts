@@ -4,7 +4,7 @@
 import {od6sutilities} from "../../system/utilities";
 import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
-import {getEffectMod} from "./roll-effects";
+import {cancelAction, getEffectMod} from "./roll-effects";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
 
@@ -409,6 +409,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     if (data.score < OD6S.pipsPerDice && !(OD6S.flatSkills && (data.type === 'skill' || data.type === 'specialization'))) {
         ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+        if (isExplosive) await cancelAction({ ...data, isExplosive, itemid: data.itemId } as unknown as RollData);
         return false;
     }
 
@@ -484,7 +485,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                     if (isExplosive) {
                         distance = item?.getFlag('od6s', 'explosiveRange');
                     } else {
-                        distance = Math.floor(canvas.grid.measureDistance(actorToken as Token, targets[0], {gridSpaces: true}));
+                        distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
                     }
                     const rangeConfig = data.range as { short: number; medium: number; long: number };
                     if (distance < 3) {
