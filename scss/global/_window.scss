@@ -10,9 +10,10 @@
 // rather than a transparent overlay on the Foundry background.
 .od6s.sheet {
   // Interior atmosphere — soft vignette toward the bottom.
-  // --od6s-sheet-opacity (default 1) multiplies every alpha channel so the
-  // user-facing slider in the system settings can drive the sheet from
-  // fully transparent (0) through the designed default (1) up to opaque (2).
+  // --od6s-sheet-opacity (default 1) multiplies every alpha channel. The
+  // user-facing slider in the system settings drives this from 0 (fully
+  // transparent) through 1 (designed default) up to 2 (the bottom of the
+  // gradient saturates around 1.8; the top still has some translucency).
   .window-content,
   & {
     background:
