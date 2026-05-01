@@ -469,4 +469,31 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         // dice=7, pips=0 → 7D → 21 pips.
         expect(result.finalBase, "attribute base updated to dialog value").toBe(21);
     });
+
+    test("character sheet portrait img has editImage action wired (#30)", async ({page}) => {
+        // Regression for #30: clicking the character portrait did nothing.
+        // ApplicationV2 DocumentSheetV2 dispatches the editImage FilePicker via
+        // data-action="editImage" — the legacy data-edit="img" alone is ignored.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            await actor.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 250));
+            const img = actor.sheet.element.querySelector(
+                "img.profile-img",
+            ) as HTMLImageElement | null;
+            const hasAction = img?.getAttribute("data-action") === "editImage";
+            const hasEdit = img?.getAttribute("data-edit") === "img";
+            await actor.sheet.close();
+            return {foundImg: !!img, hasAction, hasEdit};
+        });
+
+        expect(result.foundImg, "profile img exists on actor sheet").toBe(true);
+        expect(result.hasAction,
+            "profile img must have data-action=editImage for V2 FilePicker wiring").toBe(true);
+        expect(result.hasEdit,
+            "profile img must have data-edit=img to identify the path attribute").toBe(true);
+    });
 });
