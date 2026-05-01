@@ -20,13 +20,17 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
     foundRange.medium = '';
     foundRange.long = '';
 
-    // Range values are declared NumberField in schema, but legacy data can carry
-    // string values like "AGI+2" — treat as Record<string, any> at the access site.
-    const itemRange = (item.system as OD6SWeaponItemSystem).range as unknown as Record<string, any>;
+    const itemRange = (item.system as OD6SWeaponItemSystem).range;
     const range: any = {};
     range.short = itemRange.short;
     range.medium = itemRange.medium;
     range.long = itemRange.long;
+
+    const numericRange = {
+        short: Number(itemRange.short),
+        medium: Number(itemRange.medium),
+        long: Number(itemRange.long),
+    };
 
     let baseDice;
 
@@ -34,22 +38,22 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
         regex.test(itemRange.medium) ||
         regex.test(itemRange.long)) {
         // There is a non-numeric value, extract it and find the attribute
-        for (const range in itemRange) {
+        for (const rangeKey of ['short', 'medium', 'long'] as const) {
             for (const attr in OD6S.attributes) {
-                if (itemRange[range].toLowerCase().includes(attr)) {
-                    foundRange[range] = attr;
+                if (itemRange[rangeKey].toLowerCase().includes(attr)) {
+                    foundRange[rangeKey] = attr;
                     break;
                 }
             }
-            if (foundRange[range] === '') {
+            if (foundRange[rangeKey] === '') {
                 // String is present, but attribute not found.  Flee!
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_INVALID_RANGE_ATTRIBUTE'));
                 return false;
             }
         }
     } else {
-        // No strings in range values
-        return range;
+        // No strings in range values — coerce to numbers so the return type matches.
+        return numericRange;
     }
     if ((new Set([foundRange.short, foundRange.medium, foundRange.long])).size === 1) {
         baseDice = Math.floor(actor.system.attributes[foundRange.short].score / OD6S.pipsPerDice) * OD6S.pipsPerDice;

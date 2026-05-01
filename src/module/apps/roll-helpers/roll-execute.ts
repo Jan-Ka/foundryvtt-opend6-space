@@ -296,9 +296,9 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             } else if (item.type === "weapon") {
                 let found = false;
                 const itemData = item.system as OD6SWeaponItemSystem;
-                if ( (itemData as unknown as { type: string }).type === 'specialization' && typeof (itemData.stats.specialization) !== 'undefined' &&
+                if (typeof (itemData.stats.specialization) !== 'undefined' &&
                     itemData.stats.specialization !== 'null' && itemData.stats.specialization !== '') {
-                    const spec = rollData.actor.items.find((i: Item) => i.name === itemData.stats.specialization);
+                    const spec = rollData.actor.items.find((i: Item) => i.type === 'specialization' && i.name === itemData.stats.specialization);
                     if (typeof (spec) !== 'undefined' && spec.name !== '') {
                         found = true
                         const specSys = spec.system as OD6SSpecializationItemSystem;

@@ -253,7 +253,7 @@ interface OD6SWeaponItemSystem extends OD6SItemBase, OD6SEquipment, OD6SEquip {
         parry_skill: string;
         parry_specialization: string;
     };
-    range: { short: number; medium: number; long: number };
+    range: { short: string; medium: string; long: string };
     damage: { type: string; score: number; muscle: boolean; str: boolean };
     blast_radius: Record<
         "1" | "2" | "3" | "4",
