@@ -158,7 +158,7 @@ export default class od6sAttributesSortingConfiguration extends HandlebarsApplic
         }
         await game.settings.set("od6s", "attributes_sorting", attrSort);
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

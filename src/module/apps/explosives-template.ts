@@ -145,8 +145,9 @@ export default class ExplosivesTemplate {
         this.#moveTime = now;
 
         const center = event.data.getLocalPosition(canvas.stage);
-        const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        const snapped = canvas.grid.getSnappedPosition(center.x, center.y, interval);
+        const snapped = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS
+            ? { x: center.x, y: center.y }
+            : canvas.grid.getSnappedPoint({ x: center.x, y: center.y }, { mode: CONST.GRID_SNAPPING_MODES.CENTER, resolution: 1 });
 
         this.previewX = snapped.x;
         this.previewY = snapped.y;
@@ -155,10 +156,10 @@ export default class ExplosivesTemplate {
         this.#drawCircle(this.previewX, this.previewY);
 
         // Draw range line
-        const distance = Math.floor(canvas.grid.measureDistance(
+        const distance = Math.floor(canvas.grid.measurePath([
             { x: this.originX, y: this.originY },
-            { x: this.previewX, y: this.previewY }
-        ));
+            { x: this.previewX, y: this.previewY },
+        ]).distance);
 
         this.#rangeLine.clear();
         this.#rangeLine.lineStyle(4, 0xffd900, 1);
@@ -193,8 +194,9 @@ export default class ExplosivesTemplate {
 
         await this.#finishPlacement();
 
-        const interval = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS ? 0 : 2;
-        const snapped = canvas.grid.getSnappedPosition(this.previewX, this.previewY, interval);
+        const snapped = canvas.grid.type === CONST.GRID_TYPES.GRIDLESS
+            ? { x: this.previewX, y: this.previewY }
+            : canvas.grid.getSnappedPoint({ x: this.previewX, y: this.previewY }, { mode: CONST.GRID_SNAPPING_MODES.CENTER, resolution: 1 });
 
         const radiusPixels = this.radius * canvas.dimensions.distancePixels;
 

@@ -11,7 +11,7 @@ export async function scatterExplosive(range: any, origin: any, regionId: any): 
     const region = canvas.scene.getEmbeddedDocument('Region', regionId);
     const shape = region.shapes[0];
     const target = {x: shape.x, y: shape.y};
-    const sourceRay = new Ray(origin, target);
+    const sourceRay = new foundry.canvas.geometry.Ray(origin, target);
 
     // Save original position for un-scatter on hit
     await region.setFlag('od6s', 'originalX', shape.x);
@@ -65,7 +65,7 @@ export async function scatterExplosive(range: any, origin: any, regionId: any): 
 
     const newAngle = sourceRay.angle + angle;
 
-    const destRay = Ray.fromAngle(shape.x, shape.y, newAngle, distance);
+    const destRay = foundry.canvas.geometry.Ray.fromAngle(shape.x, shape.y, newAngle, distance);
 
     // Check if it would collide with a wall and stop it there
     const checkCollision = CONFIG.Canvas.polygonBackends.move.testCollision(
@@ -74,9 +74,9 @@ export async function scatterExplosive(range: any, origin: any, regionId: any): 
 
     let newPos;
     if (checkCollision !== null) {
-        const distanceToCollision = (canvas.grid.measureDistance(destRay.A, checkCollision)
+        const distanceToCollision = (canvas.grid.measurePath([destRay.A, checkCollision]).distance
             * canvas.dimensions.distancePixels) - 5;
-        const collisionRay = Ray.fromAngle(shape.x, shape.y, newAngle, distanceToCollision);
+        const collisionRay = foundry.canvas.geometry.Ray.fromAngle(shape.x, shape.y, newAngle, distanceToCollision);
         newPos = { x: collisionRay.B.x, y: collisionRay.B.y };
     } else {
         newPos = { x: Math.floor(destRay.B.x), y: Math.floor(destRay.B.y) };
@@ -117,7 +117,7 @@ export async function getExplosiveTargets(actor: any, itemId: any): Promise<any[
     for (const target of hitTokens) {
         const thisTarget: any = {};
         thisTarget.id = target.id;
-        thisTarget.range = canvas.grid.measureDistance(center, target.center);
+        thisTarget.range = canvas.grid.measurePath([center, target.center]).distance;
         thisTarget.zone = getBlastRadius(item, thisTarget.range);
         thisTarget.name = target.name;
         targets.push(thisTarget);

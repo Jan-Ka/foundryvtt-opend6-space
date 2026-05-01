@@ -50,5 +50,7 @@ export async function cancelAction(rollData: RollData): Promise<void> {
         }
         await item?.unsetFlag('od6s', 'explosiveSet');
         await item?.unsetFlag('od6s', 'explosiveTemplate');
+        await item?.unsetFlag('od6s', 'explosiveOrigin');
+        await item?.unsetFlag('od6s', 'explosiveRange');
     }
 }

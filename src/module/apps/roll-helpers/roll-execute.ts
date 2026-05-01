@@ -508,13 +508,11 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             }
         }
         if (game.settings.get('od6s', 'auto_explosive') && region) {
-            // @ts-expect-error
-            await region.setFlag('od6s', 'originalOwner', game.user.owner);
+            await region.setFlag('od6s', 'originalOwner', game.user.id);
             await region.setFlag('od6s', 'templateId', rollMessage._id);
 
             if (!flags.success) {
-                // @ts-expect-error
-                await od6sutilities.scatterExplosive(rollData.range, origin, templateId);
+                await od6sutilities.scatterExplosive(rollData.range, origin, regionId);
                 await od6sutilities.wait(100);
                 const newTargets = await od6sutilities.getExplosiveTargets(rollData.actor, rollData.itemid);
                 if (Object.keys(newTargets).length === 0) {
@@ -526,9 +524,14 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                 await od6sutilities.wait(100);
             }
         }
-        if(!game.settings.get('od6s','explosive_end_of_round')) {
-            // @ts-expect-error
-            await template.document.update({hidden: false});
+        if (region && !game.settings.get('od6s', 'explosive_end_of_round')) {
+            await region.update({ visibility: 2 });
+        }
+        if (game.settings.get('od6s', 'auto_explosive')) {
+            await item?.unsetFlag('od6s', 'explosiveSet');
+            await item?.unsetFlag('od6s', 'explosiveTemplate');
+            await item?.unsetFlag('od6s', 'explosiveOrigin');
+            await item?.unsetFlag('od6s', 'explosiveRange');
         }
     }
 
