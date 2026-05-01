@@ -9,12 +9,16 @@
 // Subtle radial glow + hairline interior frame so the sheet feels intentional
 // rather than a transparent overlay on the Foundry background.
 .od6s.sheet {
-  // Interior atmosphere — soft vignette toward the bottom
+  // Interior atmosphere — soft vignette toward the bottom.
+  // --od6s-sheet-opacity (default 1) multiplies every alpha channel. The
+  // user-facing slider in the system settings drives this from 0 (fully
+  // transparent) through 1 (designed default) up to 2 (the bottom of the
+  // gradient saturates around 1.8; the top still has some translucency).
   .window-content,
   & {
     background:
-      radial-gradient(ellipse at top, rgba(201, 162, 39, 0.05) 0%, transparent 60%),
-      linear-gradient(180deg, rgba(8, 12, 18, 0.35) 0%, rgba(8, 12, 18, 0.55) 100%);
+      radial-gradient(ellipse at top, rgba(201, 162, 39, calc(0.05 * var(--od6s-sheet-opacity, 1))) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(8, 12, 18, calc(0.35 * var(--od6s-sheet-opacity, 1))) 0%, rgba(8, 12, 18, calc(0.55 * var(--od6s-sheet-opacity, 1))) 100%);
   }
 }
 
