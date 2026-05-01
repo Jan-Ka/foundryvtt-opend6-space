@@ -1,5 +1,6 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
+import {computeSkillDisplayScore} from "./skill-score";
 
 export function prepareBaseActorData(actor: any): void {
     // Set all mod values to zero
@@ -86,14 +87,23 @@ export async function prepareDerivedActorData(actor: any): Promise<void> {
         i.findActiveEffects();
         i.applyMods();
 
-        if(i.type === 'skill' || i.type === 'specialization') {
-            if (i.system.isAdvancedSkill) {
-                i.system.total = i.system.score;
-                i.system.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(i.system.score));
-            } else {
-                i.system.total = i.system.score + actor.system.attributes[i.system.attribute].score;
-                i.system.totalText = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(i.system.total));
-            }
+        if (i.type === 'skill' || i.type === 'specialization') {
+            // `system.score` is the canonical own-progression value (base + mod),
+            // already reset by `i.applyMods()` above. `system.total` is the display
+            // value that includes the linked attribute (and respects flatSkills /
+            // advanced-skill rules). Templates and roll-dialog data-score reads
+            // should consume `system.total`; roll-formula consumers add the
+            // attribute themselves and therefore stay on `system.score`.
+            const attrKey = typeof i.system.attribute === 'string' ? i.system.attribute : undefined;
+            const attribute = attrKey ? actor.system.attributes?.[attrKey] : undefined;
+            i.system.total = computeSkillDisplayScore({
+                base: i.system.base,
+                mod: i.system.mod,
+                isAdvancedSkill: i.type === 'skill' && i.system.isAdvancedSkill,
+                attributeScore: attribute?.score,
+                flatSkills: OD6S.flatSkills,
+            });
+            i.system.totalText = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(i.system.total));
         }
     }
 

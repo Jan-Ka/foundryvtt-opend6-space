@@ -10,15 +10,15 @@
             </div>
         {{/if}}
         <div class="flexrow flex-group-left">
-            <div class="dice flexrow flex-group-left" data-dice="{{diceFromScore skill.system.score}}">
+            <div class="dice flexrow flex-group-left" data-dice="{{diceFromScore skill.system.total}}">
                 <label for="dice">{{localize 'OD6S.DICE'}}</label>
                 <input type="number" data-dtype="Number"
-                       max="99" id="dice" name="dice" value="{{diceFromScore skill.system.score}}">
+                       max="99" id="dice" name="dice" value="{{diceFromScore skill.system.total}}">
             </div>
-            <div class="pips flexrow flex-group-left" data-pips="{{pipsFromScore skill.system.score}}">
+            <div class="pips flexrow flex-group-left" data-pips="{{pipsFromScore skill.system.total}}">
                 <label for="pips">{{localize 'OD6S.PIPS'}}</label>
                 <input type="number" data-dtype="Number"
-                       max="99" id="pips" name="pips" value="{{pipsFromScore skill.system.score}}">
+                       max="99" id="pips" name="pips" value="{{pipsFromScore skill.system.total}}">
             </div>
         </div>
         <div class="flexrow flex-group-left">

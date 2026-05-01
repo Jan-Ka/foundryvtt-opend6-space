@@ -97,11 +97,13 @@
   overflow: hidden;
 }
 
-// ── Settings config dialogs ──────────────────────────────────────────────
-// All od6s ApplicationV2 settings forms (Rules Options, Automation, etc.)
-// use position.height: "auto", which lets content grow past the viewport
-// with no internal scroll. Cap at 90vh and make the inner form scroll.
-.od6s.settings-config {
+// ── Viewport-capped scroll for od6s ApplicationV2 windows ────────────────
+// Settings dialogs (Rules Options, Automation, etc.) and item/actor sheets
+// all use position.height: "auto", which lets content grow past the
+// viewport with no internal scroll. Cap at 90vh and make .window-content
+// the scroll container.
+.od6s.settings-config,
+.od6s.sheet {
   max-height: 90vh;
   display: flex;
   flex-direction: column;

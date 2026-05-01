@@ -49,12 +49,12 @@
                                                 <div class="flex-group-center"
                                                      data-item-id="{{skill._id}}"
                                                      data-type="skill"
-                                                     data-score="{{skill.system.score}}"
+                                                     data-score="{{skill.system.total}}"
                                                      data-base="{{skill.system.base}}"
                                                      data-label="{{skill.name}}">
                                                     {{#unless (flatSkills)}}
-                                                        <b>{{diceFromScore skill.system.score}}</b>D+<b>{{pipsFromScore
-                                                            skill.system.score}}</b>
+                                                        <b>{{diceFromScore skill.system.total}}</b>D+<b>{{pipsFromScore
+                                                            skill.system.total}}</b>
                                                     {{else}}
                                                         {{ skill.system.base }}
                                                     {{/unless}}</div>
@@ -64,7 +64,7 @@
                                                          title="{{localize "OD6S.INCREASE_SKILL"}}"
                                                          data-item-id="{{skill._id}}"
                                                          data-type="skill"
-                                                         data-score="{{skill.system.score}}"
+                                                         data-score="{{skill.system.total}}"
                                                          data-base="{{skill.system.base}}"
                                                          data-label="{{skill.name}}">
                                                         <a><i class="fas fa-plus-square"></i></a></div>
@@ -72,7 +72,7 @@
                                                          title="{{localize "OD6S.DECREASE_SKILL"}}"
                                                          data-item-id="{{skill._id}}"
                                                          data-type="skill"
-                                                         data-score="{{skill.system.score}}"
+                                                         data-score="{{skill.system.total}}"
                                                          data-base="{{skill.system.base}}"
                                                          data-label="{{skill.name}}">
                                                         <a><i class="fas fa-minus-square"></i></a></div>

@@ -14,7 +14,6 @@ import {registerEffectListeners} from "./sheet-listeners/effects";
 import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
-import {computeSkillDisplayScore} from "./actor-helpers/skill-score";
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
@@ -124,33 +123,8 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             if (i.type === "gear") {
                 gear.push(i);
             } else if (i.type === "skill") {
-                // Compute the display score *idempotently* from base/mod/attribute.
-                // Reading + writing `i.system.score` here used to compound across
-                // re-renders because prepareDerivedData() only resets score on
-                // actor re-prepare, not on every sheet render.
-                if (typeof i.system.attribute !== "undefined") {
-                    i.system.score = computeSkillDisplayScore({
-                        base: i.system.base,
-                        mod: i.system.mod,
-                        isAdvancedSkill: i.system.isAdvancedSkill,
-                        attributeScore:
-                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
-                        flatSkills: OD6S.flatSkills,
-                    });
-                }
                 skills.push(i);
             } else if (i.type === "specialization") {
-                // Specializations always roll on the linked attribute; no
-                // advanced-skill exemption applies.
-                if (typeof i.system.attribute !== "undefined") {
-                    i.system.score = computeSkillDisplayScore({
-                        base: i.system.base,
-                        mod: i.system.mod,
-                        attributeScore:
-                            actorData.system.attributes?.[i.system.attribute.toLowerCase()]?.score,
-                        flatSkills: OD6S.flatSkills,
-                    });
-                }
                 specializations.push(i);
             } else if (i.type === "weapon") {
                 weapons.push(i);
