@@ -169,18 +169,8 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         for (const i of sheetData.items) {
             i.img = i.img || CONST.DEFAULT_TOKEN;
             if (i.type === "skill") {
-                if (!OD6S.flatSkills
-                    && typeof i.system.score !== "undefined"
-                    && typeof i.system.attribute !== "undefined") {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                }
                 skills.push(i);
             } else if (i.type === "specialization") {
-                if (!OD6S.flatSkills) {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                }
                 specializations.push(i);
             } else if (i.type === "vehicle-weapon") {
                 vehicle_weapons.push(i);
@@ -209,18 +199,8 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         for (const i of sheetData.items) {
             i.img = i.img || CONST.DEFAULT_TOKEN;
             if (i.type === "skill") {
-                if (!OD6S.flatSkills
-                    && typeof i.system.score !== "undefined"
-                    && typeof i.system.attribute !== "undefined") {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                }
                 skills.push(i);
             } else if (i.type === "specialization") {
-                if (!OD6S.flatSkills) {
-                    i.system.score = (+i.system.score)
-                        + (+actorData.system.attributes[i.system.attribute.toLowerCase()].score);
-                }
                 specializations.push(i);
             } else if (i.type === "starship-weapon") {
                 starship_weapons.push(i);
