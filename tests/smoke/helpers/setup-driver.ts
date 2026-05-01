@@ -64,6 +64,21 @@ export interface EnsureWorldOptions {
      * and the `task foundry:start` Taskfile recipe.
      */
     adminKey?: string;
+    /**
+     * GM user name for joining a running world to inspect its id.
+     * Only used when we need to detect a mismatched world before
+     * shutting it down.
+     */
+    gmUser?: string;
+    /** GM join password (FOUNDRY_GM_PASSWORD). Empty for password-less GM. */
+    gmPassword?: string;
+    /**
+     * If a different world is running, return it to /setup and launch
+     * the expected world instead. Default true. Set to false to fail
+     * loud when the world is mismatched (preserves an in-progress
+     * non-smoke session).
+     */
+    autoShutdown?: boolean;
     /** Logging hook for orchestration trace. */
     log?: (msg: string) => void;
 }
@@ -107,10 +122,33 @@ export async function ensureWorldLaunched(
         }
 
         if (url.includes("/join") || url.includes("/game")) {
-            // World is up — the caller's loginAndWaitReady will verify
-            // it's the world we expect via the world-id assertion.
-            log(`[setup-driver] world launched`);
-            return;
+            // A world is up. Confirm it's *our* world; if not, optionally
+            // shut it down and re-enter the loop so /setup launches the
+            // right one. Without this check the running world would only
+            // be detected per-spec by loginAndWaitReady's identity guard,
+            // by which point globalSetup has already returned success.
+            const runningId = await detectRunningWorldId(page, opts);
+            if (runningId === opts.worldId) {
+                log(`[setup-driver] world '${opts.worldId}' already launched`);
+                return;
+            }
+            if (runningId === null) {
+                // Could not determine the world id (e.g., login failed).
+                // Hand back to the caller — loginAndWaitReady will surface
+                // the underlying error with better context than we can.
+                log(`[setup-driver] world launched but id undetectable; deferring to caller`);
+                return;
+            }
+            const autoShutdown = opts.autoShutdown ?? true;
+            if (!autoShutdown) {
+                throw new Error(
+                    `[setup-driver] world '${runningId}' running but expected '${opts.worldId}'.\n` +
+                    `  → Stop the running world or set FOUNDRY_SMOKE_AUTOSHUTDOWN=1.`,
+                );
+            }
+            log(`[setup-driver] world '${runningId}' running; shutting down to launch '${opts.worldId}'`);
+            await shutdownRunningWorld(page, opts);
+            continue;
         }
 
         throw new Error(
@@ -226,6 +264,17 @@ async function confirmMigrationIfShown(page: Page): Promise<void> {
     } catch {
         return; // no dialog — happy path
     }
+    // The migration prompt has a "Create a backup before migrating?"
+    // checkbox that defaults to checked. The backup step can take
+    // minutes on a populated world and easily blows past our launch
+    // wait. A smoke world has no data worth preserving (we recreate
+    // it on demand), so uncheck it to keep the launch fast.
+    await page.evaluate(() => {
+        const cb = document.querySelector(
+            'dialog input[name="createBackup"]',
+        ) as HTMLInputElement | null;
+        if (cb) cb.checked = false;
+    });
     await yesBtn.click({force: true});
 }
 
@@ -270,4 +319,52 @@ async function createWorld(page: Page, opts: EnsureWorldOptions): Promise<void> 
     // After creation Foundry usually returns to /setup with the new tile
     // present. Re-enter the loop to launch it.
     await page.waitForLoadState("domcontentloaded");
+}
+
+/**
+ * Resolve the id of the world Foundry is currently serving.
+ *
+ * Foundry exposes `game.world.id` on the /join page itself — no login
+ * required. From /game the same global is authoritative. Returns null
+ * if the global isn't populated (caller defers to per-spec
+ * `loginAndWaitReady` for a clearer error).
+ */
+async function detectRunningWorldId(
+    page: Page,
+    _opts: EnsureWorldOptions,
+): Promise<string | null> {
+    try {
+        await page.waitForFunction(() => (window as any).game?.world?.id, null, {timeout: 15_000});
+        return await page.evaluate(() => (window as any).game?.world?.id ?? null);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Return the running world to /setup so the loop can re-launch the
+ * expected one.
+ *
+ * From /join: submit the "Return to Setup" admin form (`#join-game-setup`)
+ * with `FOUNDRY_ADMIN_KEY`. This is the path Foundry's UI uses, and
+ * unlike `game.shutDown()` it doesn't require the browser to hold a
+ * Gamemaster session — only the server admin key.
+ *
+ * From /game: fall back to `game.shutDown()`, which requires the
+ * logged-in user to be a Gamemaster. If they aren't, this throws and
+ * surfaces the underlying Foundry message.
+ */
+async function shutdownRunningWorld(page: Page, opts: EnsureWorldOptions): Promise<void> {
+    const url = page.url();
+    if (url.includes("/join")) {
+        const adminKey = opts.adminKey ?? "";
+        const form = page.locator("#join-game-setup");
+        await form.locator('input[name="adminPassword"]').fill(adminKey);
+        await form.locator('button[type="submit"]').click();
+    } else {
+        await page.evaluate(() => (window as any).game?.shutDown?.());
+    }
+    // The redirect target is /setup on success, /auth if the admin key
+    // was rejected. Either is fine for the hop loop.
+    await page.waitForURL((u) => /\/(setup|auth)\b/.test(u.pathname), {timeout: 30_000});
 }

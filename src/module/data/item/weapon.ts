@@ -21,6 +21,19 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         if (typeof range[key] !== "string") range[key] = String(range[key] ?? "0");
       }
     }
+    // Normalize subtype to the localized form. Helpers (isRanged,
+    // isMuscle, isExplosive) and the weapon-sheet <option> values all
+    // operate on localized strings, but the schema's initial is the
+    // raw i18n key — so a brand-new weapon's stored subtype never
+    // matches any rendered option until the user manually picks one.
+    // localize() is a no-op when called before i18n is ready (returns
+    // the key); we re-run it on every construction so the value
+    // self-heals once i18n is up.
+    if (typeof source.subtype === "string" && source.subtype.startsWith("OD6S.")) {
+      const localized = (game as { i18n?: { localize?: (k: string) => string } } | undefined)
+        ?.i18n?.localize?.(source.subtype);
+      if (localized && localized !== source.subtype) source.subtype = localized;
+    }
     return super.migrateData(source);
   }
 
@@ -34,7 +47,15 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         type: new fields.StringField({ initial: "Number" }),
         label: new fields.StringField({ initial: "OD6S.SCALE" }),
       }),
-      subtype: new fields.StringField({ initial: "OD6S.RANGED" }),
+      // Helpers (isRanged, isMuscle, isExplosive) and the weapon-sheet
+      // <option value> all operate on the *localized* subtype, so the
+      // initial value must be the localized string, not the raw i18n
+      // key. Falls back to the key if i18n isn't ready yet (early init);
+      // migrateData below normalizes any key-form value on later loads.
+      subtype: new fields.StringField({
+        initial: () => (game as { i18n?: { localize?: (k: string) => string } } | undefined)
+          ?.i18n?.localize?.("OD6S.RANGED") ?? "OD6S.RANGED",
+      }),
       stats: new fields.SchemaField({
         attribute: new fields.StringField({ initial: "AGI" }),
         skill: new fields.StringField({ initial: "" }),

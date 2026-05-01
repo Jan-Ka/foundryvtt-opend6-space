@@ -116,7 +116,14 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
             input.value = "15";
             input.dispatchEvent(new Event("change", {bubbles: true}));
         }
-        const form = (dlg as any).element?.querySelector("form") as HTMLFormElement | null;
+        // OD6SEditDifficulty sets tag: "form", so dlg.element is the
+        // form itself. The template no longer wraps content in a nested
+        // <form> (removed in #34's fix), so a descendant form lookup
+        // returns null on current builds — fall back to the root.
+        const root = (dlg as any).element as HTMLElement | null;
+        const form = (root?.tagName === "FORM"
+            ? (root as HTMLFormElement)
+            : (root?.querySelector("form") as HTMLFormElement | null));
         if (form) form.requestSubmit();
         await new Promise((r) => setTimeout(r, 800));
         return true;

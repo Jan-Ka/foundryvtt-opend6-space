@@ -1,7 +1,7 @@
-<form autocomplete="off" onsubmit="event.preventDefault();">
+<div autocomplete="off">
     <div class="flexrow flex-group-left">
         <label for="base-difficulty">{{localize "OD6S.BASE_DIFFICULTY"}}:</label>
-        <input name="baseDifficulty" type="number" value="{{data.baseDifficulty}}">
+        <input id="base-difficulty" name="baseDifficulty" type="number" value="{{data.baseDifficulty}}">
     </div>
     <input name="messageId" type="hidden" value="{{data.messageId}}">
     <div class="flexrow flex-group-center"
@@ -9,4 +9,4 @@
         <button class="edit-difficulty-submit" type="submit" name="submit" value="submit">{{localize "OD6S.SUBMIT"}}</button>
         <button type="button" name="cancel" data-action="cancel">{{localize "OD6S.CANCEL"}}</button>
     </div>
-</form>
+</div>

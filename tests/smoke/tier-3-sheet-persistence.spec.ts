@@ -203,4 +203,184 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
             expect(result.rangePersisted).toBe(42);
         }
     });
+
+    test("item-attribute-edit dialog template has no <form> and named dice/pips inputs", async ({page}) => {
+        // Mirrors the actor-side structural test above, for the item-side
+        // template used by `_editTemplateAttribute` on species/character
+        // templates. Catches a regression where the template carries an
+        // outer <form> (nested inside DialogV2's own form → inner form is
+        // dropped by HTML parsing) or its inputs lack name= (DialogV2.input
+        // returns an empty result and getScoreFromDice produces NaN).
+        await loginAndWaitReady(page);
+
+        const result = await evalInWorld(page, async () => {
+            const html = await window.foundry.applications.handlebars.renderTemplate(
+                "systems/od6s/templates/item/item-attribute-edit.html",
+                {score: 5},
+            );
+            const div = document.createElement("div");
+            div.innerHTML = html;
+            const innerForms = div.querySelectorAll("form");
+            const dice = div.querySelector("#dice") as HTMLInputElement;
+            const pips = div.querySelector("#pips") as HTMLInputElement;
+            return {
+                templateHasInnerForm: innerForms.length > 0,
+                diceName: dice?.name,
+                pipsName: pips?.name,
+            };
+        });
+
+        expect(result.templateHasInnerForm, "item-attribute-edit must not wrap content in <form>")
+            .toBe(false);
+        expect(result.diceName).toBe("dice");
+        expect(result.pipsName).toBe("pips");
+    });
+
+    test("weapon subtype <option> is selected to match stored value", async ({page}) => {
+        // Regression for malformed `(eq localize subtype …)` Handlebars in
+        // item-weapon-sheet.html. With `eq` mis-applied no <option> rendered
+        // selected, so after a re-render the <select> snapped to the first
+        // option, and the next submitOnChange clobbered the saved subtype.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            for (const i of actor.items.filter((x: any) => x.name?.startsWith("smoke-weapon-subtype"))) {
+                await i.delete();
+            }
+            const [weapon] = await actor.createEmbeddedDocuments("Item", [{
+                name: "smoke-weapon-subtype",
+                type: "weapon",
+            }]);
+
+            await weapon.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 250));
+
+            const root = weapon.sheet.element as HTMLElement;
+            const select = root.querySelector('select[name="system.subtype"]') as HTMLSelectElement;
+            const stored = actor.items.get(weapon.id).system.subtype;
+            // Selected option's value must match the stored subtype after
+            // initial render — otherwise the next form submission silently
+            // overwrites system.subtype with the first option's value.
+            const selectedMatchesStored = select?.value === stored;
+
+            // Clobber check: change an unrelated field (damage type) and
+            // verify subtype is unchanged on the document.
+            const damageType = root.querySelector(
+                'select[name="system.damage.type"]',
+            ) as HTMLSelectElement | null;
+            let subtypeAfterDamageChange: string | null = null;
+            if (damageType && damageType.options.length > 0) {
+                const otherOption = [...damageType.options].find((o) => o.value !== damageType.value);
+                if (otherOption) {
+                    damageType.value = otherOption.value;
+                    damageType.dispatchEvent(new Event("change", {bubbles: true}));
+                    await new Promise((r) => setTimeout(r, 500));
+                    subtypeAfterDamageChange = actor.items.get(weapon.id).system.subtype;
+                }
+            }
+
+            await weapon.sheet.close();
+            await weapon.delete();
+            return {stored, selectedMatchesStored, subtypeAfterDamageChange};
+        });
+
+        expect(result.selectedMatchesStored,
+            "weapon subtype <select> must reflect the stored value on render").toBe(true);
+        if (result.subtypeAfterDamageChange !== null) {
+            expect(result.subtypeAfterDamageChange,
+                "changing damage type must not clobber stored subtype").toBe(result.stored);
+        }
+    });
+
+    test("advance dialog submit does not throw on stale event.currentTarget", async ({page}) => {
+        // Regression for #42: advanceAction read event.currentTarget.dataset,
+        // but the dialog's submit fires async after the click event has been
+        // fully dispatched, so currentTarget is null → TypeError.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            // The .advancedialog button is only rendered in advance mode.
+            // Also give the actor character points so the cpcost gate
+            // doesn't reject the submit.
+            await actor.update({
+                "system.attributes.agi.base": 6,
+                "system.sheetmode.value": "advance",
+                "system.characterpoints.value": 50,
+            });
+            await actor.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 300));
+
+            const root = actor.sheet.element as HTMLElement;
+            const advanceBtn = root.querySelector(
+                '.advancedialog[data-type="attribute"][data-attrname="agi"]',
+            ) as HTMLElement | null;
+            if (!advanceBtn) {
+                await actor.sheet.close();
+                return {found: false};
+            }
+
+            const errors: string[] = [];
+            const onErr = (e: ErrorEvent) => errors.push(String(e.message ?? e));
+            const onRej = (e: PromiseRejectionEvent) => errors.push(String(e.reason?.message ?? e.reason));
+            window.addEventListener("error", onErr);
+            window.addEventListener("unhandledrejection", onRej);
+
+            advanceBtn.click();
+            await new Promise((r) => setTimeout(r, 400));
+
+            const dlg = [...window.foundry.applications.instances.values()].find(
+                (a: any) => (a as any).id === "od6s-advance-dialog",
+            ) as any;
+
+            let submitted = false;
+            if (dlg) {
+                const dlgRoot = dlg.element as HTMLElement;
+                const free = dlgRoot.querySelector(
+                    'input[name="freeadvance"]',
+                ) as HTMLInputElement | null;
+                if (free) {
+                    free.checked = true;
+                    free.dispatchEvent(new Event("change", {bubbles: true}));
+                    await new Promise((r) => setTimeout(r, 250));
+                }
+                const dice = dlgRoot.querySelector('input[name="dice"]') as HTMLInputElement | null;
+                const pips = dlgRoot.querySelector('input[name="pips"]') as HTMLInputElement | null;
+                if (dice) dice.value = "7";
+                if (pips) pips.value = "0";
+                const form = dlgRoot.tagName === "FORM"
+                    ? (dlgRoot as HTMLFormElement)
+                    : dlgRoot.querySelector("form") as HTMLFormElement | null;
+                if (form) {
+                    form.requestSubmit();
+                    await new Promise((r) => setTimeout(r, 700));
+                    submitted = true;
+                }
+            }
+
+            window.removeEventListener("error", onErr);
+            window.removeEventListener("unhandledrejection", onRej);
+
+            const finalBase = window.game.actors.get(actor.id).system.attributes.agi.base;
+            await actor.sheet.close();
+
+            const currentTargetErrors = errors.filter(
+                (e) => /currentTarget/i.test(e) && /dataset/i.test(e),
+            );
+            return {found: true, submitted, finalBase, currentTargetErrors};
+        });
+
+        if (!result.found) {
+            test.skip(true, "no .advancedialog[data-type=attribute] button on the rendered sheet");
+            return;
+        }
+        expect(result.submitted, "advance dialog opened and submitted").toBe(true);
+        expect(result.currentTargetErrors,
+            "no TypeError reading dataset off a stale event.currentTarget").toEqual([]);
+        // base is stored in pips (3 pips = 1 die). dice=7, pips=0 → 7D → 21 pips.
+        expect(result.finalBase, "attribute base advanced to dialog value").toBe(21);
+    });
 });

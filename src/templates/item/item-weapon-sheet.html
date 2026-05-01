@@ -93,7 +93,7 @@
                 <select name="system.subtype" id="item.system.subtype">
                     
                         {{#each (getWeaponTypes) as |subtype|}}
-                            <option value="{{ localize subtype }}" {{#if (eq localize subtype item.system.subtype)}}selected{{/if}}>
+                            <option value="{{ localize subtype }}" {{#if (eq (localize subtype) item.system.subtype)}}selected{{/if}}>
                                 {{localize subtype}}
                             </option>
                         {{/each}}
