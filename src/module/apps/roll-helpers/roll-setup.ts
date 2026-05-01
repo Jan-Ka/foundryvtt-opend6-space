@@ -46,7 +46,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     const contact = false;
     let canStun = false;
     let onlyStun = false;
-    const actorToken = data.actor.isToken ? data.actor.token : data.actor.getActiveTokens()[0];
+    const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
 
     if (typeof(data.itemId) !== 'undefined' && data.itemId !== '') {
         let item = data.actor.items.get(data.itemId);
