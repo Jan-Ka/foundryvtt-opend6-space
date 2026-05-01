@@ -177,31 +177,42 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
             const persistedName = actor.items.get(weapon.id).name;
 
-            // Range field
+            // Range field — system.range.short is a StringField in the schema.
             const rangeInput = root.querySelector(
-                'input[name="system.range.short"], input[name="system.range.medium"], input[name="system.range.long"]',
+                'input[name="system.range.short"]',
             ) as HTMLInputElement | null;
-            let rangePersisted: number | null = null;
+            let rangePersisted: string | null = null;
             if (rangeInput) {
                 rangeInput.value = "42";
                 rangeInput.dispatchEvent(new Event("change", {bubbles: true}));
                 await new Promise((r) => setTimeout(r, 400));
-                const path = rangeInput.name.split(".");
-                let v: any = actor.items.get(weapon.id);
-                for (const k of path) v = v?.[k];
-                rangePersisted = Number(v);
+                rangePersisted = String(actor.items.get(weapon.id).system.range.short);
+            }
+
+            // Skill field — system.stats.skill is a StringField in the schema.
+            const skillInput = root.querySelector(
+                'input[name="system.stats.skill"]',
+            ) as HTMLInputElement | null;
+            let skillPersisted: string | null = null;
+            if (skillInput) {
+                skillInput.value = "Firearms";
+                skillInput.dispatchEvent(new Event("change", {bubbles: true}));
+                await new Promise((r) => setTimeout(r, 400));
+                skillPersisted = String(actor.items.get(weapon.id).system.stats.skill);
             }
 
             await weapon.sheet.close();
             await weapon.delete();
-            return {inForm, persistedName, rangePersisted};
+            return {inForm, persistedName, rangePersisted, skillPersisted};
         });
 
         expect(result.inForm, "weapon name input is direct child of item-sheet form").toBe(true);
         expect(result.persistedName).toBe("smoke-weapon-renamed");
-        if (result.rangePersisted !== null) {
-            expect(result.rangePersisted).toBe(42);
-        }
+        // #38 regression: range and skill must persist via the form-change
+        // submit path, not just direct item.update. Failing soft (null) means
+        // the input never rendered, which is itself a regression.
+        expect(result.rangePersisted, "system.range.short input rendered and persisted (#38)").toBe("42");
+        expect(result.skillPersisted, "system.stats.skill input rendered and persisted (#38)").toBe("Firearms");
     });
 
     test("item-attribute-edit dialog template has no <form> and named dice/pips inputs", async ({page}) => {
