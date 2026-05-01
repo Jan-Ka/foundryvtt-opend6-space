@@ -527,6 +527,12 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if (region && !game.settings.get('od6s', 'explosive_end_of_round')) {
             await region.update({ visibility: 2 });
         }
+        if (game.settings.get('od6s', 'auto_explosive')) {
+            await item?.unsetFlag('od6s', 'explosiveSet');
+            await item?.unsetFlag('od6s', 'explosiveTemplate');
+            await item?.unsetFlag('od6s', 'explosiveOrigin');
+            await item?.unsetFlag('od6s', 'explosiveRange');
+        }
     }
 
     if (rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block') {
