@@ -5,10 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Historical release notes prior to this changelog are at the project
-[wiki](https://github.com/Jan-Ka/foundryvtt-opend6-space/wiki) (the original
-GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>
-remains available for entries that pre-date the GitHub move).
+Historical release notes prior to this changelog live on the original
+GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 

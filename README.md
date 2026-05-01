@@ -25,7 +25,8 @@ Built so my brother can keep having awesome adventures in space.
 ## Requirements
 
 - Foundry VTT **v14** (minimum 14, maximum 14)
-- [socketlib](https://foundryvtt.com/packages/socketlib) module — must be installed and active
+- [socketlib](https://foundryvtt.com/packages/socketlib) module — must be
+  installed and active
 
 ## Installation
 
@@ -52,7 +53,7 @@ for the verify command. Each release also ships a CycloneDX SBOM
 ## Configuration
 
 System rules can be tailored under **Game Settings → Configure Settings →
-System Settings**. See the [wiki](https://github.com/Jan-Ka/foundryvtt-opend6-space/wiki)
+System Settings**. See the [System Settings wiki page](https://github.com/Jan-Ka/foundryvtt-opend6-space/wiki/System-Settings)
 for a tour of the options.
 
 ## Localization
@@ -97,7 +98,9 @@ The specs reuse the same probes documented in
 sheet rendering, settings forms, roll flow, wound transitions, and
 combat.
 
-See the [architecture notes](docs/ARCHITECTURE.md) for an overview of the module layout and conventions — or run `/init` in Claude Code to regenerate them.
+See the [architecture notes](docs/ARCHITECTURE.md) for an overview of the
+module layout and conventions — or run `/init` in Claude Code to regenerate
+them.
 
 ## Contributing
 

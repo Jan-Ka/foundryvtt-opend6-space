@@ -62,7 +62,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          WIKI_URL: ${{ github.server_url }}/${{ github.repository }}/wiki
+          WIKI_URL: ${{ github.server_url }}/${{ github.repository }}/wiki/Troubleshooting
           ARTIFACT_NAME: od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -91,7 +91,7 @@ jobs:
             echo
             echo "> Foundry's *Install System → Manifest URL* flow does **not** work for PR previews — artifacts require a logged-in download, so manual extraction is the only path. Stable installs will continue to use the manifest URL from tagged releases."
             echo
-            echo "More detail / troubleshooting: see the [project wiki](${WIKI_URL})."
+            echo "More detail / troubleshooting: see the [Troubleshooting wiki page](${WIKI_URL})."
             echo
             echo "_This comment is updated automatically on every push._"
           } > "$BODY_FILE"

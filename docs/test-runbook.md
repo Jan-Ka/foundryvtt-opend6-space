@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # OpenD6 Space — Test Runbook
 
 A tier-based test plan for verifying system health after migrations, refactors,
@@ -5,21 +6,21 @@ or Foundry version bumps.
 
 ## Automated vs manual
 
-| Tier | What | How |
-|------|------|-----|
-| 0 | Lint, typecheck, unit tests, build | `pnpm run check && pnpm run build` |
-| 1 | Boot & registration | `pnpm run test:smoke` |
-| 2 | Sheet rendering | `pnpm run test:smoke` |
-| 3a | Settings forms | `pnpm run test:smoke` |
-| 3b | Roll flow (attribute + skill) | `pnpm run test:smoke` |
-| 3c | Wound flow & status effects | `pnpm run test:smoke` |
-| 3d | Combat & initiative | `pnpm run test:smoke` |
-| 3e | Damage pipeline (wounds + vehicle) | `pnpm run test:smoke` |
-| 3f | Vehicle actor & item schema | `pnpm run test:smoke` |
-| 3g | Weapon roll (item.roll) | `pnpm run test:smoke` |
-| 3h | Edit-difficulty chat-card flow | `pnpm run test:smoke` |
-| 4 | Multi-user / socket flows | Manual (requires two clients) |
-| 5 | Migration from pre-v2 world | Manual (requires backup world) |
+| Tier | What                               | How                                |
+| ---- | ---------------------------------- | ---------------------------------- |
+| 0    | Lint, typecheck, unit tests, build | `pnpm run check && pnpm run build` |
+| 1    | Boot & registration                | `pnpm run test:smoke`              |
+| 2    | Sheet rendering                    | `pnpm run test:smoke`              |
+| 3a   | Settings forms                     | `pnpm run test:smoke`              |
+| 3b   | Roll flow (attribute + skill)      | `pnpm run test:smoke`              |
+| 3c   | Wound flow & status effects        | `pnpm run test:smoke`              |
+| 3d   | Combat & initiative                | `pnpm run test:smoke`              |
+| 3e   | Damage pipeline (wounds + vehicle) | `pnpm run test:smoke`              |
+| 3f   | Vehicle actor & item schema        | `pnpm run test:smoke`              |
+| 3g   | Weapon roll (item.roll)            | `pnpm run test:smoke`              |
+| 3h   | Edit-difficulty chat-card flow     | `pnpm run test:smoke`              |
+| 4    | Multi-user / socket flows          | Manual (requires two clients)      |
+| 5    | Migration from pre-v2 world        | Manual (requires backup world)     |
 
 **Do not run Tiers 1–3 manually unless Playwright is unavailable or you are
 diagnosing a specific failure.** The console blocks below are reference
@@ -52,7 +53,7 @@ pnpm run test:smoke
 Requires a running Foundry process at `localhost:30000` with the `od6s`
 system installed. Configure via env:
 
-```
+```text
 FOUNDRY_URL=http://localhost:30000
 FOUNDRY_USER=Gamemaster
 FOUNDRY_GM_PASSWORD=            # per-user GM join password (blank for fresh worlds)

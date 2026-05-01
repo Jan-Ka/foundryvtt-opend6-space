@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 
 # Contributor Covenant Code of Conduct
 
@@ -82,4 +83,3 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 [Mozilla CoC]: https://github.com/mozilla/diversity
 [FAQ]: https://www.contributor-covenant.org/faq
 [translations]: https://www.contributor-covenant.org/translations
-

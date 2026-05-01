@@ -127,6 +127,7 @@ Release artifacts are signed with [cosign](https://docs.sigstore.dev/)
 keyless signing via GitHub Actions OIDC. To verify a downloaded
 `od6s.zip`:
 
+<!-- markdownlint-disable MD013 -->
 ```bash
 cosign verify-blob \
   --certificate od6s.zip.pem \
@@ -135,6 +136,7 @@ cosign verify-blob \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   od6s.zip
 ```
+<!-- markdownlint-enable MD013 -->
 
 Each release also includes a CycloneDX SBOM (`sbom.cdx.json`) and a
 SHA-256 checksum file (`od6s.zip.sha256`).
