@@ -66,6 +66,7 @@ export class od6sadvance {
             cpcostcolor: "black",
             freeadvance: freeAdvance,
             type: dataset.type,
+            attrname: dataset.attrname,
             originalscore: originalScore,
             itemid: itemid,
             used: used,
@@ -80,7 +81,6 @@ export class od6sadvance {
                 (dlg, formData) => od6sadvance.advanceAction(
                     dlg.actorSheet.actor,
                     dlg.advanceData,
-                    event,
                     formData.base,
                 ),
             ).render({force: true});
@@ -91,7 +91,6 @@ export class od6sadvance {
                 (dlg, formData) => od6sadvance.advanceAction(
                     dlg.actorSheet.actor,
                     dlg.advanceData,
-                    event,
                     formData.dice,
                     formData.pips,
                 ),
@@ -99,7 +98,7 @@ export class od6sadvance {
         }
     }
 
-    static async advanceAction(actor: Actor, advanceData: any, event: Event, dice?: number, pips?: number) {
+    static async advanceAction(actor: Actor, advanceData: any, dice?: number, pips?: number) {
 
         const actorData = actor.system as OD6SCharacterSystem;
         const actorUpdate: any = {};
@@ -121,16 +120,14 @@ export class od6sadvance {
             }
         }
 
-        const dataset = (event.currentTarget as HTMLElement).dataset;
-
         /* Determine item or attribute */
-        if (dataset.type === "attribute") {
+        if (advanceData.type === "attribute") {
             actorUpdate.system.attributes = {};
-            actorUpdate.system.attributes[dataset.attrname!] = {};
-            actorUpdate.system.attributes[dataset.attrname!].base = advanceData.score;
+            actorUpdate.system.attributes[advanceData.attrname!] = {};
+            actorUpdate.system.attributes[advanceData.attrname!].base = advanceData.score;
         }
 
-        if(dataset.type === "skill") {
+        if(advanceData.type === "skill") {
             const skill = actor.items.get(advanceData.itemid);
 
             if(OD6S.specLink) {
@@ -169,7 +166,7 @@ export class od6sadvance {
             }
         }
 
-        if(dataset.type === "specialization") {
+        if(advanceData.type === "specialization") {
             /* Add/subtract to item score, not displayed/aggregate score */
             let newScore;
             OD6S.flatSkills ? newScore = advanceData.base : newScore = advanceData.score - advanceData.originalscore;
