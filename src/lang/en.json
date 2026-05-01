@@ -611,6 +611,8 @@
   "OD6S.CONFIG_SHOW_METAPHYSICS_ATTRIBUTES": "Show Metaphysics on Attributes Tab",
   "OD6S.CONFIG_SHOW_METAPHYSICS_ATTRIBUTES_DESCRIPTION": "If selected the Metaphysics Attribute and/or Skills will be shown on the Attributes tab, but only if 'Do not use Metaphysics Attribute' under 'Rules Options is not selected.'",
   "OD6S.CONFIG_SHOW_MODIFIERS_DESCRIPTION": "Show common difficulty/modifier options on roll dialogs",
+  "OD6S.CONFIG_SHEET_BACKGROUND_OPACITY": "Sheet Background Opacity",
+  "OD6S.CONFIG_SHEET_BACKGROUND_OPACITY_DESCRIPTION": "Multiplier applied to the actor/item sheet background. 0 = fully transparent, 1 = default, 2 = fully opaque. Useful for adapting sheets to busy maps (low value over a starfield, high value over a jungle).",
   "OD6S.CONFIG_SHOW_MODIFIERS": "Show Modifiers on Rolls",
   "OD6S.CONFIG_SHOW_SKILL_SPECIALIZATION_DESCRIPTION": "Show the base Skill for a Specialization when rolling specializations in the roll dialog and the chat log.",
   "OD6S.CONFIG_SHOW_SKILL_SPECIALIZATION": "Show Skill on Spec Rolls",

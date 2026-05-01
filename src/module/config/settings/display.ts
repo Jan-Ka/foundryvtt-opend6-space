@@ -1,5 +1,10 @@
 import OD6S from "../config-od6s";
 
+export function applySheetBackgroundOpacity(value: number): void {
+    const clamped = Number.isFinite(value) ? Math.max(0, Math.min(2, value)) : 1;
+    document.documentElement.style.setProperty("--od6s-sheet-opacity", String(clamped));
+}
+
 export function registerDisplaySettings() {
     game.settings.register("od6s", "hide_compendia", {
         name: game.i18n.localize("OD6S.CONFIG_HIDE_COMPENDIA"),
@@ -89,6 +94,19 @@ export function registerDisplaySettings() {
         requiresReload: true,
         onChange: (value: boolean) => OD6S.showSkillSpecialization = value
     })
+
+    game.settings.register("od6s", "sheet_background_opacity", {
+        name: game.i18n.localize('OD6S.CONFIG_SHEET_BACKGROUND_OPACITY'),
+        hint: game.i18n.localize('OD6S.CONFIG_SHEET_BACKGROUND_OPACITY_DESCRIPTION'),
+        scope: "client",
+        config: true,
+        default: 1,
+        type: Number,
+        range: {min: 0, max: 2, step: 0.05},
+        onChange: (value: number) => applySheetBackgroundOpacity(value),
+    });
+
+    applySheetBackgroundOpacity(game.settings.get('od6s', 'sheet_background_opacity') as number);
 
     game.settings.register("od6s", "show_metaphysics_attributes", {
         name: game.i18n.localize('OD6S.CONFIG_SHOW_METAPHYSICS_ATTRIBUTES'),
