@@ -101,7 +101,7 @@ test("vehicle/starship sheet re-render does not double-count skill scores (#29)"
             // StarshipItems against the live DataModel.
             for (let i = 0; i < 3; i++) {
                 await actor.sheet.render(true);
-                await new Promise((r) => setTimeout(r, 150));
+                await new Promise((r) => setTimeout(r, 250));
             }
             const fresh = window.game.actors.get(actor.id).items.get(skill.id);
             out[type] = {
