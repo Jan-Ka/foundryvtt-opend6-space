@@ -23,21 +23,25 @@ test("weapon roll opens dialog, submits, creates chat message with damage flags"
         if (actor.system.attributes.agi.base < 1) {
             await actor.update({"system.attributes.agi.base": 10});
         }
-        // Create a smoke weapon if not present
-        const existing = actor.items.find((i: any) => i.type === "weapon" && i.name === "smoke-weapon");
-        if (!existing) {
-            await actor.createEmbeddedDocuments("Item", [{
-                name: "smoke-weapon",
-                type: "weapon",
-                system: {
-                    damage: 12,       // 4D damage (score in pips: 4×3=12)
-                    damage_type: "p", // physical
-                    range: {short: 20, medium: 50, long: 100},
-                    skill: {value: "Firearms"},
-                    attribute: {value: "agi"},
-                },
-            }]);
-        }
+        // Recreate the smoke weapon every run so this test isn't sensitive
+        // to schema drift in stale documents from earlier runs (the original
+        // version of this spec wrote against the wrong schema shape).
+        const stale = actor.items.filter(
+            (i: any) => i.type === "weapon" && i.name === "smoke-weapon",
+        ).map((i: any) => i.id);
+        if (stale.length) await actor.deleteEmbeddedDocuments("Item", stale);
+        await actor.createEmbeddedDocuments("Item", [{
+            name: "smoke-weapon",
+            type: "weapon",
+            system: {
+                // Schema: damage is a SchemaField — score (pips) and type live
+                // under it. 4D = 12 pips at the default 3 pips/die.
+                damage: {score: 12, type: "p"},
+                // range fields are StringField in the schema.
+                range: {short: "20", medium: "50", long: "100"},
+                stats: {skill: "Firearms", attribute: "AGI"},
+            },
+        }]);
     });
 
     const result = await evalInWorld(page, async () => {
