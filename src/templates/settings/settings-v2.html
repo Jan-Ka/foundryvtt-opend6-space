@@ -1,4 +1,4 @@
-<form autocomplete="off" onsubmit="event.preventDefault();">
+<div>
     {{#each settings as |setting s|}}
         <div class="form-group">
             <label for="{{setting.key}}">{{localize setting.name}}</label>
@@ -29,4 +29,4 @@
     <div class="submit">
         <button type="submit" name="close" data-action="closeForm">{{localize "Submit"}}</button>
     </div>
-</form>
+</div>

@@ -87,7 +87,7 @@ export default class od6sRulesConfiguration extends HandlebarsApplicationMixin(A
 
     static async #onCloseForm(this: od6sRulesConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

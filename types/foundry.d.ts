@@ -71,6 +71,19 @@ declare class Module {
 // ---- Foundry Namespace ----
 
 declare namespace foundry {
+    namespace canvas {
+        namespace geometry {
+            class Ray {
+                constructor(A: { x: number; y: number }, B: { x: number; y: number });
+                A: { x: number; y: number };
+                B: { x: number; y: number };
+                angle: number;
+                distance: number;
+                static fromAngle(x: number, y: number, radians: number, distance: number): Ray;
+            }
+        }
+    }
+
     namespace utils {
         function mergeObject<T extends object>(original: T, other: any, options?: MergeObjectOptions): T;
         function deepClone<T>(original: T): T;
@@ -102,6 +115,12 @@ declare namespace foundry {
                 static confirm(options: any): Promise<boolean>;
                 static prompt(options: any): Promise<any>;
                 static wait(options: any): Promise<any>;
+            }
+        }
+
+        namespace settings {
+            class SettingsConfig {
+                static reloadConfirm(options?: { world?: boolean }): Promise<boolean>;
             }
         }
 

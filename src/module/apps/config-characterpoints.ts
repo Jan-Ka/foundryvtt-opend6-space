@@ -66,7 +66,7 @@ export default class od6sCharacterPointConfiguration extends HandlebarsApplicati
 
     static async #onCloseForm(this: od6sCharacterPointConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

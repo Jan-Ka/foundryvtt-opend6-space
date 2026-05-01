@@ -68,7 +68,7 @@ export default class od6sWildDieConfiguration extends HandlebarsApplicationMixin
 
     static async #onCloseForm(this: od6sWildDieConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

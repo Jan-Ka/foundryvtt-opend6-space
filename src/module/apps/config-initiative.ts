@@ -83,7 +83,7 @@ export default class od6sInitiativeConfiguration extends HandlebarsApplicationMi
 
     static async #onCloseForm(this: od6sInitiativeConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

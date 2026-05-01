@@ -87,7 +87,7 @@ export default class od6sActiveAttributesConfiguration extends HandlebarsApplica
 
     static async #onCloseForm(this: od6sActiveAttributesConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }

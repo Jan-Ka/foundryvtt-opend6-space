@@ -66,7 +66,7 @@ export default class od6sDeadlinessConfiguration extends HandlebarsApplicationMi
 
     static async #onCloseForm(this: od6sDeadlinessConfiguration): Promise<void> {
         if (this.requiresWorldReload) {
-            await SettingsConfig.reloadConfirm({world: true});
+            await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }
         await this.close();
     }
