@@ -383,4 +383,90 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         // base is stored in pips (3 pips = 1 die). dice=7, pips=0 → 7D → 21 pips.
         expect(result.finalBase, "attribute base advanced to dialog value").toBe(21);
     });
+
+    test("attribute-edit dialog submit does not throw on stale event.currentTarget", async ({page}) => {
+        // Regression for #42 residual: editAttributeAction read
+        // event.currentTarget.dataset.attrname after awaiting DialogV2.input,
+        // but currentTarget is null by then → TypeError, update never runs.
+        // Mirrors the advance-dialog regression test above.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            await actor.update({
+                "system.attributes.agi.base": 6,
+                "system.sheetmode.value": "freeedit",
+            });
+            await actor.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 300));
+
+            const root = actor.sheet.element as HTMLElement;
+            const editBtn = root.querySelector(
+                '.attribute-edit[data-attrname="agi"]',
+            ) as HTMLElement | null;
+            if (!editBtn) {
+                await actor.sheet.close();
+                return {found: false};
+            }
+
+            const errors: string[] = [];
+            const onErr = (e: ErrorEvent) => errors.push(String(e.message ?? e));
+            const onRej = (e: PromiseRejectionEvent) => errors.push(String(e.reason?.message ?? e.reason));
+            window.addEventListener("error", onErr);
+            window.addEventListener("unhandledrejection", onRej);
+
+            editBtn.click();
+            // DialogV2.input renders asynchronously; poll for it.
+            let dice: HTMLInputElement | null = null;
+            let pips: HTMLInputElement | null = null;
+            for (let i = 0; i < 30; i++) {
+                await new Promise((r) => setTimeout(r, 100));
+                dice = document.querySelector('input[name="dice"]') as HTMLInputElement | null;
+                pips = document.querySelector('input[name="pips"]') as HTMLInputElement | null;
+                if (dice && pips) break;
+            }
+
+            let submitted = false;
+            if (dice && pips) {
+                dice.value = "7";
+                pips.value = "0";
+                dice.dispatchEvent(new Event("change", {bubbles: true}));
+                pips.dispatchEvent(new Event("change", {bubbles: true}));
+                const dlgEl = dice.closest(".application") as HTMLElement | null;
+                const okBtn = dlgEl?.querySelector(
+                    'button[data-action="ok"], button[data-action="submit"], button.dialog-button[data-button="ok"], footer button[type="submit"]',
+                ) as HTMLButtonElement | null;
+                if (okBtn) {
+                    okBtn.click();
+                    for (let i = 0; i < 30; i++) {
+                        await new Promise((r) => setTimeout(r, 100));
+                        if (window.game.actors.get(actor.id).system.attributes.agi.base !== 6) break;
+                    }
+                    submitted = true;
+                }
+            }
+
+            window.removeEventListener("error", onErr);
+            window.removeEventListener("unhandledrejection", onRej);
+
+            const finalBase = window.game.actors.get(actor.id).system.attributes.agi.base;
+            await actor.sheet.close();
+
+            const currentTargetErrors = errors.filter(
+                (e) => /currentTarget/i.test(e) && /dataset/i.test(e),
+            );
+            return {found: true, submitted, finalBase, currentTargetErrors};
+        });
+
+        if (!result.found) {
+            test.skip(true, "no .attribute-edit[data-attrname=agi] button on the rendered sheet");
+            return;
+        }
+        expect(result.submitted, "attribute-edit dialog opened and submitted").toBe(true);
+        expect(result.currentTargetErrors,
+            "no TypeError reading dataset off a stale event.currentTarget").toEqual([]);
+        // dice=7, pips=0 → 7D → 21 pips.
+        expect(result.finalBase, "attribute base updated to dialog value").toBe(21);
+    });
 });

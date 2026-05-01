@@ -14,6 +14,7 @@ export class od6sattributeedit {
         event.preventDefault();
 
         const attribute = event.currentTarget.dataset.attrname;
+        const label = event.currentTarget.dataset.label;
         // @ts-expect-error this.actor is bound by mixin caller
         const score = this.actor.system.attributes[attribute].base;
 
@@ -22,20 +23,18 @@ export class od6sattributeedit {
             {score});
 
         const result = await foundry.applications.api.DialogV2.input({
-            window: {title: game.i18n.localize("OD6S.EDIT") + " " + event.currentTarget.dataset.label + "!"},
+            window: {title: game.i18n.localize("OD6S.EDIT") + " " + label + "!"},
             content,
             ok: {label: game.i18n.localize("OD6S.EDIT_ATTRIBUTE")},
         });
         if (!result) return;
 
         // @ts-expect-error this.actor is bound by mixin caller
-        await od6sattributeedit.editAttributeAction(result.dice, result.pips, event, this.actor);
+        await od6sattributeedit.editAttributeAction(result.dice, result.pips, attribute, this.actor);
     }
 
-    static async editAttributeAction(dice: any, pips: any, event: any, actor: any) {
-        event.preventDefault();
+    static async editAttributeAction(dice: any, pips: any, attribute: string, actor: any) {
         const newScore = od6sutilities.getScoreFromDice(dice, pips);
-        const attribute = event.currentTarget.dataset.attrname;
 
         const update: any = {};
         update.id = actor.id;
