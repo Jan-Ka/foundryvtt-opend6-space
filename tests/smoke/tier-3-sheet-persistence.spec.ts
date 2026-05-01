@@ -150,7 +150,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(data.pips).toBe("2");
     });
 
-    test("item name input on item sheet persists", async ({page}) => {
+    test("weapon item-sheet persists name, range.short, and stats.skill via form change (#38)", async ({page}) => {
         await loginAndWaitReady(page);
         await ensureCharacter(page);
 
