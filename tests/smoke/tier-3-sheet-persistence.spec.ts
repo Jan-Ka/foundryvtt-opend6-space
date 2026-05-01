@@ -303,7 +303,14 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
         const result = await evalInWorld(page, async () => {
             const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
-            await actor.update({"system.attributes.agi.base": 6});
+            // The .advancedialog button is only rendered in advance mode.
+            // Also give the actor character points so the cpcost gate
+            // doesn't reject the submit.
+            await actor.update({
+                "system.attributes.agi.base": 6,
+                "system.sheetmode.value": "advance",
+                "system.characterpoints.value": 50,
+            });
             await actor.sheet.render(true);
             await new Promise((r) => setTimeout(r, 300));
 
@@ -373,6 +380,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.submitted, "advance dialog opened and submitted").toBe(true);
         expect(result.currentTargetErrors,
             "no TypeError reading dataset off a stale event.currentTarget").toEqual([]);
-        expect(result.finalBase, "attribute base advanced to dialog value").toBe(7);
+        // base is stored in pips (3 pips = 1 die). dice=7, pips=0 → 7D → 21 pips.
+        expect(result.finalBase, "attribute base advanced to dialog value").toBe(21);
     });
 });

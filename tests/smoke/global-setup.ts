@@ -24,6 +24,13 @@ const FOUNDRY_URL = process.env.FOUNDRY_URL ?? "http://localhost:30000";
 const FOUNDRY_ADMIN_KEY = process.env.FOUNDRY_ADMIN_KEY ?? "";
 const FOUNDRY_SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "od6s-smoke";
 const FOUNDRY_SYSTEM_ID = process.env.FOUNDRY_SYSTEM_ID ?? "od6s";
+const FOUNDRY_USER = process.env.FOUNDRY_USER ?? "Gamemaster";
+const FOUNDRY_GM_PASSWORD = process.env.FOUNDRY_GM_PASSWORD ?? "";
+// Default on. Set to "0" / "false" to refuse to shut down a running
+// non-smoke world (preserves an in-progress personal session).
+const FOUNDRY_SMOKE_AUTOSHUTDOWN = !/^(0|false)$/i.test(
+    process.env.FOUNDRY_SMOKE_AUTOSHUTDOWN ?? "",
+);
 const PROBE_TIMEOUT_MS = 10_000;
 
 class SmokePreconditionError extends Error {
@@ -63,6 +70,9 @@ export default async function globalSetup(_config: FullConfig): Promise<void> {
             worldId: FOUNDRY_SMOKE_WORLD,
             system: FOUNDRY_SYSTEM_ID,
             adminKey: FOUNDRY_ADMIN_KEY,
+            gmUser: FOUNDRY_USER,
+            gmPassword: FOUNDRY_GM_PASSWORD,
+            autoShutdown: FOUNDRY_SMOKE_AUTOSHUTDOWN,
             log: (msg) => console.log(msg),
         });
     } finally {
