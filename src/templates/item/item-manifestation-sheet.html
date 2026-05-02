@@ -60,7 +60,7 @@
                         {{#unless item.system.skills.channel.value}}disabled{{/unless}}>
                     
                         {{#each (getDifficultiesShort) as |level key|}}
-                            <option value="{{ key }}" {{#if (eq key item.system.skills.channel.difficulty)}}selected{{/if}}>
+                            <option value="{{ key }}" {{#if (eq key @root.item.system.skills.channel.difficulty)}}selected{{/if}}>
                                 {{localize level}}
                             </option>
                         {{/each}}
@@ -78,7 +78,7 @@
                         {{#unless item.system.skills.sense.value}}disabled{{/unless}}>
                     
                         {{#each (getDifficultiesShort) as |level key|}}
-                            <option value="{{ key }}" {{#if (eq key item.system.skills.sense.difficulty)}}selected{{/if}}>
+                            <option value="{{ key }}" {{#if (eq key @root.item.system.skills.sense.difficulty)}}selected{{/if}}>
                                 {{localize level}}
                             </option>
                         {{/each}}
@@ -97,7 +97,7 @@
                         {{#unless item.system.skills.transform.value}}disabled{{/unless}}>
                     
                         {{#each (getDifficultiesShort) as |level key|}}
-                            <option value="{{ key }}" {{#if (eq key item.system.skills.transform.difficulty)}}selected{{/if}}>
+                            <option value="{{ key }}" {{#if (eq key @root.item.system.skills.transform.difficulty)}}selected{{/if}}>
                                 {{localize level}}
                             </option>
                         {{/each}}

@@ -11,7 +11,7 @@
                         <select name="system.price" id="item.system.price">
                             
                                 {{#each (getPrices) as |price key|}}
-                                    <option value="{{ key }}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                    <option value="{{ key }}" {{#if (eq key @root.item.system.price)}}selected{{/if}}>
                                         {{key}}: {{localize price}}
                                     </option>
                                 {{/each}}
@@ -54,7 +54,7 @@
                     <select name="system.location" id="item.system.location" style="width: 70px;">
                         
                             {{#each (getCyberneticsLocations) as |location| }}
-                                <option value="{{location}}" {{#if (eq location item.system.location)}}selected{{/if}}>{{localize location}}</option>
+                                <option value="{{location}}" {{#if (eq location @root.item.system.location)}}selected{{/if}}>{{localize location}}</option>
                             {{/each}}
                         
                     </select>

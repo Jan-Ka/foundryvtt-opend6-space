@@ -39,7 +39,7 @@
                     
                         {{#each (getAttributes) as |attribute key|}}
                             {{#if attribute.active }}
-                            <option value="{{ key }}" {{#if (eq key item.system.attribute)}}selected{{/if}}>
+                            <option value="{{ key }}" {{#if (eq key @root.item.system.attribute)}}selected{{/if}}>
                                 {{localize attribute.name}}
                             </option>
                             {{/if}}

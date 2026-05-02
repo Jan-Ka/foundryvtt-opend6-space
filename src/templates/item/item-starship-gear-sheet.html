@@ -17,7 +17,7 @@
                             <select name="system.price" id="item.system.price">
                                 
                                     {{#each (getPrices) as |price key|}}
-                                        <option value="{{ key }}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq key @root.item.system.price)}}selected{{/if}}>
                                             {{key}}: {{localize price}}
                                         </option>
                                     {{/each}}

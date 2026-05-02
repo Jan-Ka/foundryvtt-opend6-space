@@ -17,7 +17,7 @@
                             <select name="system.price" id="item.system.price">
                                 
                                     {{#each (getPrices) as |price key|}}
-                                        <option value="{{ key }}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq key @root.item.system.price)}}selected{{/if}}>
                                             {{key}}: {{localize price}}
                                         </option>
                                     {{/each}}
@@ -37,7 +37,7 @@
                             <select name="system.damaged" id="item.system.damaged">
                                 
                                     {{#each (getWeaponDamageLevels) as |level key|}}
-                                        <option value="{{ key }}" {{#if (eq key item.system.damaged)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq key @root.item.system.damaged)}}selected{{/if}}>
                                             {{localize level}}
                                         </option>
                                     {{/each}}
@@ -106,7 +106,7 @@
                             <select name="system.damage.type" id="item.system.damage.type">
                                 
                                     {{#each (getDamageTypes) as |damagetype key|}}
-                                        <option value="{{ key }}" {{#if (eq key item.system.damage.type)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq key @root.item.system.damage.type)}}selected{{/if}}>
                                             {{localize damagetype}}
                                         </option>
                                     {{/each}}

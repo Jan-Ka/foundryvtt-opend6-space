@@ -486,6 +486,61 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.selAfterSecond, "<select> still shows stored damage after re-render").toBe(result.target);
     });
 
+    test("armor sheet damaged <select> persists non-default level (#67)", async ({page}) => {
+        // Sister coverage to the weapon-subtype and starship-damage tests
+        // for the broader each-block sweep (#67). Pick a non-first option
+        // so the bug actually surfaces — the stored value would otherwise
+        // happen to match the first <option> rendered.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            for (const i of actor.items.filter((x: any) => x.name?.startsWith("smoke-armor-67"))) {
+                await i.delete();
+            }
+            const [armor] = await actor.createEmbeddedDocuments("Item", [{
+                name: "smoke-armor-67",
+                type: "armor",
+            }]);
+            await armor.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 300));
+            const root = armor.sheet.element as HTMLElement;
+            const sel = root.querySelector('select[name="system.damaged"]') as HTMLSelectElement | null;
+            if (!sel) {
+                await armor.sheet.close();
+                await armor.delete();
+                return {found: false};
+            }
+            const initial = sel.value;
+            const target = [...sel.options].find((o) => o.value !== initial)?.value;
+            if (!target) {
+                await armor.sheet.close();
+                await armor.delete();
+                return {found: false};
+            }
+            sel.value = target;
+            sel.dispatchEvent(new Event("change", {bubbles: true}));
+            await new Promise((r) => setTimeout(r, 500));
+
+            const storedAfter = actor.items.get(armor.id).system.damaged;
+            const selAfter = (root.querySelector(
+                'select[name="system.damaged"]',
+            ) as HTMLSelectElement | null)?.value ?? null;
+
+            await armor.sheet.close();
+            await armor.delete();
+            return {found: true, target, storedAfter, selAfter};
+        });
+
+        if (!result.found) {
+            test.skip(true, "armor damaged <select> not present");
+            return;
+        }
+        expect(result.storedAfter, "stored damaged matches user selection").toBe(result.target);
+        expect(result.selAfter, "<select> reflects stored damaged after submit").toBe(result.target);
+    });
+
     test("sheet-mode footer pins to the bottom of the form (#63)", async ({page}) => {
         // The flex chain is fragile: form.flexcol → inner div.flexcol →
         // .sheet-body { flex: 1 }. If the inner div doesn't carry
