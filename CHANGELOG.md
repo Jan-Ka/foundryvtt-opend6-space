@@ -18,6 +18,42 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ### Removed
 
+## [2.4.0] - 2026-05-02
+
+Chat-card accessibility pass closing #77, plus the per-roll mode
+selector and a v13 ApplicationV2 delete-button regression fix that
+surfaced while testing it.
+
+### Added
+
+- Chat cards now distinguish public / self-roll / GM-whisper / blind
+  rolls with distinct, WCAG-AA-checked accent colors and a localized
+  text badge in the header (Private / GM / Hidden) that screen readers
+  pick up alongside the visual treatment (#77). The blind-roll default
+  is a neutral slate grey to stay legible over busy maps, per the
+  accessibility request in the issue.
+- Four client-scoped color pickers and a chat background-opacity
+  slider, registered together in the settings UI. Independent from
+  the existing sheet-opacity slider — chat density makes the trade-offs
+  different, so it gets its own knob.
+- Per-roll **Mode** selector in the roll dialog footer (mirrors the
+  existing sheet-mode footer pattern). Defaults to `gmroll` for GMs
+  who have **Hide GM rolls** on, public otherwise; the explicit dialog
+  choice always wins over the auto-private setting.
+- `getWeaponRange` regression coverage for the calculated-range
+  branches (#75).
+
+### Fixed
+
+- Trash icon on chat cards now actually deletes the message. Foundry
+  v13's ApplicationV2 action map (`ChatLog`) requires
+  `data-action="deleteMessage"` on the button — the V2-migrated
+  templates were missing it, so clicks were no-ops.
+- Players can roll from their character sheet again (#76) — fixed
+  before the chat work, included here.
+
+### Removed
+
 ## [2.3.0] - 2026-05-02
 
 Closes the entire 2026-05-02 user-reported bug batch (#54, #55, #61,
