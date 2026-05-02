@@ -220,9 +220,7 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
         speaker: ChatMessage.getSpeaker({actor: (game as any).actors.find((a: any) => a.id === actor.id)}),
         flavor: label,
         flags: {od6s: flags},
-        rollMode,
-        create: true,
-    });
+    }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
         const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));

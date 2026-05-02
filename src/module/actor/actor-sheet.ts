@@ -704,9 +704,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker(),
             flavor: label,
-            rollMode,
-            create: true,
-        });
+        }, {rollMode, create: true});
 
         await this.document.update({"system.wounds.body_points.max": roll.total});
     }

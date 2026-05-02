@@ -155,11 +155,13 @@ export async function detonateExplosives(combat: any): Promise<void> {
             if(typeof(origMessage) !== 'undefined') {
                 const cloneMessage = (origMessage as any).clone(data);
                 await origMessage.unsetFlag('od6s', 'isExplosive');
+                // Blind rolls also populate `whisper`, so the blind check
+                // must come first or it would never be reached.
                 let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
-                if(origMessage.whisper.length > 0) {
-                    rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
-                } else if (origMessage.blind) {
+                if (origMessage.blind) {
                     rollMode = CONST.DICE_ROLL_MODES.BLIND;
+                } else if (origMessage.whisper.length > 0) {
+                    rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
                 }
                 await (ChatMessage as any).deleteDocuments([origMessage.id]);
                 cloneMessage.flags.od6s.canUseCp = false;
