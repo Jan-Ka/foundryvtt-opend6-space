@@ -696,9 +696,9 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         const label = game.i18n.localize("OD6S.ROLLING") + " " + game.i18n.localize(OD6S.bodyPointsName);
 
-        let rollMode: any = (CONST as any).DICE_ROLL_MODES.PUBLIC;
+        let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
         if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-            rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+            rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         }
         const roll = await new Roll(rollString).evaluate();
         await roll.toMessage({

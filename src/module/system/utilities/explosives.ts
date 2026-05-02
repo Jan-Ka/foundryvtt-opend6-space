@@ -155,11 +155,11 @@ export async function detonateExplosives(combat: any): Promise<void> {
             if(typeof(origMessage) !== 'undefined') {
                 const cloneMessage = (origMessage as any).clone(data);
                 await origMessage.unsetFlag('od6s', 'isExplosive');
-                let rollMode = (CONST as any).DICE_ROLL_MODES.PUBLIC;
+                let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
                 if(origMessage.whisper.length > 0) {
-                    rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+                    rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
                 } else if (origMessage.blind) {
-                    rollMode = (CONST as any).DICE_ROLL_MODES.BLIND;
+                    rollMode = CONST.DICE_ROLL_MODES.BLIND;
                 }
                 await (ChatMessage as any).deleteDocuments([origMessage.id]);
                 cloneMessage.flags.od6s.canUseCp = false;

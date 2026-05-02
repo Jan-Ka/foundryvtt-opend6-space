@@ -218,8 +218,8 @@ export function registerChatLogListeners() {
                 }
             }
 
-            let rollMode = (CONST as any).DICE_ROLL_MODES.PUBLIC;
-            if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+            let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
+            if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
 
             const rollMessage = await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({actor: game.actors.find(a => a.id === data.actor)}),

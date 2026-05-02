@@ -128,7 +128,7 @@ interface SimpleRollResult {
 async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     let wild = false;
     let rollString = "";
-    let rollMode = (CONST as any).DICE_ROLL_MODES.PUBLIC;
+    let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
     let dice = result.dice;
     const pips = result.pips;
     const damageRoll = !!result.damageroll;
@@ -183,7 +183,7 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     }
 
     if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-        rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
     const rollMessage = await roll.toMessage({
         speaker: ChatMessage.getSpeaker(),

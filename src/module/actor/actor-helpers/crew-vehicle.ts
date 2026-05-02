@@ -211,9 +211,9 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
         }
     }
 
-    let rollMode: any = (CONST as any).DICE_ROLL_MODES.PUBLIC;
+    let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
     if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-        rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
 
     const rollMessage = await roll.toMessage({

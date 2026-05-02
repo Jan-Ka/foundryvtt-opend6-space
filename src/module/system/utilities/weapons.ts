@@ -102,8 +102,8 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
         flags.range = newRanges;
         flags.origRange = range;
         const label = game.i18n.localize('OD6S.RANGE_ROLL') + ": " + item.name;
-        let rollMode = (CONST as any).DICE_ROLL_MODES.PUBLIC;
-        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
+        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker(),
             flavor: label,

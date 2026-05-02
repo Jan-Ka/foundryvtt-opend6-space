@@ -96,7 +96,7 @@ export class od6sInitRoll {
         const messageOptions: any = {
             'flags.od6s.canUseCp': true
         };
-        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) messageOptions.rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) messageOptions.rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         await game.combats.active.rollInitiative(rollData.combatantId, {
             "formula": rollString,
             "messageOptions": messageOptions
