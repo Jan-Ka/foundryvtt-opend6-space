@@ -200,12 +200,14 @@ export class OD6SItem extends Item {
         );
 
         // DialogV2.input parses the rendered <form>'s named inputs into
-        // an object on submit, and returns null on cancel.
+        // an object on submit, and returns null on cancel. Note: the V1
+        // Dialog.prompt forwarded `options` here, but those are
+        // document-create options (renderSheet etc.) that get passed to
+        // this.create below — not dialog config. Don't spread them.
         const result = await foundry.applications.api.DialogV2.input({
             window: {title},
             content: html,
             ok: {label: title},
-            ...options,
         });
         if (!result) return null;
 
