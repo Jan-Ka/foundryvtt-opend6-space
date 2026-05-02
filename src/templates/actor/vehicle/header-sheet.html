@@ -125,7 +125,7 @@
             <select name="system.damage.value" id="actor.system.damage.value" style="width: 70px;">
                 
                     {{#each (getVehicleDamageLevels) as |level key|}}
-                        <option value="{{ key }}" {{#if (eq key actor.system.damage.value)}}selected{{/if}}>
+                        <option value="{{ key }}" {{#if (eq key @root.actor.system.damage.value)}}selected{{/if}}>
                             {{localize key}}
                         </option>
                     {{/each}}

@@ -19,7 +19,7 @@
                                 <select name="system.price" id="item.system.price">
                                     
                                         {{#each (getPrices) as |price key|}}
-                                            <option value="{{ key }}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                            <option value="{{ key }}" {{#if (eq key @root.item.system.price)}}selected{{/if}}>
                                                 {{key}}: {{localize price}}
                                             </option>
                                         {{/each}}
@@ -33,7 +33,7 @@
                                     <select name="system.ammo_price" id="item.system.ammo_price">
                                         
                                             {{#each (getPrices) as |ammo_price key|}}
-                                                <option value="{{ key }}" {{#if (eq key item.system.ammo_price)}}selected{{/if}}>
+                                                <option value="{{ key }}" {{#if (eq key @root.item.system.ammo_price)}}selected{{/if}}>
                                                     {{key}}: {{localize ammo_price}}
                                                 </option>
                                             {{/each}}
@@ -54,7 +54,7 @@
                                 <select name="system.damaged" id="item.system.damaged">
                                     
                                         {{#each (getWeaponDamageLevels) as |level key|}}
-                                            <option value="{{ key }}" {{#if (eq key item.system.damaged)}}selected{{/if}}>
+                                            <option value="{{ key }}" {{#if (eq key @root.item.system.damaged)}}selected{{/if}}>
                                                 {{localize level}}
                                             </option>
                                         {{/each}}
@@ -93,7 +93,7 @@
                 <select name="system.subtype" id="item.system.subtype">
                     
                         {{#each (getWeaponTypes) as |subtype|}}
-                            <option value="{{ localize subtype }}" {{#if (eq (localize subtype) item.system.subtype)}}selected{{/if}}>
+                            <option value="{{ localize subtype }}" {{#if (eq (localize subtype) @root.item.system.subtype)}}selected{{/if}}>
                                 {{localize subtype}}
                             </option>
                         {{/each}}
@@ -113,7 +113,7 @@
                         <select name="system.difficulty" id="item.system.difficulty">
                             
                                 {{#each (getMeleeDifficultyLevels) as |level|}}
-                                    <option value="{{ level }}" {{#if (eq level item.system.difficulty)}}selected{{/if}}>
+                                    <option value="{{ level }}" {{#if (eq level @root.item.system.difficulty)}}selected{{/if}}>
                                         {{localize level}}
                                     </option>
                                 {{/each}}
@@ -198,7 +198,7 @@
                                 {{#if item.system.stun.stun_only}}disabled{{/if}}>
                             
                                 {{#each (getDamageTypes) as |damagetype key|}}
-                                    <option value="{{ key }}" {{#if (eq key item.system.damage.type)}}selected{{/if}}>
+                                    <option value="{{ key }}" {{#if (eq key @root.item.system.damage.type)}}selected{{/if}}>
                                         {{localize damagetype}}
                                     </option>
                                 {{/each}}
@@ -239,7 +239,7 @@
                         <select name="system.stun.type" id="item.system.stun.type">
                             
                                 {{#each (getDamageTypes) as |damagetype key|}}
-                                    <option value="{{ key }}" {{#if (eq key item.system.stun.type)}}selected{{/if}}>
+                                    <option value="{{ key }}" {{#if (eq key @root.item.system.stun.type)}}selected{{/if}}>
                                         {{localize damagetype}}
                                     </option>
                                 {{/each}}
@@ -304,7 +304,7 @@
                             <select name="system.stun.type" id="item.system.stun.type">
                                 
                                     {{#each (getDamageTypes) as |damagetype key|}}
-                                        <option value="{{ key }}" {{#if (eq key item.system.stun.type)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq key @root.item.system.stun.type)}}selected{{/if}}>
                                             {{localize damagetype}}
                                         </option>
                                     {{/each}}
@@ -351,7 +351,7 @@
                 <select name="system.stats.attribute" id="item.system.stats.attribute" style="width: 70px;">
                     
                         {{#each (getAttributes) as |attribute key|}}
-                            <option value="{{ key }}" {{#if (eq key item.system.stats.attribute)}}selected{{/if}}>
+                            <option value="{{ key }}" {{#if (eq key @root.item.system.stats.attribute)}}selected{{/if}}>
                                 {{localize attribute.name}}
                             </option>
                         {{/each}}
