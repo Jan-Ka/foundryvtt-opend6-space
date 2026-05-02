@@ -3,7 +3,7 @@
     <div class="flexrow flex-group-left usecharacterpoints">
         <div data-characterpoints="{{characterpoints}}">{{ localize 'OD6S.USE_CHARACTER_POINTS'}}</div>
         <div class="flexrow flex-group-center">
-            <div class="boxed" style="color:{{ cpcostcolor }};">{{characterpoints}}</div>
+            <div class="boxed cpcost cpcost-{{cpcostcolor}}">{{characterpoints}}</div>
             <div class="flex-group-center cpup">
                 <i class="fas fa-plus-square"></i>
             </div>
@@ -32,6 +32,6 @@
         </div>
     </div>
     <footer class="form-footer">
-        <button type="submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+        <button type="submit" class="dialog-submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
     </footer>
 </div>
