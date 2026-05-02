@@ -118,11 +118,21 @@
     }
 
     h2.charname {
-      height: 44px;
-      padding: 0;
+      // Reset the h2's own font-size so the input's `font-size: 2.1em`
+      // is relative to the sheet base, not the browser's default h2 size
+      // (~1.5em). With the cascade, the input was resolving to ~50px,
+      // exceeding the box and getting clipped by .sheet-header's
+      // overflow:hidden. Use flex centering so the input sits in the
+      // box regardless of intrinsic height.
+      font-size: 1em;
+      line-height: 1;
+      min-height: 50px;
+      padding: 4px 0 6px;
       margin: 0 0 6px;
       border: none;
       position: relative;
+      display: flex;
+      align-items: center;
 
       &::after {
         content: "";
@@ -136,12 +146,12 @@
 
       input {
         width: 100%;
-        height: 100%;
         margin: 0;
         font-family: $font-display;
         font-size: 2.1em;
         font-weight: 700;
         letter-spacing: 0.04em;
+        line-height: 1.2;
         color: $c-accent;
         background: transparent;
         border: none;

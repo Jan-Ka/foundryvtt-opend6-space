@@ -1,5 +1,8 @@
 import OD6S from "../../config/config-od6s";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
+
 /**
  * Delete an item from the actor, with confirmation dialog.
  */
@@ -27,15 +30,15 @@ export async function deleteItem(sheet: any, ev: Event) {
             const li = ct.closest<HTMLElement>(".item");
             itemId = li?.dataset.itemId;
         }
-        const confirmText = "<p>" + game.i18n.localize("OD6S.DELETE_CONFIRM") + "</p>";
-        await Dialog.prompt({
-            title: game.i18n.localize("OD6S.DELETE"),
-            content: confirmText,
-            callback: async () => {
-                await sheet.document.deleteEmbeddedDocuments('Item', [itemId]);
-                sheet.render(false);
-            }
-        })
+        // V1 Dialog.prompt rendered with the unstyled grey template; use
+        // DialogV2.confirm for the same yes/no shape with the V2 styling.
+        const ok = await foundry.applications.api.DialogV2.confirm({
+            window: {title: game.i18n.localize("OD6S.DELETE")},
+            content: `<p>${game.i18n.localize("OD6S.DELETE_CONFIRM")}</p>`,
+        });
+        if (!ok) return;
+        await sheet.document.deleteEmbeddedDocuments('Item', [itemId]);
+        sheet.render(false);
     } else {
         await sheet.document.deleteEmbeddedDocuments('Item', [ct.dataset.itemId]);
         sheet.render(false);

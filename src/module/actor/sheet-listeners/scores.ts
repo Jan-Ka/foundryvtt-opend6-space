@@ -6,6 +6,9 @@ import {od6sattributeedit} from "../attribute-edit";
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const foundry: any;
+
 interface DiceScore { dice: number; pips: number }
 
 /**
@@ -115,14 +118,14 @@ export function registerScoreListeners(
     // Roll Body Points
     el.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
         elem.addEventListener('click', async () => {
-            const confirmText = "<p>" + game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS") + "</p>";
-            await Dialog.prompt({
-                title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName),
-                content: confirmText,
-                callback: () => {
-                    return sheet._rollBodyPoints();
-                }
-            })
+            // V1 Dialog.prompt rendered with the unstyled grey template;
+            // use DialogV2.confirm for the same yes/no shape with the V2
+            // styling.
+            const ok = await foundry.applications.api.DialogV2.confirm({
+                window: {title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
+                content: `<p>${game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS")}</p>`,
+            });
+            if (ok) await sheet._rollBodyPoints();
         }));
 
     // Edit active effect (score-related effects)
