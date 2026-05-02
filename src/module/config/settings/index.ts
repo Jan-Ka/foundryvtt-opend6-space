@@ -11,6 +11,7 @@ import {registerRulesSettings} from "./rules";
 import {registerAttributeSettings} from "./attributes";
 import {registerAutomationSettings} from "./automation";
 import {registerMiscSettings} from "./misc";
+import {registerChatColorSettings} from "./chat-colors";
 
 export {updateRerollInitiative} from "./combat";
 
@@ -25,6 +26,7 @@ export async function registerSettings() {
     registerRulesSettings();
     registerAttributeSettings();
     registerMiscSettings();
+    registerChatColorSettings();
 
     updateConfig();
 }

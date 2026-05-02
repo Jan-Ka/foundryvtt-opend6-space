@@ -70,3 +70,20 @@ export function computeWildDieReduction(
     const newTotal = originalTotal - baseDieResults[highest].result - 1;
     return { discardedIndex: highest, newTotal };
 }
+
+export interface ResolveRollModeInput {
+    /** Per-roll mode chosen in the dialog, if any. Wins over hide-gm-rolls. */
+    explicit?: string | null;
+    isGM: boolean;
+    hideGmRolls: boolean;
+}
+
+/**
+ * Resolve the rollMode passed to ChatMessage. An explicit dialog choice always
+ * wins; otherwise GMs with `hide-gm-rolls` get gmroll, everyone else publicroll.
+ */
+export function resolveRollMode(input: ResolveRollModeInput): string {
+    if (typeof input.explicit === "string" && input.explicit.length > 0) return input.explicit;
+    if (input.isGM && input.hideGmRolls) return "gmroll";
+    return "publicroll";
+}

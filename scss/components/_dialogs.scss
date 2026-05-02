@@ -117,4 +117,25 @@
       text-align: right;
     }
   }
+
+  // Footer with roll-mode selector + submit. Mirrors the .sheetmode footer
+  // pattern from the actor sheet (see scss/components/_forms.scss).
+  .roll-dialog .form-footer,
+  .metaphysics-roll-dialog .form-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 8px;
+
+    .sheet-mode.roll-mode {
+      flex: 0 0 auto;
+      margin-top: 0;
+    }
+
+    .dialog-submit {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+  }
 }

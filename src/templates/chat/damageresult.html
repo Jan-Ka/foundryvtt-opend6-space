@@ -3,7 +3,7 @@
     <span class="message-metadata">
           <time class="message-timestamp">{{timeSince message.timestamp}}</time>
         {{#if user.isGM}}
-            <a class="button message-delete"><i class="fas fa-trash"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash"></i></a>
         {{/if}}
       </span>
     {{#if message.flavor}}

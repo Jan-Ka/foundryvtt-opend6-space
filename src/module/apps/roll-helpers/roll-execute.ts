@@ -7,7 +7,7 @@ import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-
 import {applyDifficultyModifiers} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
-import {computeHighHitDamage, computeWildDieReduction} from "./roll-execute-math";
+import {computeHighHitDamage, computeWildDieReduction, resolveRollMode} from "./roll-execute-math";
 import {debug} from "../../system/logger";
 
 export async function executeRollAction(rollData: RollData): Promise<unknown> {
@@ -45,7 +45,11 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     rollData.isknown = true;
-    let rollMode: string = CONST.DICE_ROLL_MODES.PUBLIC;
+    const rollMode: string = resolveRollMode({
+        explicit: typeof rollData.rollmode === "string" ? rollData.rollmode : null,
+        isGM: !!game.user.isGM,
+        hideGmRolls: !!game.settings.get('od6s', 'hide-gm-rolls'),
+    });
     if (rollData.fatepoint) {
         rollData.dice = (+rollData.originaldice * 2);
         rollData.pips = (+rollData.originalpips * 2);
@@ -223,6 +227,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     const flags: RollMessageFlags = {
+        "rollMode": rollMode,
         "actorId": rollData.actor.id,
         "targetName": targetName,
         "targetId": targetId,
@@ -438,9 +443,6 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         label = label + " (" + game.i18n.localize('OD6S.SKILL_MINIMUM') + ": " + rollMin + ")";
     }
 
-    if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) {
-        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
-    }
     const rollMessage = await roll.toMessage({
             speaker: ChatMessage.getSpeaker({actor: actor}),
             flavor: label,

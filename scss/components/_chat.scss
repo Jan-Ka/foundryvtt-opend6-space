@@ -12,7 +12,9 @@
 .chat-sidebar .chat-message,
 .chat-message.message.flexcol {
   background:
-    linear-gradient(180deg, rgba(20, 24, 32, 0.92) 0%, rgba(8, 12, 18, 0.92) 100%);
+    linear-gradient(180deg,
+      rgba(20, 24, 32, calc(0.92 * var(--od6s-chat-opacity, 1))) 0%,
+      rgba(8, 12, 18, calc(0.92 * var(--od6s-chat-opacity, 1))) 100%);
   color: $c-text-primary;
   border: 1px solid $c-border;
   border-left: 2px solid $c-accent-border;
@@ -498,12 +500,59 @@
   }
 }
 
-// ── Whisper / blind / private message tints ────────────────────────────────
-.chat-message.whisper {
+// ── Roll-mode tints (od6s-roll-{public,self,gm,blind}) ─────────────────────
+// Mode classes are added by registerChatHooks → tagRollMode in chat-hooks.ts.
+// The accent colors come from client-scoped settings registered in
+// settings/chat-colors.ts; the CSS custom property fallbacks are kept in sync
+// with the DEFAULTS map there. Colors are combined with the dark base via
+// color-mix so user-chosen hues stay readable on transparent map backgrounds.
+.chat-message.od6s-roll-self {
+  border-left-color: var(--od6s-chat-color-self, #4fb6c4) !important;
   background:
-    linear-gradient(180deg, rgba(28, 24, 40, 0.92) 0%, rgba(14, 12, 22, 0.92) 100%) !important;
+    linear-gradient(180deg,
+      color-mix(in srgb,
+        var(--od6s-chat-color-self, #4fb6c4) 14%,
+        rgba(20, 24, 32, calc(0.92 * var(--od6s-chat-opacity, 1)))) 0%,
+      rgba(8, 12, 18, calc(0.92 * var(--od6s-chat-opacity, 1))) 100%) !important;
 }
 
-.chat-message.blind {
-  border-left-color: $c-warning !important;
+.chat-message.od6s-roll-gm {
+  border-left-color: var(--od6s-chat-color-gm, #7a6dc4) !important;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,
+        var(--od6s-chat-color-gm, #7a6dc4) 16%,
+        rgba(20, 24, 32, calc(0.92 * var(--od6s-chat-opacity, 1)))) 0%,
+      rgba(8, 12, 18, calc(0.92 * var(--od6s-chat-opacity, 1))) 100%) !important;
+}
+
+.chat-message.od6s-roll-blind {
+  border-left-color: var(--od6s-chat-color-blind, #8a93a6) !important;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,
+        var(--od6s-chat-color-blind, #8a93a6) 18%,
+        rgba(20, 24, 32, calc(0.92 * var(--od6s-chat-opacity, 1)))) 0%,
+      rgba(8, 12, 18, calc(0.92 * var(--od6s-chat-opacity, 1))) 100%) !important;
+}
+
+// ── Roll-mode badge (header pill: PRIVATE / GM / HIDDEN) ───────────────────
+.chat-message .od6s-roll-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  font-family: $font-display;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+  background: rgba(0, 0, 0, 0.35);
+  line-height: 1.4;
+
+  &.od6s-roll-badge--self  { color: var(--od6s-chat-color-self,  #4fb6c4); }
+  &.od6s-roll-badge--gm    { color: var(--od6s-chat-color-gm,    #7a6dc4); }
+  &.od6s-roll-badge--blind { color: var(--od6s-chat-color-blind, #8a93a6); }
 }

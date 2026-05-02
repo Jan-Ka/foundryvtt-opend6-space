@@ -87,6 +87,7 @@ export interface RollData {
     stun: boolean;
     attackerScale: number;
     modifiers: RollModifiers;
+    rollmode?: string;
 }
 
 /**
@@ -163,6 +164,12 @@ export interface RollMessageFlags {
     triggered?: boolean;
     targets?: unknown;
     originalroll?: unknown;
+    /**
+     * Persisted roll mode chosen at message creation. Read by chat-mode.ts so
+     * the renderer can distinguish self vs gm in single-GM worlds, where
+     * `whisper === [author.id]` is ambiguous.
+     */
+    rollMode?: string;
 }
 
 /** Minimal payload for metaphysics multi-skill roll dialogs — not a full RollData. */
