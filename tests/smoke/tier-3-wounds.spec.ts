@@ -116,11 +116,19 @@ test("wound dropdown reflects stored value on render and persists round-trip", a
             return {skipReason: "wounds dropdown not rendered (woundConfig?)"};
         }
         const target = [...sel1.options].find((o) => o.value !== "0");
-        const targetVal = target?.value ?? "";
-        if (target) {
-            sel1.value = target.value;
-            sel1.dispatchEvent(new Event("change", {bubbles: true}));
-            await new Promise((r) => setTimeout(r, 600));
+        if (!target) {
+            await actor.sheet.close();
+            await actor.delete();
+            return {skipReason: "no non-zero wound option (deadliness config?)"};
+        }
+        const targetVal = target.value;
+        const targetNum = Number(targetVal);
+        sel1.value = targetVal;
+        sel1.dispatchEvent(new Event("change", {bubbles: true}));
+        // Poll for the persisted value rather than a fixed sleep — survives slow CI.
+        for (let i = 0; i < 30; i++) {
+            await new Promise((r) => setTimeout(r, 50));
+            if (window.game.actors.get(actor.id).system.wounds.value === targetNum) break;
         }
         const persistedAfterChange = window.game.actors.get(actor.id).system.wounds.value;
         await actor.sheet.close();
