@@ -1,0 +1,120 @@
+@use '../utils' as *;
+
+// ── Roll / advance / specialize dialogs ─────────────────────────────────
+// Scoped to .od6s.dialog so we don't accidentally restyle Foundry's
+// generic DialogV2 confirms used by the rest of the system.
+.od6s.dialog {
+
+  // Section divider — replaces the bare <div class="center"><b>X</b></div>
+  // pattern. Gives Penalties / Modifiers a real visual weight matched to
+  // the sheet's gold scribe lines.
+  .dialog-section {
+    margin: 12px 0 6px;
+    padding: 0;
+    font-family: $font-display;
+    font-size: 0.78em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: $c-accent;
+    text-align: center;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 4em);
+      height: 1px;
+      background: $grad-rule;
+    }
+    &::before { left: 0; }
+    &::after  { right: 0; }
+  }
+
+  // "D" suffix after each penalty / dice input — was a bare <b>D</b>,
+  // now a small muted glyph that doesn't compete with the number.
+  .dice-suffix {
+    margin-left: 4px;
+    color: $c-accent;
+    font-family: $font-display;
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  // Character-points cost readout. Was inline `style="color:black"`,
+  // invisible against the dark dialog background. Map cpcostcolor's two
+  // existing string values to text colors that work on the panel.
+  .cpcost {
+    font-family: $font-numeric;
+    font-weight: 700;
+  }
+  .cpcost-black { color: $c-text-primary; }
+  .cpcost-red   { color: $c-bad; }
+
+  // Roll / submit button — match the gold accent treatment used on the
+  // .create-character button so dialog actions feel like the same family.
+  .dialog-submit {
+    background: $grad-banner;
+    border: 1px solid $c-accent-border;
+    color: $c-accent-bright;
+    border-radius: 2px;
+    padding: 6px 22px;
+    font-family: $font-display;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    font-size: 0.95em;
+    box-shadow: $c-shadow-inset, 0 2px 8px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      filter: brightness(1.18);
+      box-shadow:
+        $c-shadow-inset,
+        0 2px 10px rgba(0, 0, 0, 0.55),
+        $c-glow-soft;
+    }
+
+    &:active { transform: translateY(1px); }
+  }
+
+  // Tighten the row rhythm so the dialog feels less stretched out.
+  .roll-dialog {
+    > .flexrow {
+      margin: 4px 0;
+      align-items: center;
+      gap: 8px;
+    }
+
+    // Two-column layout for penalty / modifier rows. Was broken because
+    // 3 of 4 .column elements had a `column>` typo and never picked up
+    // the flex:50% rule.
+    .row {
+      display: flex;
+      gap: 10px;
+      margin: 2px 0;
+
+      > .column { flex: 1 1 50%; min-width: 0; }
+    }
+
+    // Ensure labels in label/input pairs stay left-aligned and the input
+    // doesn't collapse against the right edge.
+    label {
+      flex: 0 0 auto;
+      margin-right: 6px;
+      color: $c-text-muted;
+    }
+
+    // Numeric inputs in the dialog are short — no need for them to
+    // grow to the full row width.
+    input[type="number"] {
+      width: 4em;
+      text-align: right;
+    }
+  }
+}

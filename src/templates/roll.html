@@ -25,7 +25,7 @@
         <div class="flexrow flex-group-left usecharacterpoints">
             <div data-characterpoints="{{characterpoints}}">{{ localize 'OD6S.USE_CHARACTER_POINTS'}}</div>
             <div class="flexrow flex-group-center">
-                <div class="boxed" style="color:{{ cpcostcolor }};">{{characterpoints}}</div>
+                <div class="boxed cpcost cpcost-{{cpcostcolor}}">{{characterpoints}}</div>
                 <div class="flex-group-center cpup">
                     <i class="fas fa-plus-square"></i>
                 </div>
@@ -162,9 +162,9 @@
         {{/if}}
     {{/if}}
     {{#if (showPenalties type) }}
-        <div class="center"><b>{{localize "OD6S.PENALTIES"}}</b></div>
+        <h3 class="dialog-section">{{localize "OD6S.PENALTIES"}}</h3>
         <div class="row">
-            <div class="column>">
+            <div class="column">
                 <div class="flexrow flex-group-left" title="{{localize 'OD6S.ACTION_PENALTY'}}">
                     <div class="actionpenalty flexrow flex-group-left">
                         <label for="actionpenalty">{{localize 'OD6S.ACTIONS'}}:</label>
@@ -173,7 +173,7 @@
                          data-actionpenalty="{{actionpenalty}}">
                         <input type="number" data-dtype="Number"
                                max="99" id="actionpenalty" name="actionpenalty"
-                               value="{{actionpenalty}}"><b>D</b>
+                               value="{{actionpenalty}}"><span class="dice-suffix">D</span>
                     </div>
                 </div>
             </div>
@@ -186,13 +186,13 @@
                          data-woundpenalty="{{woundpenalty}}">
                         <input type="number" data-dtype="Number"
                                max="99" id="woundpenalty" name="woundpenalty"
-                               value="{{woundpenalty}}"><b>D</b>
+                               value="{{woundpenalty}}"><span class="dice-suffix">D</span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="column>">
+            <div class="column">
                 <div class="flexrow flex-group-left" title="{{localize 'OD6S.STUNNED_PENALTY'}}">
                     <div class="stunnedpenalty flexrow flex-group-left">
                         <label for="stunnedpenalty">{{localize 'OD6S.WOUNDS_STUNNED'}}:</label>
@@ -201,11 +201,11 @@
                          data-otherpenalty="{{stunnedpenalty}}">
                         <input type="number" data-dtype="Number"
                                max="99" id="stunnedpenalty" name="stunnedpenalty"
-                               value="{{stunnedpenalty}}"><b>D</b>
+                               value="{{stunnedpenalty}}"><span class="dice-suffix">D</span>
                     </div>
                 </div>
             </div>
-            <div class="column>">
+            <div class="column">
                 <div class="flexrow flex-group-left" title="{{localize 'OD6S.OTHER_PENALTY'}}">
                     <div class="otherpenalty flexrow flex-group-left">
                         <label for="otherpenalty">{{localize 'OD6S.OTHER'}}:</label>
@@ -214,7 +214,7 @@
                          data-otherpenalty="{{otherpenalty}}">
                         <input type="number" data-dtype="Number"
                                max="99" id="otherpenalty" name="otherpenalty"
-                               value="{{otherpenalty}}"><b>D</b>
+                               value="{{otherpenalty}}"><span class="dice-suffix">D</span>
                     </div>
                 </div>
             </div>
@@ -281,7 +281,7 @@
             </div>
         {{else}}
             {{#if (showModifiers)}}
-                <div class="center"><b>{{localize "OD6S.MODIFIERS"}}</b></div>
+                <h3 class="dialog-section">{{localize "OD6S.MODIFIERS"}}</h3>
                 <div class="flexrow flex-group-left">
                     {{#unless (displayRange subtype)}}
                         <div class="flexrow flex-group-left range" data-range="{{range}}">
@@ -426,7 +426,7 @@
         {{/if}}
     {{/if}}
     {{#if (isSkillOrAttribute type subtype) }}
-        <div class="center"><b>{{localize "OD6S.MODIFIERS"}}</b></div>
+        <h3 class="dialog-section">{{localize "OD6S.MODIFIERS"}}</h3>
         <div class="row">
             <div class="column">
                 <div class="flexrow flex-group-left miscmod modifier">
@@ -439,6 +439,6 @@
         </div>
     {{/if}}
     <footer class="form-footer">
-        <button type="submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+        <button type="submit" class="dialog-submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
     </footer>
 </div>
