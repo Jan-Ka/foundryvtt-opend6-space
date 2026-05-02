@@ -18,6 +18,8 @@ const OPACITY_KEY = 'chat_background_opacity';
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
+let colorPickerHookRegistered = false;
+
 function applyOne(key: ChatColorKey, value: unknown) {
     const raw = typeof value === 'string' && HEX.test(value) ? value : DEFAULTS[key];
     document.documentElement.style.setProperty(`--od6s-chat-color-${key}`, raw);
@@ -62,13 +64,18 @@ export function registerChatColorSettings() {
     });
 
     // Upgrade the four text inputs to <input type="color"> in the settings UI.
-    Hooks.on('renderSettingsConfig', (_app: any, html: any) => {
-        const root: HTMLElement = html?.jquery ? html[0] : html;
-        (Object.values(SETTING_BY_KEY)).forEach(key => {
-            const input = root.querySelector<HTMLInputElement>(`input[name="od6s.${key}"]`);
-            if (input && input.type !== 'color') input.type = 'color';
+    // settings-od6s.ts re-runs registerSettings() on every renderSettingsConfig,
+    // so guard against accumulating handlers per settings-window open.
+    if (!colorPickerHookRegistered) {
+        colorPickerHookRegistered = true;
+        Hooks.on('renderSettingsConfig', (_app: any, html: any) => {
+            const root: HTMLElement = html?.jquery ? html[0] : html;
+            Object.values(SETTING_BY_KEY).forEach(key => {
+                const input = root.querySelector<HTMLInputElement>(`input[name="od6s.${key}"]`);
+                if (input && input.type !== 'color') input.type = 'color';
+            });
         });
-    });
+    }
 
     applyChatColors();
 }

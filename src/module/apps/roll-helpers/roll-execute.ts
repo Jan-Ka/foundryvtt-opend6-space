@@ -227,6 +227,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     const flags: RollMessageFlags = {
+        "rollMode": rollMode,
         "actorId": rollData.actor.id,
         "targetName": targetName,
         "targetId": targetId,
