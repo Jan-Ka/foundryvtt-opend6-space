@@ -172,23 +172,36 @@
   }
 
   // ── Sheet body scroll plumbing ───────────────────────────────────────────
-  // .od6s lives on the application root; the form is a grandchild via
-  // .window-content. Make window-content a flex column that constrains the
-  // form's height, then let the form's flex column give sheet-body the
-  // remaining vertical space with internal scroll.
-  .window-content {
+  // ApplicationV2's actual DOM for an actor/item sheet:
+  //   form.application.sheet.od6s
+  //     header.window-header
+  //     section.window-content                    ← flex column, doesn't scroll
+  //       div.flexcol[data-application-part]      ← our template root
+  //         header.sheet-header
+  //         nav.sheet-tabs
+  //         section.sheet-body                    ← flex:1, overflow-y:auto
+  //         section.sheet-mode                    ← flex:0 0 auto (pinned)
+  //     div.window-resize-handle
+  //
+  // For .sheet-mode to pin to the bottom of the form, every layer from
+  // window-content down has to be a flex column that fills its parent and
+  // does not itself become the scroll container. The .od6s.sheet >
+  // .window-content rule in _window.scss provides flex:1+min-height on
+  // window-content; here we (a) make it a flex column with overflow:hidden
+  // so its child (the data-application-part div) actually controls layout,
+  // and (b) make that child flex:1 + flex column so .sheet-body's flex:1
+  // has somewhere to expand into.
+  &.sheet > .window-content {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 0;
   }
 
-  form.flexcol {
+  &.sheet > .window-content > [data-application-part] {
     flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    height: 100%;
   }
 
   .sheet-body {

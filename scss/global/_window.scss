@@ -115,6 +115,13 @@
   > .window-content {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
   }
+}
+
+// Settings dialogs scroll the whole window-content as one unit. Actor/item
+// sheets need the scroll one level deeper (on .sheet-body) so the
+// .sheet-mode footer can pin below the scroll area instead of scrolling
+// with it. See _forms.scss for the full flex chain that makes this work.
+.od6s.settings-config > .window-content {
+  overflow-y: auto;
 }
