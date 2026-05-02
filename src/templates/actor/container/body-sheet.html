@@ -46,7 +46,7 @@
                                                 data-item-id="{{item._id}}" style="width: 70px" data-dtype="String">
                                             
                                                 {{#each (getConfig 'difficultyShort' '') as |level key|}}
-                                                    <option value="{{key}}" {{#if (eq key item.system.price)}}selected{{/if}}>
+                                                    <option value="{{key}}" {{#if (eq key @root.item.system.price)}}selected{{/if}}>
                                                         {{localize level}}
                                                     </option>
                                                 {{/each}}
