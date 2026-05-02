@@ -305,6 +305,187 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         }
     });
 
+    test("weapon subtype Melee survives multi-step edits (#55)", async ({page}) => {
+        // User-reported repro from #55: create weapon → set Melee →
+        // change damage type / toggle str / change dice — every other
+        // edit reverts subtype back to Ranged.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            for (const i of actor.items.filter((x: any) => x.name?.startsWith("smoke-weapon-55"))) {
+                await i.delete();
+            }
+            const [weapon] = await actor.createEmbeddedDocuments("Item", [{
+                name: "smoke-weapon-55",
+                type: "weapon",
+            }]);
+
+            await weapon.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 300));
+
+            const trail: Array<{step: string; stored: string; selected: string | null}> = [];
+            const snapshot = (step: string) => {
+                const root = weapon.sheet.element as HTMLElement;
+                const sel = root.querySelector('select[name="system.subtype"]') as HTMLSelectElement | null;
+                trail.push({
+                    step,
+                    stored: actor.items.get(weapon.id).system.subtype,
+                    selected: sel ? sel.value : null,
+                });
+            };
+
+            const meleeLabel = window.game.i18n.localize("OD6S.MELEE");
+
+            snapshot("after-create");
+
+            // Step 1: set Type → Melee.
+            const root = () => weapon.sheet.element as HTMLElement;
+            const subtype = root().querySelector('select[name="system.subtype"]') as HTMLSelectElement;
+            subtype.value = meleeLabel;
+            subtype.dispatchEvent(new Event("change", {bubbles: true}));
+            await new Promise((r) => setTimeout(r, 500));
+            snapshot("after-set-melee");
+
+            // Step 2: change damage.type.
+            const dtype = root().querySelector('select[name="system.damage.type"]') as HTMLSelectElement | null;
+            if (dtype) {
+                const other = [...dtype.options].find((o) => o.value !== dtype.value);
+                if (other) {
+                    dtype.value = other.value;
+                    dtype.dispatchEvent(new Event("change", {bubbles: true}));
+                    await new Promise((r) => setTimeout(r, 500));
+                }
+            }
+            snapshot("after-damage-type");
+
+            // Step 3: toggle damage.str checkbox (only present when Melee).
+            const str = root().querySelector('input[name="system.damage.str"]') as HTMLInputElement | null;
+            if (str) {
+                str.checked = !str.checked;
+                str.dispatchEvent(new Event("change", {bubbles: true}));
+                await new Promise((r) => setTimeout(r, 500));
+            }
+            snapshot("after-toggle-str");
+
+            // Step 4: change damage dice via the editweapondamage handler.
+            const diceInput = root().querySelector('.editweapondamage input#dice') as HTMLInputElement | null;
+            if (diceInput) {
+                diceInput.value = "2";
+                diceInput.dispatchEvent(new Event("change", {bubbles: true}));
+                await new Promise((r) => setTimeout(r, 500));
+            }
+            snapshot("after-dice-edit");
+
+            // Step 5: edit skill text input.
+            const skill = root().querySelector('input[name="system.stats.skill"]') as HTMLInputElement | null;
+            if (skill) {
+                skill.value = "brawling";
+                skill.dispatchEvent(new Event("change", {bubbles: true}));
+                await new Promise((r) => setTimeout(r, 500));
+            }
+            snapshot("after-skill-edit");
+
+            await weapon.sheet.close();
+            await weapon.delete();
+            return {meleeLabel, trail};
+        });
+
+        // Every snapshot after step 1 must show subtype still Melee, both
+        // in storage and in the rendered <select>.
+        const afterMelee = result.trail.slice(1);
+        for (const snap of afterMelee) {
+            expect(snap.stored, `[${snap.step}] stored subtype must remain Melee`)
+                .toBe(result.meleeLabel);
+            if (snap.selected !== null) {
+                expect(snap.selected, `[${snap.step}] subtype <select> must show Melee`)
+                    .toBe(result.meleeLabel);
+            }
+        }
+    });
+
+    test("starship damage <select> persists non-default level (#65)", async ({page}) => {
+        // Same root cause as #55: inside `{{#each ... as |level key|}}`, the
+        // option's `(eq key actor.system.damage.value)` check resolves
+        // `actor` against the iterated string instead of root context, so
+        // no option gets `selected` and the next submit clobbers the value
+        // back to whatever the browser is currently showing.
+        await loginAndWaitReady(page);
+
+        const result = await evalInWorld(page, async () => {
+            for (const a of window.game.actors.filter((x: any) => x.name === "smoke-starship")) {
+                await a.delete();
+            }
+            const ship = await window.Actor.create({
+                name: "smoke-starship",
+                type: "starship",
+                system: {sheetmode: {value: "freeedit"}},
+            }, {render: false});
+
+            await ship.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 300));
+
+            const root = ship.sheet.element as HTMLElement;
+            const sel = root.querySelector('select[name="system.damage.value"]') as HTMLSelectElement | null;
+            if (!sel) {
+                await ship.sheet.close();
+                await ship.delete();
+                return {found: false};
+            }
+
+            // Pick a non-first option (the bug only surfaces on non-default).
+            const initial = sel.value;
+            const target = [...sel.options].find((o) => o.value !== initial)?.value;
+            if (!target) {
+                await ship.sheet.close();
+                await ship.delete();
+                return {found: false};
+            }
+
+            sel.value = target;
+            sel.dispatchEvent(new Event("change", {bubbles: true}));
+            await new Promise((r) => setTimeout(r, 500));
+
+            const storedAfterFirst = window.game.actors.get(ship.id).system.damage.value;
+            const selAfterFirst = (root.querySelector(
+                'select[name="system.damage.value"]',
+            ) as HTMLSelectElement | null)?.value ?? null;
+
+            // Second nudge: change an unrelated field (sheetmode) to force a
+            // re-render + re-submit cycle and verify damage doesn't revert.
+            const mode = root.querySelector(
+                'select[name="system.sheetmode.value"]',
+            ) as HTMLSelectElement | null;
+            if (mode) {
+                const otherMode = [...mode.options].find((o) => o.value !== mode.value);
+                if (otherMode) {
+                    mode.value = otherMode.value;
+                    mode.dispatchEvent(new Event("change", {bubbles: true}));
+                    await new Promise((r) => setTimeout(r, 500));
+                }
+            }
+
+            const storedAfterSecond = window.game.actors.get(ship.id).system.damage.value;
+            const selAfterSecond = (root.querySelector(
+                'select[name="system.damage.value"]',
+            ) as HTMLSelectElement | null)?.value ?? null;
+
+            await ship.sheet.close();
+            await ship.delete();
+            return {found: true, target, storedAfterFirst, selAfterFirst, storedAfterSecond, selAfterSecond};
+        });
+
+        if (!result.found) {
+            test.skip(true, "starship damage <select> not present");
+            return;
+        }
+        expect(result.storedAfterFirst, "stored damage matches user selection").toBe(result.target);
+        expect(result.selAfterFirst, "<select> reflects stored damage after first submit").toBe(result.target);
+        expect(result.storedAfterSecond, "damage survives an unrelated re-render").toBe(result.target);
+        expect(result.selAfterSecond, "<select> still shows stored damage after re-render").toBe(result.target);
+    });
+
     test("advance dialog submit does not throw on stale event.currentTarget", async ({page}) => {
         // Regression for #42: advanceAction read event.currentTarget.dataset,
         // but the dialog's submit fires async after the click event has been
