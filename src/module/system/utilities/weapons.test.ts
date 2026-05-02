@@ -57,6 +57,14 @@ describe('getWeaponRange', () => {
             user: { isGM: false },
         });
         vi.stubGlobal('ChatMessage', { getSpeaker: () => ({}) });
+        vi.stubGlobal('CONST', {
+            DICE_ROLL_MODES: {
+                PUBLIC: 'publicroll',
+                PRIVATE: 'gmroll',
+                BLIND: 'blindroll',
+                SELF: 'selfroll',
+            },
+        });
         vi.stubGlobal('Roll', class {
             total = 0;
             constructor(public formula: string) {}
@@ -139,5 +147,28 @@ describe('getWeaponRange', () => {
         });
         expect(rollEvaluate).toHaveBeenCalledTimes(1);
         expect(rollToMessage).toHaveBeenCalledTimes(1);
+        // Pin the v13+ call shape: rollMode and create must be in the
+        // options arg (second), not inside messageData (first). If they
+        // leak back into messageData, Foundry silently ignores them and
+        // the GM hide-rolls setting becomes a no-op (issue #76).
+        const [messageData, options] = rollToMessage.mock.calls[0];
+        expect(messageData).not.toHaveProperty('rollMode');
+        expect(messageData).not.toHaveProperty('create');
+        expect(options).toEqual({rollMode: 'publicroll', create: true});
+    });
+
+    it('uses gmroll mode when GM has hide-gm-rolls enabled', async () => {
+        settings.set('static_str_range', false);
+        settings.set('hide-gm-rolls', true);
+        vi.stubGlobal('game', {
+            i18n: { localize: (k: string) => k },
+            settings: { get: (_ns: string, key: string) => settings.get(key) },
+            user: { isGM: true },
+        });
+        const actor = mockActor({ agi: { score: 9 } });
+        const item = { ...rangeItem('AGI', 'AGI+2', 'AGI-1'), name: 'Blaster' } as unknown as Item;
+        await getWeaponRange(actor, item);
+        const [, options] = rollToMessage.mock.calls[0];
+        expect(options).toEqual({rollMode: 'gmroll', create: true});
     });
 });

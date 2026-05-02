@@ -7,9 +7,9 @@ import OD6SCreateCharacter from "../apps/character-creation";
 
 // Listener modules
 import {registerInventoryListeners} from "./sheet-listeners/inventory";
-import {registerCombatActionListeners} from "./sheet-listeners/combat-actions";
+import {registerCombatActionListeners, registerCombatRollListeners} from "./sheet-listeners/combat-actions";
 import {registerVehicleListeners} from "./sheet-listeners/vehicle";
-import {registerScoreListeners} from "./sheet-listeners/scores";
+import {registerScoreListeners, registerRollListeners} from "./sheet-listeners/scores";
 import {registerEffectListeners} from "./sheet-listeners/effects";
 import {registerDragListeners} from "./sheet-listeners/drag";
 
@@ -252,9 +252,16 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         bindPrimaryTabs(this as any, root);
 
-        if (!this.isEditable) return;
-
+        // Roll triggers must be bound for any owner regardless of edit mode —
+        // V2 sheets render in PLAY mode by default (isEditable === false), but
+        // rolling a skill/attack is a play-mode action. See issue #76.
         const html = [root];
+        if (this.actor.isOwner) {
+            registerRollListeners(html, this);
+            registerCombatRollListeners(html, this);
+        }
+
+        if (!this.isEditable) return;
 
         root.querySelectorAll(".alpha-item-sort-button").forEach((elem) =>
             elem.addEventListener("click", async () => {
@@ -689,17 +696,15 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         const label = game.i18n.localize("OD6S.ROLLING") + " " + game.i18n.localize(OD6S.bodyPointsName);
 
-        let rollMode: any = 0;
+        let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
         if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-            rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+            rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         }
         const roll = await new Roll(rollString).evaluate();
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker(),
             flavor: label,
-            rollMode,
-            create: true,
-        });
+        }, {rollMode, create: true});
 
         await this.document.update({"system.wounds.body_points.max": roll.total});
     }

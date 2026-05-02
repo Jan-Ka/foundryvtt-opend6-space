@@ -211,18 +211,16 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
         }
     }
 
-    let rollMode: any = "roll";
+    let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
     if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-        rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
 
     const rollMessage = await roll.toMessage({
         speaker: ChatMessage.getSpeaker({actor: (game as any).actors.find((a: any) => a.id === actor.id)}),
         flavor: label,
         flags: {od6s: flags},
-        rollMode,
-        create: true,
-    });
+    }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
         const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));

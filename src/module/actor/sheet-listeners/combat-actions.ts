@@ -1,4 +1,27 @@
 /**
+ * Register the play-mode-safe combat-action roll triggers (combat-action /
+ * vehicle-action click). Bound regardless of `isEditable` so non-edit-mode
+ * sheets can still roll attacks.
+ */
+export function registerCombatRollListeners(
+    html: HTMLElement[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sheet: any,
+): void {
+    const el = html[0];
+
+    el.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            await sheet._rollAvailableAction(ev);
+        }));
+
+    el.querySelectorAll<HTMLElement>('.vehicle-action').forEach((elem: HTMLElement) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            await sheet._rollAvailableVehicleAction(ev);
+        }));
+}
+
+/**
  * Register combat action-related event listeners on the actor sheet.
  */
 export function registerCombatActionListeners(
@@ -17,18 +40,6 @@ export function registerCombatActionListeners(
     el.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
         elem.addEventListener('contextmenu', (ev: Event) => {
             sheet._onAvailableActionAdd(ev);
-        }));
-
-    // Roll available action
-    el.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
-        elem.addEventListener('click', async (ev: Event) => {
-            await sheet._rollAvailableAction(ev);
-        }));
-
-    // Roll available vehicle action
-    el.querySelectorAll<HTMLElement>('.vehicle-action').forEach((elem: HTMLElement) =>
-        elem.addEventListener('click', async (ev: Event) => {
-            await sheet._rollAvailableVehicleAction(ev);
         }));
 
     // Edit misc action

@@ -128,7 +128,7 @@ interface SimpleRollResult {
 async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     let wild = false;
     let rollString = "";
-    let rollMode = 0;
+    let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
     let dice = result.dice;
     const pips = result.pips;
     const damageRoll = !!result.damageroll;
@@ -183,15 +183,13 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     }
 
     if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-        rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
+        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
     const rollMessage = await roll.toMessage({
         speaker: ChatMessage.getSpeaker(),
         flavor: label,
         flags: {od6s: flags},
-        rollMode,
-        create: true,
-    });
+    }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
         const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));

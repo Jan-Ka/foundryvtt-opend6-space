@@ -218,8 +218,8 @@ export function registerChatLogListeners() {
                 }
             }
 
-            let rollMode = 'roll';
-            if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = "gm";
+            let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
+            if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
 
             const rollMessage = await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({actor: game.actors.find(a => a.id === data.actor)}),
@@ -227,8 +227,7 @@ export function registerChatLogListeners() {
                 flags: {
                     od6s: flags
                 },
-                messageMode: rollMode, create: true
-            });
+            }, {rollMode, create: true});
 
             if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
                 const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));

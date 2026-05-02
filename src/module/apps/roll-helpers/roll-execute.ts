@@ -45,7 +45,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     rollData.isknown = true;
-    let rollMode: string = 'roll';
+    let rollMode: string = CONST.DICE_ROLL_MODES.PUBLIC;
     if (rollData.fatepoint) {
         rollData.dice = (+rollData.originaldice * 2);
         rollData.pips = (+rollData.originalpips * 2);
@@ -439,14 +439,14 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) {
-        rollMode = "gm";
+        rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
     const rollMessage = await roll.toMessage({
             speaker: ChatMessage.getSpeaker({actor: actor}),
             flavor: label,
             flags: {od6s: flags}
         },
-        {messageMode: rollMode, create: true}
+        {rollMode, create: true}
     );
 
     if (flags.wild === true && parseInt(OD6S.wildDieOneDefault) === 2 && parseInt(OD6S.wildDieOneAuto) === 0) {
