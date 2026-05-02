@@ -151,8 +151,7 @@ export async function onDropItem(sheet: any, event: any, data: any) {
                 // Inline the equivalent createEmbeddedDocuments call.
                 const created = await sheet.document.createEmbeddedDocuments("Item", [itemData]);
                 if (created?.length) {
-                    // @ts-expect-error
-                    await sourceActor!.deleteEmbeddedDocuments('Item', [system._id]);
+                    await sourceActor!.deleteEmbeddedDocuments('Item', [item.id]);
                 }
             } else {
                 ui.notifications.warn('OD6S.WARN_NOT_DELETING_ITEM_OWNER');
