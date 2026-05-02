@@ -36,7 +36,15 @@
             <select name="system.wounds.value" id="actor.system.wounds.value" style="width: 70px;">
                 
                     {{#each (getWoundLevels actor.type) as |level key|}}
-                        <option value="{{ key }}" {{#if (eq key actor.system.wounds.value)}}selected{{/if}}>
+                        {{!-- Inside #each, the iteration's current item is `level`,
+                             so `actor` must be reached via the parent context.
+                             key is a string from Object.keys; wounds.value is a
+                             NumberField, so coerce key to a number for the strict
+                             eq. Without this, no option ever gets `selected` and
+                             the browser defaults to the first one (Healthy) on
+                             every render — which looked to users like the change
+                             didn't save. --}}
+                        <option value="{{ key }}" {{#if (eq (add key 0) ../actor.system.wounds.value)}}selected{{/if}}>
                             {{localize (woundsFromValue key ../actor.type)}}
                         </option>
                     {{/each}}
