@@ -486,6 +486,63 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.selAfterSecond, "<select> still shows stored damage after re-render").toBe(result.target);
     });
 
+    test("sheet-mode footer is present on all sheetmode-bearing actor types (#63)", async ({page}) => {
+        // The mode toggle was tucked into per-type header partials with
+        // inconsistent placement (in-header for npc/creature/vehicle/starship,
+        // bottom-left section for character). Lifted to a single footer
+        // partial in actor/common/actor-sheet.html so every actor type with
+        // a sheetmode field gets the same styled <section class="sheet-mode">
+        // pinned at the bottom of the form.
+        await loginAndWaitReady(page);
+
+        const result = await evalInWorld(page, async () => {
+            const types = ["character", "npc", "creature", "vehicle", "starship"];
+            const out: Array<{
+                type: string;
+                hasSection: boolean;
+                hasSelect: boolean;
+                optionValues: string[];
+                selectedValue: string | null;
+                advancePresent: boolean;
+            }> = [];
+            for (const type of types) {
+                for (const a of window.game.actors.filter((x: any) => x.name === `probe-${type}`)) {
+                    await a.delete();
+                }
+                const a = await window.Actor.create({name: `probe-${type}`, type}, {render: false});
+                await a.sheet.render(true);
+                await new Promise((r) => setTimeout(r, 350));
+                const root = a.sheet.element as HTMLElement;
+                const section = root.querySelector("section.sheet-mode");
+                const sel = section?.querySelector(
+                    'select[name="system.sheetmode.value"]',
+                ) as HTMLSelectElement | null;
+                const optionValues = sel ? [...sel.options].map((o) => o.value) : [];
+                out.push({
+                    type,
+                    hasSection: !!section,
+                    hasSelect: !!sel,
+                    optionValues,
+                    selectedValue: sel?.value ?? null,
+                    advancePresent: optionValues.includes("advance"),
+                });
+                await a.sheet.close();
+                await a.delete();
+            }
+            return out;
+        });
+
+        for (const r of result) {
+            expect(r.hasSection, `[${r.type}] <section class="sheet-mode"> present`).toBe(true);
+            expect(r.hasSelect, `[${r.type}] mode <select> present`).toBe(true);
+            expect(r.optionValues, `[${r.type}] always offers normal + freeedit`)
+                .toEqual(expect.arrayContaining(["normal", "freeedit"]));
+            expect(r.advancePresent, `[${r.type}] advance offered iff character`)
+                .toBe(r.type === "character");
+            expect(r.selectedValue, `[${r.type}] default selected is normal`).toBe("normal");
+        }
+    });
+
     test("advance dialog submit does not throw on stale event.currentTarget", async ({page}) => {
         // Regression for #42: advanceAction read event.currentTarget.dataset,
         // but the dialog's submit fires async after the click event has been

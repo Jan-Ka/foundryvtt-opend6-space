@@ -12,5 +12,8 @@
         </div>
     </header>
     {{> (getBodyTemplate actor.type)}}
+    {{#if actor.system.sheetmode}}
+        {{> systems/od6s/templates/actor/common/sheet-mode.html}}
+    {{/if}}
 </div>
 
