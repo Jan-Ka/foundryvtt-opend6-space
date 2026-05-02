@@ -598,12 +598,21 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
         const result = await evalInWorld(page, async () => {
             const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
-            // The biography tab is where the actor description prose-mirror lives.
-            (actor as any).tabGroups = {primary: "description"};
-            await actor.sheet.render(true);
+            // bindPrimaryTabs reads tabGroups.primary off the *sheet* app
+            // instance, not the actor document. Set it on the sheet before
+            // first render so the biography tab is the active one and the
+            // description prose-mirrors are visible (non-zero rects).
+            const sheet: any = actor.sheet;
+            (sheet.tabGroups ??= {}).primary = "description";
+            await sheet.render(true);
             await new Promise((r) => setTimeout(r, 400));
 
-            const root = actor.sheet.element as HTMLElement;
+            const root = sheet.element as HTMLElement;
+            // Sanity: confirm the biography tab is actually the active pane.
+            // If not, the rest of the test would silently pass vacuously
+            // because hidden tabs have zero-sized descendants.
+            const activeTab = root.querySelector(".sheet-body > .tab.active") as HTMLElement | null;
+            const activeTabName = activeTab?.dataset.tab ?? null;
             const pms = [...root.querySelectorAll("prose-mirror")] as HTMLElement[];
             const out = pms.map((pm) => {
                 const ec = pm.querySelector(".editor-content") as HTMLElement | null;
@@ -622,13 +631,18 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
                     hitTag: top?.tagName ?? "(none)",
                 };
             });
-            await actor.sheet.close();
-            return out;
+            await sheet.close();
+            return {activeTabName, editors: out};
         });
+
+        // Pin the precondition so a future change to the tab plumbing can't
+        // turn this into a vacuous pass (hidden tabs have zero rects, which
+        // the .height filter would silently drop).
+        expect(result.activeTabName, "biography tab is the active pane").toBe("description");
 
         // Description tab must render at least one prose-mirror with a
         // sized editor-content whose center belongs to the editor.
-        const usable = result.filter((r) => r.hasEditor && r.height && r.height > 0);
+        const usable = result.editors.filter((r) => r.hasEditor && r.height && r.height > 0);
         expect(usable.length, "at least one prose-mirror has a sized editor-content").toBeGreaterThan(0);
         for (const r of usable) {
             expect(r.height, "editor-content fills more than one line").toBeGreaterThan(60);
