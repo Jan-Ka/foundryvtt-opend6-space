@@ -2,9 +2,29 @@ import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
 import { isOpposedQueueEmpty, setOpposedQueueEntry } from "../system/utilities/opposed";
 import {promptResistanceRolls} from "../socketlib";
+import {deriveRollMode} from "./chat-mode";
+
+function tagRollMode(msg: any, html: HTMLElement) {
+    const mode = deriveRollMode(msg);
+    html.classList.add(`od6s-roll-${mode}`);
+    if (mode === 'public') return;
+
+    const header = html.querySelector('.message-header');
+    if (!header || header.querySelector('.od6s-roll-badge')) return;
+
+    const badge = document.createElement('span');
+    badge.classList.add('od6s-roll-badge', `od6s-roll-badge--${mode}`);
+    badge.textContent = game.i18n.localize(`OD6S.ROLL_BADGE_${mode.toUpperCase()}`);
+
+    const sender = header.querySelector('.message-sender');
+    if (sender) sender.after(badge);
+    else header.prepend(badge);
+}
 
 export function registerChatHooks() {
     Hooks.on('renderChatMessageHTML', (msg, html, data) => {
+        tagRollMode(msg, html);
+
         if (game.settings.get('od6s', 'hide-gm-rolls') && data.whisperTo !== '') {
             if (game.user.isGM === false &&
                 game.userId !== data.author.id &&

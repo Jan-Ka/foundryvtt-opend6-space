@@ -102,6 +102,17 @@
         <hr>
     {{/each}}
     <footer class="form-footer">
+        <section class="sheet-mode roll-mode">
+            <div class="flexrow flex-group-left sheetmode">
+                <label for="rollmode">{{localize 'OD6S.ROLL_MODE'}}</label>
+                <select name="rollmode" id="rollmode">
+                    <option value="publicroll" {{#if (eq rollmode "publicroll")}}selected{{/if}}>{{localize "CHAT.MODES.public"}}</option>
+                    <option value="gmroll"     {{#if (eq rollmode "gmroll")}}selected{{/if}}>{{localize "CHAT.MODES.gm"}}</option>
+                    <option value="blindroll"  {{#if (eq rollmode "blindroll")}}selected{{/if}}>{{localize "CHAT.MODES.blind"}}</option>
+                    <option value="selfroll"   {{#if (eq rollmode "selfroll")}}selected{{/if}}>{{localize "CHAT.MODES.self"}}</option>
+                </select>
+            </div>
+        </section>
         <button type="submit" class="dialog-submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
     </footer>
 </div>

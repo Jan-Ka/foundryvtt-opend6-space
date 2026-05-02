@@ -62,6 +62,11 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             this.rollData.cpcostcolor =
                 this.rollData.characterpoints > this.rollData.actor.system.characterpoints.value ? "red" : "black";
         }
+        if (typeof this.rollData.rollmode !== "string") {
+            this.rollData.rollmode = (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls"))
+                ? "gmroll"
+                : "publicroll";
+        }
         return this.rollData;
     }
 
@@ -287,6 +292,10 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         find("#vehicleterraindifficulty")?.addEventListener("change", (ev) => {
             this.rollData.vehicleterraindifficulty = (ev.target as HTMLSelectElement).value;
+        });
+
+        find("#rollmode")?.addEventListener("change", (ev) => {
+            this.rollData.rollmode = (ev.target as HTMLSelectElement).value;
         });
     }
 

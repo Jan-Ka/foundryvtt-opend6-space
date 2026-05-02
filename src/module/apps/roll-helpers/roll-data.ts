@@ -87,6 +87,7 @@ export interface RollData {
     stun: boolean;
     attackerScale: number;
     modifiers: RollModifiers;
+    rollmode?: string;
 }
 
 /**
