@@ -1,0 +1,18 @@
+<section class="sheet-mode">
+    <div class="flexrow flex-group-left sheetmode">
+        <label for="actor.system.sheetmode.value">{{localize 'OD6S.SHEETMODE'}}:</label>
+        <select id="actor.system.sheetmode.value" name="system.sheetmode.value">
+            <option value="normal" {{#if (eq "normal" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_NORMAL'}}</option>
+            {{#if (eq actor.type "character")}}
+                <option value="advance" {{#if (eq "advance" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_ADVANCE'}}</option>
+            {{/if}}
+            <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
+        </select>
+
+        {{#if (skillUsed)}}
+            {{#if (ne actor.system.sheetmode.value "normal")}}
+                <button type="button" class="session-reset-button">{{localize 'OD6S.RESET_SESSION'}}</button>
+            {{/if}}
+        {{/if}}
+    </div>
+</section>

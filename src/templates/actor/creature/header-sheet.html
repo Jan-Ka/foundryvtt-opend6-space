@@ -69,14 +69,5 @@
             <input title="{{localize actor.system.scale.label}}" name="system.scale.score" type="number" min="0" max="99"
                    value="{{actor.system.scale.score}}" placeholder="0" data-dtype="{{actor.system.scale.type}}"/>
         </div>
-        <div class="flexrow flex-group-left sheetmode">
-            <label for="actor.system.sheetmode.value">{{localize 'OD6S.SHEETMODE'}}:</label>
-            <select name="system.sheetmode.value" id="actor.system.sheetmode.value" style="width: 70px;">
-                
-                    <option value="normal" {{#if (eq "normal" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_NORMAL'}}</option>
-                    <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
-                
-            </select>
-        </div>
     </div>
 </div>

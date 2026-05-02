@@ -56,6 +56,7 @@ async function loadHandleBarTemplates() {
         charPath + "create-attribute-column-custom.html",
         charPath + "create-skill-column.html",
         commonPath + "wounds.html",
+        commonPath + "sheet-mode.html",
         containerPath + "body-sheet.html",
         containerPath + "header-sheet.html",
         npcPath + "header-sheet.html",

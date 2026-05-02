@@ -159,14 +159,5 @@
                        data-dtype="Boolean" {{#if actor.system.embedded_pilot.value}}checked{{/if}}/>
             </div>
         {{/if}}
-        <div class="flexrow flex-group-left sheetmode">
-            <label for="actor.system.sheetmode.value">{{localize 'OD6S.SHEETMODE'}}:</label>
-            <select name="system.sheetmode.value" id="actor.system.sheetmode.value" style="width: 70px;">
-                
-                    <option value="normal" {{#if (eq "normal" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_NORMAL'}}</option>
-                    <option value="freeedit" {{#if (eq "freeedit" actor.system.sheetmode.value)}}selected{{/if}}>{{localize 'OD6S.SHEETMODE_FREEDIT'}}</option>
-                
-            </select>
-        </div>
     </div>
 </div>

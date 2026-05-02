@@ -486,6 +486,105 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.selAfterSecond, "<select> still shows stored damage after re-render").toBe(result.target);
     });
 
+    test("sheet-mode footer pins to the bottom of the form (#63)", async ({page}) => {
+        // The flex chain is fragile: form.flexcol → inner div.flexcol →
+        // .sheet-body { flex: 1 }. If the inner div doesn't carry
+        // flex:1 / full-height, .sheet-body collapses to its content
+        // and the footer just floats below the body content instead of
+        // pinning to the bottom of the sheet.
+        await loginAndWaitReady(page);
+
+        const result = await evalInWorld(page, async () => {
+            for (const a of window.game.actors.filter((x: any) => x.name === "probe-pin")) {
+                await a.delete();
+            }
+            const a = await window.Actor.create({name: "probe-pin", type: "character"}, {render: false});
+            await a.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 350));
+            const root = a.sheet.element as HTMLElement;
+            const form = root.tagName === "FORM" ? root : root.querySelector("form");
+            const footer = root.querySelector("section.sheet-mode") as HTMLElement | null;
+            const body = root.querySelector("section.sheet-body") as HTMLElement | null;
+            const formRect = form?.getBoundingClientRect();
+            const footerRect = footer?.getBoundingClientRect();
+            const bodyRect = body?.getBoundingClientRect();
+            await a.sheet.close();
+            await a.delete();
+            return {
+                formBottom: formRect?.bottom ?? 0,
+                footerBottom: footerRect?.bottom ?? 0,
+                bodyHeight: bodyRect?.height ?? 0,
+                formHeight: formRect?.height ?? 0,
+            };
+        });
+
+        // Footer's bottom edge should sit very close to the form's bottom edge
+        // (a few px slack for borders/padding). On the bug, footer.bottom was
+        // hundreds of px above form.bottom.
+        const gap = result.formBottom - result.footerBottom;
+        expect(gap, "footer pinned within 16px of form bottom").toBeLessThan(16);
+        // .sheet-body should occupy a meaningful share of the form (it has
+        // flex:1). Sanity-check it's at least 40% of the form height.
+        expect(result.bodyHeight / result.formHeight, ".sheet-body fills the available space").toBeGreaterThan(0.4);
+    });
+
+    test("sheet-mode footer is present on all sheetmode-bearing actor types (#63)", async ({page}) => {
+        // The mode toggle was tucked into per-type header partials with
+        // inconsistent placement (in-header for npc/creature/vehicle/starship,
+        // bottom-left section for character). Lifted to a single footer
+        // partial in actor/common/actor-sheet.html so every actor type with
+        // a sheetmode field gets the same styled <section class="sheet-mode">
+        // pinned at the bottom of the form.
+        await loginAndWaitReady(page);
+
+        const result = await evalInWorld(page, async () => {
+            const types = ["character", "npc", "creature", "vehicle", "starship"];
+            const out: Array<{
+                type: string;
+                hasSection: boolean;
+                hasSelect: boolean;
+                optionValues: string[];
+                selectedValue: string | null;
+                advancePresent: boolean;
+            }> = [];
+            for (const type of types) {
+                for (const a of window.game.actors.filter((x: any) => x.name === `probe-${type}`)) {
+                    await a.delete();
+                }
+                const a = await window.Actor.create({name: `probe-${type}`, type}, {render: false});
+                await a.sheet.render(true);
+                await new Promise((r) => setTimeout(r, 350));
+                const root = a.sheet.element as HTMLElement;
+                const section = root.querySelector("section.sheet-mode");
+                const sel = section?.querySelector(
+                    'select[name="system.sheetmode.value"]',
+                ) as HTMLSelectElement | null;
+                const optionValues = sel ? [...sel.options].map((o) => o.value) : [];
+                out.push({
+                    type,
+                    hasSection: !!section,
+                    hasSelect: !!sel,
+                    optionValues,
+                    selectedValue: sel?.value ?? null,
+                    advancePresent: optionValues.includes("advance"),
+                });
+                await a.sheet.close();
+                await a.delete();
+            }
+            return out;
+        });
+
+        for (const r of result) {
+            expect(r.hasSection, `[${r.type}] <section class="sheet-mode"> present`).toBe(true);
+            expect(r.hasSelect, `[${r.type}] mode <select> present`).toBe(true);
+            expect(r.optionValues, `[${r.type}] always offers normal + freeedit`)
+                .toEqual(expect.arrayContaining(["normal", "freeedit"]));
+            expect(r.advancePresent, `[${r.type}] advance offered iff character`)
+                .toBe(r.type === "character");
+            expect(r.selectedValue, `[${r.type}] default selected is normal`).toBe("normal");
+        }
+    });
+
     test("advance dialog submit does not throw on stale event.currentTarget", async ({page}) => {
         // Regression for #42: advanceAction read event.currentTarget.dataset,
         // but the dialog's submit fires async after the click event has been
