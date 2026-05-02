@@ -39,8 +39,6 @@ describe('getWeaponRange', () => {
     let rollEvaluate: ReturnType<typeof vi.fn>;
     let rollToMessage: ReturnType<typeof vi.fn>;
 
-    const g = globalThis as Record<string, unknown>;
-
     beforeEach(() => {
         warn.mockReset();
         settings.clear();
@@ -52,26 +50,23 @@ describe('getWeaponRange', () => {
         rollEvaluate = vi.fn(async function (this: { total: number }) { this.total = 12; return this; });
         rollToMessage = vi.fn(async () => undefined);
 
-        g.ui = { notifications: { warn } };
-        g.game = {
+        vi.stubGlobal('ui', { notifications: { warn } });
+        vi.stubGlobal('game', {
             i18n: { localize: (k: string) => k },
             settings: { get: (_ns: string, key: string) => settings.get(key) },
             user: { isGM: false },
-        };
-        g.ChatMessage = { getSpeaker: () => ({}) };
-        g.Roll = class {
+        });
+        vi.stubGlobal('ChatMessage', { getSpeaker: () => ({}) });
+        vi.stubGlobal('Roll', class {
             total = 0;
             constructor(public formula: string) {}
             evaluate = rollEvaluate;
             toMessage = rollToMessage;
-        };
+        });
     });
 
     afterEach(() => {
-        delete g.ui;
-        delete g.game;
-        delete g.ChatMessage;
-        delete g.Roll;
+        vi.unstubAllGlobals();
     });
 
     function mockActor(attributes: Record<string, { score: number }>): Actor {
