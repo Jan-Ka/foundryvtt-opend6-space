@@ -24,7 +24,7 @@ export async function addToCrew(actor: Actor, vehicleId: string): Promise<unknow
         };
 
         const addTemplate = "systems/od6s/templates/actor/common/verify-new-crew.html";
-        const html = await renderTemplate(addTemplate, data);
+        const html = await foundry.applications.handlebars.renderTemplate(addTemplate, data);
         const label = game.i18n.localize("OD6S.TRANSFER_VEHICLE");
 
         const confirmed = await foundry.applications.api.DialogV2.confirm({
@@ -281,8 +281,11 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
         return a.localeCompare(b);
     })
 
-    // Render the entity creation form
-    const html = await renderTemplate(template, {
+    // Render the entity creation form. The V1 globals (renderTemplate,
+    // Dialog, FormDataExtended) are deprecated in v13+ and produce the
+    // unstyled grey/white-text dialog reported in #64; route through
+    // the V2 namespaces instead.
+    const html = await foundry.applications.handlebars.renderTemplate(template, {
         name: data.name || game.i18n.format("OD6S.NEW_ITEM", {entity: label}),
         folder: data.folder,
         folders: folders,
@@ -296,20 +299,18 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
         hasTypes: types.length > 1
     });
 
-    // Render the confirmation dialog window
-    return Dialog.prompt({
-        title: title,
+    // DialogV2.input parses the rendered <form>'s named inputs into an
+    // object on submit, and returns null on cancel.
+    const result = await foundry.applications.api.DialogV2.input({
+        window: {title},
         content: html,
-        label: title,
-        callback: html => {
-            const form = html[0].querySelector("form");
-            const fd = new FormDataExtended(form);
-            foundry.utils.mergeObject(data, fd.object);
-            if (!data.folder) delete data["folder"];
-            if (types.length === 1) data.type = types[0];
-            data.name = data.name || game.i18n.localize('OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type]);
-            return actor.createEmbeddedDocuments('Item', [data]);
-        },
-        rejectClose: false
+        ok: {label: title},
     });
+    if (!result) return undefined;
+
+    foundry.utils.mergeObject(data, result);
+    if (!data.folder) delete data["folder"];
+    if (types.length === 1) data.type = types[0];
+    data.name = data.name || game.i18n.localize('OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type]);
+    return actor.createEmbeddedDocuments('Item', [data]);
 }

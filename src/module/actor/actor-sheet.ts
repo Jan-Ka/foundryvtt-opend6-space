@@ -176,7 +176,13 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                 vehicle_weapons.push(i);
             } else if (i.type === "vehicle-gear") {
                 vehicle_gear.push(i);
-            } else if (i.type === "armor" || i.type === "weapon" || i.type === "gear") {
+            } else if (OD6S.cargo_hold.includes(i.type)) {
+                // Cargo can hold any cargo-eligible type that isn't a
+                // native equipped slot for this actor (vehicle-weapon /
+                // vehicle-gear handled above). Without this catch-all,
+                // items added via the cargo-hold + dialog of types like
+                // starship-weapon / starship-gear are created but never
+                // displayed.
                 cargo_hold.push(i);
             }
         }
@@ -206,7 +212,13 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                 starship_weapons.push(i);
             } else if (i.type === "starship-gear") {
                 starship_gear.push(i);
-            } else if (i.type === "armor" || i.type === "weapon" || i.type === "gear") {
+            } else if (OD6S.cargo_hold.includes(i.type)) {
+                // Cargo can hold any cargo-eligible type that isn't a
+                // native equipped slot for this actor (starship-weapon /
+                // starship-gear handled above). Without this catch-all,
+                // items added via the cargo-hold + dialog of types like
+                // vehicle-weapon / vehicle-gear are created but never
+                // displayed.
                 cargo_hold.push(i);
             }
         }

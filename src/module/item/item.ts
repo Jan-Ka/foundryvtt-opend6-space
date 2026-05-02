@@ -178,38 +178,44 @@ export class OD6SItem extends Item {
             return a.localeCompare(b);
         })
 
-        // Render the document creation form
-        const html = await renderTemplate("templates/sidebar/document-create.html", {
-            folders,
-            name: (data as any).name || game.i18n.format("DOCUMENT.New", {type: label}),
-            folder: (data as any).folder,
-            hasFolders: folders.length >= 1,
-            type: (data as any).type || CONFIG[documentName]?.defaultType || types[0],
-            types: types.reduce((obj, t) => {
-                const label = CONFIG[documentName]?.typeLabels?.[t] ?? t;
-                (obj as any)[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
-                return obj;
-            }, {}),
-            hasTypes: types.length > 1
-        });
-
-        // Render the confirmation dialog window
-        return Dialog.prompt({
-            title: title,
-            content: html,
-            label: title,
-            callback: html => {
-                const form = html[0].querySelector("form");
-                const fd = new FormDataExtended(form);
-                foundry.utils.mergeObject(data, fd.object, {inplace: true});
-                if ( !(data as any).folder ) delete (data as any).folder;
-                if ( types.length === 1 ) (data as any).type = types[0];
-                if ( !(data as any).name?.trim() ) (data as any).name = this.defaultName();
-                return this.create(data, {parent, pack, renderSheet: true});
+        // Render the document creation form. The V1 globals
+        // (renderTemplate, Dialog, FormDataExtended) produce the
+        // unstyled grey/white-text dialog; route through the V2
+        // namespaces instead.
+        const html = await foundry.applications.handlebars.renderTemplate(
+            "templates/sidebar/document-create.html",
+            {
+                folders,
+                name: (data as any).name || game.i18n.format("DOCUMENT.New", {type: label}),
+                folder: (data as any).folder,
+                hasFolders: folders.length >= 1,
+                type: (data as any).type || CONFIG[documentName]?.defaultType || types[0],
+                types: types.reduce((obj, t) => {
+                    const label = CONFIG[documentName]?.typeLabels?.[t] ?? t;
+                    (obj as any)[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
+                    return obj;
+                }, {}),
+                hasTypes: types.length > 1
             },
-            rejectClose: false,
-            options
+        );
+
+        // DialogV2.input parses the rendered <form>'s named inputs into
+        // an object on submit, and returns null on cancel. Note: the V1
+        // Dialog.prompt forwarded `options` here, but those are
+        // document-create options (renderSheet etc.) that get passed to
+        // this.create below — not dialog config. Don't spread them.
+        const result = await foundry.applications.api.DialogV2.input({
+            window: {title},
+            content: html,
+            ok: {label: title},
         });
+        if (!result) return null;
+
+        foundry.utils.mergeObject(data, result, {inplace: true});
+        if (!(data as any).folder) delete (data as any).folder;
+        if (types.length === 1) (data as any).type = types[0];
+        if (!(data as any).name?.trim()) (data as any).name = this.defaultName();
+        return this.create(data, {parent, pack, renderSheet: true});
     }
 
     /**
