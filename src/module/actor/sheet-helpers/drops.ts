@@ -24,7 +24,7 @@ export async function onDrop(sheet: any, event: any) {
     // Handle different data types
     switch (data.type) {
         case "ActiveEffect":
-            return sheet._onDropActiveEffect(event, data);
+            return onDropActiveEffect(sheet, event, data);
         case "Actor":
             return onDropActor(sheet, event, data);
         case "Item": {
@@ -65,7 +65,7 @@ export async function onDrop(sheet: any, event: any) {
             }
         }
         case "Folder":
-            return sheet._onDropFolder(event, data);
+            return onDropFolder(sheet, event, data);
         case "availableaction":
             return await sheet._createAction(data);
         case "assignedaction":
@@ -187,4 +187,49 @@ export async function onDropActor(sheet: any, event: any, data: any) {
             await sheet.linkCrew(data.uuid);
         }
     }
+}
+
+/**
+ * Drop an ActiveEffect onto the actor sheet. V1 ActorSheet provided
+ * `_onDropActiveEffect`; ActorSheetV2 does not, so the prior call site
+ * threw TypeError and the drop silently failed (#71).
+ */
+export async function onDropActiveEffect(sheet: any, _event: any, data: any) {
+    if (!sheet.document.isOwner) return false;
+    const effect: any = await (ActiveEffect as any).implementation.fromDropData(data);
+    if (!effect) return false;
+    // Don't re-create an effect that's already on this actor.
+    if (effect.target === sheet.document) return false;
+    return sheet.document.createEmbeddedDocuments("ActiveEffect", [effect.toObject()]);
+}
+
+/**
+ * Drop a Folder of Items onto the actor sheet. V1 ActorSheet provided
+ * `_onDropFolder`; ActorSheetV2 does not (#71). Walk the folder
+ * (including subfolders), filter to item types this actor accepts via
+ * `OD6S.allowedItemTypes`, and create them in one batch.
+ */
+export async function onDropFolder(sheet: any, _event: any, data: any) {
+    if (!sheet.document.isOwner) return false;
+    const folder: any = await (Folder as any).implementation.fromDropData(data);
+    if (!folder || folder.type !== "Item") return false;
+
+    const allowed = OD6S.allowedItemTypes[sheet.document.type] ?? [];
+    const collected: object[] = [];
+    const walk = (f: any) => {
+        for (const doc of f.contents ?? []) {
+            if (allowed.length === 0 || allowed.includes(doc.type)) {
+                collected.push(doc.toObject());
+            }
+        }
+        for (const child of f.children ?? []) {
+            // V14 folder children come as wrapped {folder, ...} or as
+            // bare Folder docs depending on context; handle both.
+            walk(child.folder ?? child);
+        }
+    };
+    walk(folder);
+
+    if (!collected.length) return false;
+    return sheet.document.createEmbeddedDocuments("Item", collected);
 }
