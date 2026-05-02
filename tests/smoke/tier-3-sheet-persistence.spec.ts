@@ -585,6 +585,57 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         }
     });
 
+    test("description prose-mirror contenteditable is reachable to clicks (#54)", async ({page}) => {
+        // Foundry's <prose-mirror> uses an absolutely-positioned toolbar, so
+        // .menu-container has 0 layout height. Without a flex chain the
+        // .editor-content collapses to its content height (~30px) while
+        // floating toolbar buttons overlay the rest of the prose-mirror box,
+        // intercepting clicks meant for the contenteditable area. Assert
+        // that elementFromPoint at the center of .editor-content actually
+        // lands inside .editor-content (and isn't a BUTTON).
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            // The biography tab is where the actor description prose-mirror lives.
+            (actor as any).tabGroups = {primary: "description"};
+            await actor.sheet.render(true);
+            await new Promise((r) => setTimeout(r, 400));
+
+            const root = actor.sheet.element as HTMLElement;
+            const pms = [...root.querySelectorAll("prose-mirror")] as HTMLElement[];
+            const out = pms.map((pm) => {
+                const ec = pm.querySelector(".editor-content") as HTMLElement | null;
+                if (!ec) return {hasEditor: false};
+                const r = ec.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) {
+                    return {hasEditor: true, height: r.height, hitInside: false, hitTag: "(zero-rect)"};
+                }
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                const top = document.elementFromPoint(cx, cy);
+                return {
+                    hasEditor: true,
+                    height: r.height,
+                    hitInside: !!top && ec.contains(top),
+                    hitTag: top?.tagName ?? "(none)",
+                };
+            });
+            await actor.sheet.close();
+            return out;
+        });
+
+        // Description tab must render at least one prose-mirror with a
+        // sized editor-content whose center belongs to the editor.
+        const usable = result.filter((r) => r.hasEditor && r.height && r.height > 0);
+        expect(usable.length, "at least one prose-mirror has a sized editor-content").toBeGreaterThan(0);
+        for (const r of usable) {
+            expect(r.height, "editor-content fills more than one line").toBeGreaterThan(60);
+            expect(r.hitInside, `clicks land inside editor-content (got ${r.hitTag})`).toBe(true);
+        }
+    });
+
     test("advance dialog submit does not throw on stale event.currentTarget", async ({page}) => {
         // Regression for #42: advanceAction read event.currentTarget.dataset,
         // but the dialog's submit fires async after the click event has been
