@@ -194,9 +194,11 @@ export async function onDropActor(sheet: any, event: any, data: any) {
  * `_onDropActiveEffect`; ActorSheetV2 does not, so the prior call site
  * threw TypeError and the drop silently failed (#71).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function onDropActiveEffect(sheet: any, _event: any, data: any) {
     if (!sheet.document.isOwner) return false;
-    const effect: any = await (ActiveEffect as any).implementation.fromDropData(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const effect = await (ActiveEffect as any).implementation.fromDropData(data);
     if (!effect) return false;
     // Don't re-create an effect that's already on this actor.
     if (effect.target === sheet.document) return false;
@@ -209,13 +211,18 @@ export async function onDropActiveEffect(sheet: any, _event: any, data: any) {
  * (including subfolders), filter to item types this actor accepts via
  * `OD6S.allowedItemTypes`, and create them in one batch.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function onDropFolder(sheet: any, _event: any, data: any) {
     if (!sheet.document.isOwner) return false;
-    const folder: any = await (Folder as any).implementation.fromDropData(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const folder = await (Folder as any).implementation.fromDropData(data);
     if (!folder || folder.type !== "Item") return false;
 
     const allowed = OD6S.allowedItemTypes[sheet.document.type] ?? [];
     const collected: object[] = [];
+    // Folder.children is an array of {folder, depth, root} wrappers in
+    // v14 client side; .contents is the immediate documents.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const walk = (f: any) => {
         for (const doc of f.contents ?? []) {
             if (allowed.length === 0 || allowed.includes(doc.type)) {
@@ -223,8 +230,6 @@ export async function onDropFolder(sheet: any, _event: any, data: any) {
             }
         }
         for (const child of f.children ?? []) {
-            // V14 folder children come as wrapped {folder, ...} or as
-            // bare Folder docs depending on context; handle both.
             walk(child.folder ?? child);
         }
     };
