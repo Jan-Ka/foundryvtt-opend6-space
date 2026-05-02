@@ -128,7 +128,7 @@ interface SimpleRollResult {
 async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     let wild = false;
     let rollString = "";
-    let rollMode = 0;
+    let rollMode = (CONST as any).DICE_ROLL_MODES.PUBLIC;
     let dice = result.dice;
     const pips = result.pips;
     const damageRoll = !!result.damageroll;

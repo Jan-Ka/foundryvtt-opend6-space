@@ -57,6 +57,14 @@ describe('getWeaponRange', () => {
             user: { isGM: false },
         });
         vi.stubGlobal('ChatMessage', { getSpeaker: () => ({}) });
+        vi.stubGlobal('CONST', {
+            DICE_ROLL_MODES: {
+                PUBLIC: 'publicroll',
+                PRIVATE: 'gmroll',
+                BLIND: 'blindroll',
+                SELF: 'selfroll',
+            },
+        });
         vi.stubGlobal('Roll', class {
             total = 0;
             constructor(public formula: string) {}

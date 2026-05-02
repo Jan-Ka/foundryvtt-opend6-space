@@ -35,6 +35,37 @@ function recalcScoreFromInput(
 }
 
 /**
+ * Register the play-mode-safe roll triggers (skill/attribute/spec/init click,
+ * weapon-action click, body-points roll). Bound regardless of `isEditable` —
+ * V2 sheets render in PLAY mode by default, where `isEditable` is false, but
+ * rolling is a play-mode action and must work for any owner.
+ */
+export function registerRollListeners(
+    html: HTMLElement[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sheet: any,
+): void {
+    const el = html[0];
+
+    const rollDialog = new (od6sroll);
+    el.querySelectorAll<HTMLElement>('.rolldialog').forEach((elem) =>
+        elem.addEventListener('click', rollDialog._onRollEvent.bind(sheet)));
+    el.querySelectorAll<HTMLElement>('.initrolldialog').forEach((elem) =>
+        elem.addEventListener('click', od6sInitRoll._onInitRollDialog.bind(sheet) as unknown as EventListener));
+    el.querySelectorAll<HTMLElement>('.actionroll').forEach((elem) =>
+        elem.addEventListener('click', rollDialog._onRollItem.bind(sheet)));
+
+    el.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
+        elem.addEventListener('click', async () => {
+            const ok = await foundry.applications.api.DialogV2.confirm({
+                window: {title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
+                content: `<p>${game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS")}</p>`,
+            });
+            if (ok) await sheet._rollBodyPoints();
+        }));
+}
+
+/**
  * Register score-related event listeners (attributes, skills, specializations,
  * advances, funds, toughness, maneuverability, body points, etc.) on the actor sheet.
  */
@@ -44,15 +75,6 @@ export function registerScoreListeners(
     sheet: any,
 ): void {
     const el = html[0];
-
-    // Rollable abilities.
-    const rollDialog = new (od6sroll);
-    el.querySelectorAll<HTMLElement>('.rolldialog').forEach((elem) =>
-        elem.addEventListener('click', rollDialog._onRollEvent.bind(sheet)));
-    el.querySelectorAll<HTMLElement>('.initrolldialog').forEach((elem) =>
-        elem.addEventListener('click', od6sInitRoll._onInitRollDialog.bind(sheet) as unknown as EventListener));
-    el.querySelectorAll<HTMLElement>('.actionroll').forEach((elem) =>
-        elem.addEventListener('click', rollDialog._onRollItem.bind(sheet)));
 
     // Attribute/skill advances
     const advanceDialog = new (od6sadvance);
@@ -113,19 +135,6 @@ export function registerScoreListeners(
             const target = ev.target as HTMLInputElement;
             await sheet.document.setWoundLevelFromBodyPoints(+target.value);
             sheet.render();
-        }));
-
-    // Roll Body Points
-    el.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
-        elem.addEventListener('click', async () => {
-            // V1 Dialog.prompt rendered with the unstyled grey template;
-            // use DialogV2.confirm for the same yes/no shape with the V2
-            // styling.
-            const ok = await foundry.applications.api.DialogV2.confirm({
-                window: {title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
-                content: `<p>${game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS")}</p>`,
-            });
-            if (ok) await sheet._rollBodyPoints();
         }));
 
     // Edit active effect (score-related effects)

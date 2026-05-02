@@ -14,7 +14,7 @@ export class OD6SCombatTracker extends foundry.applications.sidebar.tabs.CombatT
         }
         const messageOptions: Record<string, unknown> = {};
         if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-            messageOptions.messageMode = "gm";
+            messageOptions.rollMode = (CONST as any).DICE_ROLL_MODES.PRIVATE;
         }
         return this.viewed.rollInitiative([combatant.id], {messageOptions});
     }
