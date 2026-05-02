@@ -147,15 +147,17 @@ export async function onDropItem(sheet: any, event: any, data: any) {
                 sourceActor = game.actors.get(data.actorId);
             }
             if (game.user.isGM || sourceActor!.isOwner) {
-                if (await sheet._onDropItemCreate(itemData)) {
-                    // @ts-expect-error
-                    await sourceActor!.deleteEmbeddedDocuments('Item', [system._id]);
+                // V1 ActorSheet provided _onDropItemCreate; V2 does not.
+                // Inline the equivalent createEmbeddedDocuments call.
+                const created = await sheet.document.createEmbeddedDocuments("Item", [itemData]);
+                if (created?.length) {
+                    await sourceActor!.deleteEmbeddedDocuments('Item', [item.id]);
                 }
             } else {
                 ui.notifications.warn('OD6S.WARN_NOT_DELETING_ITEM_OWNER');
             }
         } else {
-            await sheet._onDropItemCreate(itemData);
+            await sheet.document.createEmbeddedDocuments("Item", [itemData]);
         }
     }
     sheet.render();
