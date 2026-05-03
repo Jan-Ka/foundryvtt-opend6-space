@@ -1,6 +1,7 @@
 import {od6sutilities} from "../system/utilities";
 import {od6sroll} from "../apps/roll";
 import OD6S from "../config/config-od6s";
+import {isCharacterActor, isVehicleActor, isContainerActor, isSkillItem, isSpecializationItem} from "../system/type-guards";
 
 import {resolveRollAction} from "./actor-helpers/roll-action";
 import {prepareBaseActorData, prepareDerivedActorData, applyMods as applyModsHelper, setStrengthDamageBonus as setStrengthDamageBonusHelper, setInitiative as setInitiativeHelper, setResistance as setResistanceHelper} from "./actor-helpers/prepare-data";
@@ -15,8 +16,8 @@ import {useCharacterPointOnRoll as useCharacterPointOnRollHelper} from "./actor-
 export class OD6SActor extends Actor {
 
     get visible(): boolean {
-        if (this.type === "container" && !game.user.isGM) {
-            return !!(this.system as OD6SCharacterSystem).visible;
+        if (isContainerActor(this) && !game.user.isGM) {
+            return !!this.system.visible;
         } else {
             return super.visible;
         }
@@ -112,17 +113,14 @@ export class OD6SActor extends Actor {
         let vehicle: any;
         let pilot: Actor | null;
 
-        if(this.type === 'character' || this.type === 'npc' || this.type === 'creature') {
-            vehicle = (this.system as OD6SCharacterSystem).vehicle;
+        if (isCharacterActor(this)) {
+            vehicle = this.system.vehicle;
             pilot = this;
+        } else if (isVehicleActor(this)) {
+            vehicle = this.system;
+            pilot = this.system.embedded_pilot.value ? this : null;
         } else {
-            const sys = this.system as OD6SVehicleSystem;
-            vehicle = sys;
-            if (sys.embedded_pilot.value) {
-                pilot = this;
-            } else {
-                pilot = null;
-            }
+            return undefined;
         }
 
         if(action === 'maneuver') {
@@ -131,15 +129,15 @@ export class OD6SActor extends Actor {
                 let found = false;
                 const spec = pilot.items.find(i => i.type === "specialization" &&
                     i.name === vehicle.specialization.value);
-                if (typeof spec !== 'undefined') {
-                    score = (+score) + (+(spec.system as OD6SSpecializationItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score)
+                if (spec !== undefined && isSpecializationItem(spec)) {
+                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
                     found = true;
                 }
 
                 if (!found) {
                     const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill.value);
-                    if (typeof (skill) !== 'undefined') {
-                        score = (+score) + (+(skill.system as OD6SSkillItemSystem).score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                    if (skill !== undefined && isSkillItem(skill)) {
+                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
                         found = true;
                     }
                 }
