@@ -220,6 +220,8 @@ export function isScoreTooLow(
 
 // ---- Roll-type classification (#98 prep) ----
 
+import { weaponTypes } from "../../config/weapons";
+
 /**
  * Stable handler-dispatch keys for every (type, subtype) path setupRollData
  * accepts. Drives the per-handler decomposition planned in #98 — a future
@@ -249,23 +251,29 @@ export type RollTypeKey =
     | 'purchase'
     | 'brawlattack';
 
+/** Canonical post-normalization roll types. Output of classifyRoll. */
+export type CanonicalRollType =
+    | 'weapon' | 'starship-weapon' | 'vehicle-weapon'
+    | 'action' | 'skill' | 'specialization'
+    | 'damage' | 'resistance'
+    | 'mortally_wounded' | 'incapacitated'
+    | 'funds' | 'brawlattack';
+
 export interface ClassifiedRoll {
-    /** Canonical type after normalization — what setupRollData ultimately uses. */
-    type: string;
-    /** Canonical subtype after normalization. Empty string when none. */
+    type: CanonicalRollType;
+    /**
+     * Canonical subtype after normalization. Empty string when none.
+     * Load-bearing for `action-other`: that key collapses every unrecognized
+     * action subtype into one bucket while preserving the original string here,
+     * so callers handling action-other can still inspect the input subtype.
+     */
     subtype: string;
-    /** Stable discriminator for handler dispatch. */
     key: RollTypeKey;
 }
 
 export type Localize = (key: string) => string;
 
-const RANGED_ATTACK_ALIASES = [
-    'OD6S.RANGED',
-    'OD6S.THROWN',
-    'OD6S.MISSILE',
-    'OD6S.EXPLOSIVE',
-] as const;
+const MELEE_WEAPON_TYPE_KEY = 'OD6S.MELEE';
 
 const RESISTANCE_NAME_ALIASES = [
     'OD6S.ENERGY_RESISTANCE',
@@ -292,10 +300,13 @@ export function classifyRoll(
     let subtype = input.subtype ?? '';
     const name = input.name ?? '';
 
-    if (RANGED_ATTACK_ALIASES.some(k => subtype === localize(k))) {
-        subtype = 'rangedattack';
-    } else if (subtype === localize('OD6S.MELEE')) {
-        subtype = 'meleeattack';
+    // Reuses the canonical weapon-type list from config/weapons so adding a
+    // new ranged weapon type there picks up alias normalization automatically.
+    for (const k of weaponTypes) {
+        if (subtype === localize(k)) {
+            subtype = k === MELEE_WEAPON_TYPE_KEY ? 'meleeattack' : 'rangedattack';
+            break;
+        }
     }
 
     if (type === 'skill' && name === 'Dodge') {
@@ -319,10 +330,26 @@ export function classifyRoll(
         }
     }
 
+    if (!isCanonicalType(type)) {
+        throw new Error(`classifyRoll: unrecognized roll type "${type}"`);
+    }
     return { type, subtype, key: deriveRollTypeKey(type, subtype) };
 }
 
-function deriveRollTypeKey(type: string, subtype: string): RollTypeKey {
+function isCanonicalType(type: string): type is CanonicalRollType {
+    switch (type) {
+        case 'weapon': case 'starship-weapon': case 'vehicle-weapon':
+        case 'action': case 'skill': case 'specialization':
+        case 'damage': case 'resistance':
+        case 'mortally_wounded': case 'incapacitated':
+        case 'funds': case 'brawlattack':
+            return true;
+        default:
+            return false;
+    }
+}
+
+function deriveRollTypeKey(type: CanonicalRollType, subtype: string): RollTypeKey {
     switch (type) {
         case 'weapon': return 'weapon';
         case 'starship-weapon': return 'starship-weapon';
@@ -348,7 +375,4 @@ function deriveRollTypeKey(type: string, subtype: string): RollTypeKey {
                 default: return 'action-other';
             }
     }
-    throw new Error(
-        `classifyRoll: unrecognized roll type "${type}"${subtype ? `, subtype "${subtype}"` : ''}`,
-    );
 }

@@ -5,100 +5,70 @@
  *   - {@link COMMON_FIELDS}: finalize sets these uniformly for every roll
  *     type. Handlers MUST NOT diverge from the default for these.
  *   - {@link ROLL_TYPE_FIELDS}[key]: fields the handler for `key` is allowed
- *     to populate in its partial output. The union across all keys plus
- *     COMMON_FIELDS must equal `keyof RollData` (asserted by the test).
+ *     to populate in its partial output.
  *
- * The cross-cutting risk the #98 issue calls out (bonusmod / miscMod /
- * damageScore are written by multiple type-specific paths and folded into
- * common-derived fields like bonusdice) shows up here as fields appearing
- * in multiple ROLL_TYPE_FIELDS buckets — that overlap is the type-specific
- * contribution. The fold itself (bonusmod → bonusdice/bonuspips) happens
- * in finalize, so bonusdice/bonuspips are COMMON even though every attack
- * handler contributes a bonusmod increment that feeds them.
+ * Partition invariants (totality, no overlap) are checked at compile time
+ * via the `_assert*` types below — bad declarations fail to type-check
+ * before any runtime test runs.
+ *
+ * The cross-cutting risk #98 calls out (bonusmod / miscMod / damageScore are
+ * written by multiple type-specific paths and folded into common-derived
+ * fields like bonusdice) shows up here as fields appearing in multiple
+ * ROLL_TYPE_FIELDS buckets — that overlap is the type-specific contribution.
+ * The fold itself happens in finalize, so bonusdice/bonuspips are COMMON
+ * even though every attack handler contributes a bonusmod increment.
  *
  * No Foundry globals; pure data + types.
  */
 
 import type { RollData, RollTypeKey } from './roll-data';
 
-/**
- * Fields finalize sets uniformly. A field belongs here iff *no* handler
- * needs to override its default — finalize fills it from input data,
- * actor state, settings, or by folding handler-contributed intermediates.
- */
-export const COMMON_FIELDS: readonly (keyof RollData)[] = [
-    // Identity / labels
+export const COMMON_FIELDS = [
     'label', 'title',
-    // Roll dice/pips — derived in finalize from score (handler may override
-    // score, but the score→dice conversion is uniform).
     'dice', 'pips', 'originaldice', 'originalpips',
-    // Bonus dice — derived in finalize from accumulated bonusmod.
     'bonusdice', 'bonuspips',
-    // Wild die — setting + actor flag, no handler diverges.
     'wilddie', 'showWildDie',
-    // Fate-point / character-point ledger — finalize-managed.
     'fatepoint', 'fatepointeffect', 'characterpoints',
     'contact', 'cpcost', 'cpcostcolor',
-    // CP/FP eligibility — flipped to false by funds/purchase/vehicletoughness
-    // policies in finalize keyed off the canonical type, not by handlers.
+    // canusefp/cp diverge in funds/purchase/vehicletoughness, but always to
+    // the same value (false) — that's a finalize policy keyed by canonical
+    // type, not handler output.
     'canusefp', 'canusecp',
-    // Visibility — every roll type sets this from a setting key. The mapping
-    // is a finalize policy keyed by RollTypeKey, not handler output.
+    // Visibility maps from RollTypeKey to a setting key in finalize, not
+    // handler output.
     'isvisible', 'isknown',
-    // Explosive flag — derived from item flag at top of setup, before dispatch.
+    // Derived from item flag at top of setup, before dispatch.
     'isExplosive',
-    // Canonical type/subtype — produced by classifyRoll, not handlers.
+    // Produced by classifyRoll, not handlers.
     'type', 'subtype',
-    // Actor / token — input.
     'actor', 'token',
-    // Penalty bundle — derived in finalize via computePenalties + splitBonus.
+    // Derived in finalize via computePenalties + splitBonusForPenalty.
     'actionpenalty', 'woundpenalty', 'stunnedpenalty', 'otherpenalty',
-    // Combat shot/defense ledger — finalize defaults.
     'multishot', 'shots', 'fulldefense', 'timer',
-    // Item / target plumbing — input.
     'itemid', 'targets', 'target',
-    // Difficulty number — input (handler may set difficultylevel string but
-    // not the number).
+    // Number — handlers may set difficultylevel string but not the number.
     'difficulty',
-    // Opposability — derived from canonical type/subtype in finalize.
+    // Derived from canonical type/subtype in finalize.
     'isoppasable',
-    // Vehicle UI defaults — literal in finalize.
     'vehiclespeed', 'vehiclecollisiontype', 'vehicleterraindifficulty',
-    // Template path — literal.
     'template',
-    // Modifiers subobject — finalize assembles from miscMod/scaleMod/range.
+    // Finalize assembles from miscMod/scaleMod/range intermediates.
     'modifiers',
-    // Roll mode — set later by execute path, optional.
+    // Set by execute path, not setup.
     'rollmode',
-];
+] as const satisfies readonly (keyof RollData)[];
 
-/**
- * Per-handler field ownership. Each handler may populate the listed fields
- * in its partial output; finalize fills the rest from {@link COMMON_FIELDS}.
- *
- * Overlap between buckets is intentional and meaningful — it documents the
- * cross-cutting fields that multiple type-specific paths contribute to.
- */
-export const ROLL_TYPE_FIELDS: Record<RollTypeKey, readonly (keyof RollData)[]> = {
-    // ---- Direct weapon rolls (hand-held, vehicle-mounted, starship-mounted) ----
-    'weapon': [
-        'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
-        'damagemodifiers', 'source', 'range', 'difficultylevel',
-        'only_stun', 'can_stun', 'stun', 'attackerScale', 'specSkill',
-    ],
-    'starship-weapon': [
-        'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
-        'damagemodifiers', 'source', 'range', 'difficultylevel',
-        'only_stun', 'can_stun', 'stun', 'attackerScale', 'specSkill',
-    ],
-    'vehicle-weapon': [
-        'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
-        'damagemodifiers', 'source', 'range', 'difficultylevel',
-        'only_stun', 'can_stun', 'stun', 'attackerScale', 'specSkill',
-        'vehicle',
-    ],
+const WEAPON_BUCKET = [
+    'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
+    'damagemodifiers', 'source', 'range', 'difficultylevel',
+    'only_stun', 'can_stun', 'stun', 'attackerScale', 'specSkill',
+] as const satisfies readonly (keyof RollData)[];
 
-    // ---- Action rolls (skill-backed combat actions) ----
+export const ROLL_TYPE_FIELDS = {
+    'weapon': WEAPON_BUCKET,
+    'starship-weapon': WEAPON_BUCKET,
+    'vehicle-weapon': [...WEAPON_BUCKET, 'vehicle'],
+
     'action-meleeattack': ['score', 'attackerScale', 'damagescore'],
     'action-brawlattack': [
         'score', 'attackerScale',
@@ -118,25 +88,44 @@ export const ROLL_TYPE_FIELDS: Record<RollTypeKey, readonly (keyof RollData)[]> 
     'action-attribute': ['score'],
     'action-other': [],
 
-    // ---- Skill / specialization rolls ----
     'skill': ['attribute'],
     'skill-dodge': ['attribute'],
     'specialization': ['attribute', 'specSkill'],
 
-    // ---- Damage / resistance / wound / status rolls ----
     'damage': [],
     'resistance': ['scaledice'],
     'resistance-vehicletoughness': ['scaledice', 'vehicle'],
     'mortally_wounded': [],
     'incapacitated': [],
 
-    // ---- Economy ----
     'funds': [],
     'purchase': ['seller'],
 
-    // ---- Top-level brawl (sheet button shortcut) ----
     'brawlattack': [
         'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
         'can_stun', 'attackerScale',
     ],
-};
+} as const satisfies Record<RollTypeKey, readonly (keyof RollData)[]>;
+
+// ---- Compile-time partition invariants ----
+//
+// These types resolve to `never` iff the partition is well-formed; if any
+// invariant is violated, the corresponding `_assert*` constant fails to
+// type-check with the offending field name in the error.
+
+type AnyHandlerField = (typeof ROLL_TYPE_FIELDS)[RollTypeKey][number];
+type AnyCommonField = (typeof COMMON_FIELDS)[number];
+
+/** Fields in RollData not covered by COMMON_FIELDS or any handler bucket. */
+type _MissingFromPartition = Exclude<keyof RollData, AnyCommonField | AnyHandlerField>;
+
+/** Fields listed in the partition that aren't actually keyof RollData. (Should be never since `satisfies` already constrains.) */
+type _ExtraInPartition = Exclude<AnyCommonField | AnyHandlerField, keyof RollData>;
+
+/** Fields appearing in BOTH COMMON_FIELDS and a handler bucket — strict-partition violation. */
+type _CommonHandlerOverlap = Extract<AnyCommonField, AnyHandlerField>;
+
+const _assertNoMissing: [_MissingFromPartition] extends [never] ? true : never = true;
+const _assertNoExtra: [_ExtraInPartition] extends [never] ? true : never = true;
+const _assertNoOverlap: [_CommonHandlerOverlap] extends [never] ? true : never = true;
+void _assertNoMissing; void _assertNoExtra; void _assertNoOverlap;
