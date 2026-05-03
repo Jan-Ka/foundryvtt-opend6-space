@@ -6,7 +6,10 @@
  * branches in setupRollData (#98) that has no other smoke coverage:
  *   - brawlattack       → action-brawlattack
  *   - vehicleramattack  → action-vehicleramattack
- *   - vehicletoughness  → resistance-vehicletoughness (top-level type rewrite)
+ *   - vehicletoughness  → resistance-vehicletoughness (action+vehicletoughness
+ *                         path — rollAction wraps with type='action'; the
+ *                         top-level type='vehicletoughness' rewrite remains
+ *                         uncovered by smoke)
  *
  * Assertion shape mirrors tier-3-weapon-roll: dialog opens, submit produces
  * a chat message with od6s flags. Doesn't pin specific flag values — the
@@ -149,6 +152,8 @@ test("vehicletoughness action roll opens dialog and creates chat message", async
     expect(result.errs, "unhandled rejections").toEqual([]);
     expect(result.dialogOpened, "toughness dialog opened").toBe(true);
     expect(result.chatCreated, "toughness chat message created").toBe(true);
-    // vehicletoughness top-level rewrite collapses to type='resistance' in classifyRoll.
+    // action+vehicletoughness collapses to type='resistance' via the action-
+    // subtype rewrite at roll-setup.ts:309-313 (classifier key: resistance-
+    // vehicletoughness).
     expect(result.chatType, "message has od6s.type flag").toBeTruthy();
 });
