@@ -1,5 +1,6 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
+import {isSkillItem} from "../../system/type-guards";
 
 /**
  * Add a character template to an actor via drop.
@@ -128,8 +129,8 @@ export async function templateItems(sheet: any, itemList: any) {
         }
 
         // Metaphysics skills get 1D if the attribute is not used
-        if (templateItem.type === 'skill' && (templateItem.system as OD6SSkillItemSystem).attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
-            (templateItem.system as OD6SSkillItemSystem).base = OD6S.pipsPerDice;
+        if (isSkillItem(templateItem) && templateItem.system.attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+            templateItem.system.base = OD6S.pipsPerDice;
         }
 
         result.push(templateItem);

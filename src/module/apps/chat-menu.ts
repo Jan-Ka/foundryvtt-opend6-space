@@ -1,3 +1,5 @@
+import {isCharacterActor} from "../system/type-guards";
+
 export class OD6SChat {
 
     static chatContextMenu(html: any, options: any[]) {
@@ -14,9 +16,10 @@ export class OD6SChat {
                     }
 
                     if (message!.getFlag('od6s', 'canUseCp') &&
-                        (game.user.isGM || actor!.isOwner) &&
-                        (actor!.type === "character"||actor!.type === "npc") &&
-                        (actor!.system as OD6SCharacterSystem).characterpoints.value > 0) {
+                        actor && (game.user.isGM || actor.isOwner) &&
+                        isCharacterActor(actor) &&
+                        (actor.type === "character" || actor.type === "npc") &&
+                        actor.system.characterpoints.value > 0) {
                         return true;
                     }
                 }

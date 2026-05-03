@@ -2,6 +2,7 @@ import OD6S from "../../config/config-od6s";
 import { boolCheck } from "./converters";
 import { getActorFromUuid, getTokenFromUuid } from "./actors";
 import { getInjury } from "./wounds";
+import { isVehicleActor } from "../type-guards";
 
 /**
  * Pure stun-effect calculator extracted from handleOpposedRoll.
@@ -260,8 +261,8 @@ export async function generateOpposedRoll(token: TokenDocument, msg: ChatMessage
     if (!token.actor.hasPlayerOwner) {
         if (msg.getFlag('od6s', 'type') === 'damage' || msg.getFlag('od6s','type') === 'explosive') {
             const type = msg.getFlag('od6s', 'damageType');
-            if (token.actor.type === 'vehicle' || token.actor.type === 'starship') {
-                const sys = token.actor.system as OD6SVehicleSystem;
+            if (isVehicleActor(token.actor)) {
+                const sys = token.actor.system;
                 if (sys.embedded_pilot.value || sys.crewmembers.length < 1) {
                     await token.actor.rollAction('vehicletoughness', msg);
                     return;

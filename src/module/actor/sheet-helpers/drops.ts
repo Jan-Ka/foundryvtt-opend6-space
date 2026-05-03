@@ -1,6 +1,7 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {onDropCharacterTemplate, onDropItemGroup, onDropSpeciesTemplate} from "./templates";
+import {isSkillItem, isSpecializationItem} from "../../system/type-guards";
 
 /**
  * Override for the _onDrop handler.
@@ -37,7 +38,8 @@ export async function onDrop(sheet: any, event: any) {
                 case "species-template":
                     return onDropSpeciesTemplate(sheet, event, item, data);
                 case "skill": {
-                    const sys = item.system as OD6SSkillItemSystem;
+                    if (!isSkillItem(item)) return;
+                    const sys = item.system;
                     if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;
@@ -46,7 +48,8 @@ export async function onDrop(sheet: any, event: any) {
                     }
                 }
                 case "specialization": {
-                    const sys = item.system as OD6SSpecializationItemSystem;
+                    if (!isSpecializationItem(item)) return;
+                    const sys = item.system;
                     if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;

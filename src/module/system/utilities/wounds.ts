@@ -1,4 +1,5 @@
 import OD6S from "../../config/config-od6s";
+import {isCharacterActor} from "../type-guards";
 
 // ---- Pure functions (testable without Foundry globals) ----
 
@@ -55,7 +56,7 @@ export function lookupInjury(
  * Get the action penalty from the actor's wound level vs. the system wound levels
  */
 export function getWoundPenalty(actor: Actor): number {
-    if (actor.type === 'vehicle' || actor.type === 'starship') return 0;
+    if (!isCharacterActor(actor)) return 0;
 
     let deadlinessLevel: number;
     if (OD6S.woundConfig === 1) {
@@ -66,7 +67,7 @@ export function getWoundPenalty(actor: Actor): number {
             : 'deadliness';
         deadlinessLevel = game.settings.get('od6s', settingKey) as number;
     }
-    return lookupWoundPenalty(OD6S.deadliness[deadlinessLevel], (actor.system as OD6SCharacterSystem).wounds.value);
+    return lookupWoundPenalty(OD6S.deadliness[deadlinessLevel], actor.system.wounds.value);
 }
 
 export function getWoundLevel(value: number, actor: Actor): string {

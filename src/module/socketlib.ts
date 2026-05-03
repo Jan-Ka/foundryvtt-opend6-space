@@ -1,5 +1,6 @@
 import {od6sutilities} from "./system/utilities";
 import OD6S from "./config/config-od6s";
+import {isVehicleActor} from "./system/type-guards";
 
 export function registerSocketlib() {
     Hooks.once("socketlib.ready", () => {
@@ -165,9 +166,9 @@ export async function promptResistanceRolls(msg: any) {
         if (msg.getFlag('od6s', 'wild') && !msg.getFlag('od6s', 'wildHandled')) return;
 
         if (typeof (target) !== 'undefined' && target) {
-            if (target.actor.type === 'starship' || target.actor.type === 'vehicle') {
+            if (isVehicleActor(target.actor)) {
                 if(!target.actor.isOwner) return;
-                const crew = await od6sutilities.getActorFromUuid((target.actor.system as OD6SVehicleSystem).crewmembers[0].uuid);
+                const crew = await od6sutilities.getActorFromUuid(target.actor.system.crewmembers[0].uuid);
                 if (typeof (crew) !== 'undefined' || crew !== null) {
                     if (crew?.hasPlayerOwner && crew?.isOwner) {
                         return crew.rollAction('vehicletoughness', msg);
