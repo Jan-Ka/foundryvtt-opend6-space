@@ -9,6 +9,12 @@ import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-g
 import {bucketRangeFromDistance} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
+import {
+    applyWeaponMods,
+    buildDamagedWeaponModifier,
+    buildStrengthDamageModifier,
+    computeStunFlags,
+} from "./weapon-context-math";
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
     let attribute;
@@ -147,25 +153,22 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             }
         }
         if (weapon.system.scale.score) attackerScale = weapon.system.scale.score;
-        if (weapon.system.mods.damage !== 0) damageScore += weapon.system.mods.damage;
-        if (weapon.system.mods.difficulty !== 0) miscMod += weapon.system.mods.difficulty;
-        if (weapon.system.mods.attack !== 0) bonusmod += weapon.system.mods.attack;
+        ({damageScore, miscMod, bonusmod} = applyWeaponMods(
+            {damageScore, miscMod, bonusmod},
+            weapon.system.mods,
+        ));
 
         if (OD6S.meleeDifficulty) {
             weapon.system.difficulty ? difficultyLevel = weapon.system.difficulty : difficultyLevel = 'OD6S.DIFFICULTY_EASY';
         }
 
-        if(isExplosive) {
-            onlyStun = weapon.system.stun?.stun_only;
-            if (game.settings.get('od6s','explosive_zones')) {
-                canStun = onlyStun || weapon.system.blast_radius["1"].stun_damage > 0;
-            } else {
-                canStun = onlyStun || weapon.system.stun.damage > 0;
-            }
-        } else {
-            onlyStun = weapon.system.stun?.stun_only;
-            canStun = onlyStun || weapon.system.stun?.score > 0 ;
-        }
+        ({onlyStun, canStun} = computeStunFlags({
+            stunOnly: weapon.system.stun?.stun_only,
+            weaponStunScore: weapon.system.stun?.score ?? 0,
+            isExplosive,
+            explosiveZonesEnabled: Boolean(game.settings.get('od6s', 'explosive_zones')),
+            blastZone1StunDamage: weapon.system.blast_radius?.["1"]?.stun_damage ?? 0,
+        }));
 
         if(data.subtype === 'rangedattack') {
             data.range = await od6sutilities.getWeaponRange(data.actor, weapon) as typeof data.range;
@@ -174,21 +177,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             data.range = weapon.system.range as typeof data.range;
         }
 
-        if (weapon.system.damaged > 0) {
-           const damageMod = {
-               "name": 'OD6S.WEAPON_DAMAGED',
-               "value": -(OD6S.weaponDamage[weapon.system.damaged].penalty),
-               "level": OD6S.weaponDamage[weapon.system.damaged].label
-           }
-           damageModifiers.push(damageMod);
-        }
+        const damagedMod = buildDamagedWeaponModifier(weapon.system.damaged, OD6S.weaponDamage);
+        if (damagedMod) damageModifiers.push(damagedMod);
 
         if (weapon.system.damage.muscle) {
-            const strmod = {
-                "name": 'OD6S.STRENGTH_DAMAGE_BONUS',
-                "value": (data.actor.system as OD6SCharacterSystem).strengthdamage.score
-            }
-            damageModifiers.push(strmod);
+            damageModifiers.push(buildStrengthDamageModifier(
+                (data.actor.system as OD6SCharacterSystem).strengthdamage.score,
+            ));
         }
 
         // Check for effect modifiers
@@ -227,9 +222,10 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             const vwSys = vehicleWeapon.system as OD6SVehicleWeaponItemSystem;
             damageScore = vwSys.damage.score;
             damageType = vwSys.damage.type;
-            if (vwSys.mods.damage !== 0) damageScore += vwSys.mods.damage;
-            if (vwSys.mods.difficulty !== 0) miscMod += vwSys.mods.difficulty;
-            if (vwSys.mods.attack !== 0) bonusmod += vwSys.mods.attack;
+            ({damageScore, miscMod, bonusmod} = applyWeaponMods(
+                {damageScore, miscMod, bonusmod},
+                vwSys.mods,
+            ));
             if (vwSys.scale.score) {
                 attackerScale = vwSys.scale.score;
             } else if (isVehicleActor(data.actor)) {

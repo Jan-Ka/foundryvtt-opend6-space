@@ -1,0 +1,99 @@
+/**
+ * Pure helpers extracted from the weapon-attack branch of setupRollData.
+ * No Foundry globals — testable in isolation.
+ */
+
+import type { Modifier } from "./difficulty-math";
+
+export interface WeaponMods {
+    difficulty: number;
+    attack: number;
+    damage: number;
+}
+
+export interface ModTotals {
+    damageScore: number;
+    miscMod: number;
+    bonusmod: number;
+}
+
+/**
+ * Apply a weapon's `mods` block to the running roll totals. Only non-zero
+ * mods contribute, mirroring the original guarded `+=` calls.
+ */
+export function applyWeaponMods(current: ModTotals, mods: WeaponMods): ModTotals {
+    return {
+        damageScore: current.damageScore + (mods.damage !== 0 ? mods.damage : 0),
+        miscMod: current.miscMod + (mods.difficulty !== 0 ? mods.difficulty : 0),
+        bonusmod: current.bonusmod + (mods.attack !== 0 ? mods.attack : 0),
+    };
+}
+
+export interface StunFlagInputs {
+    stunOnly: boolean;
+    weaponStunScore: number;
+    isExplosive: boolean;
+    explosiveZonesEnabled: boolean;
+    blastZone1StunDamage: number;
+}
+
+export interface StunFlags {
+    onlyStun: boolean;
+    canStun: boolean;
+}
+
+/**
+ * Decide the `onlyStun` / `canStun` flags from a weapon's stun/blast fields.
+ *
+ * Note: the original code's explosive-without-zones branch read
+ * `weapon.system.stun.damage`, but the weapon schema defines
+ * `stun.{stun_only,score,type}` — there is no `stun.damage` field, so that
+ * branch effectively never set `canStun` from a non-zero stun value. This
+ * helper uses `weaponStunScore` consistently across the non-explosive and
+ * explosive-without-zones branches, which is the apparent original intent.
+ */
+export function computeStunFlags(input: StunFlagInputs): StunFlags {
+    const onlyStun = input.stunOnly;
+    let canStun: boolean;
+    if (input.isExplosive) {
+        canStun = onlyStun || (input.explosiveZonesEnabled
+            ? input.blastZone1StunDamage > 0
+            : input.weaponStunScore > 0);
+    } else {
+        canStun = onlyStun || input.weaponStunScore > 0;
+    }
+    return { onlyStun, canStun };
+}
+
+export interface WeaponDamageEntry {
+    penalty: number;
+    label: string;
+}
+
+/**
+ * Build the OD6S.WEAPON_DAMAGED damage modifier from a weapon's `damaged`
+ * level. Returns null when `damaged === 0` (weapon undamaged).
+ */
+export function buildDamagedWeaponModifier(
+    damaged: number,
+    table: Record<number, WeaponDamageEntry>,
+): (Modifier & { level: string }) | null {
+    if (damaged <= 0) return null;
+    const entry = table[damaged];
+    return {
+        name: "OD6S.WEAPON_DAMAGED",
+        value: -entry.penalty,
+        level: entry.label,
+    };
+}
+
+/**
+ * Build the OD6S.STRENGTH_DAMAGE_BONUS damage modifier (added when the
+ * weapon's `damage.muscle` flag is set).
+ */
+export function buildStrengthDamageModifier(strScore: number): Modifier {
+    return {
+        name: "OD6S.STRENGTH_DAMAGE_BONUS",
+        value: strScore,
+    };
+}
