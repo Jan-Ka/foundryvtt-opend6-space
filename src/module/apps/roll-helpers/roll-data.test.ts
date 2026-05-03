@@ -92,6 +92,9 @@ describe('classifyRoll', () => {
             ['incapacitated', 'incapacitated'],
             ['funds', 'funds'],
             ['brawlattack', 'brawlattack'],
+            // Top-level attribute roll (Actor.rollAttribute) — distinct from
+            // action+attribute, which is dispatched via the action handler.
+            ['attribute', 'attribute'],
         ] as const)('type=%s → key=%s', (type, key) => {
             const result = classifyRoll({ type }, localize);
             expect(result).toEqual({ type, subtype: '', key });

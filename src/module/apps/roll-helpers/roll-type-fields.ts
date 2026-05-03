@@ -30,9 +30,10 @@ export const COMMON_FIELDS = [
     'wilddie', 'showWildDie',
     'fatepoint', 'fatepointeffect', 'characterpoints',
     'contact', 'cpcost', 'cpcostcolor',
-    // canusefp/cp diverge in funds/purchase/vehicletoughness, but always to
-    // the same value (false) — that's a finalize policy keyed by canonical
-    // type, not handler output.
+    // canusefp/cp diverge in vehicletoughness paths (always false) and in
+    // funds/purchase paths (false only when OD6S.fundsFate is off, otherwise
+    // true). Both are finalize policies keyed by canonical type and the
+    // funds_fate setting, not handler output.
     'canusefp', 'canusecp',
     // Visibility maps from RollTypeKey to a setting key in finalize, not
     // handler output.
@@ -105,6 +106,10 @@ export const ROLL_TYPE_FIELDS = {
         'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
         'can_stun', 'attackerScale',
     ],
+
+    // Top-level attribute roll (Actor.rollAttribute). Flows through
+    // setupRollData with no type-specific writes; score/dice come from input.
+    'attribute': [],
 } as const satisfies Record<RollTypeKey, readonly (keyof RollData)[]>;
 
 // ---- Compile-time partition invariants ----
