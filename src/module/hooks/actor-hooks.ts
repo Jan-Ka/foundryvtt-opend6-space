@@ -11,7 +11,7 @@ export function registerActorHooks() {
                     for (const c in document.system.crewmembers) {
                         const actor = await od6sutilities.getActorFromUuid(document.system.crewmembers[c].uuid);
                         if (!actor) continue;
-                        await (actor as any).removeFromCrew(document.uuid);
+                        await actor.removeFromCrew(document.uuid);
                     }
                 }
             }
@@ -21,7 +21,7 @@ export function registerActorHooks() {
             if (typeof document.system.vehicle.uuid !== 'undefined' && document.system.vehicle.uuid !== '') {
                 if (game.user.isGM) {
                     const vehicle = await od6sutilities.getActorFromUuid(document.system.vehicle.uuid);
-                    if (vehicle) await (vehicle as any).forceRemoveCrewmember(document.uuid);
+                    if (vehicle) await vehicle.forceRemoveCrewmember(document.uuid);
                 }
             }
         }
@@ -192,7 +192,7 @@ export function registerActorHooks() {
                     const crewMember = await od6sutilities.getActorFromUuid(document.actor.system.crewmembers[i].uuid);
                     if (crewMember) {
                         try {
-                            (crewMember as any).removeFromCrew(document.actor.uuid);
+                            await crewMember.removeFromCrew(document.actor.uuid);
                         } catch {
                             // Likely the other token was simultaneously deleted
                         }
@@ -204,7 +204,7 @@ export function registerActorHooks() {
                 const vehicle = await od6sutilities.getActorFromUuid(document.actor.getFlag('od6s', 'crew'));
                 if (vehicle) {
                     try {
-                        await (vehicle as any).forceRemoveCrewmember(document.actor.uuid);
+                        await vehicle.forceRemoveCrewmember(document.actor.uuid);
                     } catch {
                         // Likely the other token was simultaneously deleted
                     }
