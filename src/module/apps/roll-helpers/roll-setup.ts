@@ -216,9 +216,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         const ownsSkill = !!stats.skill
             && data.actor.items.some((i: Item) => i.type === 'skill' && i.name === stats.skill);
         if (ownsSpec) {
-            bonusmod += getEffectMod('specialization', stats.specialization, data.actor);
+            bonusmod += (+getEffectMod('specialization', stats.specialization, data.actor));
         } else if (ownsSkill) {
-            bonusmod += getEffectMod('skill', stats.skill, data.actor);
+            bonusmod += (+getEffectMod('skill', stats.skill, data.actor));
         }
     }
 
