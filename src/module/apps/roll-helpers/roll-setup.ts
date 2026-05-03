@@ -8,6 +8,7 @@ import {cancelAction, getEffectMod} from "./roll-effects";
 import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
+import {bucketDistance} from "./range-from-distance";
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
     let attribute;
@@ -479,19 +480,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                         distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
                     }
                     const rangeConfig = data.range as { short: number; medium: number; long: number };
-                    if (distance < 3) {
-                        range = "OD6S.RANGE_POINT_BLANK_SHORT";
-                        if (rangeDifficulty) difficultyLevel = 'OD6S.DIFFICULTY_VERY_EASY'
-                    } else if (distance <= rangeConfig.short) {
-                        range = "OD6S.RANGE_SHORT_SHORT"
-                        if (rangeDifficulty) difficultyLevel = 'OD6S.DIFFICULTY_EASY'
-                    } else if (distance <= rangeConfig.medium) {
-                        range = "OD6S.RANGE_MEDIUM_SHORT"
-                        if (rangeDifficulty) difficultyLevel = 'OD6S.DIFFICULTY_MODERATE'
-                    } else if (distance <= rangeConfig.long) {
-                        range = "OD6S.RANGE_LONG_SHORT"
-                        if (rangeDifficulty) difficultyLevel = 'OD6S.DIFFICULTY_DIFFICULT'
-                    } else {
+                    const bucket = bucketDistance(distance, rangeConfig);
+                    if (bucket.outOfRange) {
                         if (isExplosive) {
                             const regionId = item?.getFlag('od6s', 'explosiveTemplate');
                             if (regionId) {
@@ -507,6 +497,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                         ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));
                         return false;
                     }
+                    range = bucket.range;
+                    if (rangeDifficulty) difficultyLevel = bucket.difficultyLevel;
                 }
             }
         }
