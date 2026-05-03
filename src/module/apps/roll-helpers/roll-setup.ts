@@ -5,6 +5,7 @@ import {od6sutilities} from "../../system/utilities";
 import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
+import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
 
@@ -213,20 +214,16 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     if (data.subtype === 'vehiclerangedweaponattack') {
         let vehicleWeapon: Item | undefined;
-        if (data.actor.type === 'vehicle') {
-            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
+        if (isVehicleActor(data.actor)) {
+            if (data.actor.system.embedded_pilot?.value) {
                 vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
-            } else {
+            } else if (data.actor.type === 'vehicle') {
                 vehicleWeapon = (data.actor as any).vehicle_weapons.filter((i: Item) => i._id === data.itemId)[0];
-            }
-        } else if (data.actor.type === 'starship') {
-            if ((data.actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
-                vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
             } else {
                 vehicleWeapon = (data.actor as any).starship_weapons.filter((i: Item) => i._id === data.itemId)[0];
             }
-        } else {
-            vehicleWeapon = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons?.filter((i: Item) => i.id === data.itemId)[0];
+        } else if (isCharacterActor(data.actor)) {
+            vehicleWeapon = data.actor.system.vehicle.vehicle_weapons?.filter((i: Item) => i.id === data.itemId)[0];
         }
 
         isAttack = true;
@@ -239,15 +236,15 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             if (vwSys.mods.attack !== 0) bonusmod += vwSys.mods.attack;
             if (vwSys.scale.score) {
                 attackerScale = vwSys.scale.score;
-            } else if (data.actor.type === 'vehicle' || data.actor.type === 'starship' || (data.actor.system as OD6SVehicleSystem)?.embedded_pilot?.value) {
+            } else if (isVehicleActor(data.actor)) {
                 attackerScale = data.actor.system.scale.score;
-            } else {
-                attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
+            } else if (isCharacterActor(data.actor)) {
+                attackerScale = data.actor.system.vehicle.scale!.score;
             }
-        } else {
+        } else if (isCharacterActor(data.actor)) {
             damageScore = data.damage ?? 0;
             damageType = data.damage_type ?? '';
-            attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
+            attackerScale = data.actor.system.vehicle.scale!.score;
         }
         damageSource = data.name;
     }
@@ -269,9 +266,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         }
     }
 
-    if (data.type === 'brawlattack' || data.subtype === 'brawlattack') {
+    if ((data.type === 'brawlattack' || data.subtype === 'brawlattack') && isCharacterActor(data.actor)) {
         damageType = 'p';
-        damageScore = (data.actor.system as OD6SCharacterSystem).strengthdamage.score;
+        damageScore = data.actor.system.strengthdamage.score;
         isAttack = true;
         canStun = true;
         stunDamageScore = damageScore;
@@ -340,13 +337,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             case 'meleeattack':
                 skill = await data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.MELEE_COMBAT'));
-                if (typeof (skill) !== 'undefined') {
+                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
+                    const attrKey = skill.system.attribute.toLowerCase();
                     if (OD6S.flatSkills) {
-                        data.score = (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
-                        flatPips = (skill.system as OD6SSkillItemSystem).score;
+                        data.score = data.actor.system.attributes[attrKey].score;
+                        flatPips = skill.system.score;
                     } else {
-                        data.score = (skill.system as OD6SSkillItemSystem).score +
-                            (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
+                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
                     }
                 } else {
                     data.score = data.actor.system.attributes.agi.score;
@@ -356,13 +353,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             case 'brawlattack':
                 skill = await data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.BRAWL'));
-                if (typeof (skill) !== 'undefined') {
+                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
+                    const attrKey = skill.system.attribute.toLowerCase();
                     if (OD6S.flatSkills) {
-                        data.score = (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
-                        flatPips = (skill.system as OD6SSkillItemSystem).score;
+                        data.score = data.actor.system.attributes[attrKey].score;
+                        flatPips = skill.system.score;
                     } else {
-                        data.score = (skill.system as OD6SSkillItemSystem).score +
-                            (data.actor.system as OD6SCharacterSystem).attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score;
+                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
                     }
                 } else {
                     const bAttr = game.settings.get('od6s', 'brawl_attribute')
@@ -383,9 +380,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     let rollValues = od6sutilities.getDiceFromScore(data.score);
 
     let stunnedPenalty = 0;
-    if (data.actor.type === 'character' || data.actor.type === 'npc' || data.actor.type === 'creature') {
-        const sys = data.actor.system as OD6SCharacterSystem;
-        stunnedPenalty = sys.stuns.current ? sys.stuns.current : 0;
+    if (isCharacterActor(data.actor)) {
+        stunnedPenalty = data.actor.system.stuns.current ? data.actor.system.stuns.current : 0;
     }
 
     let actionPenalty = ((+data.actor.itemTypes.action.length) > 0) ? (+data.actor.itemTypes.action.length) - 1 : 0;

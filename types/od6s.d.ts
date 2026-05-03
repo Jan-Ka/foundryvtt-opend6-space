@@ -93,6 +93,23 @@ interface OD6SCharacterSystem {
     created?: { value: boolean };
 }
 
+/** System data for the container actor type. */
+interface OD6SContainerSystem {
+    itemtypes: {
+        armor: boolean;
+        weapon: boolean;
+        gear: boolean;
+        cybernetics: boolean;
+        vehicle_weapons: boolean;
+        vehicle_gear: boolean;
+        starship_weapons: boolean;
+        starship_gear: boolean;
+    };
+    merchant: boolean;
+    visible: boolean;
+    locked: boolean;
+}
+
 /** System data for vehicle and starship actor types. */
 interface OD6SVehicleSystem {
     attributes: OD6SAttributes;
@@ -410,8 +427,15 @@ interface Actor {
     type: OD6SActorType;
 
     /**
-     * Typed union of character/vehicle system shapes. Use `actor.type` to
-     * narrow before accessing type-specific fields (e.g. `vehicle.crewmembers`).
+     * Typed union of OD6S actor system shapes. TypeScript can't correlate
+     * `type` with `system` through class augmentation, so use the
+     * `isCharacterActor` / `isVehicleActor` / `isContainerActor` type guards
+     * in `system/type-guards.ts` to narrow at branch points.
+     *
+     * Note: `OD6SContainerSystem` is intentionally NOT in this union — adding
+     * it would force ~30 narrowing fixes across the rules engine that aren't
+     * in scope for #57. Container access continues to flow through the
+     * `isContainerActor` guard.
      */
     system: OD6SCharacterSystem | OD6SVehicleSystem;
 
@@ -545,3 +569,68 @@ interface User {
     /** Tokens currently targeted by this user. */
     targets: Set<Token>;
 }
+
+// ---- Discriminated actor/item unions ----
+//
+// TypeScript class augmentation can't correlate `Actor.type` with `Actor.system`,
+// so these intersection types pair them up explicitly. Use the type guards in
+// `src/module/system/type-guards.ts` to narrow at runtime — call sites then get
+// `system` typed without an `as` cast.
+
+type OD6SCharacterActor = Actor & {
+    type: "character" | "npc" | "creature";
+    system: OD6SCharacterSystem;
+};
+
+type OD6SVehicleActor = Actor & {
+    type: "vehicle" | "starship";
+    system: OD6SVehicleSystem;
+};
+
+type OD6SContainerActor = Actor & {
+    type: "container";
+    system: OD6SContainerSystem;
+};
+
+type OD6SAnyActor = OD6SCharacterActor | OD6SVehicleActor | OD6SContainerActor;
+
+type OD6SSkillItem = Item & { type: "skill"; system: OD6SSkillItemSystem };
+type OD6SSpecializationItem = Item & { type: "specialization"; system: OD6SSpecializationItemSystem };
+type OD6SAdvantageItem = Item & { type: "advantage"; system: OD6SAdvantageItemSystem };
+type OD6SDisadvantageItem = Item & { type: "disadvantage"; system: OD6SDisadvantageItemSystem };
+type OD6SSpecialAbilityItem = Item & { type: "specialability"; system: OD6SSpecialAbilityItemSystem };
+type OD6SArmorItem = Item & { type: "armor"; system: OD6SArmorItemSystem };
+type OD6SWeaponItem = Item & { type: "weapon"; system: OD6SWeaponItemSystem };
+type OD6SGearItem = Item & { type: "gear"; system: OD6SGearItemSystem };
+type OD6SCyberneticItem = Item & { type: "cybernetic"; system: OD6SCyberneticItemSystem };
+type OD6SManifestationItem = Item & { type: "manifestation"; system: OD6SManifestationItemSystem };
+type OD6SCharacterTemplateItem = Item & { type: "character-template"; system: OD6SCharacterTemplateItemSystem };
+type OD6SActionItem = Item & { type: "action"; system: OD6SActionItemSystem };
+type OD6SVehicleItem = Item & { type: "vehicle"; system: OD6SVehicleItemSystem };
+type OD6SVehicleWeaponItem = Item & { type: "vehicle-weapon"; system: OD6SVehicleWeaponItemSystem };
+type OD6SVehicleGearItem = Item & { type: "vehicle-gear"; system: OD6SVehicleGearItemSystem };
+type OD6SStarshipWeaponItem = Item & { type: "starship-weapon"; system: OD6SStarshipWeaponItemSystem };
+type OD6SStarshipGearItem = Item & { type: "starship-gear"; system: OD6SStarshipGearItemSystem };
+type OD6SSpeciesTemplateItem = Item & { type: "species-template"; system: OD6SSpeciesTemplateItemSystem };
+type OD6SItemGroupItem = Item & { type: "item-group"; system: OD6SItemGroupSystem };
+
+type OD6SAnyItem =
+    | OD6SSkillItem
+    | OD6SSpecializationItem
+    | OD6SAdvantageItem
+    | OD6SDisadvantageItem
+    | OD6SSpecialAbilityItem
+    | OD6SArmorItem
+    | OD6SWeaponItem
+    | OD6SGearItem
+    | OD6SCyberneticItem
+    | OD6SManifestationItem
+    | OD6SCharacterTemplateItem
+    | OD6SActionItem
+    | OD6SVehicleItem
+    | OD6SVehicleWeaponItem
+    | OD6SVehicleGearItem
+    | OD6SStarshipWeaponItem
+    | OD6SStarshipGearItem
+    | OD6SSpeciesTemplateItem
+    | OD6SItemGroupItem;
