@@ -37,7 +37,7 @@ export class OD6SChat {
                     } else {
                         actor = game.actors.get(message!.speaker.actor);
                     }
-                    return (actor as any).useCharacterPointOnRoll(message, message!.getRollData());
+                    return actor!.useCharacterPointOnRoll(message!);
                 }
             }
         )
