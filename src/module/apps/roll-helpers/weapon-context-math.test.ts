@@ -4,6 +4,7 @@ import {
     computeStunFlags,
     buildDamagedWeaponModifier,
     buildStrengthDamageModifier,
+    ramAttackContribution,
     type ModTotals,
     type WeaponDamageEntry,
 } from './weapon-context-math';
@@ -120,6 +121,36 @@ describe('buildStrengthDamageModifier', () => {
     it('produces a modifier carrying the strength damage score', () => {
         expect(buildStrengthDamageModifier(5)).toEqual({
             name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 5,
+        });
+    });
+});
+
+describe('ramAttackContribution', () => {
+    it('emits no modifier and zero increment when both scores are 0', () => {
+        expect(ramAttackContribution(0, 0)).toEqual({
+            bonusModIncrement: 0,
+            modifier: null,
+        });
+    });
+
+    it('emits the ram-damage modifier when ram_damage > 0', () => {
+        expect(ramAttackContribution(0, 4)).toEqual({
+            bonusModIncrement: 0,
+            modifier: { name: 'OD6S.ACTIVE_EFFECTS', value: 4 },
+        });
+    });
+
+    it('emits the bonusmod increment when ram > 0', () => {
+        expect(ramAttackContribution(3, 0)).toEqual({
+            bonusModIncrement: 3,
+            modifier: null,
+        });
+    });
+
+    it('emits both when both are > 0', () => {
+        expect(ramAttackContribution(3, 4)).toEqual({
+            bonusModIncrement: 3,
+            modifier: { name: 'OD6S.ACTIVE_EFFECTS', value: 4 },
         });
     });
 });

@@ -6,7 +6,7 @@ import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
 import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
-import {bucketRangeFromDistance} from "./difficulty-math";
+import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
 import {
@@ -14,7 +14,29 @@ import {
     buildDamagedWeaponModifier,
     buildStrengthDamageModifier,
     computeStunFlags,
+    ramAttackContribution,
 } from "./weapon-context-math";
+import {computePenalties, isPenaltyBypassType, resolveSkillBackedAction} from "./action-math";
+
+/**
+ * Returns the "vehicle data" carried by an actor regardless of host type:
+ * for vehicle/starship actors it's `system` itself; for character actors
+ * it's the embedded `system.vehicle` field. The shape is loosely typed
+ * because the two sources only partially overlap at runtime.
+ */
+function selectVehicleData(actor: Actor): {
+    uuid?: string;
+    scale?: { score: number };
+    ram?: { score: number };
+    ram_damage?: { score: number };
+    ranged?: { score?: number };
+    vehicle_weapons?: Item[];
+} {
+    if (actor.type === 'vehicle' || actor.type === 'starship') {
+        return actor.system as never;
+    }
+    return (actor.system as OD6SCharacterSystem).vehicle as never;
+}
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
     let attribute;
@@ -186,20 +208,17 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             ));
         }
 
-        // Check for effect modifiers
-        const stats = weapon.system.stats
-        let found = false;
-        if (typeof (stats.specialization) !== 'undefined' && stats.specialization !== '') {
-            if (data.actor.items.filter((i: Item) => i.type === 'specialization' && i.name === stats.specialization)) {
-                bonusmod += (+getEffectMod('specialization', stats.specialization, data.actor));
-                found = true;
-            }
-        }
-
-        if (!found && typeof (stats.skill) !== 'undefined' && stats.skill !== '') {
-            if (data.actor.items.filter((i: Item) => i.type === 'skill' && i.name === stats.skill)) {
-                bonusmod += (+getEffectMod('skill', stats.skill, data.actor));
-            }
+        // Check for effect modifiers — prefer specialization over skill when
+        // the actor owns the matching item.
+        const stats = weapon.system.stats;
+        const ownsSpec = !!stats.specialization
+            && data.actor.items.some((i: Item) => i.type === 'specialization' && i.name === stats.specialization);
+        const ownsSkill = !!stats.skill
+            && data.actor.items.some((i: Item) => i.type === 'skill' && i.name === stats.skill);
+        if (ownsSpec) {
+            bonusmod += (+getEffectMod('specialization', stats.specialization, data.actor));
+        } else if (ownsSkill) {
+            bonusmod += (+getEffectMod('skill', stats.skill, data.actor));
         }
     }
 
@@ -226,13 +245,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                 {damageScore, miscMod, bonusmod},
                 vwSys.mods,
             ));
-            if (vwSys.scale.score) {
-                attackerScale = vwSys.scale.score;
-            } else if (isVehicleActor(data.actor)) {
-                attackerScale = data.actor.system.scale.score;
-            } else if (isCharacterActor(data.actor)) {
-                attackerScale = data.actor.system.vehicle.scale!.score;
-            }
+            attackerScale = vwSys.scale.score
+                ? vwSys.scale.score
+                : selectVehicleData(data.actor).scale?.score ?? 0;
         } else if (isCharacterActor(data.actor)) {
             damageScore = data.damage ?? 0;
             damageType = data.damage_type ?? '';
@@ -245,17 +260,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         damageType = 'p';
         damageSource = 'OD6S.COLLISION';
         isAttack = true;
-        const vehicle: any = (data.actor.type === 'vehicle' || data.actor.type === 'starship') ? data.actor.system : (data.actor.system as OD6SCharacterSystem).vehicle;
-        if (vehicle.ram_damage?.score > 0) {
-            const rangedmod = {
-                "name": 'OD6S.ACTIVE_EFFECTS',
-                "value": vehicle.ram_damage.score
-            }
-            damageModifiers.push(rangedmod);
-        }
-        if (vehicle.ram?.score > 0) {
-            bonusmod += (+vehicle.ram.score);
-        }
+        const vehicleData = selectVehicleData(data.actor);
+        const ram = ramAttackContribution(
+            vehicleData.ram?.score ?? 0,
+            vehicleData.ram_damage?.score ?? 0,
+        );
+        if (ram.modifier) damageModifiers.push(ram.modifier);
+        bonusmod += ram.bonusModIncrement;
     }
 
     if ((data.type === 'brawlattack' || data.subtype === 'brawlattack') && isCharacterActor(data.actor)) {
@@ -275,18 +286,10 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     if (targets.length === 1) {
         if (!attackerScale && isAttack) {
-            if (typeof (data.subtype) !== 'undefined' && data.subtype.includes('vehicle')) {
-                if ((data.actor.system as OD6SVehicleSystem).crew?.value) {
-                    attackerScale = data.actor.system.scale.score;
-                } else {
-                    attackerScale = (data.actor.system as OD6SCharacterSystem).vehicle.scale!.score;
-                }
+            if (data.subtype !== undefined && data.subtype.includes('vehicle')) {
+                attackerScale = selectVehicleData(data.actor).scale?.score ?? 0;
             } else {
-                if (typeof (data.actor.system.scale.score) === 'undefined') {
-                    attackerScale = 0;
-                } else {
-                    attackerScale = data.actor.system.scale.score;
-                }
+                attackerScale = data.actor.system.scale.score ?? 0;
             }
         }
 
@@ -326,39 +329,38 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                 data.score = data.actor.system.attributes.agi.score;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
-            case 'meleeattack':
-                skill = await data.actor.items.find((i: Item) => i.type === 'skill'
+            case 'meleeattack': {
+                skill = data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.MELEE_COMBAT'));
-                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
-                    const attrKey = skill.system.attribute.toLowerCase();
-                    if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[attrKey].score;
-                        flatPips = skill.system.score;
-                    } else {
-                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
-                    }
-                } else {
-                    data.score = data.actor.system.attributes.agi.score;
-                }
+                const resolved = resolveSkillBackedAction({
+                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
+                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
+                        : null,
+                    attributes: data.actor.system.attributes,
+                    flatSkills: OD6S.flatSkills,
+                    fallbackAttributeKey: 'agi',
+                });
+                data.score = resolved.score;
+                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
-            case 'brawlattack':
-                skill = await data.actor.items.find((i: Item) => i.type === 'skill'
+            }
+            case 'brawlattack': {
+                skill = data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.BRAWL'));
-                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
-                    const attrKey = skill.system.attribute.toLowerCase();
-                    if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[attrKey].score;
-                        flatPips = skill.system.score;
-                    } else {
-                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
-                    }
-                } else {
-                    const bAttr = game.settings.get('od6s', 'brawl_attribute')
-                    data.score = data.actor.system.attributes[bAttr].score;
-                }
+                const resolved = resolveSkillBackedAction({
+                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
+                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
+                        : null,
+                    attributes: data.actor.system.attributes,
+                    flatSkills: OD6S.flatSkills,
+                    fallbackAttributeKey: game.settings.get('od6s', 'brawl_attribute'),
+                });
+                data.score = resolved.score;
+                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
+            }
             case '':
                 if (data.name === game.i18n.localize('OD6S.ENERGY_RESISTANCE') ||
                     data.name === game.i18n.localize('OD6S.PHYSICAL_RESISTANCE') ||
@@ -371,25 +373,16 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     let rollValues = od6sutilities.getDiceFromScore(data.score);
 
-    let stunnedPenalty = 0;
-    if (isCharacterActor(data.actor)) {
-        stunnedPenalty = data.actor.system.stuns.current ? data.actor.system.stuns.current : 0;
-    }
-
-    let actionPenalty = ((+data.actor.itemTypes.action.length) > 0) ? (+data.actor.itemTypes.action.length) - 1 : 0;
-    if (data.type === 'mortally_wounded' ||
-        data.type === 'incapacitated' ||
-        data.type === 'damage' ||
-        data.type === 'resistance' ||
-        data.type === 'funds' ||
-        data.type === 'purchase') {
-        woundPenalty = 0;
-        actionPenalty = 0;
-        stunnedPenalty = 0;
-        isVisible = true;
-    } else {
-        woundPenalty = od6sutilities.getWoundPenalty(data.actor);
-    }
+    const penalties = computePenalties({
+        rollType: data.type,
+        actionItemCount: data.actor.itemTypes.action.length,
+        stunsCurrent: isCharacterActor(data.actor) ? (data.actor.system.stuns.current ?? 0) : 0,
+        woundPenalty: isPenaltyBypassType(data.type) ? 0 : od6sutilities.getWoundPenalty(data.actor),
+    });
+    woundPenalty = penalties.woundPenalty;
+    const actionPenalty = penalties.actionPenalty;
+    const stunnedPenalty = penalties.stunnedPenalty;
+    if (penalties.isBypass) isVisible = true;
 
     if (data.type === 'funds') {
         isVisible = !game.settings.get('od6s', 'hide-skill-cards');
@@ -513,55 +506,40 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     }
 
     if (data.subtype === 'vehicleramattack') {
-        const vehicle: any = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
-            ? data.actor.system : (data.actor.system as OD6SCharacterSystem).vehicle;
-        if (typeof (vehicle.ram?.score) !== 'undefined') {
-            bonusmod += (+vehicle.ram.score);
+        const vehicleData = selectVehicleData(data.actor);
+        if (vehicleData.ram?.score !== undefined) {
+            bonusmod += vehicleData.ram.score;
         }
     }
 
-    const charSys = data.actor.system as OD6SCharacterSystem;
-    if (data.subtype === 'meleeattack') {
-        bonusmod += (+charSys.melee.mod);
-    }
-
-    if (data.subtype === 'brawlattack') {
-        bonusmod += (+charSys.brawl.mod);
-        canStun = true;
-        damageScore = charSys.strengthdamage.score;
-        stunDamageScore = damageScore;
-        stunDamageType = 'p';
-    }
-
-    if (data.subtype === 'dodge') {
-        bonusmod += (+charSys.dodge.mod);
-    }
-
-    if (data.subtype === 'parry') {
-        bonusmod += (+charSys.parry.mod);
-    }
-
-    if (data.subtype === 'block') {
-        bonusmod += (+charSys.block.mod);
+    if (isCharacterActor(data.actor)) {
+        const charSys = data.actor.system;
+        if (data.subtype === 'meleeattack') {
+            bonusmod += charSys.melee.mod;
+        }
+        if (data.subtype === 'brawlattack') {
+            bonusmod += charSys.brawl.mod;
+            canStun = true;
+            damageScore = charSys.strengthdamage.score;
+            stunDamageScore = damageScore;
+            stunDamageType = 'p';
+        }
+        if (data.subtype === 'dodge') bonusmod += charSys.dodge.mod;
+        if (data.subtype === 'parry') bonusmod += charSys.parry.mod;
+        if (data.subtype === 'block') bonusmod += charSys.block.mod;
     }
 
     if (OD6S.flatSkills) {
-        bonusdice.dice = 0;
-        bonusdice.pips = (+bonusmod);
+        bonusdice = { dice: 0, pips: bonusmod };
     } else {
         bonusdice = od6sutilities.getDiceFromScore(bonusmod);
     }
+    const split = splitBonusForPenalty(bonusdice.dice, bonusdice.pips, OD6S.pipsPerDice);
+    bonusdice = { dice: split.bonusDice, pips: split.bonusPips };
+    penaltydice = split.penaltyDice;
 
-    if (od6sutilities.getScoreFromDice(bonusdice.dice, bonusdice.pips) < 0) {
-        penaltydice = bonusdice.dice * -1;
-        bonusdice.dice = 0;
-        bonusdice.pips = 0;
-    }
-
-    if (OD6S.flatSkills && flatPips === 0 && (data.type === 'skill' || data.type === 'specialization')) {
-        bonusdice.pips = (+bonusdice.pips) + (+data.score);
-    } else if (OD6S.flatSkills && flatPips > 0) {
-        bonusdice.pips = (+bonusdice.pips) + (+flatPips);
+    if (OD6S.flatSkills) {
+        bonusdice.pips += flatSkillBonusPips(flatPips, data.score, data.type);
     }
 
     if (isAttack) {

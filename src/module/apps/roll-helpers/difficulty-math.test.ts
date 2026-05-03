@@ -6,6 +6,7 @@ import {
     applyDamageModifiers,
     bucketRangeFromDistance,
     splitBonusForPenalty,
+    flatSkillBonusPips,
 } from './difficulty-math';
 
 describe('selectHighestDefense', () => {
@@ -201,5 +202,25 @@ describe('splitBonusForPenalty', () => {
             bonusPips: 3,
             penaltyDice: 0,
         });
+    });
+});
+
+describe('flatSkillBonusPips', () => {
+    it('returns flatPips when > 0 regardless of roll type', () => {
+        expect(flatSkillBonusPips(4, 99, 'skill')).toBe(4);
+        expect(flatSkillBonusPips(4, 99, 'attribute')).toBe(4);
+    });
+
+    it('returns the roll score for skill rolls when flatPips is 0', () => {
+        expect(flatSkillBonusPips(0, 7, 'skill')).toBe(7);
+    });
+
+    it('returns the roll score for specialization rolls when flatPips is 0', () => {
+        expect(flatSkillBonusPips(0, 7, 'specialization')).toBe(7);
+    });
+
+    it('returns 0 for non-skill/spec roll types when flatPips is 0', () => {
+        expect(flatSkillBonusPips(0, 7, 'attribute')).toBe(0);
+        expect(flatSkillBonusPips(0, 7, 'weapon')).toBe(0);
     });
 });

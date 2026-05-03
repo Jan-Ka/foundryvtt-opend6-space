@@ -104,3 +104,23 @@ export function buildStrengthDamageModifier(strScore: number): Modifier {
         value: strScore,
     };
 }
+
+export interface RamAttackContribution {
+    /** Amount to add to bonusmod (0 when the vehicle has no `ram.score`). */
+    bonusModIncrement: number;
+    /** OD6S.ACTIVE_EFFECTS damage modifier, or null when ram_damage is 0. */
+    modifier: Modifier | null;
+}
+
+/**
+ * Compute the bonusmod and damage-modifier contributions for a vehicle ram
+ * attack from the ram bonus / ram-damage scores.
+ */
+export function ramAttackContribution(ramScore: number, ramDamageScore: number): RamAttackContribution {
+    return {
+        bonusModIncrement: ramScore > 0 ? ramScore : 0,
+        modifier: ramDamageScore > 0
+            ? { name: "OD6S.ACTIVE_EFFECTS", value: ramDamageScore }
+            : null,
+    };
+}
