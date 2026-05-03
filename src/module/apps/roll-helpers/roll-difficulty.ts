@@ -35,7 +35,9 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
             }
         case 'vehicleramattack': {
             const targetActor = rollData.target?.actor;
-            const targetDodge = targetActor && isCharacterActor(targetActor) ? targetActor.system.dodge?.score ?? 0 : 0;
+            const targetDodge = targetActor && (isCharacterActor(targetActor) || isVehicleActor(targetActor))
+                ? targetActor.system.dodge?.score ?? 0
+                : 0;
             if (OD6S.vehicleDifficulty) {
                 if (targetDodge > 0) {
                     return (+targetDodge) + (+OD6S.vehicle_speeds[rollData.vehiclespeed].mod);
@@ -54,7 +56,9 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
         case 'vehiclerangedweaponattack':
         case 'rangedattack': {
             const targetActor = rollData.target?.actor;
-            const targetDodge = targetActor && isCharacterActor(targetActor) ? targetActor.system.dodge?.score ?? 0 : 0;
+            const targetDodge = targetActor && (isCharacterActor(targetActor) || isVehicleActor(targetActor))
+                ? targetActor.system.dodge?.score ?? 0
+                : 0;
             if (targetDodge > 0) {
                 return (+targetDodge);
             } else {
@@ -142,7 +146,11 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
             } else if (targetActor && isVehicleActor(targetActor)) {
                 const vehicleDefense = targetActor.system.maneuverability.score;
                 if (vehicleDefense === 0) {
-                    return OD6S.baseBrawlAttackDifficulty;
+                    if (OD6S.meleeDifficulty) {
+                        return await od6sutilities.getDifficultyFromLevel(OD6S.baseBrawlAttackDifficultyLevel);
+                    } else {
+                        return OD6S.baseBrawlAttackDifficulty;
+                    }
                 } else {
                     return vehicleDefense;
                 }

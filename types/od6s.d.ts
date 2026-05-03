@@ -122,6 +122,8 @@ interface OD6SVehicleSystem {
     ranged_damage: OD6SScoreField;
     ram: OD6SScoreField;
     ram_damage: OD6SScoreField;
+    /** Active reaction-roll dodge score (set by `vehicledodge` rolls). */
+    dodge: { score: number; mod: number; type: string; label: string };
     embedded_pilot: { value: boolean };
     crewmembers: Array<{ uuid: string; name?: string }>;
     crew: { value: number };
