@@ -1,6 +1,7 @@
 import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
+import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -36,11 +37,10 @@ export class OD6SItem extends Item {
      * Create derived data for the item
      */
     prepareDerivedData() {
-        if (this.type === 'skill' || this.type === 'specialization') {
-            const sys = this.system as OD6SSkillItemSystem;
-            sys.score = (+sys.base) + (+sys.mod);
+        if (isSkillItem(this) || isSpecializationItem(this)) {
+            this.system.score = (+this.system.base) + (+this.system.mod);
         }
-        if (this.type === 'starship-weapon' || this.type === 'vehicle-weapon') {
+        if (isVehicleWeaponItem(this) || isStarshipWeaponItem(this)) {
             const sys = this.system as OD6SVehicleWeaponItemSystem & {
                 stats: { attribute: string; skill: string; specialization: string };
                 subtype: string;
@@ -75,42 +75,37 @@ export class OD6SItem extends Item {
     }
 
     applyMods() {
-        if(this.type.match(/^(skill|specialization)/)) {
-            const sys = this.system as OD6SSkillItemSystem;
-            sys.score = (+sys.base) + (+sys.mod);
+        if (isSkillItem(this) || isSpecializationItem(this)) {
+            this.system.score = (+this.system.base) + (+this.system.mod);
         }
     }
 
-    getScore() {
-        if (this.type.match(/^(skill|specialization)/)) {
-            if (this.actor) {
-                const sys = this.system as OD6SSkillItemSystem;
-                const actorSys = this.actor.system as OD6SCharacterSystem;
-                if (sys.isAdvancedSkill) {
-                    return sys.score;
-                } else {
-                    return actorSys.attributes[sys.attribute.toLowerCase()].score + sys.score;
-                }
+    getScore(): number | undefined {
+        if ((isSkillItem(this) || isSpecializationItem(this)) && this.actor
+            && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
+            if (this.system.isAdvancedSkill) {
+                return this.system.score;
+            } else {
+                return this.actor.system.attributes[this.system.attribute.toLowerCase()].score + this.system.score;
             }
         }
         if (this.type.match(/weapon/)) {
-            if (this.actor) {
+            if (this.actor && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
                 const sys = this.system as OD6SWeaponItemSystem & { fire_control?: { score: number } };
-                const actorSys = this.actor.system as OD6SCharacterSystem;
-                let score = actorSys.attributes[sys.stats.attribute.toLowerCase()].score;
+                let score = this.actor.system.attributes[sys.stats.attribute.toLowerCase()].score;
                 const spec = this.actor.items.find(i => i.name === sys.stats.specialization && i.type === 'specialization');
-                if (typeof spec !== 'undefined') {
+                if (spec !== undefined && isSpecializationItem(spec)) {
                     if (typeof sys.fire_control !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
                         score = score + sys.fire_control.score;
                     }
-                    return score + (spec.system as OD6SSpecializationItemSystem).score;
+                    return score + spec.system.score;
                 } else {
                     const skill = this.actor.items.find(i => i.name === sys.stats.skill && i.type === 'skill');
-                    if (typeof skill !== 'undefined') {
+                    if (skill !== undefined && isSkillItem(skill)) {
                         if (typeof sys.fire_control !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
                             score = score + sys.fire_control.score;
                         }
-                        return score + (skill.system as OD6SSkillItemSystem).score;
+                        return score + skill.system.score;
                     }
                 }
                 if (typeof sys.fire_control?.score !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
@@ -121,26 +116,21 @@ export class OD6SItem extends Item {
         }
     }
 
-    getScoreText() {
+    getScoreText(): string | undefined {
         return od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(this.getScore() ?? 0))
     }
 
-    getParryText() {
-        if (this.type === 'weapon') {
-            if (this.actor) {
-                const sys = this.system as OD6SWeaponItemSystem;
-                if (sys.stats.parry_specialization !== '') {
-                    const spec = this.actor.items.find(s => s.name === sys.stats.parry_specialization && s.type === 'specialization');
-                    if (typeof spec !== 'undefined') return spec.getScoreText();
-                }
-                if (sys.stats.parry_skill !== '') {
-                    if(this.actor) {
-                        const skill = this.actor.items.find(s=>s.name === sys.stats.parry_skill && s.type === 'skill' );
-                        if (typeof skill !== 'undefined') return skill.getScoreText();
-                    }
-                }
-                return this.actor.getActionScoreText('parry')
+    getParryText(): string | undefined {
+        if (isWeaponItem(this) && this.actor) {
+            if (this.system.stats.parry_specialization !== '') {
+                const spec = this.actor.items.find(s => s.name === this.system.stats.parry_specialization && s.type === 'specialization');
+                if (typeof spec !== 'undefined') return spec.getScoreText();
             }
+            if (this.system.stats.parry_skill !== '') {
+                const skill = this.actor.items.find(s => s.name === this.system.stats.parry_skill && s.type === 'skill');
+                if (typeof skill !== 'undefined') return skill.getScoreText();
+            }
+            return this.actor.getActionScoreText('parry');
         }
     }
 
