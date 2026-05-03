@@ -108,9 +108,8 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     // Apply costs (character points / fate points only exist on character actors)
-    const charSys = actor.system as OD6SCharacterSystem;
     if (isCharacterActor(actor)) {
-        if ((rollData.characterpoints > 0) && (actor.system.characterpoints.value > 0)) {
+        if ((rollData.characterpoints > 0) && (actor.system.characterpoints.value >= rollData.characterpoints)) {
             doUpdate = true;
             actor.system.characterpoints.value -= rollData.characterpoints;
         }
@@ -158,8 +157,8 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         final: difficulty,
     });
 
-    if (rollData.subtype === 'brawlattack') {
-        damageScore = charSys.strengthdamage.score;
+    if (rollData.subtype === 'brawlattack' && isCharacterActor(actor)) {
+        damageScore = actor.system.strengthdamage.score;
         damageType = 'p';
     }
 
@@ -535,21 +534,25 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         }
     }
 
-    if (rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block') {
+    if ((rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block')
+        && isCharacterActor(actor)) {
         doUpdate = true;
         if (rollData.fulldefense) {
-            charSys[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
+            actor.system[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
         } else {
-            charSys[rollData.subtype].score = +(flags.total ?? 0);
+            actor.system[rollData.subtype].score = +(flags.total ?? 0);
         }
     }
 
     if (rollData.subtype === 'vehicledodge') {
         let vehicle: Actor | null | undefined;
-        if (rollData.actor.type === 'vehicle' || rollData.actor.type === 'starship') {
+        let vehicleUuid: string | undefined;
+        if (isVehicleActor(rollData.actor)) {
             vehicle = rollData.actor;
-        } else {
-            vehicle = await od6sutilities.getActorFromUuid(charSys.vehicle.uuid);
+            vehicleUuid = rollData.actor.uuid;
+        } else if (isCharacterActor(rollData.actor)) {
+            vehicleUuid = rollData.actor.system.vehicle.uuid;
+            vehicle = await od6sutilities.getActorFromUuid(vehicleUuid);
         }
         const dodgeScore = rollData.fulldefense
             ? (+roll.total + baseAttackDifficulty)
@@ -563,19 +566,19 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
         if (game.user.isGM) {
             await vehicle?.update(vehicleUpdate);
-        } else {
-            await OD6S.socket.executeAsGM('updateVehicle', charSys.vehicle.uuid, vehicleUpdate);
+        } else if (vehicleUuid) {
+            await OD6S.socket.executeAsGM('updateVehicle', vehicleUuid, vehicleUpdate);
         }
     }
 
-    if (doUpdate) {
+    if (doUpdate && isCharacterActor(actor)) {
         const update = {
             system: {
-                fatepoints: charSys.fatepoints,
-                characterpoints: charSys.characterpoints,
-                dodge: { score: charSys.dodge.score },
-                parry: { score: charSys.parry.score },
-                block: { score: charSys.block.score },
+                fatepoints: actor.system.fatepoints,
+                characterpoints: actor.system.characterpoints,
+                dodge: { score: actor.system.dodge.score },
+                parry: { score: actor.system.parry.score },
+                block: { score: actor.system.block.score },
             },
         };
         await actor.update(update);
