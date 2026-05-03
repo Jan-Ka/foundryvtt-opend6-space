@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSkillBackedAction } from './action-math';
+import { computePenalties, isPenaltyBypassType, resolveSkillBackedAction } from './action-math';
 
 const attributes = {
     agi: { score: 9 },
@@ -63,5 +63,77 @@ describe('resolveSkillBackedAction', () => {
             flatSkills: false,
             fallbackAttributeKey: 'wis',
         })).toEqual({ score: 0 });
+    });
+});
+
+describe('isPenaltyBypassType', () => {
+    it.each([
+        'mortally_wounded',
+        'incapacitated',
+        'damage',
+        'resistance',
+        'funds',
+        'purchase',
+    ])('returns true for %s', (rollType) => {
+        expect(isPenaltyBypassType(rollType)).toBe(true);
+    });
+
+    it.each(['skill', 'specialization', 'attribute', 'weapon', ''])(
+        'returns false for %s',
+        (rollType) => {
+            expect(isPenaltyBypassType(rollType)).toBe(false);
+        },
+    );
+});
+
+describe('computePenalties', () => {
+    it('zeros all penalties and flags bypass for damage rolls', () => {
+        expect(computePenalties({
+            rollType: 'damage',
+            actionItemCount: 3,
+            stunsCurrent: 2,
+            woundPenalty: 5,
+        })).toEqual({
+            woundPenalty: 0,
+            actionPenalty: 0,
+            stunnedPenalty: 0,
+            isBypass: true,
+        });
+    });
+
+    it('passes wound penalty through for normal rolls', () => {
+        expect(computePenalties({
+            rollType: 'skill',
+            actionItemCount: 1,
+            stunsCurrent: 0,
+            woundPenalty: 3,
+        }).woundPenalty).toBe(3);
+    });
+
+    it('subtracts one free action from the action item count', () => {
+        expect(computePenalties({
+            rollType: 'skill',
+            actionItemCount: 4,
+            stunsCurrent: 0,
+            woundPenalty: 0,
+        }).actionPenalty).toBe(3);
+    });
+
+    it('action penalty floors at 0 when no actions are tracked', () => {
+        expect(computePenalties({
+            rollType: 'skill',
+            actionItemCount: 0,
+            stunsCurrent: 0,
+            woundPenalty: 0,
+        }).actionPenalty).toBe(0);
+    });
+
+    it('stunned penalty passes through stunsCurrent', () => {
+        expect(computePenalties({
+            rollType: 'skill',
+            actionItemCount: 1,
+            stunsCurrent: 7,
+            woundPenalty: 0,
+        }).stunnedPenalty).toBe(7);
     });
 });
