@@ -2,6 +2,7 @@ import OD6S from "../config/config-od6s";
 import {RollDialog} from "./roll-dialog";
 import {setupRollData} from "./roll-helpers/roll-setup";
 import {executeRollAction} from "./roll-helpers/roll-execute";
+import {isCharacterActor, isVehicleActor, isActionItem} from "../system/type-guards";
 import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-helpers/roll-difficulty";
 import {getEffectMod, getRange, cancelAction} from "./roll-helpers/roll-effects";
 import type {RollData, IncomingRollData, MetaphysicsRollData} from "./roll-helpers/roll-data";
@@ -20,11 +21,11 @@ export class od6sroll {
         const actor = (this as any).actor as Actor;
         const item = actor.items.find((i: Item) => i.id === (event.currentTarget as HTMLElement).dataset.itemId);
         if (!item) return;
-        if ((actor.type === 'vehicle' || actor.type === 'starship') && (actor.system as OD6SVehicleSystem).embedded_pilot?.value) {
+        if (isVehicleActor(actor) && actor.system.embedded_pilot?.value) {
             return item.roll();
         }
-        const sys = item.system as OD6SActionItemSystem;
-        if (sys?.subtype?.includes("vehicle")) {
+        if (isActionItem(item) && item.system.subtype?.includes("vehicle")) {
+            const sys = item.system;
             if (sys.subtype === 'vehiclerangedweaponattack') {
                 return actor.rollAction(sys.itemId);
             } else if (sys.subtype === 'vehiclesensors') {
@@ -109,7 +110,7 @@ export class od6sroll {
 
         const actions = Object.keys(skills).length;
         const actionpenalty = (+actions) + ((actor as any).actions.length) - 1;
-        const stunnedpenalty = (actor.system as OD6SCharacterSystem).stuns.current;
+        const stunnedpenalty = isCharacterActor(actor) ? actor.system.stuns.current : 0;
 
         this.rollData = {
             title: item.name,

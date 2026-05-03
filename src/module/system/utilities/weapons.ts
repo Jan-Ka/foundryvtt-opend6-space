@@ -1,6 +1,7 @@
 import OD6S from "../../config/config-od6s";
 import { getDiceFromScore } from "./dice";
 import { getScoreFromSkill } from "./skills";
+import { isCharacterActor, isWeaponItem } from "../type-guards";
 
 /**
  * Calculate Strength Damage die code from a Strength die count.
@@ -20,7 +21,8 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
     foundRange.medium = '';
     foundRange.long = '';
 
-    const itemRange = (item.system as OD6SWeaponItemSystem).range;
+    if (!isWeaponItem(item)) return false;
+    const itemRange = item.system.range;
     const range: any = {};
     range.short = itemRange.short;
     range.medium = itemRange.medium;
@@ -116,9 +118,10 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
 }
 
 export function getMeleeDamage(actor: Actor, weapon: Item): number {
-    const wsys = weapon.system as OD6SWeaponItemSystem;
-    if (wsys.damage.str) {
-        return (+(actor.system as OD6SCharacterSystem).strengthdamage.score) + (+wsys.damage.score);
+    if (!isWeaponItem(weapon)) return 0;
+    const wsys = weapon.system;
+    if (wsys.damage.str && isCharacterActor(actor)) {
+        return (+actor.system.strengthdamage.score) + (+wsys.damage.score);
     } else {
         return (+wsys.damage.score);
     }

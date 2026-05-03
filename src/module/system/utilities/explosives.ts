@@ -3,6 +3,7 @@ import { wait } from "./converters";
 import { boolCheck } from "./converters";
 import { getDiceFromScore } from "./dice";
 import { getActorFromUuid } from "./actors";
+import { isWeaponItem } from "../type-guards";
 
 export async function scatterExplosive(range: any, origin: any, regionId: any): Promise<void> {
     let distanceTerms = '';
@@ -189,6 +190,7 @@ export async function detonateExplosive(data: any): Promise<any> {
     }
 
     const item = actor!.items.get(data.itemId);
+    const wsys = item && isWeaponItem(item) ? item.system : undefined;
 
     if (game.settings.get('od6s', 'auto_explosive')) {
         const regionId = item!.getFlag('od6s', 'explosiveTemplate');
@@ -213,7 +215,7 @@ export async function detonateExplosive(data: any): Promise<any> {
     msgData.flags.od6s.targets = [];
     msgData.flags.od6s.item = item!.id;
     msgData.flags.od6s.isOpposable = true;
-    msgData.flags.od6s.damageType = (item!.system as OD6SWeaponItemSystem).damage.type;
+    msgData.flags.od6s.damageType = wsys?.damage.type;
     msgData.flags.od6s.stun = data.stun;
     msgData.flags.od6s.attackMessage = data.messageId;
 
@@ -233,7 +235,7 @@ export async function detonateExplosive(data: any): Promise<any> {
     let rollString;
 
     if(game.settings.get('od6s','explosive_zones')) {
-        const wsys = item!.system as OD6SWeaponItemSystem;
+        if (!wsys) return false;
         // Separate rolls for each zone; damage score represents whole dice
         for (const i in wsys.blast_radius) {
             const zone = wsys.blast_radius[i as "1" | "2" | "3" | "4"];
@@ -290,7 +292,7 @@ export async function detonateExplosive(data: any): Promise<any> {
         }
     } else {
         msgData.flags.od6s.targets = targets;
-        const wsys = item!.system as OD6SWeaponItemSystem;
+        if (!wsys) return false;
         // One roll, with a fraction for zones > 1
         const dice = (boolCheck(data.stun)) ? getDiceFromScore(wsys.stun.score, OD6S.pipsPerDice)
             : getDiceFromScore(wsys.damage.score, OD6S.pipsPerDice);

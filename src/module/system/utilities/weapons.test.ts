@@ -2,34 +2,29 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getMeleeDamage, getWeaponRange } from './weapons';
 
 describe('getMeleeDamage', () => {
+    const meleeActor = (strScore: number | string) =>
+        ({ type: 'character', system: { strengthdamage: { score: strScore } } } as unknown as Actor);
+    const meleeWeapon = (str: boolean, score: number | string) =>
+        ({ type: 'weapon', system: { damage: { str, score } } } as unknown as Item);
+
     it('adds strength damage when weapon has str flag', () => {
-        const actor = { system: { strengthdamage: { score: 6 } } } as unknown as Actor;
-        const weapon = { system: { damage: { str: true, score: 12 } } } as unknown as Item;
-        expect(getMeleeDamage(actor, weapon)).toBe(18);
+        expect(getMeleeDamage(meleeActor(6), meleeWeapon(true, 12))).toBe(18);
     });
 
     it('returns weapon damage only when no str flag', () => {
-        const actor = { system: { strengthdamage: { score: 6 } } } as unknown as Actor;
-        const weapon = { system: { damage: { str: false, score: 12 } } } as unknown as Item;
-        expect(getMeleeDamage(actor, weapon)).toBe(12);
+        expect(getMeleeDamage(meleeActor(6), meleeWeapon(false, 12))).toBe(12);
     });
 
     it('handles zero strength damage', () => {
-        const actor = { system: { strengthdamage: { score: 0 } } } as unknown as Actor;
-        const weapon = { system: { damage: { str: true, score: 9 } } } as unknown as Item;
-        expect(getMeleeDamage(actor, weapon)).toBe(9);
+        expect(getMeleeDamage(meleeActor(0), meleeWeapon(true, 9))).toBe(9);
     });
 
     it('handles zero weapon damage with str bonus', () => {
-        const actor = { system: { strengthdamage: { score: 6 } } } as unknown as Actor;
-        const weapon = { system: { damage: { str: true, score: 0 } } } as unknown as Item;
-        expect(getMeleeDamage(actor, weapon)).toBe(6);
+        expect(getMeleeDamage(meleeActor(6), meleeWeapon(true, 0))).toBe(6);
     });
 
     it('coerces string scores via unary plus', () => {
-        const actor = { system: { strengthdamage: { score: '6' } } } as unknown as Actor;
-        const weapon = { system: { damage: { str: true, score: '12' } } } as unknown as Item;
-        expect(getMeleeDamage(actor, weapon)).toBe(18);
+        expect(getMeleeDamage(meleeActor('6'), meleeWeapon(true, '12'))).toBe(18);
     });
 });
 
@@ -79,13 +74,14 @@ describe('getWeaponRange', () => {
 
     function mockActor(attributes: Record<string, { score: number }>): Actor {
         return {
+            type: 'character',
             items: { find: () => undefined },
             system: { attributes },
         } as unknown as Actor;
     }
 
     function rangeItem(short: string, medium: string, long: string): Item {
-        return { system: { range: { short, medium, long } } } as unknown as Item;
+        return { type: 'weapon', system: { range: { short, medium, long } } } as unknown as Item;
     }
 
     it('returns numeric ranges coerced from all-numeric strings', async () => {

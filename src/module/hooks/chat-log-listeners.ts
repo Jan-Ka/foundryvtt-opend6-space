@@ -1,5 +1,6 @@
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
+import {isCharacterActor} from "../system/type-guards";
 import { isOpposedQueueEmpty, pushOpposedQueue } from "../system/utilities/opposed";
 import OD6SEditDifficulty from "../apps/edit-difficulty";
 import {OD6SEditDamage} from "../apps/edit-damage";
@@ -61,60 +62,53 @@ export function registerChatLogListeners() {
             let actor = token?.actor;
             if (!actor) return;
             const result = ev.currentTarget.dataset.result;
-            const isVehicle = ev.currentTarget.dataset.isVehicle;
+            const isVehicleData = ev.currentTarget.dataset.isVehicle === true || ev.currentTarget.dataset.isVehicle === 'true';
             const messageId = ev.currentTarget.dataset.messageId;
-            const update = {};
             const stun = ev.currentTarget.dataset.stun;
             const msg = game.messages.get(messageId);
             const stunEffect = msg!.getFlag('od6s', 'stunEffect');
 
-            if ((actor.type !== 'vehicle' && actor.type !== 'starship') && (isVehicle === true || isVehicle === 'true')) {
-                actor = await od6sutilities.getActorFromUuid((actor.system as OD6SCharacterSystem).vehicle.uuid);
+            if (isCharacterActor(actor) && isVehicleData) {
+                actor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
             }
+            if (!actor) return;
 
             if (od6sutilities.boolCheck(stun)) {
                 if (stunEffect === 'unconscious') {
                     if (game.settings.get('od6s', 'auto_status')) {
-                        await actor!.toggleStatusEffect('unconscious', {overlay: false, active: true});
+                        await actor.toggleStatusEffect('unconscious', {overlay: false, active: true});
                     }
                 } else {
-                    if (stunEffect === '-1D') {
-                        const update: any = {}
-                        update[`system.stuns.current`] = 1;
-                        update[`system.stuns.rounds`] = 1;
-                        update[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
-                        await actor!.update(update);
-                    } else if (stunEffect === '-2D') {
-                        (update as any)[`system.stuns.current`] = 2;
-                        (update as any)[`system.stuns.rounds`] = 1;
-                        (update as any)[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
-                        await actor!.update(update);
+                    if (isCharacterActor(actor) && (stunEffect === '-1D' || stunEffect === '-2D')) {
+                        const stunCurrent = stunEffect === '-1D' ? 1 : 2;
+                        await actor.update({
+                            'system.stuns.current': stunCurrent,
+                            'system.stuns.rounds': 1,
+                            'system.stuns.value': (+actor.system.stuns.value) + 1,
+                        });
                     }
-                    if(!actor!.effects.contents.find(
-                        (i: any) => i.name === game.i18n.localize(CONFIG!.statusEffects.find(
-                            e => e.id === 'stunned')!.name))) {
-                        await actor!.toggleStatusEffect('stunned', {overlay: false, active: true});
+                    const stunnedName = game.i18n.localize(CONFIG!.statusEffects.find(e => e.id === 'stunned')!.name);
+                    if (!actor.effects.contents.find((i: any) => i.name === stunnedName)) {
+                        await actor.toggleStatusEffect('stunned', {overlay: false, active: true});
                     }
                 }
-
             } else {
-                (update as any).id = actor!.id;
-                if (game.settings.get('od6s', 'bodypoints') === 0 || (isVehicle === true || isVehicle === 'true')
-                    || actor!.type === 'starship' || actor!.type === 'vehicle') {
-                    if (isVehicle === true || isVehicle === 'true') {
-                        await actor!.applyDamage(result);
+                const usesDamageLevels = game.settings.get('od6s', 'bodypoints') === 0
+                    || isVehicleData
+                    || actor.type === 'starship' || actor.type === 'vehicle';
+                if (usesDamageLevels) {
+                    if (isVehicleData) {
+                        await actor.applyDamage(result);
                     } else {
-                        await actor!.applyWounds(result);
+                        await actor.applyWounds(result);
                     }
-                } else {
-                    let bp = (actor!.system as OD6SCharacterSystem).wounds.body_points.current - result;
+                } else if (isCharacterActor(actor)) {
+                    let bp = actor.system.wounds.body_points.current - result;
                     if (bp < 0) bp = 0;
-                    (update as any)['system.wounds.body_points.current'] = bp;
-                    if (game.settings.get('od6s', 'bodypoints') === 1) await actor!.setWoundLevelFromBodyPoints(bp);
+                    await actor.update({ 'system.wounds.body_points.current': bp });
+                    if (game.settings.get('od6s', 'bodypoints') === 1) await actor.setWoundLevelFromBodyPoints(bp);
                 }
-                await actor!.update(update);
             }
-            await actor!.update(update);
             await msg!.setFlag('od6s', 'applied', true);
         })
 
