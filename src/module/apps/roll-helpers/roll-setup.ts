@@ -15,6 +15,7 @@ import {
     buildStrengthDamageModifier,
     computeStunFlags,
 } from "./weapon-context-math";
+import {resolveSkillBackedAction} from "./action-math";
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
     let attribute;
@@ -326,39 +327,38 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                 data.score = data.actor.system.attributes.agi.score;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
-            case 'meleeattack':
-                skill = await data.actor.items.find((i: Item) => i.type === 'skill'
+            case 'meleeattack': {
+                skill = data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.MELEE_COMBAT'));
-                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
-                    const attrKey = skill.system.attribute.toLowerCase();
-                    if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[attrKey].score;
-                        flatPips = skill.system.score;
-                    } else {
-                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
-                    }
-                } else {
-                    data.score = data.actor.system.attributes.agi.score;
-                }
+                const resolved = resolveSkillBackedAction({
+                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
+                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
+                        : null,
+                    attributes: data.actor.system.attributes,
+                    flatSkills: OD6S.flatSkills,
+                    fallbackAttributeKey: 'agi',
+                });
+                data.score = resolved.score;
+                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
-            case 'brawlattack':
-                skill = await data.actor.items.find((i: Item) => i.type === 'skill'
+            }
+            case 'brawlattack': {
+                skill = data.actor.items.find((i: Item) => i.type === 'skill'
                     && i.name === game.i18n.localize('OD6S.BRAWL'));
-                if (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor)) {
-                    const attrKey = skill.system.attribute.toLowerCase();
-                    if (OD6S.flatSkills) {
-                        data.score = data.actor.system.attributes[attrKey].score;
-                        flatPips = skill.system.score;
-                    } else {
-                        data.score = skill.system.score + data.actor.system.attributes[attrKey].score;
-                    }
-                } else {
-                    const bAttr = game.settings.get('od6s', 'brawl_attribute')
-                    data.score = data.actor.system.attributes[bAttr].score;
-                }
+                const resolved = resolveSkillBackedAction({
+                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
+                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
+                        : null,
+                    attributes: data.actor.system.attributes,
+                    flatSkills: OD6S.flatSkills,
+                    fallbackAttributeKey: game.settings.get('od6s', 'brawl_attribute'),
+                });
+                data.score = resolved.score;
+                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
                 isVisible = !game.settings.get('od6s', 'hide-combat-cards');
                 break;
+            }
             case '':
                 if (data.name === game.i18n.localize('OD6S.ENERGY_RESISTANCE') ||
                     data.name === game.i18n.localize('OD6S.PHYSICAL_RESISTANCE') ||
