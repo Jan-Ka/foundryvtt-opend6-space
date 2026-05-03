@@ -6,9 +6,9 @@ import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
 import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
+import {bucketRangeFromDistance} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
-import {bucketDistance} from "./range-from-distance";
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
     let attribute;
@@ -480,8 +480,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                         distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
                     }
                     const rangeConfig = data.range as { short: number; medium: number; long: number };
-                    const bucket = bucketDistance(distance, rangeConfig);
-                    if (bucket.outOfRange) {
+                    const bucket = bucketRangeFromDistance(distance, rangeConfig, rangeDifficulty);
+                    if (bucket === null) {
                         if (isExplosive) {
                             const regionId = item?.getFlag('od6s', 'explosiveTemplate');
                             if (regionId) {
@@ -498,7 +498,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                         return false;
                     }
                     range = bucket.range;
-                    if (rangeDifficulty) difficultyLevel = bucket.difficultyLevel;
+                    if (bucket.difficultyLevel !== null) difficultyLevel = bucket.difficultyLevel;
                 }
             }
         }
