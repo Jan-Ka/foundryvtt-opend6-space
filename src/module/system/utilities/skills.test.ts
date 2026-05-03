@@ -4,6 +4,7 @@ import { getScoreFromSkill } from './skills';
 // Mock actor with items collection that has a find method
 function mockActor(items: any[], attributes: Record<string, { score: number }>): Actor {
     return {
+        type: 'character',
         items: {
             find: (predicate: any) => items.find(predicate),
         },

@@ -1,6 +1,7 @@
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
 import {AdvanceDialog} from "./advance-dialog";
+import {isCharacterActor, isSpecializationItem} from "../system/type-guards";
 
 export class od6sadvance {
 
@@ -100,11 +101,12 @@ export class od6sadvance {
 
     static async advanceAction(actor: Actor, advanceData: any, dice?: number, pips?: number) {
 
-        const actorData = actor.system as OD6SCharacterSystem;
+        if (!isCharacterActor(actor)) return;
+        const actorData = actor.system;
         const actorUpdate: any = {};
         const updates: any[] = [];
         actorUpdate.system = {};
-        let specs: Item[] = [];
+        let specs: OD6SSpecializationItem[] = [];
 
         /* freeadvance was checked, use form data instead */
         if (advanceData.freeadvance) {
@@ -132,8 +134,8 @@ export class od6sadvance {
 
             if(OD6S.specLink) {
                 /* Also advance any specializations derived from this skill */
-                specs = actor.items.filter((i: Item) => i.type === 'specialization' &&
-                    (i.system as OD6SSpecializationItemSystem).skill === skill?.name);
+                specs = actor.items
+                    .filter((i: Item) => isSpecializationItem(i) && i.system.skill === skill?.name) as OD6SSpecializationItem[];
             }
 
             /* Add/subtract to item score, not displayed/aggregate score */
@@ -155,8 +157,7 @@ export class od6sadvance {
                 for (const spec in specs) {
                     let newSpecScore;
                     if (!OD6S.flatSkills) {
-                        newSpecScore = (+newScore) +
-                            (+(specs[spec].system as OD6SSpecializationItemSystem).base);
+                        newSpecScore = (+newScore) + (+specs[spec].system.base);
                     }
                     updates.push({
                         _id: specs[spec]._id,

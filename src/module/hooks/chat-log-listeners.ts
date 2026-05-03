@@ -1,5 +1,6 @@
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
+import {isCharacterActor} from "../system/type-guards";
 import { isOpposedQueueEmpty, pushOpposedQueue } from "../system/utilities/opposed";
 import OD6SEditDifficulty from "../apps/edit-difficulty";
 import {OD6SEditDamage} from "../apps/edit-damage";
@@ -68,8 +69,8 @@ export function registerChatLogListeners() {
             const msg = game.messages.get(messageId);
             const stunEffect = msg!.getFlag('od6s', 'stunEffect');
 
-            if ((actor.type !== 'vehicle' && actor.type !== 'starship') && (isVehicle === true || isVehicle === 'true')) {
-                actor = await od6sutilities.getActorFromUuid((actor.system as OD6SCharacterSystem).vehicle.uuid);
+            if (isCharacterActor(actor) && (isVehicle === true || isVehicle === 'true')) {
+                actor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
             }
 
             if (od6sutilities.boolCheck(stun)) {
@@ -78,17 +79,19 @@ export function registerChatLogListeners() {
                         await actor!.toggleStatusEffect('unconscious', {overlay: false, active: true});
                     }
                 } else {
-                    if (stunEffect === '-1D') {
-                        const update: any = {}
-                        update[`system.stuns.current`] = 1;
-                        update[`system.stuns.rounds`] = 1;
-                        update[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
-                        await actor!.update(update);
-                    } else if (stunEffect === '-2D') {
-                        (update as any)[`system.stuns.current`] = 2;
-                        (update as any)[`system.stuns.rounds`] = 1;
-                        (update as any)[`system.stuns.value`] = (+(actor!.system as OD6SCharacterSystem).stuns.value) + 1;
-                        await actor!.update(update);
+                    if (actor && isCharacterActor(actor)) {
+                        if (stunEffect === '-1D') {
+                            const update: any = {}
+                            update[`system.stuns.current`] = 1;
+                            update[`system.stuns.rounds`] = 1;
+                            update[`system.stuns.value`] = (+actor.system.stuns.value) + 1;
+                            await actor.update(update);
+                        } else if (stunEffect === '-2D') {
+                            (update as any)[`system.stuns.current`] = 2;
+                            (update as any)[`system.stuns.rounds`] = 1;
+                            (update as any)[`system.stuns.value`] = (+actor.system.stuns.value) + 1;
+                            await actor.update(update);
+                        }
                     }
                     if(!actor!.effects.contents.find(
                         (i: any) => i.name === game.i18n.localize(CONFIG!.statusEffects.find(
@@ -106,8 +109,8 @@ export function registerChatLogListeners() {
                     } else {
                         await actor!.applyWounds(result);
                     }
-                } else {
-                    let bp = (actor!.system as OD6SCharacterSystem).wounds.body_points.current - result;
+                } else if (isCharacterActor(actor!)) {
+                    let bp = actor!.system.wounds.body_points.current - result;
                     if (bp < 0) bp = 0;
                     (update as any)['system.wounds.body_points.current'] = bp;
                     if (game.settings.get('od6s', 'bodypoints') === 1) await actor!.setWoundLevelFromBodyPoints(bp);

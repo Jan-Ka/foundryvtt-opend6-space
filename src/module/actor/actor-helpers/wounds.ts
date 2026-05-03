@@ -5,6 +5,7 @@ import {
     computeNewDamageLevel,
     computeNewWoundLevel,
 } from "./wounds-math";
+import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
 import {debug} from "../../system/logger";
 
 export {findWoundLevelByCore, computeNewDamageLevel, computeNewWoundLevel};
@@ -20,7 +21,8 @@ export async function applyDamage(actor: Actor, damage: string): Promise<void> {
 }
 
 export function calculateNewDamageLevel(actor: Actor, damage: string): string | undefined {
-    const current = (actor.system as OD6SVehicleSystem).damage.value;
+    if (!isVehicleActor(actor)) return undefined;
+    const current = actor.system.damage.value;
     const next = computeNewDamageLevel(current, damage);
     debug('wounds', 'damage transition', {actor: actor.name, current, incoming: damage, next});
     return next;
@@ -32,10 +34,10 @@ export async function applyWounds(actor: Actor, wound: string): Promise<void> {
     update.id = actor.id;
     update._id = actor.id;
     const armorUpdates: any[] = [];
-    if(wound === 'OD6S.WOUNDS_STUNNED') {
+    if (wound === 'OD6S.WOUNDS_STUNNED' && isCharacterActor(actor)) {
         update[`system.stuns.current`] = 1;
         update[`system.stuns.rounds`] = 1;
-        update[`system.stuns.value`] = (actor.system as OD6SCharacterSystem).stuns.value + 1;
+        update[`system.stuns.value`] = actor.system.stuns.value + 1;
     }
 
     if (game.settings.get('od6s', 'weapon_armor_damage') && game.settings.get('od6s', 'auto_armor_damage')) {
@@ -85,7 +87,8 @@ export async function applyWounds(actor: Actor, wound: string): Promise<void> {
 
 export function calculateNewWoundLevel(actor: Actor, wound: string): unknown {
     const deadlinessTable = OD6S.deadliness[OD6S.deadlinessLevel[actor.type]];
-    const current = (actor.system as OD6SCharacterSystem).wounds.value;
+    if (!isCharacterActor(actor)) return undefined;
+    const current = actor.system.wounds.value;
     const next = computeNewWoundLevel(current, wound, deadlinessTable, OD6S.stunDamageIncrement);
     debug('wounds', 'wound transition', {
         actor: actor.name,
@@ -149,9 +152,9 @@ export function findFirstWoundLevel(_actor: Actor, table: Record<string, { core:
 }
 
 export function getWoundLevelFromBodyPoints(actor: Actor, bp?: number): string | undefined {
-    if (actor.type === 'vehicle' || actor.type === 'starship') return;
+    if (!isCharacterActor(actor)) return;
     let bodyPointsCurrent;
-    const sys = actor.system as OD6SCharacterSystem;
+    const sys = actor.system;
     if (typeof (bp) !== 'undefined') {
         bodyPointsCurrent = bp;
     } else {
