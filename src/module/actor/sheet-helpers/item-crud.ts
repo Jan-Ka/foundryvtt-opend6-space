@@ -1,4 +1,5 @@
 import OD6S from "../../config/config-od6s";
+import {isSkillItem} from "../../system/type-guards";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const foundry: any;
@@ -76,10 +77,10 @@ export async function addItem(
     const cEntries = od6sutilities.getItemsFromCompendiumByType(data.type);
 
     if (data.type === 'skill') {
-        worldItems = worldItems.filter((i: Item) => (i.system as OD6SSkillItemSystem).attribute === data.attrname);
+        worldItems = worldItems.filter((i: Item) => isSkillItem(i) && i.system.attribute === data.attrname);
         for (const i of cEntries) {
             const item = await od6sutilities._getItemFromCompendium((i as Item).name);
-            if (item && (item.system as OD6SSkillItemSystem).attribute === data.attrname) {
+            if (item && isSkillItem(item) && item.system.attribute === data.attrname) {
                 compendiumItems.push(item);
             }
         }

@@ -3,6 +3,7 @@ declare const foundry: any;
 import {od6sutilities} from "../system/utilities";
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import OD6S from "../config/config-od6s";
+import {isWeaponItem} from "../system/type-guards";
 
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
@@ -120,8 +121,8 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
                 return item;
 
             case "weapon":
-                if (item.type === "specialization") {
-                    (this.item.system as OD6SWeaponItemSystem).stats.specialization = (item as Item).name;
+                if (item.type === "specialization" && isWeaponItem(this.item)) {
+                    this.item.system.stats.specialization = (item as Item).name;
                     await this.item.update(this.item.system, {diff: true});
                 }
         }

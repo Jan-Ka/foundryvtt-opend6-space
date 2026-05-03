@@ -1,5 +1,6 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
+import {isVehicleActor} from "../../system/type-guards";
 
 export async function addEmbeddedPilot(actor: Actor, pilotActor: Actor): Promise<void> {
     /* Copy attributes and items to vehicle */
@@ -72,7 +73,8 @@ export async function removeFromCrew(actor: Actor, vehicleID: string): Promise<v
 }
 
 export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promise<void> {
-    const crewMembers = (actor.system as OD6SVehicleSystem).crewmembers.filter((e) => e.uuid !== crewID);
+    if (!isVehicleActor(actor)) return;
+    const crewMembers = actor.system.crewmembers.filter((e) => e.uuid !== crewID);
     const update: any = {};
     update.system = {};
     update.system.crewmembers = crewMembers;
@@ -84,8 +86,12 @@ export function isCrewMember(actor: Actor): boolean {
 }
 
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
+    if (!isVehicleActor(actor)) return;
     const data: any = {};
-    const sys = actor.system as OD6SVehicleSystem & Record<string, any>;
+    // OD6SVehicleSystem augmentation lacks the runtime-defined `attribute`,
+    // `skill`, `specialization` fields from vehicle-common.ts schema; keep
+    // a Record fallback until that gap is closed.
+    const sys = actor.system as typeof actor.system & Record<string, any>;
     data.uuid = actor.uuid;
     data.name = actor.name;
     data.type = actor.type;

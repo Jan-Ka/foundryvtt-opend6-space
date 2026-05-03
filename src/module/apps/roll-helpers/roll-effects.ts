@@ -3,9 +3,11 @@
  */
 
 import type {RollData} from "./roll-data";
+import {isCharacterActor, isSpecializationItem} from "../../system/type-guards";
 
 export function getEffectMod(type: string, name: string, actor: Actor): number {
-    const sys = actor.system as OD6SCharacterSystem;
+    if (!isCharacterActor(actor)) return 0;
+    const sys = actor.system;
     if (type === 'skill') {
         if (typeof (sys.customeffects?.skills[name]) !== 'undefined') {
             return sys.customeffects.skills[name];
@@ -18,10 +20,9 @@ export function getEffectMod(type: string, name: string, actor: Actor): number {
         }
 
         const spec = actor.items.filter((i: Item) => i.type === type && i.name === name)[0];
-        if (typeof (spec) !== 'undefined') {
-            const specSys = spec.system as OD6SSpecializationItemSystem;
-            if (typeof (sys.customeffects.skills[specSys.skill]) !== 'undefined') {
-                return sys.customeffects.skills[specSys.skill];
+        if (spec && isSpecializationItem(spec)) {
+            if (typeof (sys.customeffects.skills[spec.system.skill]) !== 'undefined') {
+                return sys.customeffects.skills[spec.system.skill];
             }
         }
     }
