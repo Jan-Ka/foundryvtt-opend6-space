@@ -53,10 +53,10 @@ export async function onDrop(sheet: any, event: any) {
                     if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;
-                    } else if (typeof (sys.attribute) === 'undefined' || sys.skill === '') {
+                    } else if (typeof (sys.skill) === 'undefined' || sys.skill === '') {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_SKILL'))
                         return;
-                    } else if (!(actor.items.find((i: any) => i.type === 'specialization' && i.name === item.name))) {
+                    } else if (!(actor.items.find((i: Item) => i.type === 'skill' && i.name === sys.skill))) {
                         ui.notifications.warn(game.i18n.localize('OD6S.DOES_NOT_POSSESS_SKILL'));
                         return;
                     } else {

@@ -168,11 +168,10 @@ export async function promptResistanceRolls(msg: any) {
         if (typeof (target) !== 'undefined' && target) {
             if (isVehicleActor(target.actor)) {
                 if(!target.actor.isOwner) return;
+                if (target.actor.system.crewmembers.length < 1) return;
                 const crew = await od6sutilities.getActorFromUuid(target.actor.system.crewmembers[0].uuid);
-                if (typeof (crew) !== 'undefined' || crew !== null) {
-                    if (crew?.hasPlayerOwner && crew?.isOwner) {
-                        return crew.rollAction('vehicletoughness', msg);
-                    }
+                if (crew && crew.hasPlayerOwner && crew.isOwner) {
+                    return crew.rollAction('vehicletoughness', msg);
                 }
             }
 
