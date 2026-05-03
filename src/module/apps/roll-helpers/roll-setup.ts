@@ -5,7 +5,7 @@ import {od6sutilities} from "../../system/utilities";
 import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
-import {isCharacterActor, isVehicleActor, isWeaponItem, isSkillItem, isSpecializationItem} from "../../system/type-guards";
+import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
 
