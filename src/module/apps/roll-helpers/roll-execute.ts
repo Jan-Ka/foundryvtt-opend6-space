@@ -5,6 +5,7 @@ import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-difficulty";
 import {applyDifficultyModifiers} from "./difficulty-math";
+import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
 import {computeHighHitDamage, computeWildDieReduction, resolveRollMode} from "./roll-execute-math";
@@ -40,8 +41,8 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     let difficulty;
 
-    if (actor.type !== 'vehicle' && actor.type !== 'starship') {
-        strModDice = od6sutilities.getDiceFromScore((rollData.actor.system as OD6SCharacterSystem).strengthdamage.score);
+    if (isCharacterActor(actor)) {
+        strModDice = od6sutilities.getDiceFromScore(actor.system.strengthdamage.score);
     }
 
     rollData.isknown = true;
@@ -106,16 +107,17 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         rollString += "+" + rollData.bonuspips;
     }
 
-    // Apply costs
-    const charSys = actor.system as OD6SCharacterSystem;
-    if ((rollData.characterpoints > 0) && (charSys.characterpoints.value > 0)) {
-        doUpdate = true;
-        charSys.characterpoints.value -= rollData.characterpoints;
-    }
+    // Apply costs (character points / fate points only exist on character actors)
+    if (isCharacterActor(actor)) {
+        if ((rollData.characterpoints > 0) && (actor.system.characterpoints.value >= rollData.characterpoints)) {
+            doUpdate = true;
+            actor.system.characterpoints.value -= rollData.characterpoints;
+        }
 
-    if (rollData.fatepoint && (charSys.fatepoints.value > 0)) {
-        doUpdate = true;
-        charSys.fatepoints.value -= 1;
+        if (rollData.fatepoint && (actor.system.fatepoints.value > 0)) {
+            doUpdate = true;
+            actor.system.fatepoints.value -= 1;
+        }
     }
 
     if (typeof (rollData.target) !== 'undefined') {
@@ -155,8 +157,8 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         final: difficulty,
     });
 
-    if (rollData.subtype === 'brawlattack') {
-        damageScore = charSys.strengthdamage.score;
+    if (rollData.subtype === 'brawlattack' && isCharacterActor(actor)) {
+        damageScore = actor.system.strengthdamage.score;
         damageType = 'p';
     }
 
@@ -275,44 +277,40 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     if (rollData.itemid) {
         const item = rollData.actor.items.get(rollData.itemid);
+        const hasAttributes = isCharacterActor(rollData.actor) || isVehicleActor(rollData.actor);
         if (typeof (item) !== 'undefined') {
-            if (item.type === 'specialization') {
-                const itemSys = item.system as OD6SSpecializationItemSystem;
-                const skill = rollData.actor.items.find((i: Item) => i.name === itemSys.skill);
-                if (typeof (skill) !== 'undefined' && skill.name !== '') {
-                    const skillSys = skill.system as OD6SSkillItemSystem;
-                    if (skillSys.min === true || String(skillSys.min).toLowerCase() === 'true') {
-                        rollMin = od6sutilities.getDiceFromScore(itemSys.score +
-                            (rollData.actor.system as OD6SCharacterSystem).attributes[itemSys.attribute].score).dice * OD6S.pipsPerDice;
+            if (isSpecializationItem(item)) {
+                const skill = rollData.actor.items.find((i: Item) => i.name === item.system.skill);
+                if (skill !== undefined && skill.name !== '' && isSkillItem(skill) && hasAttributes) {
+                    if (skill.system.min === true || String(skill.system.min).toLowerCase() === 'true') {
+                        rollMin = od6sutilities.getDiceFromScore(item.system.score +
+                            rollData.actor.system.attributes[item.system.attribute].score).dice * OD6S.pipsPerDice;
                     }
                 }
                 if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                     await item.update({'system.used.value': true});
                 }
-            } else if (item.type === "skill") {
-                const itemSys = item.system as OD6SSkillItemSystem;
-                if (itemSys.min === true || String(itemSys.min).toLowerCase() === 'true') {
-                    rollMin = od6sutilities.getDiceFromScore(itemSys.score +
-                        (rollData.actor.system as OD6SCharacterSystem).attributes[itemSys.attribute].score).dice * OD6S.pipsPerDice;
+            } else if (isSkillItem(item)) {
+                if ((item.system.min === true || String(item.system.min).toLowerCase() === 'true') && hasAttributes) {
+                    rollMin = od6sutilities.getDiceFromScore(item.system.score +
+                        rollData.actor.system.attributes[item.system.attribute].score).dice * OD6S.pipsPerDice;
                 }
                 if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                     await item.update({'system.used.value': true});
                 }
-            } else if (item.type === "weapon") {
+            } else if (isWeaponItem(item)) {
                 let found = false;
-                const itemData = item.system as OD6SWeaponItemSystem;
-                if (typeof (itemData.stats.specialization) !== 'undefined' &&
-                    itemData.stats.specialization !== 'null' && itemData.stats.specialization !== '') {
-                    const spec = rollData.actor.items.find((i: Item) => i.type === 'specialization' && i.name === itemData.stats.specialization);
-                    if (typeof (spec) !== 'undefined' && spec.name !== '') {
-                        found = true
-                        const specSys = spec.system as OD6SSpecializationItemSystem;
-                        const skill = rollData.actor.items.find((i: Item) => i.name === specSys.skill);
-                        if (typeof (skill) !== 'undefined' && skill.name !== '') {
-                            const skillSys = skill.system as OD6SSkillItemSystem;
-                            if (skillSys.min === true || String(skillSys.min).toLowerCase() === 'true') {
-                                rollMin = od6sutilities.getDiceFromScore(specSys.score +
-                                    (rollData.actor.system as OD6SCharacterSystem).attributes[skillSys.attribute].score).dice * OD6S.pipsPerDice;
+                const stats = item.system.stats;
+                if (typeof (stats.specialization) !== 'undefined' &&
+                    stats.specialization !== 'null' && stats.specialization !== '') {
+                    const spec = rollData.actor.items.find((i: Item) => i.type === 'specialization' && i.name === stats.specialization);
+                    if (spec !== undefined && spec.name !== '' && isSpecializationItem(spec)) {
+                        found = true;
+                        const skill = rollData.actor.items.find((i: Item) => i.name === spec.system.skill);
+                        if (skill !== undefined && skill.name !== '' && isSkillItem(skill) && hasAttributes) {
+                            if (skill.system.min === true || String(skill.system.min).toLowerCase() === 'true') {
+                                rollMin = od6sutilities.getDiceFromScore(spec.system.score +
+                                    rollData.actor.system.attributes[skill.system.attribute].score).dice * OD6S.pipsPerDice;
                             }
                             if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                                 await spec.update({'system.used.value': true});
@@ -321,14 +319,13 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
                     }
                 }
 
-                if (!found && typeof (itemData.stats.skill) !== 'undefined' &&
-                    itemData.stats.skill !== 'null' && itemData.stats.skill !== '') {
-                    const skill = rollData.actor.items.find((i: Item) => i.name === itemData.stats.skill);
-                    if (typeof (skill) !== 'undefined' && skill.name !== '') {
-                        const skillSys = skill.system as OD6SSkillItemSystem;
-                        if (skillSys.min === true || String(skillSys.min).toLowerCase() === 'true') {
-                            rollMin = od6sutilities.getDiceFromScore(skillSys.score +
-                                (rollData.actor.system as OD6SCharacterSystem).attributes[skillSys.attribute].score).dice * OD6S.pipsPerDice;
+                if (!found && typeof (stats.skill) !== 'undefined' &&
+                    stats.skill !== 'null' && stats.skill !== '') {
+                    const skill = rollData.actor.items.find((i: Item) => i.name === stats.skill);
+                    if (skill !== undefined && skill.name !== '' && isSkillItem(skill) && hasAttributes) {
+                        if (skill.system.min === true || String(skill.system.min).toLowerCase() === 'true') {
+                            rollMin = od6sutilities.getDiceFromScore(skill.system.score +
+                                rollData.actor.system.attributes[skill.system.attribute].score).dice * OD6S.pipsPerDice;
                         }
                         if(OD6S.skillUsed && OD6S.autoSkillUsed) {
                             await skill.update({'system.used.value': true});
@@ -537,21 +534,25 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         }
     }
 
-    if (rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block') {
+    if ((rollData.subtype === 'dodge' || rollData.subtype === 'parry' || rollData.subtype === 'block')
+        && isCharacterActor(actor)) {
         doUpdate = true;
         if (rollData.fulldefense) {
-            charSys[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
+            actor.system[rollData.subtype].score = (+(flags.total ?? 0) + baseAttackDifficulty);
         } else {
-            charSys[rollData.subtype].score = +(flags.total ?? 0);
+            actor.system[rollData.subtype].score = +(flags.total ?? 0);
         }
     }
 
     if (rollData.subtype === 'vehicledodge') {
         let vehicle: Actor | null | undefined;
-        if (rollData.actor.type === 'vehicle' || rollData.actor.type === 'starship') {
+        let vehicleUuid: string | undefined;
+        if (isVehicleActor(rollData.actor)) {
             vehicle = rollData.actor;
-        } else {
-            vehicle = await od6sutilities.getActorFromUuid(charSys.vehicle.uuid);
+            vehicleUuid = rollData.actor.uuid;
+        } else if (isCharacterActor(rollData.actor)) {
+            vehicleUuid = rollData.actor.system.vehicle.uuid;
+            vehicle = await od6sutilities.getActorFromUuid(vehicleUuid);
         }
         const dodgeScore = rollData.fulldefense
             ? (+roll.total + baseAttackDifficulty)
@@ -565,19 +566,19 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
         if (game.user.isGM) {
             await vehicle?.update(vehicleUpdate);
-        } else {
-            await OD6S.socket.executeAsGM('updateVehicle', charSys.vehicle.uuid, vehicleUpdate);
+        } else if (vehicleUuid) {
+            await OD6S.socket.executeAsGM('updateVehicle', vehicleUuid, vehicleUpdate);
         }
     }
 
-    if (doUpdate) {
+    if (doUpdate && isCharacterActor(actor)) {
         const update = {
             system: {
-                fatepoints: charSys.fatepoints,
-                characterpoints: charSys.characterpoints,
-                dodge: { score: charSys.dodge.score },
-                parry: { score: charSys.parry.score },
-                block: { score: charSys.block.score },
+                fatepoints: actor.system.fatepoints,
+                characterpoints: actor.system.characterpoints,
+                dodge: { score: actor.system.dodge.score },
+                parry: { score: actor.system.parry.score },
+                block: { score: actor.system.block.score },
             },
         };
         await actor.update(update);
