@@ -6,7 +6,7 @@ import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
 import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
-import {bucketRangeFromDistance} from "./difficulty-math";
+import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
 import type {Modifier} from "./difficulty-math";
 import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
 import {
@@ -208,20 +208,17 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             ));
         }
 
-        // Check for effect modifiers
-        const stats = weapon.system.stats
-        let found = false;
-        if (typeof (stats.specialization) !== 'undefined' && stats.specialization !== '') {
-            if (data.actor.items.filter((i: Item) => i.type === 'specialization' && i.name === stats.specialization)) {
-                bonusmod += (+getEffectMod('specialization', stats.specialization, data.actor));
-                found = true;
-            }
-        }
-
-        if (!found && typeof (stats.skill) !== 'undefined' && stats.skill !== '') {
-            if (data.actor.items.filter((i: Item) => i.type === 'skill' && i.name === stats.skill)) {
-                bonusmod += (+getEffectMod('skill', stats.skill, data.actor));
-            }
+        // Check for effect modifiers — prefer specialization over skill when
+        // the actor owns the matching item.
+        const stats = weapon.system.stats;
+        const ownsSpec = !!stats.specialization
+            && data.actor.items.some((i: Item) => i.type === 'specialization' && i.name === stats.specialization);
+        const ownsSkill = !!stats.skill
+            && data.actor.items.some((i: Item) => i.type === 'skill' && i.name === stats.skill);
+        if (ownsSpec) {
+            bonusmod += getEffectMod('specialization', stats.specialization, data.actor);
+        } else if (ownsSkill) {
+            bonusmod += getEffectMod('skill', stats.skill, data.actor);
         }
     }
 
@@ -533,22 +530,16 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     }
 
     if (OD6S.flatSkills) {
-        bonusdice.dice = 0;
-        bonusdice.pips = (+bonusmod);
+        bonusdice = { dice: 0, pips: bonusmod };
     } else {
         bonusdice = od6sutilities.getDiceFromScore(bonusmod);
     }
+    const split = splitBonusForPenalty(bonusdice.dice, bonusdice.pips, OD6S.pipsPerDice);
+    bonusdice = { dice: split.bonusDice, pips: split.bonusPips };
+    penaltydice = split.penaltyDice;
 
-    if (od6sutilities.getScoreFromDice(bonusdice.dice, bonusdice.pips) < 0) {
-        penaltydice = bonusdice.dice * -1;
-        bonusdice.dice = 0;
-        bonusdice.pips = 0;
-    }
-
-    if (OD6S.flatSkills && flatPips === 0 && (data.type === 'skill' || data.type === 'specialization')) {
-        bonusdice.pips = (+bonusdice.pips) + (+data.score);
-    } else if (OD6S.flatSkills && flatPips > 0) {
-        bonusdice.pips = (+bonusdice.pips) + (+flatPips);
+    if (OD6S.flatSkills) {
+        bonusdice.pips += flatSkillBonusPips(flatPips, data.score, data.type);
     }
 
     if (isAttack) {

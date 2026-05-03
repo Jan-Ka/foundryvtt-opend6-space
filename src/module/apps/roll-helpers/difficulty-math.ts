@@ -162,3 +162,22 @@ export function splitBonusForPenalty(
     }
     return { bonusDice, bonusPips, penaltyDice: 0 };
 }
+
+/**
+ * Extra pips folded into bonusdice when running in flat-skills mode for
+ * skill / specialization rolls.
+ *
+ * - If the roll already carries flatPips (>0), use that directly.
+ * - Otherwise, for skill / specialization rolls with no flatPips, the score
+ *   itself rolls in as flat pips.
+ * - For all other roll types, contributes nothing.
+ */
+export function flatSkillBonusPips(
+    flatPips: number,
+    rollScore: number,
+    rollType: string,
+): number {
+    if (flatPips > 0) return flatPips;
+    if (rollType === 'skill' || rollType === 'specialization') return rollScore;
+    return 0;
+}
