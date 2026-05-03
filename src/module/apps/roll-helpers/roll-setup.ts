@@ -23,7 +23,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     let isAttack = false;
     let isVisible = false;
     let isOpposable = false;
-    const isKnown = false;
     let difficultyLevel = game.settings.get('od6s','default_unknown_difficulty') ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY';
     let bonusmod = 0;
     let bonusdice: DiceValue = { dice: 0, pips: 0 };
@@ -34,8 +33,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     let canUseCp = true;
     let canUseFp = true;
     let vehicle = '';
-    const vehicleSpeed = 'cruise';
-    const vehicleCollisionType = 't_bone';
     let vehicleTerrainDifficulty = 'OD6S.DIFFICULTY_EASY';
     let damageSource = '';
     let attackerScale = 0;
@@ -43,8 +40,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     let flatPips = 0;
     let specSkill = '';
     let isExplosive = false;
-    const timer = 0;
-    const contact = false;
     let canStun = false;
     let onlyStun = false;
     const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
@@ -658,13 +653,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         fatepointeffect: fatepointeffect,
         characterpoints: 0,
         canusecp: canUseCp,
-        contact: contact,
+        contact: false,
         cpcost: 0,
         cpcostcolor: "black",
         bonusdice: bonusdice.dice,
         bonuspips: bonusdice.pips,
         isvisible: isVisible,
-        isknown: isKnown,
+        isknown: false,
         isExplosive: isExplosive,
         type: data.type,
         subtype: data.subtype ?? '',
@@ -681,7 +676,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         itemid: data.itemId ?? '',
         targets: targets,
         target: targets[0],
-        timer: timer,
+        timer: 0,
         damagetype: damageType,
         damagescore: damageScore,
         stundamagetype: stunDamageType,
@@ -693,8 +688,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         scaledice: scaleDice,
         seller: seller,
         vehicle: vehicle,
-        vehiclespeed: vehicleSpeed,
-        vehiclecollisiontype: vehicleCollisionType,
+        vehiclespeed: 'cruise',
+        vehiclecollisiontype: 't_bone',
         vehicleterraindifficulty: vehicleTerrainDifficulty,
         source: damageSource,
         range: range,
