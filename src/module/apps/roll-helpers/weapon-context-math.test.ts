@@ -84,6 +84,12 @@ describe('computeStunFlags', () => {
             ...baseInput, isExplosive: true, explosiveZonesEnabled: false, stunOnly: true,
         }).canStun).toBe(true);
     });
+
+    it('coerces undefined stunOnly to a strict boolean', () => {
+        const result = computeStunFlags({ ...baseInput, stunOnly: undefined, weaponStunScore: 2 });
+        expect(result.onlyStun).toBe(false);
+        expect(result.canStun).toBe(true);
+    });
 });
 
 describe('buildDamagedWeaponModifier', () => {
@@ -94,6 +100,10 @@ describe('buildDamagedWeaponModifier', () => {
 
     it('returns null when undamaged', () => {
         expect(buildDamagedWeaponModifier(0, table)).toBeNull();
+    });
+
+    it('returns null when the level is missing from the table', () => {
+        expect(buildDamagedWeaponModifier(99, table)).toBeNull();
     });
 
     it('returns negated penalty as the modifier value', () => {

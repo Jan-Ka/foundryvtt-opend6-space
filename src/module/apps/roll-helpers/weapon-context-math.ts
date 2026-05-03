@@ -30,7 +30,7 @@ export function applyWeaponMods(current: ModTotals, mods: WeaponMods): ModTotals
 }
 
 export interface StunFlagInputs {
-    stunOnly: boolean;
+    stunOnly: boolean | undefined;
     weaponStunScore: number;
     isExplosive: boolean;
     explosiveZonesEnabled: boolean;
@@ -51,9 +51,14 @@ export interface StunFlags {
  * branch effectively never set `canStun` from a non-zero stun value. This
  * helper uses `weaponStunScore` consistently across the non-explosive and
  * explosive-without-zones branches, which is the apparent original intent.
+ *
+ * `stunOnly` accepts `undefined` because item systems that don't define a
+ * `stun` block (e.g. vehicle weapons) yield `weapon.system.stun?.stun_only
+ * === undefined`. The helper coerces to a strict boolean so callers can
+ * forward the result into `RollData` without further guarding.
  */
 export function computeStunFlags(input: StunFlagInputs): StunFlags {
-    const onlyStun = input.stunOnly;
+    const onlyStun = Boolean(input.stunOnly);
     let canStun: boolean;
     if (input.isExplosive) {
         canStun = onlyStun || (input.explosiveZonesEnabled
@@ -72,7 +77,8 @@ export interface WeaponDamageEntry {
 
 /**
  * Build the OD6S.WEAPON_DAMAGED damage modifier from a weapon's `damaged`
- * level. Returns null when `damaged === 0` (weapon undamaged).
+ * level. Returns null when `damaged <= 0` (weapon undamaged) or when the
+ * level is not present in `table` (corrupted / out-of-range value).
  */
 export function buildDamagedWeaponModifier(
     damaged: number,
@@ -80,6 +86,7 @@ export function buildDamagedWeaponModifier(
 ): (Modifier & { level: string }) | null {
     if (damaged <= 0) return null;
     const entry = table[damaged];
+    if (!entry) return null;
     return {
         name: "OD6S.WEAPON_DAMAGED",
         value: -entry.penalty,
