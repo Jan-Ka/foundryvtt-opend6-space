@@ -1,7 +1,7 @@
 import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
-import {isCharacterActor, isSkillItem, isSpecializationItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
+import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -81,7 +81,8 @@ export class OD6SItem extends Item {
     }
 
     getScore(): number | undefined {
-        if ((isSkillItem(this) || isSpecializationItem(this)) && this.actor && isCharacterActor(this.actor)) {
+        if ((isSkillItem(this) || isSpecializationItem(this)) && this.actor
+            && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
             if (this.system.isAdvancedSkill) {
                 return this.system.score;
             } else {
@@ -89,7 +90,7 @@ export class OD6SItem extends Item {
             }
         }
         if (this.type.match(/weapon/)) {
-            if (this.actor && isCharacterActor(this.actor)) {
+            if (this.actor && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
                 const sys = this.system as OD6SWeaponItemSystem & { fire_control?: { score: number } };
                 let score = this.actor.system.attributes[sys.stats.attribute.toLowerCase()].score;
                 const spec = this.actor.items.find(i => i.name === sys.stats.specialization && i.type === 'specialization');
