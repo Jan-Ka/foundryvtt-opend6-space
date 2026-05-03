@@ -4,6 +4,7 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {selectHighestDefense} from "./difficulty-math";
+import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {RollData} from "./roll-data";
 import {debug} from "../../system/logger";
@@ -33,7 +34,8 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
                 return await od6sutilities.getDifficultyFromLevel(rollData.vehicleterraindifficulty)
             }
         case 'vehicleramattack': {
-            const targetDodge = target ? (rollData.target!.actor.system as OD6SCharacterSystem).dodge?.score ?? 0 : 0;
+            const targetActor = rollData.target?.actor;
+            const targetDodge = targetActor && isCharacterActor(targetActor) ? targetActor.system.dodge?.score ?? 0 : 0;
             if (OD6S.vehicleDifficulty) {
                 if (targetDodge > 0) {
                     return (+targetDodge) + (+OD6S.vehicle_speeds[rollData.vehiclespeed].mod);
@@ -51,7 +53,8 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
         case 'vehiclerangedattack':
         case 'vehiclerangedweaponattack':
         case 'rangedattack': {
-            const targetDodge = target ? (rollData.target!.actor.system as OD6SCharacterSystem).dodge?.score ?? 0 : 0;
+            const targetActor = rollData.target?.actor;
+            const targetDodge = targetActor && isCharacterActor(targetActor) ? targetActor.system.dodge?.score ?? 0 : 0;
             if (targetDodge > 0) {
                 return (+targetDodge);
             } else {
@@ -61,95 +64,92 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
                 return OD6S.baseRangedAttackDifficulty;
             }
         }
-        case 'meleeattack':
-            if (target) {
-                const targetData = rollData.target!.actor.system as OD6SCharacterSystem;
+        case 'meleeattack': {
+            const targetActor = rollData.target?.actor;
+            if (targetActor && isCharacterActor(targetActor)) {
+                const targetSys = targetActor.system;
 
                 if (OD6S.defenseLock) {
-                    if (targetData.parry.score === 0) {
+                    if (targetSys.parry.score === 0) {
                         if (OD6S.meleeDifficulty) {
                             return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
                         } else {
-                            // @ts-expect-error
-                            return baseMeleeAttackDifficulty;
+                            return OD6S.baseMeleeAttackDifficulty;
                         }
                     } else {
-                        return targetData.parry.score;
+                        return targetSys.parry.score;
                     }
                 }
 
-                if (rollData.target!.actor.type !== 'vehicle' && rollData.target!.actor.type !== 'starship') {
-                    if (targetData.block.score === 0 && targetData.dodge.score === 0 && targetData.parry.score === 0) {
-                        if (OD6S.meleeDifficulty) {
-                            return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
-                        } else {
-                            return OD6S.baseMeleeAttackDifficulty;
-                        }
+                if (targetSys.block.score === 0 && targetSys.dodge.score === 0 && targetSys.parry.score === 0) {
+                    if (OD6S.meleeDifficulty) {
+                        return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
                     } else {
-                        return selectHighestDefense({
-                            dodge: targetData.dodge.score,
-                            parry: targetData.parry.score,
-                            block: targetData.block.score,
-                        });
+                        return OD6S.baseMeleeAttackDifficulty;
                     }
                 } else {
-                    const vehSys = rollData.target!.actor.system as OD6SVehicleSystem;
-                    const vehicleDefense = vehSys.maneuverability.score;
-                    if (vehicleDefense === 0) {
-                        if (OD6S.meleeDifficulty) {
-                            return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
-                        } else {
-                            return OD6S.baseMeleeAttackDifficulty;
-                        }
+                    return selectHighestDefense({
+                        dodge: targetSys.dodge.score,
+                        parry: targetSys.parry.score,
+                        block: targetSys.block.score,
+                    });
+                }
+            } else if (targetActor && isVehicleActor(targetActor)) {
+                const vehicleDefense = targetActor.system.maneuverability.score;
+                if (vehicleDefense === 0) {
+                    if (OD6S.meleeDifficulty) {
+                        return await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel);
                     } else {
-                        return vehicleDefense;
+                        return OD6S.baseMeleeAttackDifficulty;
                     }
+                } else {
+                    return vehicleDefense;
                 }
             } else {
                 return OD6S.meleeDifficulty ? await od6sutilities.getDifficultyFromLevel(rollData.difficultylevel) : OD6S.baseMeleeAttackDifficulty;
             }
-        case 'brawlattack':
-            if (target) {
-                const targetData = rollData.target!.actor.system as OD6SCharacterSystem;
+        }
+        case 'brawlattack': {
+            const targetActor = rollData.target?.actor;
+            if (targetActor && isCharacterActor(targetActor)) {
+                const targetSys = targetActor.system;
 
                 if (OD6S.defenseLock) {
-                    if (targetData.block.score === 0) {
+                    if (targetSys.block.score === 0) {
                         if (OD6S.meleeDifficulty) {
                             return await od6sutilities.getDifficultyFromLevel(OD6S.baseBrawlAttackDifficultyLevel);
                         } else {
                             return OD6S.baseBrawlAttackDifficulty;
                         }
                     } else {
-                        return targetData.block.score;
+                        return targetSys.block.score;
                     }
                 }
 
-                if (rollData.target!.actor.type !== 'vehicle' && rollData.target!.actor.type !== 'starship') {
-                    if (targetData.block.score === 0 && targetData.dodge.score === 0 && targetData.parry.score === 0) {
-                        if (OD6S.meleeDifficulty) {
-                            return await od6sutilities.getDifficultyFromLevel(OD6S.baseBrawlAttackDifficultyLevel);
-                        } else {
-                            return OD6S.baseBrawlAttackDifficulty;
-                        }
+                if (targetSys.block.score === 0 && targetSys.dodge.score === 0 && targetSys.parry.score === 0) {
+                    if (OD6S.meleeDifficulty) {
+                        return await od6sutilities.getDifficultyFromLevel(OD6S.baseBrawlAttackDifficultyLevel);
                     } else {
-                        return selectHighestDefense({
-                            dodge: targetData.dodge.score,
-                            parry: targetData.parry.score,
-                            block: targetData.block.score,
-                        });
+                        return OD6S.baseBrawlAttackDifficulty;
                     }
                 } else {
-                    const vehSys = rollData.target!.actor.system as OD6SVehicleSystem;
-                    const vehicleDefense = vehSys.maneuverability.score;
-                    if (vehicleDefense === 0) {
-                        return OD6S.baseBrawlAttackDifficulty;
-                    } else {
-                        return vehicleDefense;
-                    }
+                    return selectHighestDefense({
+                        dodge: targetSys.dodge.score,
+                        parry: targetSys.parry.score,
+                        block: targetSys.block.score,
+                    });
+                }
+            } else if (targetActor && isVehicleActor(targetActor)) {
+                const vehicleDefense = targetActor.system.maneuverability.score;
+                if (vehicleDefense === 0) {
+                    return OD6S.baseBrawlAttackDifficulty;
+                } else {
+                    return vehicleDefense;
                 }
             } else {
                 return OD6S.meleeDifficulty ? await od6sutilities.getDifficultyFromLevel(OD6S.baseBrawlAttackDifficultyLevel) : OD6S.baseBrawlAttackDifficulty;
             }
+        }
 
         default:
     }
