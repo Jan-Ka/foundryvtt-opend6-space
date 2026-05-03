@@ -11,6 +11,7 @@ import {debug} from "../../system/logger";
 export {findWoundLevelByCore, computeNewDamageLevel, computeNewWoundLevel};
 
 export async function applyDamage(actor: Actor, damage: string): Promise<void> {
+    if (!isVehicleActor(actor)) return;
     const update: any = {};
     update.id = actor.id;
     update._id = actor.id;
@@ -29,6 +30,7 @@ export function calculateNewDamageLevel(actor: Actor, damage: string): string | 
 }
 
 export async function applyWounds(actor: Actor, wound: string): Promise<void> {
+    if (!isCharacterActor(actor)) return;
     const update: any = {};
     const newValue = calculateNewWoundLevel(actor, wound);
     update.id = actor.id;
