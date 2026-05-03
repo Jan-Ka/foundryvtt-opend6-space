@@ -31,13 +31,15 @@ export class OD6SChat {
                 condition: canApplyCharacterPoint,
                 callback: (li: any) => {
                     const message = game.messages.get(li.attr("data-message-id"));
+                    if (!message) return;
                     let actor;
-                    if (message!.speaker.token) {
-                        actor = game.scenes.viewed.tokens.filter(t => t.id === message!.speaker.token)[0].actor;
+                    if (message.speaker.token) {
+                        actor = game.scenes.viewed?.tokens.filter(t => t.id === message.speaker.token)[0]?.actor;
                     } else {
-                        actor = game.actors.get(message!.speaker.actor);
+                        actor = game.actors.get(message.speaker.actor);
                     }
-                    return actor!.useCharacterPointOnRoll(message!);
+                    if (!actor) return;
+                    return actor.useCharacterPointOnRoll(message);
                 }
             }
         )

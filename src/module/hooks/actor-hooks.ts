@@ -192,7 +192,7 @@ export function registerActorHooks() {
                     const crewMember = await od6sutilities.getActorFromUuid(document.actor.system.crewmembers[i].uuid);
                     if (crewMember) {
                         try {
-                            crewMember.removeFromCrew(document.actor.uuid);
+                            await crewMember.removeFromCrew(document.actor.uuid);
                         } catch {
                             // Likely the other token was simultaneously deleted
                         }
