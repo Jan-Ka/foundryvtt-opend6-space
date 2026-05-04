@@ -36,6 +36,10 @@ export interface ActorView {
 
 export interface ItemView {
     type: string;
+    /** Skill / specialization item: parent attribute key (case-insensitive). */
+    attribute?: string;
+    /** Specialization item: parent skill name. */
+    skill?: string;
 }
 
 export interface TargetView {
@@ -53,6 +57,8 @@ export interface RollSettingsView {
     hideCombatCards: boolean;
     /** When true, hide skill cards from non-GM observers. */
     hideSkillCards: boolean;
+    /** When true, the dialog exposes the parent-skill link for specializations. */
+    showSkillSpecialization: boolean;
 }
 
 export interface HandlerContext {
