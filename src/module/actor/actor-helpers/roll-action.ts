@@ -3,7 +3,7 @@ import {od6sroll} from "../../apps/roll";
 import OD6S from "../../config/config-od6s";
 
 export async function resolveRollAction(actor: any, actionId: any, msg?: any): Promise<any> {
-    const vehicle = (actor.type === 'starship' || actor.type === 'starship') ? actor.system : actor.system?.vehicle
+    const vehicle = (actor.type === 'vehicle' || actor.type === 'starship') ? actor.system : actor.system?.vehicle
     let itemId = '';
     let name = '';
     let score = 0;
