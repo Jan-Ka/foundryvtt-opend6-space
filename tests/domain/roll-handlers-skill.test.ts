@@ -4,12 +4,11 @@
  * Covers the three skill-family RollTypeKeys against the skill mechanics in
  * the rules reference: skill, skill-dodge, specialization.
  *
- * The handlers under test are stubbed (throw notImplemented); these tests
- * are red on purpose until phase 2 implements them. Each test asserts the
- * rules-defined input → output projection for one handler — bucket fields
- * only (per ROLL_TYPE_FIELDS). Cross-cutting concerns (bonusmod from active
- * effects, flatSkills attribute-as-dice substitution, fp-effect doubling)
- * belong to finalize and are not under test here.
+ * Each test asserts the rules-defined input → output projection for one
+ * handler — bucket fields only (per ROLL_TYPE_FIELDS). Cross-cutting
+ * concerns (bonusmod from active effects, flatSkills attribute-as-dice
+ * substitution, fp-effect doubling) belong to finalize and are not under
+ * test here.
  *
  * Rules referenced (ids only, content lives in gitignored docs/reference/):
  *   skill, skill-dodge       — skill-base-mechanics, skill-check
