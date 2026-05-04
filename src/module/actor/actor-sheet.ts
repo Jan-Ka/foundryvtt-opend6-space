@@ -23,6 +23,10 @@ import {
 } from "./sheet-helpers/templates";
 import {onDrop, onDropItem, onDropActor} from "./sheet-helpers/drops";
 import {onSortItem, onSortCrew, onSortCargoItem, onSortContainerItem} from "./sheet-helpers/sorting";
+import {
+    prepareCharacterItems, prepareVehicleItems,
+    prepareStarshipItems, prepareContainerItems,
+} from "./sheet-helpers/prepare-items";
 
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
@@ -60,14 +64,14 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         };
 
         if (actor.type === "character" || actor.type === "npc" || actor.type === "creature") {
-            this._prepareCharacterItems(context);
+            Object.assign(actor, prepareCharacterItems(context.items));
             await this._setCommonFlags();
         } else if (actor.type === "vehicle") {
-            this._prepareVehicleItems(context);
+            Object.assign(actor, prepareVehicleItems(context.items, OD6S.cargo_hold));
         } else if (actor.type === "starship") {
-            this._prepareStarshipItems(context);
-        } else if (actor.type === "container") {
-            this._prepareContainerItems(context);
+            Object.assign(actor, prepareStarshipItems(context.items, OD6S.cargo_hold));
+        } else if (actor.type === "container" && actor.isOwner) {
+            Object.assign(actor, prepareContainerItems(context.items));
         }
 
         context.items = context.items.sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0));
@@ -98,147 +102,6 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         if (typeof actor.getFlag("od6s", "hasTakenTurn") === "undefined") {
             await actor.setFlag("od6s", "hasTakenTurn", false);
         }
-    }
-
-    /* -------------------------------------------- */
-    /*  Item Preparation Methods                     */
-    /* -------------------------------------------- */
-
-    _prepareCharacterItems(sheetData: any) {
-        const actorData = sheetData.actor;
-        const gear: any[] = [];
-        const skills: any[] = [];
-        const specializations: any[] = [];
-        const weapons: any[] = [];
-        const armor: any[] = [];
-        const advantages: any[] = [];
-        const disadvantages: any[] = [];
-        const specialabilities: any[] = [];
-        const cybernetics: any[] = [];
-        const manifestations: any[] = [];
-        const actions: any[] = [];
-
-        for (const i of sheetData.items) {
-            i.img = i.img || CONST.DEFAULT_TOKEN;
-            if (i.type === "gear") {
-                gear.push(i);
-            } else if (i.type === "skill") {
-                skills.push(i);
-            } else if (i.type === "specialization") {
-                specializations.push(i);
-            } else if (i.type === "weapon") {
-                weapons.push(i);
-            } else if (i.type === "armor") {
-                armor.push(i);
-            } else if (i.type === "advantage") {
-                advantages.push(i);
-            } else if (i.type === "disadvantage") {
-                disadvantages.push(i);
-            } else if (i.type === "specialability") {
-                specialabilities.push(i);
-            } else if (i.type === "cybernetic") {
-                cybernetics.push(i);
-            } else if (i.type === "manifestation") {
-                manifestations.push(i);
-            } else if (i.type === "action") {
-                actions.push(i);
-            }
-        }
-
-        actorData.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.skills = skills.sort((a, b) => a.sort - b.sort);
-        actorData.specializations = specializations.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.weapons = weapons.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.armor = armor.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.advantages = advantages.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.disadvantages = disadvantages.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.specialabilities = specialabilities.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.cybernetics = cybernetics.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.manifestations = manifestations.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        actorData.actions = actions.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    }
-
-    _prepareVehicleItems(sheetData: any) {
-        const actorData = sheetData.actor;
-        const vehicle_weapons: any[] = [];
-        const vehicle_gear: any[] = [];
-        const cargo_hold: any[] = [];
-        const skills: any[] = [];
-        const specializations: any[] = [];
-
-        for (const i of sheetData.items) {
-            i.img = i.img || CONST.DEFAULT_TOKEN;
-            if (i.type === "skill") {
-                skills.push(i);
-            } else if (i.type === "specialization") {
-                specializations.push(i);
-            } else if (i.type === "vehicle-weapon") {
-                vehicle_weapons.push(i);
-            } else if (i.type === "vehicle-gear") {
-                vehicle_gear.push(i);
-            } else if (OD6S.cargo_hold.includes(i.type)) {
-                // Cargo can hold any cargo-eligible type that isn't a
-                // native equipped slot for this actor (vehicle-weapon /
-                // vehicle-gear handled above). Without this catch-all,
-                // items added via the cargo-hold + dialog of types like
-                // starship-weapon / starship-gear are created but never
-                // displayed.
-                cargo_hold.push(i);
-            }
-        }
-
-        actorData.vehicle_weapons = vehicle_weapons;
-        actorData.vehicle_gear = vehicle_gear;
-        actorData.cargo_hold = cargo_hold;
-        actorData.skills = skills;
-        actorData.specializations = specializations;
-    }
-
-    _prepareStarshipItems(sheetData: any) {
-        const actorData = sheetData.actor;
-        const starship_weapons: any[] = [];
-        const starship_gear: any[] = [];
-        const cargo_hold: any[] = [];
-        const skills: any[] = [];
-        const specializations: any[] = [];
-
-        for (const i of sheetData.items) {
-            i.img = i.img || CONST.DEFAULT_TOKEN;
-            if (i.type === "skill") {
-                skills.push(i);
-            } else if (i.type === "specialization") {
-                specializations.push(i);
-            } else if (i.type === "starship-weapon") {
-                starship_weapons.push(i);
-            } else if (i.type === "starship-gear") {
-                starship_gear.push(i);
-            } else if (OD6S.cargo_hold.includes(i.type)) {
-                // Cargo can hold any cargo-eligible type that isn't a
-                // native equipped slot for this actor (starship-weapon /
-                // starship-gear handled above). Without this catch-all,
-                // items added via the cargo-hold + dialog of types like
-                // vehicle-weapon / vehicle-gear are created but never
-                // displayed.
-                cargo_hold.push(i);
-            }
-        }
-
-        actorData.starship_weapons = starship_weapons;
-        actorData.starship_gear = starship_gear;
-        actorData.cargo_hold = cargo_hold;
-        actorData.skills = skills;
-        actorData.specializations = specializations;
-    }
-
-    _prepareContainerItems(sheetData: any) {
-        if (!this.document.isOwner) return;
-        const actorData = sheetData.actor;
-        const container: any[] = [];
-        for (const i of sheetData.items) {
-            i.img = i.img || CONST.DEFAULT_TOKEN;
-            container.push(i);
-        }
-        actorData.container = container;
     }
 
     /* -------------------------------------------- */
