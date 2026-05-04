@@ -80,9 +80,10 @@ describe('adaptActor', () => {
         expect(view.attributes?.str.score).toBe(6);
     });
 
-    it('falls back to character shape for unknown actor types (handlers fail loud downstream)', () => {
-        const view = adaptActor({ type: 'unknown', uuid: 'Actor.u', system: {} });
-        expect(view.type).toBe('character');
+    it('throws on unknown actor types — silent coercion would let unsupported actors through', () => {
+        expect(() => adaptActor({ type: 'unknown', uuid: 'Actor.u', system: {} })).toThrow(
+            /unsupported actor type/i,
+        );
     });
 
     it('omits optional fields when their source data is missing', () => {
@@ -110,7 +111,7 @@ describe('adaptItem', () => {
         expect(view.skill).toBe('Melee Combat');
     });
 
-    it('projects a weapon with damage, stun, range, scale, mods, stats, and difficulty', () => {
+    it('projects a weapon with damage, stun, range, scale, mods, stats, and difficulty (mods are flat numbers matching the schema)', () => {
         const view = adaptItem({
             type: 'weapon', name: 'Test Blaster',
             system: {
@@ -119,7 +120,7 @@ describe('adaptItem', () => {
                 range: { short: 10, medium: 30, long: 60 },
                 scale: { score: 0 },
                 damaged: 1,
-                mods: { dmg: { score: 3 }, misc: { score: 0 }, bonus: { score: 0 } },
+                mods: { damage: 3, attack: 0, difficulty: 0 },
                 stats: { skill: 'Blaster', specialization: 'Test Blaster' },
                 difficulty: 'OD6S.DIFFICULTY_MODERATE',
             },
@@ -129,9 +130,18 @@ describe('adaptItem', () => {
         expect(view.range).toEqual({ short: 10, medium: 30, long: 60 });
         expect(view.scale).toEqual({ score: 0 });
         expect(view.damaged).toBe(1);
-        expect(view.mods).toEqual({ dmg: { score: 3 }, misc: { score: 0 }, bonus: { score: 0 } });
+        expect(view.mods).toEqual({ damage: 3, attack: 0, difficulty: 0 });
         expect(view.stats).toEqual({ skill: 'Blaster', specialization: 'Test Blaster' });
         expect(view.difficulty).toBe('OD6S.DIFFICULTY_MODERATE');
+        expect(view.isExplosive).toBe(false);
+    });
+
+    it('flags isExplosive=true when weapon subtype is "explosive" (case-insensitive)', () => {
+        const view = adaptItem({
+            type: 'weapon', name: 'Frag Grenade',
+            system: { damage: { type: 'p', score: 12 }, subtype: 'Explosive' },
+        });
+        expect(view.isExplosive).toBe(true);
     });
 
     it('passes through unknown item types with just type + name', () => {

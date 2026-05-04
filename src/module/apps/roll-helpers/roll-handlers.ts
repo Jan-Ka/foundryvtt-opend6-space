@@ -117,8 +117,17 @@ export interface ItemView {
     scale?: { score: number };
     /** Damage state index (0 = pristine, higher = degraded; resolves to a penalty). */
     damaged?: number;
-    /** Weapon mod totals — keep open-shaped; resolved by applyWeaponMods. */
-    mods?: { dmg?: { score?: number }; misc?: { score?: number }; bonus?: { score?: number } };
+    /**
+     * Weapon mod totals matching the actual weapon schema (numbers, not nested
+     * objects). Mapped directly into the WeaponMods shape applyWeaponMods expects.
+     */
+    mods?: { damage?: number; attack?: number; difficulty?: number };
+    /**
+     * True when the item's subtype is `explosive`. Set by the adapter so the
+     * weapon handler can pass the real value into computeStunFlags (which has
+     * an explosive-specific blast-zone-1 stun-damage branch).
+     */
+    isExplosive?: boolean;
     /** Weapon's authored skill/specialization context. */
     stats?: { skill?: string; specialization?: string };
     /** Blast radius for explosives — only zone "1"'s stun damage is read here. */
@@ -188,11 +197,6 @@ export type Handler<K extends RollTypeKey> = (
     input: HandlerInput,
     ctx: HandlerContext,
 ) => HandlerOutput<K>;
-
-const notImplemented = <K extends RollTypeKey>(key: K): Handler<K> =>
-    () => {
-        throw new Error(`Roll handler not implemented: ${key}`);
-    };
 
 const skillItemAttribute = (item: ItemView | undefined): string | null =>
     item?.attribute ? item.attribute.toLowerCase() : null;
@@ -279,9 +283,9 @@ function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBuck
     const modded = applyWeaponMods(
         { damageScore: damagescore, miscMod: 0, bonusmod: 0 },
         {
-            damage: item.mods?.dmg?.score ?? 0,
-            difficulty: item.mods?.misc?.score ?? 0,
-            attack: item.mods?.bonus?.score ?? 0,
+            damage: item.mods?.damage ?? 0,
+            attack: item.mods?.attack ?? 0,
+            difficulty: item.mods?.difficulty ?? 0,
         },
     );
     damagescore = modded.damageScore;
@@ -289,7 +293,7 @@ function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBuck
     const { onlyStun, canStun } = computeStunFlags({
         stunOnly: item.stun?.stun_only,
         weaponStunScore: item.stun?.score ?? 0,
-        isExplosive: false, // explosive preflight is upstream of dispatch
+        isExplosive: !!item.isExplosive,
         explosiveZonesEnabled: ctx.settings.explosiveZones,
         blastZone1StunDamage: item.blast_radius?.['1']?.stun_damage ?? 0,
     });
@@ -328,7 +332,10 @@ function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBuck
         can_stun: canStun,
         // `stun` is a legacy duplicate of `only_stun` in RollData. Phase 3 cleanup.
         stun: onlyStun,
-        attackerScale: item.scale?.score ?? 0,
+        // Weapon scale of 0 falls back to the actor's scale (matches the
+        // original truthy guard at roll-setup.ts: weapon.system.scale.score is
+        // only assigned when truthy, otherwise actor scale is read elsewhere).
+        attackerScale: item.scale?.score || actorScale(ctx.actor),
         specSkill,
     };
 }
@@ -449,9 +456,9 @@ const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweapo
     const modded = applyWeaponMods(
         { damageScore: baseDamage, miscMod: 0, bonusmod: 0 },
         {
-            damage: item.mods?.dmg?.score ?? 0,
-            difficulty: item.mods?.misc?.score ?? 0,
-            attack: item.mods?.bonus?.score ?? 0,
+            damage: item.mods?.damage ?? 0,
+            attack: item.mods?.attack ?? 0,
+            difficulty: item.mods?.difficulty ?? 0,
         },
     );
     return {
@@ -460,7 +467,8 @@ const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweapo
         source: item.name ?? '',
         range: 'OD6S.RANGE_SHORT_SHORT',
         difficultylevel: defaultDifficultyLabel(ctx.settings),
-        attackerScale: item.scale?.score ?? vehicleScaleForActor(ctx.actor, ctx),
+        // Truthy fallback to vehicle scale — matches the legacy guard.
+        attackerScale: item.scale?.score || vehicleScaleForActor(ctx.actor, ctx),
         vehicle: vehicleUuidForActor(ctx.actor),
     };
 };

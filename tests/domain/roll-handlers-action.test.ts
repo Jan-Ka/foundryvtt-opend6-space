@@ -286,7 +286,7 @@ describe('action-vehiclerangedweaponattack handler', () => {
             name: 'Heavy Cannon',
             damage: { type: 'e', score: 18 },
             scale: { score: 6 },
-            mods: { dmg: { score: 3 }, misc: { score: 0 }, bonus: { score: 0 } },
+            mods: { damage: 3, attack: 0, difficulty: 0 },
         };
         const out = HANDLERS['action-vehiclerangedweaponattack'](
             makeInput('vehiclerangedweaponattack', { itemId: 'Item.weapon-1' }),
@@ -307,7 +307,7 @@ describe('action-vehiclerangedweaponattack handler', () => {
             type: 'vehicle-weapon',
             name: 'Light Cannon',
             damage: { type: 'e', score: 9 },
-            mods: { dmg: { score: 0 }, misc: { score: 0 }, bonus: { score: 0 } },
+            mods: { damage: 0, attack: 0, difficulty: 0 },
         };
         const out = HANDLERS['action-vehiclerangedweaponattack'](
             makeInput('vehiclerangedweaponattack', { itemId: 'Item.weapon-2' }),

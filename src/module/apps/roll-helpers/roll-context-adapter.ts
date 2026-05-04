@@ -87,9 +87,7 @@ export function adaptActor(actor: {
                 strengthDamage: actor.system?.strengthdamage ? +actor.system.strengthdamage.score : undefined,
                 vehicle: actor.system?.vehicle?.uuid ? { uuid: actor.system.vehicle.uuid } : undefined,
             };
-        default:
-            // 'character' (and any unknown actor type — handlers throw on unknown
-            // via the discriminated union, so unknown actors fail loudly downstream).
+        case 'character':
             return {
                 type: 'character',
                 uuid: actor.uuid,
@@ -98,6 +96,8 @@ export function adaptActor(actor: {
                 strengthDamage: actor.system?.strengthdamage ? +actor.system.strengthdamage.score : undefined,
                 vehicle: actor.system?.vehicle?.uuid ? { uuid: actor.system.vehicle.uuid } : undefined,
             };
+        default:
+            throw new Error(`adaptActor: unsupported actor type "${actor.type}"`);
     }
 }
 
@@ -153,9 +153,9 @@ export function adaptItem(item: {
             scale: sys.scale ? { score: +sys.scale.score } : undefined,
             damaged: sys.damaged !== undefined ? +sys.damaged : undefined,
             mods: sys.mods ? {
-                dmg: sys.mods.dmg ? { score: +sys.mods.dmg.score } : undefined,
-                misc: sys.mods.misc ? { score: +sys.mods.misc.score } : undefined,
-                bonus: sys.mods.bonus ? { score: +sys.mods.bonus.score } : undefined,
+                damage: +(sys.mods.damage ?? 0),
+                attack: +(sys.mods.attack ?? 0),
+                difficulty: +(sys.mods.difficulty ?? 0),
             } : undefined,
             stats: sys.stats ? { skill: sys.stats.skill, specialization: sys.stats.specialization } : undefined,
             blast_radius: sys.blast_radius ? {
@@ -164,6 +164,7 @@ export function adaptItem(item: {
                     : undefined,
             } : undefined,
             difficulty: sys.difficulty,
+            isExplosive: typeof sys.subtype === 'string' && sys.subtype.toLowerCase() === 'explosive',
         };
     }
     return base;

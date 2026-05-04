@@ -36,7 +36,7 @@ import type { RollTypeKey } from '../../src/module/apps/roll-helpers/roll-data';
 
 type WeaponKey = 'weapon' | 'starship-weapon' | 'vehicle-weapon';
 
-const noMods = { dmg: { score: 0 }, misc: { score: 0 }, bonus: { score: 0 } };
+const noMods = { damage: 0, attack: 0, difficulty: 0 };
 
 function makeSettings(overrides: Partial<RollSettingsView> = {}): RollSettingsView {
     return {
@@ -114,13 +114,19 @@ describe('weapon handler — happy path', () => {
         expect(out.range).toBe('OD6S.RANGE_POINT_BLANK_SHORT');
     });
 
-    it('uses weapon scale when set, falling back to actor scale otherwise', () => {
+    it('uses weapon scale when truthy, falling back to actor scale when 0/undefined', () => {
         const withScale = basicRangedWeapon({ scale: { score: 6 } });
-        const withoutScale = basicRangedWeapon();
-        const outA = HANDLERS['weapon'](makeInput('weapon', 'A'), makeCtx(withScale));
-        const outB = HANDLERS['weapon'](makeInput('weapon', 'B'), makeCtx(withoutScale));
-        expect(outA.attackerScale).toBe(6);
-        expect(outB.attackerScale).toBe(0);
+        const noWeaponScale = basicRangedWeapon();
+        const zeroWeaponScale = basicRangedWeapon({ scale: { score: 0 } });
+        const actorWithScale: ActorView = { type: 'character', uuid: 'Actor.x', scale: { score: 3 } };
+
+        expect(HANDLERS['weapon'](makeInput('weapon', 'A'), makeCtx(withScale, actorWithScale)).attackerScale).toBe(6);
+        // Weapon scale missing — fall back to actor.
+        expect(HANDLERS['weapon'](makeInput('weapon', 'B'), makeCtx(noWeaponScale, actorWithScale)).attackerScale).toBe(3);
+        // Weapon scale explicitly 0 — also fall back to actor (truthy guard).
+        expect(HANDLERS['weapon'](makeInput('weapon', 'C'), makeCtx(zeroWeaponScale, actorWithScale)).attackerScale).toBe(3);
+        // Both 0 — expected 0.
+        expect(HANDLERS['weapon'](makeInput('weapon', 'D'), makeCtx(noWeaponScale)).attackerScale).toBe(0);
     });
 });
 
@@ -177,6 +183,24 @@ describe('weapon handler — stun flags', () => {
         const out = HANDLERS['weapon'](makeInput('weapon', 'X'), makeCtx(basicRangedWeapon()));
         expect(out.can_stun).toBe(false);
         expect(out.only_stun).toBe(false);
+    });
+
+    it('explosive weapon: with zones enabled, can_stun reads blast-zone-1 stun_damage (not weapon.stun.score)', () => {
+        const explosiveBlast = basicRangedWeapon({
+            isExplosive: true,
+            stun: undefined,
+            blast_radius: { '1': { stun_damage: 6 } },
+        });
+        const explosiveNoBlast = basicRangedWeapon({
+            isExplosive: true,
+            stun: undefined,
+            blast_radius: { '1': { stun_damage: 0 } },
+        });
+        const ctx = (item: ItemView) =>
+            makeCtx(item, { type: 'character', uuid: 'Actor.x' }, { explosiveZones: true });
+
+        expect(HANDLERS['weapon'](makeInput('weapon', 'A'), ctx(explosiveBlast)).can_stun).toBe(true);
+        expect(HANDLERS['weapon'](makeInput('weapon', 'B'), ctx(explosiveNoBlast)).can_stun).toBe(false);
     });
 });
 
