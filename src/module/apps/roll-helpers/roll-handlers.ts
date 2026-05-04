@@ -50,6 +50,8 @@ export type ActorView =
 export interface CharacterActorView {
     type: 'character';
     uuid: string;
+    /** Strength damage score (added to melee damage when weapon.damage.str is set). */
+    strengthDamage?: number;
     /** Embedded vehicle reference when the character is piloting one. */
     vehicle?: { uuid: string };
 }
@@ -57,6 +59,8 @@ export interface CharacterActorView {
 export interface NpcActorView {
     type: 'npc';
     uuid: string;
+    /** Strength damage score (added to melee damage when weapon.damage.str is set). */
+    strengthDamage?: number;
     /** Embedded vehicle reference when the NPC is piloting one. */
     vehicle?: { uuid: string };
 }
@@ -73,10 +77,32 @@ export interface StarshipActorView {
 
 export interface ItemView {
     type: string;
+    /** Display name of the item. */
+    name?: string;
     /** Skill / specialization item: parent attribute key (case-insensitive). */
     attribute?: string;
     /** Specialization item: parent skill name. */
     skill?: string;
+    // ---- Weapon item fields ----
+    /** Primary damage. `str` = add strength damage in melee; `muscle` = explicit
+     *  strength-damage rider on damage modifiers. */
+    damage?: { type: string; score: number; str?: boolean; muscle?: boolean };
+    /** Stun damage block. `stun_only` forces stun-only mode. */
+    stun?: { type?: string; score?: number; stun_only?: boolean };
+    /** Per-band range table or `false` when out-of-range was already resolved. */
+    range?: { short: number; medium: number; long: number } | false;
+    /** Weapon-defined scale (overrides actor scale when set). */
+    scale?: { score: number };
+    /** Damage state index (0 = pristine, higher = degraded; resolves to a penalty). */
+    damaged?: number;
+    /** Weapon mod totals — keep open-shaped; resolved by applyWeaponMods. */
+    mods?: { dmg?: { score?: number }; misc?: { score?: number }; bonus?: { score?: number } };
+    /** Weapon's authored skill/specialization context. */
+    stats?: { skill?: string; specialization?: string };
+    /** Blast radius for explosives — only zone "1"'s stun damage is read here. */
+    blast_radius?: { '1'?: { stun_damage?: number } };
+    /** Authored difficulty label override (when meleeDifficulty setting is on). */
+    difficulty?: string;
 }
 
 export interface TargetView {
@@ -98,6 +124,12 @@ export interface RollSettingsView {
     showSkillSpecialization: boolean;
     /** System-constant pips per die (3 in standard OpenD6). */
     pipsPerDice: number;
+    /** When true, weapon-authored difficulty overrides the default for melee. */
+    meleeDifficulty: boolean;
+    /** When true, explosive zones (multi-radius blasts) are active. */
+    explosiveZones: boolean;
+    /** Damage state → penalty/label table (system constant from OD6S.weaponDamage). */
+    weaponDamageTable: Record<number, { penalty: number; label: string }>;
 }
 
 export interface HandlerContext {
