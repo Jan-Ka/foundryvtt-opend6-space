@@ -103,16 +103,29 @@ export async function loginAndWaitReady(page: Page): Promise<void> {
 
 /**
  * Run an arbitrary async function inside the world's page context. The
- * function receives no arguments and must return a JSON-serializable
- * result. Errors thrown inside propagate out to the test.
+ * function and arg must be JSON-serializable; the result must be too.
+ * Errors thrown inside propagate out to the test.
  *
  * Use this to run the same probe scripts the test runbook documents.
  */
 export async function evalInWorld<T>(
     page: Page,
     fn: () => Promise<T> | T,
+): Promise<T>;
+export async function evalInWorld<T, A>(
+    page: Page,
+    fn: (arg: A) => Promise<T> | T,
+    arg: A,
+): Promise<T>;
+export async function evalInWorld<T, A>(
+    page: Page,
+    fn: ((arg: A) => Promise<T> | T) | (() => Promise<T> | T),
+    arg?: A,
 ): Promise<T> {
-    return await page.evaluate(fn);
+    if (arguments.length >= 3) {
+        return await page.evaluate(fn as (arg: A) => Promise<T> | T, arg as A);
+    }
+    return await page.evaluate(fn as () => Promise<T> | T);
 }
 
 /**
