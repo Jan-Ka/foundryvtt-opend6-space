@@ -20,6 +20,7 @@
 
 import type { ClassifiedRoll, IncomingRollData, Localize, RollData, RollTypeKey } from './roll-data';
 import type { ROLL_TYPE_FIELDS } from './roll-type-fields';
+import { getDiceFromScore } from '../../system/utilities/dice';
 
 export type HandlerOutput<K extends RollTypeKey> =
     Pick<RollData, (typeof ROLL_TYPE_FIELDS)[K][number]>;
@@ -56,6 +57,8 @@ export interface CharacterActorView {
 export interface NpcActorView {
     type: 'npc';
     uuid: string;
+    /** Embedded vehicle reference when the NPC is piloting one. */
+    vehicle?: { uuid: string };
 }
 
 export interface VehicleActorView {
@@ -131,6 +134,30 @@ const specializationHandler: Handler<'specialization'> = (_input, ctx) => ({
     specSkill: ctx.settings.showSkillSpecialization && ctx.item?.skill ? ctx.item.skill : '',
 });
 
+const scaleToDice = (input: HandlerInput, ctx: HandlerContext): number =>
+    ctx.settings.diceForScale
+        ? getDiceFromScore(input.scale ?? 0, ctx.settings.pipsPerDice).dice
+        : 0;
+
+const damageHandler: Handler<'damage'> = () => ({});
+const mortallyWoundedHandler: Handler<'mortally_wounded'> = () => ({});
+const incapacitatedHandler: Handler<'incapacitated'> = () => ({});
+
+const resistanceHandler: Handler<'resistance'> = (input, ctx) => ({
+    scaledice: scaleToDice(input, ctx),
+});
+
+const resistanceVehicleToughnessHandler: Handler<'resistance-vehicletoughness'> = (input, ctx) => {
+    const vehicleUuid =
+        ctx.actor.type === 'vehicle' || ctx.actor.type === 'starship'
+            ? ctx.actor.uuid
+            : ctx.actor.vehicle?.uuid ?? '';
+    return {
+        scaledice: scaleToDice(input, ctx),
+        vehicle: vehicleUuid,
+    };
+};
+
 export const HANDLERS = {
     'weapon': notImplemented('weapon'),
     'starship-weapon': notImplemented('starship-weapon'),
@@ -149,12 +176,12 @@ export const HANDLERS = {
     'skill-dodge': skillDodgeHandler,
     'specialization': specializationHandler,
 
-    'damage': notImplemented('damage'),
-    'resistance': notImplemented('resistance'),
-    'resistance-vehicletoughness': notImplemented('resistance-vehicletoughness'),
+    'damage': damageHandler,
+    'resistance': resistanceHandler,
+    'resistance-vehicletoughness': resistanceVehicleToughnessHandler,
 
-    'mortally_wounded': notImplemented('mortally_wounded'),
-    'incapacitated': notImplemented('incapacitated'),
+    'mortally_wounded': mortallyWoundedHandler,
+    'incapacitated': incapacitatedHandler,
 
     'funds': notImplemented('funds'),
     'purchase': notImplemented('purchase'),
