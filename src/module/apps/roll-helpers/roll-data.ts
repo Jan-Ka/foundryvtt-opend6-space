@@ -217,3 +217,164 @@ export function isScoreTooLow(
     if (flatSkillsBypass) return false;
     return score < pipsPerDice;
 }
+
+// ---- Roll-type classification (#98 prep) ----
+
+import { weaponTypes } from "../../config/weapons";
+
+/**
+ * Stable handler-dispatch keys for every (type, subtype) path setupRollData
+ * accepts. Drives the per-handler decomposition planned in #98 — a future
+ * `switch (key)` over this union gets TypeScript exhaustiveness for free.
+ */
+export type RollTypeKey =
+    | 'weapon'
+    | 'starship-weapon'
+    | 'vehicle-weapon'
+    | 'action-meleeattack'
+    | 'action-brawlattack'
+    | 'action-rangedattack'
+    | 'action-vehiclerangedattack'
+    | 'action-vehiclerangedweaponattack'
+    | 'action-vehicleramattack'
+    | 'action-attribute'
+    | 'action-other'
+    | 'skill'
+    | 'skill-dodge'
+    | 'specialization'
+    | 'damage'
+    | 'resistance'
+    | 'resistance-vehicletoughness'
+    | 'mortally_wounded'
+    | 'incapacitated'
+    | 'funds'
+    | 'purchase'
+    | 'brawlattack'
+    | 'attribute';
+
+/** Canonical post-normalization roll types. Output of classifyRoll. */
+export type CanonicalRollType =
+    | 'weapon' | 'starship-weapon' | 'vehicle-weapon'
+    | 'action' | 'skill' | 'specialization'
+    | 'damage' | 'resistance'
+    | 'mortally_wounded' | 'incapacitated'
+    | 'funds' | 'brawlattack' | 'attribute';
+
+export interface ClassifiedRoll {
+    type: CanonicalRollType;
+    /**
+     * Canonical subtype after normalization. Empty string when none.
+     * Load-bearing for `action-other`: that key collapses every unrecognized
+     * action subtype into one bucket while preserving the original string here,
+     * so callers handling action-other can still inspect the input subtype.
+     */
+    subtype: string;
+    key: RollTypeKey;
+}
+
+export type Localize = (key: string) => string;
+
+const MELEE_WEAPON_TYPE_KEY = 'OD6S.MELEE';
+
+const RESISTANCE_NAME_ALIASES = [
+    'OD6S.ENERGY_RESISTANCE',
+    'OD6S.PHYSICAL_RESISTANCE',
+    'OD6S.RESISTANCE_NO_ARMOR',
+] as const;
+
+/**
+ * Pure classifier: maps an incoming roll request to its canonical (type, subtype)
+ * and a stable handler key. Mirrors the normalization scattered through
+ * roll-setup.ts: localized subtype aliases (RANGED/MELEE/…) → canonical attack
+ * subtypes; top-level vehicletoughness → resistance; top-level purchase → funds;
+ * skill+Dodge → skill+dodge; action+vehicletoughness → resistance;
+ * action+'' with a resistance i18n name → resistance.
+ *
+ * Pass `localize` (e.g. `game.i18n.localize.bind(game.i18n)`) so the helper
+ * stays Foundry-free and unit-testable.
+ */
+export function classifyRoll(
+    input: { type: string; subtype?: string; name?: string },
+    localize: Localize,
+): ClassifiedRoll {
+    let type = input.type;
+    let subtype = input.subtype ?? '';
+    const name = input.name ?? '';
+
+    // Reuses the canonical weapon-type list from config/weapons so adding a
+    // new ranged weapon type there picks up alias normalization automatically.
+    for (const k of weaponTypes) {
+        if (subtype === localize(k)) {
+            subtype = k === MELEE_WEAPON_TYPE_KEY ? 'meleeattack' : 'rangedattack';
+            break;
+        }
+    }
+
+    if (type === 'skill' && name === 'Dodge') {
+        subtype = 'dodge';
+    }
+
+    if (type === 'vehicletoughness') {
+        type = 'resistance';
+        subtype = 'vehicletoughness';
+    } else if (type === 'purchase') {
+        type = 'funds';
+        subtype = 'purchase';
+    }
+
+    if (type === 'action') {
+        if (subtype === 'vehicletoughness') {
+            type = 'resistance';
+        } else if (subtype === '' &&
+                   RESISTANCE_NAME_ALIASES.some(k => name === localize(k))) {
+            type = 'resistance';
+        }
+    }
+
+    if (!isCanonicalType(type)) {
+        throw new Error(`classifyRoll: unrecognized roll type "${type}"`);
+    }
+    return { type, subtype, key: deriveRollTypeKey(type, subtype) };
+}
+
+function isCanonicalType(type: string): type is CanonicalRollType {
+    switch (type) {
+        case 'weapon': case 'starship-weapon': case 'vehicle-weapon':
+        case 'action': case 'skill': case 'specialization':
+        case 'damage': case 'resistance':
+        case 'mortally_wounded': case 'incapacitated':
+        case 'funds': case 'brawlattack': case 'attribute':
+            return true;
+        default:
+            return false;
+    }
+}
+
+function deriveRollTypeKey(type: CanonicalRollType, subtype: string): RollTypeKey {
+    switch (type) {
+        case 'weapon': return 'weapon';
+        case 'starship-weapon': return 'starship-weapon';
+        case 'vehicle-weapon': return 'vehicle-weapon';
+        case 'skill': return subtype === 'dodge' ? 'skill-dodge' : 'skill';
+        case 'specialization': return 'specialization';
+        case 'damage': return 'damage';
+        case 'resistance':
+            return subtype === 'vehicletoughness' ? 'resistance-vehicletoughness' : 'resistance';
+        case 'mortally_wounded': return 'mortally_wounded';
+        case 'incapacitated': return 'incapacitated';
+        case 'funds': return subtype === 'purchase' ? 'purchase' : 'funds';
+        case 'brawlattack': return 'brawlattack';
+        case 'attribute': return 'attribute';
+        case 'action':
+            switch (subtype) {
+                case 'meleeattack': return 'action-meleeattack';
+                case 'brawlattack': return 'action-brawlattack';
+                case 'rangedattack': return 'action-rangedattack';
+                case 'vehiclerangedattack': return 'action-vehiclerangedattack';
+                case 'vehiclerangedweaponattack': return 'action-vehiclerangedweaponattack';
+                case 'vehicleramattack': return 'action-vehicleramattack';
+                case 'attribute': return 'action-attribute';
+                default: return 'action-other';
+            }
+    }
+}
