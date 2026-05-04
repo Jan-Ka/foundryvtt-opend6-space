@@ -343,6 +343,128 @@ const vehicleWeaponHandler: Handler<'vehicle-weapon'> = (input, ctx) => ({
     vehicle: vehicleUuidForActor(ctx.actor),
 });
 
+// ---- Action family helpers ----
+
+const characterAttributes = (actor: ActorView): Record<string, { score: number }> =>
+    (actor.type === 'character' || actor.type === 'npc') ? actor.attributes ?? {} : {};
+
+const characterAttributeScore = (actor: ActorView, key: string): number =>
+    characterAttributes(actor)[key]?.score ?? 0;
+
+const actorScale = (actor: ActorView): number => actor.scale?.score ?? 0;
+
+const vehicleScaleForActor = (actor: ActorView, ctx: HandlerContext): number =>
+    (actor.type === 'vehicle' || actor.type === 'starship')
+        ? actor.scale?.score ?? 0
+        : ctx.vehicleStats?.scale?.score ?? 0;
+
+const vehicleRamForActor = (
+    actor: ActorView,
+    ctx: HandlerContext,
+): { ram: number; ramDamage: number } =>
+    (actor.type === 'vehicle' || actor.type === 'starship')
+        ? { ram: actor.ram?.score ?? 0, ramDamage: actor.ram_damage?.score ?? 0 }
+        : {
+            ram: ctx.vehicleStats?.ram?.score ?? 0,
+            ramDamage: ctx.vehicleStats?.ram_damage?.score ?? 0,
+        };
+
+const defaultDifficultyLabel = (settings: RollSettingsView): string =>
+    settings.defaultUnknownDifficulty ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY';
+
+// ---- Action handlers ----
+
+const actionAttributeHandler: Handler<'action-attribute'> = (input, ctx) => ({
+    score: characterAttributeScore(ctx.actor, input.attribute ?? ''),
+});
+
+const actionOtherHandler: Handler<'action-other'> = () => ({});
+
+const actionRangedAttackHandler: Handler<'action-rangedattack'> = (_input, ctx) => ({
+    score: characterAttributeScore(ctx.actor, 'agi'),
+    range: 'OD6S.RANGE_SHORT_SHORT',
+    difficultylevel: defaultDifficultyLabel(ctx.settings),
+    attackerScale: actorScale(ctx.actor),
+});
+
+const actionVehicleRangedAttackHandler: Handler<'action-vehiclerangedattack'> = (_input, ctx) => ({
+    score: characterAttributeScore(ctx.actor, 'mec'),
+    range: 'OD6S.RANGE_SHORT_SHORT',
+    difficultylevel: defaultDifficultyLabel(ctx.settings),
+    attackerScale: vehicleScaleForActor(ctx.actor, ctx),
+    vehicle: vehicleUuidForActor(ctx.actor),
+});
+
+const actionMeleeAttackHandler: Handler<'action-meleeattack'> = (_input, ctx) => {
+    const resolved = resolveSkillBackedAction({
+        skill: ctx.actionSkill ?? null,
+        attributes: characterAttributes(ctx.actor),
+        flatSkills: ctx.settings.flatSkills,
+        // Melee uses AGI per the rules; not a configurable setting.
+        fallbackAttributeKey: 'agi',
+    });
+    return {
+        score: resolved.score,
+        attackerScale: actorScale(ctx.actor),
+        damagescore: characterStrengthDamage(ctx.actor),
+    };
+};
+
+const actionBrawlAttackHandler: Handler<'action-brawlattack'> = (_input, ctx) => {
+    const resolved = resolveSkillBackedAction({
+        skill: ctx.actionSkill ?? null,
+        attributes: characterAttributes(ctx.actor),
+        flatSkills: ctx.settings.flatSkills,
+        fallbackAttributeKey: ctx.settings.brawlAttribute,
+    });
+    const str = characterStrengthDamage(ctx.actor);
+    return {
+        score: resolved.score,
+        attackerScale: actorScale(ctx.actor),
+        damagetype: 'p',
+        damagescore: str,
+        stundamagetype: 'p',
+        stundamagescore: str,
+        can_stun: true,
+    };
+};
+
+const actionVehicleRamAttackHandler: Handler<'action-vehicleramattack'> = (_input, ctx) => {
+    const { ram, ramDamage } = vehicleRamForActor(ctx.actor, ctx);
+    const contribution = ramAttackContribution(ram, ramDamage);
+    const damagemodifiers: Modifier[] = [];
+    if (contribution.modifier) damagemodifiers.push(contribution.modifier);
+    return {
+        damagetype: 'p',
+        damagemodifiers,
+        source: 'OD6S.COLLISION',
+        attackerScale: vehicleScaleForActor(ctx.actor, ctx),
+        vehicle: vehicleUuidForActor(ctx.actor),
+    };
+};
+
+const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweaponattack'> = (_input, ctx) => {
+    const item = ctx.item ?? {} as ItemView;
+    const baseDamage = item.damage?.score ?? 0;
+    const modded = applyWeaponMods(
+        { damageScore: baseDamage, miscMod: 0, bonusmod: 0 },
+        {
+            damage: item.mods?.dmg?.score ?? 0,
+            difficulty: item.mods?.misc?.score ?? 0,
+            attack: item.mods?.bonus?.score ?? 0,
+        },
+    );
+    return {
+        damagetype: item.damage?.type ?? '',
+        damagescore: modded.damageScore,
+        source: item.name ?? '',
+        range: 'OD6S.RANGE_SHORT_SHORT',
+        difficultylevel: defaultDifficultyLabel(ctx.settings),
+        attackerScale: item.scale?.score ?? vehicleScaleForActor(ctx.actor, ctx),
+        vehicle: vehicleUuidForActor(ctx.actor),
+    };
+};
+
 const resistanceVehicleToughnessHandler: Handler<'resistance-vehicletoughness'> = (input, ctx) => ({
     scaledice: scaleToDice(input, ctx),
     vehicle: vehicleUuidForActor(ctx.actor),
@@ -353,14 +475,14 @@ export const HANDLERS = {
     'starship-weapon': starshipWeaponHandler,
     'vehicle-weapon': vehicleWeaponHandler,
 
-    'action-meleeattack': notImplemented('action-meleeattack'),
-    'action-brawlattack': notImplemented('action-brawlattack'),
-    'action-rangedattack': notImplemented('action-rangedattack'),
-    'action-vehiclerangedattack': notImplemented('action-vehiclerangedattack'),
-    'action-vehiclerangedweaponattack': notImplemented('action-vehiclerangedweaponattack'),
-    'action-vehicleramattack': notImplemented('action-vehicleramattack'),
-    'action-attribute': notImplemented('action-attribute'),
-    'action-other': notImplemented('action-other'),
+    'action-meleeattack': actionMeleeAttackHandler,
+    'action-brawlattack': actionBrawlAttackHandler,
+    'action-rangedattack': actionRangedAttackHandler,
+    'action-vehiclerangedattack': actionVehicleRangedAttackHandler,
+    'action-vehiclerangedweaponattack': actionVehicleRangedWeaponAttackHandler,
+    'action-vehicleramattack': actionVehicleRamAttackHandler,
+    'action-attribute': actionAttributeHandler,
+    'action-other': actionOtherHandler,
 
     'skill': skillHandler,
     'skill-dodge': skillDodgeHandler,

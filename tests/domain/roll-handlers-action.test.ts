@@ -217,13 +217,12 @@ describe('action-meleeattack handler', () => {
         expect(out.attackerScale).toBe(0);
     });
 
-    it('falls back to brawl/melee attribute when no skill item is present', () => {
+    it('falls back to AGI (rules-fixed for melee combat) when no skill item is present', () => {
         const out = HANDLERS['action-meleeattack'](
             makeInput('meleeattack'),
             makeCtx({ actor: characterWithAttrs(), actionSkill: null }),
         );
-        // settings.brawlAttribute = 'str' → fallback to str.score
-        expect(out.score).toBe(9);
+        expect(out.score).toBe(12); // agi
     });
 });
 
