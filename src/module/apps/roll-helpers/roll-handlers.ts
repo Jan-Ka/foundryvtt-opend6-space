@@ -27,7 +27,10 @@ import {
     buildDamagedWeaponModifier,
     buildStrengthDamageModifier,
     computeStunFlags,
+    ramAttackContribution,
 } from './weapon-context-math';
+import type { ActionSkill } from './action-math';
+import { resolveSkillBackedAction } from './action-math';
 
 export type HandlerOutput<K extends RollTypeKey> =
     Pick<RollData, (typeof ROLL_TYPE_FIELDS)[K][number]>;
@@ -57,6 +60,10 @@ export type ActorView =
 export interface CharacterActorView {
     type: 'character';
     uuid: string;
+    /** Attribute scores keyed by lower-case attribute name (str, agi, mec, kno, …). */
+    attributes?: Record<string, { score: number }>;
+    /** Actor scale (used as attackerScale fallback). */
+    scale?: { score: number };
     /** Strength damage score (added to melee damage when weapon.damage.str is set). */
     strengthDamage?: number;
     /** Embedded vehicle reference when the character is piloting one. */
@@ -66,20 +73,28 @@ export interface CharacterActorView {
 export interface NpcActorView {
     type: 'npc';
     uuid: string;
-    /** Strength damage score (added to melee damage when weapon.damage.str is set). */
+    attributes?: Record<string, { score: number }>;
+    scale?: { score: number };
     strengthDamage?: number;
-    /** Embedded vehicle reference when the NPC is piloting one. */
     vehicle?: { uuid: string };
 }
 
 export interface VehicleActorView {
     type: 'vehicle';
     uuid: string;
+    scale?: { score: number };
+    /** Vehicle ram bonus (skill bonus on ram attacks). */
+    ram?: { score: number };
+    /** Vehicle ram damage (additive damage modifier on ram attacks). */
+    ram_damage?: { score: number };
 }
 
 export interface StarshipActorView {
     type: 'starship';
     uuid: string;
+    scale?: { score: number };
+    ram?: { score: number };
+    ram_damage?: { score: number };
 }
 
 export interface ItemView {
@@ -137,6 +152,10 @@ export interface RollSettingsView {
     explosiveZones: boolean;
     /** Damage state → penalty/label table (system constant from OD6S.weaponDamage). */
     weaponDamageTable: Record<number, { penalty: number; label: string }>;
+    /** When true, skill-backed actions roll skill score as flat-pips on top of attribute. */
+    flatSkills: boolean;
+    /** Fallback attribute key for brawl action when no Brawling skill item exists. */
+    brawlAttribute: string;
 }
 
 export interface HandlerContext {
@@ -145,6 +164,24 @@ export interface HandlerContext {
     targets: ReadonlyArray<TargetView>;
     settings: RollSettingsView;
     localize: Localize;
+    /**
+     * Pre-resolved skill backing for skill-backed action handlers
+     * (action-meleeattack / action-brawlattack). The orchestrator looks up the
+     * actor's skill item by the action's configured skill name and projects it
+     * here; null when no matching skill item exists.
+     */
+    actionSkill?: ActionSkill | null;
+    /**
+     * Vehicle stats for vehicle-action handlers when the actor is a character
+     * piloting a vehicle (the orchestrator dereferences `actor.system.vehicle`
+     * once at the boundary). For vehicle/starship actors, handlers should read
+     * from the actor view directly.
+     */
+    vehicleStats?: {
+        scale?: { score: number };
+        ram?: { score: number };
+        ram_damage?: { score: number };
+    };
 }
 
 export type Handler<K extends RollTypeKey> = (
