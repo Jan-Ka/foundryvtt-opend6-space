@@ -2,7 +2,6 @@
  * Roll setup: assembles the rollData object from event/actor/item data and opens the dialog.
  */
 import {od6sutilities} from "../../system/utilities";
-import ExplosiveDialog from "../explosive-dialog";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
 import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
@@ -17,6 +16,7 @@ import {
     ramAttackContribution,
 } from "./weapon-context-math";
 import {computePenalties, isPenaltyBypassType, resolveSkillBackedAction} from "./action-math";
+import {runPreflight} from "./roll-preflight";
 
 /**
  * Returns the "vehicle data" carried by an actor regardless of host type:
@@ -73,27 +73,20 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     let onlyStun = false;
     const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
 
+    if (!(await runPreflight(data))) return false;
+
+    // isExplosive flag flows into RollData. The explosive-dialog gate inside
+    // runPreflight cancels (returns false) when the dialog is opened, so by
+    // the time we read here, either the item is set up OR it isn't explosive.
     if (typeof(data.itemId) !== 'undefined' && data.itemId !== '') {
         let item = data.actor.items.get(data.itemId);
-        if(typeof(item) === 'undefined') {
-            if (data.type === 'action' && data.subtype === 'vehiclerangedweaponattack') {
-                item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!.find((i: any) =>i.id === data.itemId);
-            }
+        if (typeof(item) === 'undefined'
+            && data.type === 'action' && data.subtype === 'vehiclerangedweaponattack') {
+            item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!
+                .find((i: any) => i.id === data.itemId);
         }
         if ((item?.system as OD6SWeaponItemSystem | undefined)?.subtype?.toLowerCase() === 'explosive') {
             isExplosive = true;
-            if (!item!.getFlag('od6s','explosiveSet')) {
-                const exdata = {
-                    options: OD6S.explosives,
-                    item: item!,
-                    actor: data.actor,
-                    type: 'OD6S.EXPLOSIVE_THROWN',
-                    auto: game.settings.get('od6s', 'auto_explosive'),
-                };
-
-                await new ExplosiveDialog(exdata).render({force: true});
-                return false;
-            }
         }
     }
 
@@ -127,11 +120,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         difficultyLevel = data.difficultyLevel;
     }
 
-    if (data.actor.system.sheetmode.value !== "normal") {
-        ui.notifications.warn(game.i18n.localize("OD6S.WARN_SHEET_MODE_NOT_NORMAL"));
-        return false;
-    }
-
     if (data.subtype === game.i18n.localize('OD6S.RANGED') ||
         data.subtype === game.i18n.localize('OD6S.THROWN') ||
         data.subtype === game.i18n.localize('OD6S.MISSILE') ||
@@ -146,18 +134,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     }
 
     game.user?.targets?.forEach((t: Token) => targets.push(t));
-
-    if (data.subtype === 'meleeattack' || data.subtype === 'brawlattack') {
-        if (targets.length > 0 && OD6S.meleeRange) {
-            const actorToken = data.actor.getActiveTokens()[0];
-            const fudge = Math.floor((((actorToken.width + targets[0].width)/canvas.grid.size) * 0.5) - 1);
-            const distance = Math.floor(canvas.grid.measurePath([actorToken.center, targets[0].center]).distance) - fudge;
-            if(distance !== 0 && distance/canvas.grid.distance > 1.5) {
-                ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_MELEE_BRAWL_RANGE'));
-                return false;
-            }
-        }
-    }
 
     // See if this is a weapon attack
     if (data.type === 'weapon' || data.type === 'starship-weapon' || data.type === 'vehicle-weapon') {
