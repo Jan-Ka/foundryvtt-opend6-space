@@ -21,6 +21,7 @@
 
 import OD6S from "../../config/config-od6s";
 import ExplosiveDialog from "../explosive-dialog";
+import { meleeRangeGateApplies } from "./roll-preflight-checks";
 
 /**
  * Run the three cancellation gates in order. Returns `true` to proceed,
@@ -66,8 +67,8 @@ function passesSheetModeGate(data: IncomingRollData): boolean {
 }
 
 function passesMeleeRangeGate(data: IncomingRollData): boolean {
-    if (data.subtype !== 'meleeattack' && data.subtype !== 'brawlattack') return true;
     if (!OD6S.meleeRange) return true;
+    if (!meleeRangeGateApplies(data, game.i18n.localize.bind(game.i18n))) return true;
     const targets = [...(game.user?.targets ?? [])];
     if (targets.length === 0) return true;
 
