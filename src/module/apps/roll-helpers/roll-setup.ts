@@ -1,654 +1,556 @@
 /**
- * Roll setup: assembles the rollData object from event/actor/item data and opens the dialog.
+ * Roll setup orchestrator (#98 phase 3d cutover).
+ *
+ * Replaces the legacy 650-line `setupRollData` with a thin coordinator over
+ * the rules pipeline:
+ *
+ *   1. preflight                — Foundry-coupled cancellation gates
+ *   2. classifyRoll             — type/subtype → RollTypeKey
+ *   3. adaptContext + pre-resolve actionSkill / vehicleStats
+ *   4. HANDLERS[key]            — pure typed bucket
+ *   5. score gate (with explosive cleanup)
+ *   6. orchestrator-side accumulation: bonusmod (14 sites), miscMod, scaleMod
+ *   7. range bucketing for ranged subtypes (with explosive cleanup on out-of-range)
+ *   8. roll_mod, damaged-weapon penalty, flatSkills attribute swap, fatepointeffect
+ *   9. runFinalize              — typed bucket + COMMON inputs → RollData
+ *
+ * RFC fixes applied during cutover:
+ *   - #100: +5 magic constant on action-meleeattack removed (no rules backing).
+ *   - #103: vehicleramattack `ram.score` added once (legacy added it twice).
+ *   - #104: attackerScale derives unconditionally from actor for attack rolls
+ *           with no targets (legacy left attackerScale=0).
+ *   - Audit A: fatepointeffect doubling routed through FinalizeInput.diceMultiplier
+ *              so damaged / roll_mod re-derives can't overwrite it.
+ *   - Phase 0 cleanup: legacy `'toughness'` in canOppose was already gone in
+ *     finalize; legacy top-level `brawlattack` RollTypeKey removed (no
+ *     caller produces type='brawlattack'; Actor.rollAction wraps brawl as
+ *     `{type:'action', subtype:'brawlattack'}` which routes to action-brawlattack).
  */
+
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
-import {isCharacterActor, isVehicleActor, isSkillItem} from "../../system/type-guards";
+import {isCharacterActor} from "../../system/type-guards";
 import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
-import type {Modifier} from "./difficulty-math";
-import type {IncomingRollData, RollData, DiceValue} from "./roll-data";
-import {
-    applyWeaponMods,
-    buildDamagedWeaponModifier,
-    buildStrengthDamageModifier,
-    computeStunFlags,
-    ramAttackContribution,
-} from "./weapon-context-math";
+import type {IncomingRollData, RollData, ClassifiedRoll, RollTypeKey} from "./roll-data";
+import {classifyRoll} from "./roll-data";
+import {applyWeaponMods} from "./weapon-context-math";
 import {computePenalties, isPenaltyBypassType, resolveSkillBackedAction} from "./action-math";
+import type {ActionResolution} from "./action-math";
 import {runPreflight} from "./roll-preflight";
+import {adaptContext} from "./roll-context-adapter";
+import type {RollSettingsRaw} from "./roll-context-adapter";
+import {HANDLERS} from "./roll-handlers";
+import type {HandlerContext, HandlerInput} from "./roll-handlers";
+import {runFinalize} from "./roll-finalize";
 
 /**
- * Returns the "vehicle data" carried by an actor regardless of host type:
- * for vehicle/starship actors it's `system` itself; for character actors
- * it's the embedded `system.vehicle` field. The shape is loosely typed
- * because the two sources only partially overlap at runtime.
+ * Roll-type keys whose rolls get the `dice_for_scale` negative-scaleMod dice
+ * adjustment (Audit D enumeration).
  */
-function selectVehicleData(actor: Actor): {
-    uuid?: string;
-    scale?: { score: number };
-    ram?: { score: number };
-    ram_damage?: { score: number };
-    ranged?: { score?: number };
-    vehicle_weapons?: Item[];
-} {
-    if (actor.type === 'vehicle' || actor.type === 'starship') {
-        return actor.system as never;
+const ATTACK_KEYS: ReadonlySet<RollTypeKey> = new Set<RollTypeKey>([
+    'weapon', 'starship-weapon', 'vehicle-weapon',
+    'action-brawlattack',
+    'action-vehicleramattack',
+    'action-vehiclerangedweaponattack',
+]);
+
+const RANGED_BUCKETING_SUBTYPES = new Set([
+    'rangedattack', 'vehiclerangedattack', 'vehiclerangedweaponattack',
+]);
+
+function readSettings(): RollSettingsRaw {
+    return {
+        defaultUnknownDifficulty: !!game.settings.get('od6s', 'default_unknown_difficulty'),
+        diceForScale: !!game.settings.get('od6s', 'dice_for_scale'),
+        fundsFate: !!OD6S.fundsFate,
+        hideCombatCards: !!game.settings.get('od6s', 'hide-combat-cards'),
+        hideSkillCards: !!game.settings.get('od6s', 'hide-skill-cards'),
+        showSkillSpecialization: !!OD6S.showSkillSpecialization,
+        pipsPerDice: OD6S.pipsPerDice,
+        meleeDifficulty: !!OD6S.meleeDifficulty,
+        explosiveZones: !!game.settings.get('od6s', 'explosive_zones'),
+        weaponDamageTable: OD6S.weaponDamage,
+        flatSkills: !!OD6S.flatSkills,
+        brawlAttribute: game.settings.get('od6s', 'brawl_attribute') as string,
+    };
+}
+
+/**
+ * Resolve the source item for handler dispatch. Mirrors the legacy boundary
+ * resolver: standard items.get on the actor; for character-piloted vehicle
+ * weapon attacks, fall back to the embedded `vehicle.vehicle_weapons` array.
+ */
+function resolveItemForDispatch(data: IncomingRollData): Item | undefined {
+    if (!data.itemId) return undefined;
+    let item = data.actor.items.get(data.itemId);
+    if (!item
+        && data.type === 'action'
+        && data.subtype === 'vehiclerangedweaponattack'
+        && isCharacterActor(data.actor)) {
+        item = data.actor.system.vehicle.vehicle_weapons
+            ?.find((i: { id?: string }) => i.id === data.itemId);
     }
-    return (actor.system as OD6SCharacterSystem).vehicle as never;
+    return item;
+}
+
+function resolveVehicleStatsForCharacter(actor: Actor): HandlerContext['vehicleStats'] {
+    if (!isCharacterActor(actor)) return undefined;
+    const v = actor.system.vehicle as {
+        scale?: { score: number };
+        ram?: { score: number };
+        ram_damage?: { score: number };
+    } | undefined;
+    if (!v) return undefined;
+    return {
+        scale: v.scale ? { score: +v.scale.score } : undefined,
+        ram: v.ram ? { score: +v.ram.score } : undefined,
+        ram_damage: v.ram_damage ? { score: +v.ram_damage.score } : undefined,
+    };
+}
+
+/**
+ * Build the `actionSkillResolved` bucket for action-meleeattack /
+ * action-brawlattack at the boundary. Audit E: pre-resolving here means
+ * `flatPips` is available for COMMON-side bonusdice without re-running
+ * `resolveSkillBackedAction` inside the handler.
+ */
+function preResolveActionSkill(
+    data: IncomingRollData,
+    classified: ClassifiedRoll,
+    settings: RollSettingsRaw,
+): ActionResolution | undefined {
+    if (classified.key !== 'action-meleeattack' && classified.key !== 'action-brawlattack') {
+        return undefined;
+    }
+    if (!isCharacterActor(data.actor)) return { score: 0 };
+
+    const skillName = classified.key === 'action-meleeattack'
+        ? game.i18n.localize('OD6S.MELEE_COMBAT')
+        : game.i18n.localize('OD6S.BRAWL');
+    const fallback = classified.key === 'action-meleeattack'
+        ? 'agi'
+        : (game.settings.get('od6s', 'brawl_attribute') as string);
+
+    const skillItem = data.actor.items.find(
+        (i: Item) => i.type === 'skill' && i.name === skillName,
+    );
+    const sysAttrs: Record<string, { score: number }> = {};
+    const rawAttrs = (data.actor.system as { attributes?: Record<string, { score: number }> }).attributes ?? {};
+    for (const [k, v] of Object.entries(rawAttrs)) {
+        sysAttrs[k] = { score: +v.score };
+    }
+
+    const skillSys = skillItem ? (skillItem.system as OD6SSkillItemSystem) : null;
+    return resolveSkillBackedAction({
+        skill: skillSys
+            ? { score: skillSys.score, attributeKey: skillSys.attribute.toLowerCase() }
+            : null,
+        attributes: sysAttrs,
+        flatSkills: settings.flatSkills,
+        fallbackAttributeKey: fallback,
+    });
+}
+
+function deriveVisibility(
+    key: RollTypeKey,
+    settings: RollSettingsRaw,
+    isBypass: boolean,
+): boolean {
+    if (isBypass) return true;
+    switch (key) {
+        case 'skill': case 'skill-dodge': case 'specialization':
+        case 'funds': case 'purchase': case 'action-attribute':
+            return !settings.hideSkillCards;
+        case 'weapon': case 'starship-weapon': case 'vehicle-weapon':
+        case 'action-meleeattack': case 'action-brawlattack':
+        case 'action-rangedattack': case 'action-vehiclerangedattack':
+        case 'action-vehiclerangedweaponattack': case 'action-vehicleramattack':
+        case 'action-other':
+            return !settings.hideCombatCards;
+        default:
+            return false;
+    }
+}
+
+function deriveCanUseFpCp(
+    key: RollTypeKey,
+    settings: RollSettingsRaw,
+): { canUseFp: boolean; canUseCp: boolean } {
+    if (key === 'resistance-vehicletoughness') return { canUseFp: false, canUseCp: false };
+    if ((key === 'funds' || key === 'purchase') && !settings.fundsFate) {
+        return { canUseFp: false, canUseCp: false };
+    }
+    return { canUseFp: true, canUseCp: true };
 }
 
 export async function setupRollData(data: IncomingRollData): Promise<RollData | false> {
-    let attribute;
-    let range = "OD6S.RANGE_POINT_BLANK_SHORT";
-    let woundPenalty;
-    let damageType = '';
-    let damageScore = 0;
-    let stunDamageType = '';
-    let stunDamageScore = 0;
-    const damageModifiers: Modifier[] = [];
-    const targets: Token[] = [];
-    let difficulty = 0;
-    let isAttack = false;
-    let isVisible = false;
-    let isOpposable = false;
-    let difficultyLevel = game.settings.get('od6s','default_unknown_difficulty') ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY';
-    let bonusmod = 0;
-    let bonusdice: DiceValue = { dice: 0, pips: 0 };
-    let penaltydice = 0;
-    let miscMod = 0;
-    let scaleMod = 0;
-    let scaleDice = 0;
-    let canUseCp = true;
-    let canUseFp = true;
-    let vehicle = '';
-    let vehicleTerrainDifficulty = 'OD6S.DIFFICULTY_EASY';
-    let damageSource = '';
-    let attackerScale = 0;
-    let defenderScale;
-    let flatPips = 0;
-    let specSkill = '';
-    let isExplosive = false;
-    let canStun = false;
-    let onlyStun = false;
-    const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
-
     if (!(await runPreflight(data))) return false;
 
-    // isExplosive flag flows into RollData. The explosive-dialog gate inside
-    // runPreflight cancels (returns false) when the dialog is opened, so by
-    // the time we read here, either the item is set up OR it isn't explosive.
-    if (typeof(data.itemId) !== 'undefined' && data.itemId !== '') {
-        let item = data.actor.items.get(data.itemId);
-        if (typeof(item) === 'undefined'
-            && data.type === 'action' && data.subtype === 'vehiclerangedweaponattack') {
-            item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!
-                .find((i: any) => i.id === data.itemId);
-        }
-        if ((item?.system as OD6SWeaponItemSystem | undefined)?.subtype?.toLowerCase() === 'explosive') {
-            isExplosive = true;
-        }
-    }
+    const localize = game.i18n.localize.bind(game.i18n);
+    const settings = readSettings();
+    const classified = classifyRoll(data, localize);
+    // `classifyRoll` does NOT mutate `data` — for weapon-item rolls coming
+    // through with a localized subtype alias (e.g. "Melee" / "Ranged"),
+    // `data.subtype` stays localized while `classified.subtype` is canonical.
+    // Always read `subtype` (canonical) downstream of the classifier; reading
+    // `data.subtype` would silently skip melee/ranged mod accumulation, range
+    // bucketing, and any branch keyed on the canonical attack subtype.
+    const subtype = classified.subtype;
 
-    if (typeof (data.flatpips) !== 'undefined' && data.flatpips > 0) {
-        flatPips = data.flatpips;
-    }
+    const item = resolveItemForDispatch(data);
+    const isExplosive = !!item
+        && (item.system as OD6SWeaponItemSystem | undefined)?.subtype?.toLowerCase() === 'explosive';
 
-    if ((data.type === 'funds' || data.type === 'purchase') && !OD6S.fundsFate) {
-        canUseCp = false;
-        canUseFp = false;
-    }
-
-    if (OD6S.vehicleDifficulty) {
-        vehicleTerrainDifficulty = 'OD6S.TERRAIN_EASY';
-    }
-
-    if ((typeof (data.subtype) !== 'undefined' && data.subtype.includes('vehicle'))
-        || data.type.includes('vehicle')) {
-        if (data.actor.type === 'vehicle' || data.actor.type === 'starship') {
-            vehicle = data.actor.uuid;
+    // For weapon-typed rolls with a localized ranged subtype alias (RANGED /
+    // THROWN / MISSILE / EXPLOSIVE), getWeaponRange resolves the per-roll
+    // range table and may cancel via false (e.g., out-of-ammo dialog).
+    let weaponRangeTable: { short: number; medium: number; long: number } | undefined;
+    if (item && (data.type === 'weapon' || data.type === 'starship-weapon' || data.type === 'vehicle-weapon')) {
+        // Classifier collapses every localized weapon-type alias (RANGED /
+        // THROWN / MISSILE / EXPLOSIVE) into canonical 'rangedattack', so a
+        // single check covers the whole alias set.
+        if (subtype === 'rangedattack') {
+            const r = await od6sutilities.getWeaponRange(data.actor, item);
+            if (r === false) return false;
+            weaponRangeTable = r as typeof weaponRangeTable;
         } else {
-            vehicle = (data.actor.system as OD6SCharacterSystem).vehicle.uuid;
+            weaponRangeTable = (item.system as OD6SWeaponItemSystem).range as unknown as typeof weaponRangeTable;
         }
+    } else if (item && classified.key === 'action-vehiclerangedweaponattack') {
+        const sys = item.system as { range?: typeof weaponRangeTable };
+        weaponRangeTable = sys.range;
     }
 
-    if (typeof (data.difficulty) !== 'undefined') {
-        difficulty = data.difficulty;
-    }
-
-    if (typeof (data.difficultyLevel) !== 'undefined') {
-        difficultyLevel = data.difficultyLevel;
-    }
-
-    if (data.subtype === game.i18n.localize('OD6S.RANGED') ||
-        data.subtype === game.i18n.localize('OD6S.THROWN') ||
-        data.subtype === game.i18n.localize('OD6S.MISSILE') ||
-        data.subtype === game.i18n.localize('OD6S.EXPLOSIVE')) {
-        data.subtype = "rangedattack";
-        isAttack = true;
-    }
-
-    if (data.subtype === game.i18n.localize('OD6S.MELEE')) {
-        data.subtype = "meleeattack"
-        isAttack = true;
-    }
-
+    const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
+    const targets: Token[] = [];
     game.user?.targets?.forEach((t: Token) => targets.push(t));
 
-    // See if this is a weapon attack
-    if (data.type === 'weapon' || data.type === 'starship-weapon' || data.type === 'vehicle-weapon') {
-        const weapon = data.actor.getEmbeddedDocument('Item', data.itemId ?? '');
-        damageSource = weapon.name;
-        damageType = weapon.system.damage.type;
-        damageScore = weapon.system.damage.score;
-        stunDamageType = weapon.system?.stun?.type;
-        stunDamageScore = weapon.system?.stun?.score;
-        isAttack = true;
-        if (data.subtype === 'meleeattack') {
-            damageScore = od6sutilities.getMeleeDamage(data.actor, weapon);
-            if (stunDamageScore > 0) {
-                stunDamageScore = weapon.system.damage.str ? stunDamageScore + (data.actor.system as OD6SCharacterSystem).strengthdamage.score : stunDamageScore;
-            }
+    // Boundary projection (sets `actor`, `item`, `targets`, `settings`, `localize`).
+    const ctxBase = adaptContext(
+        { type: data.actor.type, uuid: data.actor.uuid, system: data.actor.system },
+        item ? { type: item.type, name: item.name, system: item.system } : undefined,
+        { settings, localize, canvasTargets: targets },
+    );
+    const ctx: HandlerContext = {
+        ...ctxBase,
+        actionSkillResolved: preResolveActionSkill(data, classified, settings),
+        vehicleStats: resolveVehicleStatsForCharacter(data.actor),
+    };
+
+    const { actor: _omitActor, ...dataNoActor } = data;
+    void _omitActor;
+    const handlerInput: HandlerInput = { ...dataNoActor, classified };
+
+    const bucket = HANDLERS[classified.key](handlerInput, ctx);
+
+    // ---- Score resolution ----
+    const bucketAny = bucket as Partial<RollData>;
+    const workingScore = bucketAny.score ?? data.score;
+
+    const flatSkillsBypass = settings.flatSkills
+        && (classified.type === 'skill' || classified.type === 'specialization');
+    if (workingScore < settings.pipsPerDice && !flatSkillsBypass) {
+        ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+        if (isExplosive) {
+            await cancelAction({ ...data, isExplosive, itemid: data.itemId } as unknown as RollData);
         }
-        if (weapon.system.scale.score) attackerScale = weapon.system.scale.score;
-        ({damageScore, miscMod, bonusmod} = applyWeaponMods(
-            {damageScore, miscMod, bonusmod},
-            weapon.system.mods,
-        ));
+        return false;
+    }
 
-        if (OD6S.meleeDifficulty) {
-            weapon.system.difficulty ? difficultyLevel = weapon.system.difficulty : difficultyLevel = 'OD6S.DIFFICULTY_EASY';
-        }
+    // ---- bonusmod / miscMod accumulation (orchestrator-side) ----
+    let bonusmod = 0;
+    let miscMod = 0;
 
-        ({onlyStun, canStun} = computeStunFlags({
-            stunOnly: weapon.system.stun?.stun_only,
-            weaponStunScore: weapon.system.stun?.score ?? 0,
-            isExplosive,
-            explosiveZonesEnabled: Boolean(game.settings.get('od6s', 'explosive_zones')),
-            blastZone1StunDamage: weapon.system.blast_radius?.["1"]?.stun_damage ?? 0,
-        }));
+    // Weapon family: weapon mod difficulty / attack land on miscMod / bonusmod
+    // (handler already folded `damage` into bucket.damagescore via the same
+    // helper — applyWeaponMods is run twice but discarded outputs differ, so no
+    // double-fold happens).
+    if (item && (classified.type === 'weapon' || classified.type === 'starship-weapon' || classified.type === 'vehicle-weapon')) {
+        const wsys = item.system as OD6SWeaponItemSystem;
+        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
+        miscMod = folded.miscMod;
+        bonusmod = folded.bonusmod;
 
-        if(data.subtype === 'rangedattack') {
-            data.range = await od6sutilities.getWeaponRange(data.actor, weapon) as typeof data.range;
-            if (data.range === false) return false;
-        } else {
-            data.range = weapon.system.range as typeof data.range;
-        }
-
-        const damagedMod = buildDamagedWeaponModifier(weapon.system.damaged, OD6S.weaponDamage);
-        if (damagedMod) damageModifiers.push(damagedMod);
-
-        if (weapon.system.damage.muscle) {
-            damageModifiers.push(buildStrengthDamageModifier(
-                (data.actor.system as OD6SCharacterSystem).strengthdamage.score,
-            ));
-        }
-
-        // Check for effect modifiers — prefer specialization over skill when
-        // the actor owns the matching item.
-        const stats = weapon.system.stats;
-        const ownsSpec = !!stats.specialization
+        const stats = wsys.stats;
+        const ownsSpec = !!stats?.specialization
             && data.actor.items.some((i: Item) => i.type === 'specialization' && i.name === stats.specialization);
-        const ownsSkill = !!stats.skill
+        const ownsSkill = !!stats?.skill
             && data.actor.items.some((i: Item) => i.type === 'skill' && i.name === stats.skill);
         if (ownsSpec) {
-            bonusmod += (+getEffectMod('specialization', stats.specialization, data.actor));
+            bonusmod += +getEffectMod('specialization', stats.specialization!, data.actor);
         } else if (ownsSkill) {
-            bonusmod += (+getEffectMod('skill', stats.skill, data.actor));
+            bonusmod += +getEffectMod('skill', stats.skill!, data.actor);
         }
     }
 
-    if (data.subtype === 'vehiclerangedweaponattack') {
-        let vehicleWeapon: Item | undefined;
-        if (isVehicleActor(data.actor)) {
-            if (data.actor.system.embedded_pilot?.value) {
-                vehicleWeapon = data.actor.items.filter((i: Item) => i._id === data.itemId)[0];
-            } else if (data.actor.type === 'vehicle') {
-                vehicleWeapon = (data.actor as any).vehicle_weapons.filter((i: Item) => i._id === data.itemId)[0];
-            } else {
-                vehicleWeapon = (data.actor as any).starship_weapons.filter((i: Item) => i._id === data.itemId)[0];
+    if (item && classified.key === 'action-vehiclerangedweaponattack') {
+        const wsys = item.system as OD6SVehicleWeaponItemSystem;
+        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
+        miscMod = folded.miscMod;
+        bonusmod = folded.bonusmod;
+    }
+
+    if (classified.type === 'skill' && item) {
+        bonusmod += +getEffectMod('skill', item.name ?? '', data.actor);
+    }
+    if (classified.type === 'specialization' && item) {
+        bonusmod += +getEffectMod('specialization', item.name ?? '', data.actor);
+    }
+
+    if (isCharacterActor(data.actor)) {
+        const c = data.actor.system;
+        if (subtype === 'meleeattack') bonusmod += c.melee.mod;
+        if (subtype === 'brawlattack') bonusmod += c.brawl.mod;
+        if (subtype === 'dodge') bonusmod += c.dodge.mod;
+        if (subtype === 'parry') bonusmod += c.parry.mod;
+        if (subtype === 'block') bonusmod += c.block.mod;
+    }
+
+    // Ranged-attack bonus: vehicle's ranged.score for vehicle-piloted paths,
+    // actor.system.ranged.mod for personal ranged.
+    const isRangedSubtype = subtype === 'rangedattack'
+        || subtype === 'vehiclerangedattack'
+        || subtype === 'vehiclerangedweaponattack';
+    if (isRangedSubtype) {
+        if (subtype.startsWith('vehicle')) {
+            const vehSys = data.actor.system as OD6SVehicleSystem;
+            const charSys = data.actor.system as OD6SCharacterSystem & {
+                vehicle: { ranged?: { score?: number } };
+            };
+            if (vehSys?.embedded_pilot?.value && typeof ((vehSys?.ranged as OD6SScoreField)?.score) !== 'undefined') {
+                bonusmod += +(vehSys.ranged as OD6SScoreField).score;
+            } else if (typeof (charSys?.vehicle?.ranged?.score) !== 'undefined') {
+                bonusmod += +charSys.vehicle.ranged.score;
             }
-        } else if (isCharacterActor(data.actor)) {
-            vehicleWeapon = data.actor.system.vehicle.vehicle_weapons?.filter((i: Item) => i.id === data.itemId)[0];
-        }
-
-        isAttack = true;
-        if (typeof (vehicleWeapon) !== 'undefined') {
-            const vwSys = vehicleWeapon.system as OD6SVehicleWeaponItemSystem;
-            damageScore = vwSys.damage.score;
-            damageType = vwSys.damage.type;
-            ({damageScore, miscMod, bonusmod} = applyWeaponMods(
-                {damageScore, miscMod, bonusmod},
-                vwSys.mods,
-            ));
-            attackerScale = vwSys.scale.score
-                ? vwSys.scale.score
-                : selectVehicleData(data.actor).scale?.score ?? 0;
-        } else if (isCharacterActor(data.actor)) {
-            damageScore = data.damage ?? 0;
-            damageType = data.damage_type ?? '';
-            attackerScale = data.actor.system.vehicle.scale!.score;
-        }
-        damageSource = data.name;
-    }
-
-    if (data.subtype === 'vehicleramattack') {
-        damageType = 'p';
-        damageSource = 'OD6S.COLLISION';
-        isAttack = true;
-        const vehicleData = selectVehicleData(data.actor);
-        const ram = ramAttackContribution(
-            vehicleData.ram?.score ?? 0,
-            vehicleData.ram_damage?.score ?? 0,
-        );
-        if (ram.modifier) damageModifiers.push(ram.modifier);
-        bonusmod += ram.bonusModIncrement;
-    }
-
-    if ((data.type === 'brawlattack' || data.subtype === 'brawlattack') && isCharacterActor(data.actor)) {
-        damageType = 'p';
-        damageScore = data.actor.system.strengthdamage.score;
-        isAttack = true;
-        canStun = true;
-        stunDamageScore = damageScore;
-        stunDamageType = 'p';
-    }
-
-    if (data.type === 'vehicletoughness') {
-        canUseCp = canUseFp = false;
-        data.subtype = data.type;
-        data.type = 'resistance';
-    }
-
-    if (targets.length === 1) {
-        if (!attackerScale && isAttack) {
-            if (data.subtype !== undefined && data.subtype.includes('vehicle')) {
-                attackerScale = selectVehicleData(data.actor).scale?.score ?? 0;
-            } else {
-                attackerScale = data.actor.system.scale.score ?? 0;
-            }
-        }
-
-        if (typeof (targets[0].actor.system.scale.score) === 'undefined') {
-            defenderScale = 0;
         } else {
-            defenderScale = targets[0].actor.system.scale.score;
+            bonusmod += +(data.actor.system.ranged as OD6SModField).mod;
         }
+    }
+
+    // RFC #103: vehicleramattack adds ram.score ONCE (legacy added at lines
+    // 245 and 487 — same condition twice).
+    if (classified.key === 'action-vehicleramattack') {
+        const vehicleData = isCharacterActor(data.actor)
+            ? (data.actor.system.vehicle as { ram?: { score?: number } })
+            : (data.actor.system as { ram?: { score?: number } });
+        if (typeof vehicleData?.ram?.score === 'number') {
+            bonusmod += vehicleData.ram.score;
+        }
+    }
+
+    // ---- attackerScale / scaleMod ----
+    // RFC #104: derive attackerScale from the actor unconditionally for attack
+    // rolls (legacy gated on `targets.length === 1 && isAttack`, leaving
+    // attackerScale=0 for no-target attacks).
+    const isAttackRoll = ATTACK_KEYS.has(classified.key)
+        || (isRangedSubtype && (classified.type === 'weapon' || classified.type === 'starship-weapon' || classified.type === 'vehicle-weapon'))
+        || classified.key === 'action-rangedattack'
+        || classified.key === 'action-vehiclerangedattack'
+        || classified.key === 'action-meleeattack';
+
+    let attackerScale: number;
+    if (typeof bucketAny.attackerScale === 'number' && bucketAny.attackerScale !== 0) {
+        attackerScale = bucketAny.attackerScale;
+    } else if (isAttackRoll) {
+        const isVehicleSubtype = subtype.includes('vehicle');
+        if (isVehicleSubtype) {
+            attackerScale = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
+                ? +((data.actor.system as { scale?: { score?: number } }).scale?.score ?? 0)
+                : +(((data.actor.system as OD6SCharacterSystem).vehicle?.scale as { score?: number } | undefined)?.score ?? 0);
+        } else {
+            attackerScale = +(((data.actor.system as { scale?: { score?: number } }).scale?.score) ?? 0);
+        }
+    } else {
+        attackerScale = bucketAny.attackerScale ?? 0;
+    }
+
+    let scaleMod = 0;
+    if (targets.length === 1) {
+        const defenderScale = +((targets[0].actor.system as { scale?: { score?: number } }).scale?.score ?? 0);
         if (attackerScale !== defenderScale) {
             scaleMod = attackerScale - defenderScale;
         }
     }
 
-    if (data.type === 'action') {
-        let skill: Item | undefined;
-        switch (data.subtype) {
-            case 'vehicletoughness':
-                canUseCp = canUseFp = false;
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                data.type = 'resistance';
-                break;
-            case 'attribute':
-                data.score = data.actor.system.attributes[data.attribute!].score;
-                isVisible = !game.settings.get('od6s', 'hide-skill-cards');
-                break;
-            case 'vehiclerangedattack':
-                data.score = data.actor.system.attributes.mec.score;
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
-            case 'vehiclerangedweaponattack':
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
-            case 'vehicleramattack':
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
-            case 'rangedattack':
-                data.score = data.actor.system.attributes.agi.score;
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
-            case 'meleeattack': {
-                skill = data.actor.items.find((i: Item) => i.type === 'skill'
-                    && i.name === game.i18n.localize('OD6S.MELEE_COMBAT'));
-                const resolved = resolveSkillBackedAction({
-                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
-                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
-                        : null,
-                    attributes: data.actor.system.attributes,
-                    flatSkills: OD6S.flatSkills,
-                    fallbackAttributeKey: 'agi',
-                });
-                data.score = resolved.score;
-                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
+    // ---- Range bucketing (orchestrator-side) ----
+    let rangeLabel: string = (typeof bucketAny.range === 'string' ? bucketAny.range : undefined)
+        ?? 'OD6S.RANGE_POINT_BLANK_SHORT';
+    let difficultyLevel: string = bucketAny.difficultylevel
+        ?? data.difficultyLevel
+        ?? (settings.defaultUnknownDifficulty ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY');
+
+    if (RANGED_BUCKETING_SUBTYPES.has(subtype)) {
+        rangeLabel = 'OD6S.RANGE_SHORT_SHORT';
+        const rangeDifficulty = !!game.settings.get('od6s', 'map_range_to_difficulty');
+        const autoExplosive = !!game.settings.get('od6s', 'auto_explosive');
+        const wantsBucket = (targets.length === 1 || (isExplosive && autoExplosive))
+            && !!data.itemId
+            && typeof data.token !== 'undefined' && data.token !== ''
+            && !!weaponRangeTable;
+        if (wantsBucket) {
+            let distance: number | undefined;
+            if (isExplosive) {
+                distance = item?.getFlag('od6s', 'explosiveRange') as number | undefined;
+            } else {
+                distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
             }
-            case 'brawlattack': {
-                skill = data.actor.items.find((i: Item) => i.type === 'skill'
-                    && i.name === game.i18n.localize('OD6S.BRAWL'));
-                const resolved = resolveSkillBackedAction({
-                    skill: (skill !== undefined && isSkillItem(skill) && isCharacterActor(data.actor))
-                        ? {score: skill.system.score, attributeKey: skill.system.attribute.toLowerCase()}
-                        : null,
-                    attributes: data.actor.system.attributes,
-                    flatSkills: OD6S.flatSkills,
-                    fallbackAttributeKey: game.settings.get('od6s', 'brawl_attribute'),
-                });
-                data.score = resolved.score;
-                if (resolved.flatPips !== undefined) flatPips = resolved.flatPips;
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-                break;
-            }
-            case '':
-                if (data.name === game.i18n.localize('OD6S.ENERGY_RESISTANCE') ||
-                    data.name === game.i18n.localize('OD6S.PHYSICAL_RESISTANCE') ||
-                    data.name === game.i18n.localize('OD6S.RESISTANCE_NO_ARMOR')) {
-                    data.type = 'resistance';
-                }
-                isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-        }
-    }
-
-    let rollValues = od6sutilities.getDiceFromScore(data.score);
-
-    const penalties = computePenalties({
-        rollType: data.type,
-        actionItemCount: data.actor.itemTypes.action.length,
-        stunsCurrent: isCharacterActor(data.actor) ? (data.actor.system.stuns.current ?? 0) : 0,
-        woundPenalty: isPenaltyBypassType(data.type) ? 0 : od6sutilities.getWoundPenalty(data.actor),
-    });
-    woundPenalty = penalties.woundPenalty;
-    const actionPenalty = penalties.actionPenalty;
-    const stunnedPenalty = penalties.stunnedPenalty;
-    if (penalties.isBypass) isVisible = true;
-
-    if (data.type === 'funds') {
-        isVisible = !game.settings.get('od6s', 'hide-skill-cards');
-    }
-
-    if (data.score < OD6S.pipsPerDice && !(OD6S.flatSkills && (data.type === 'skill' || data.type === 'specialization'))) {
-        ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
-        if (isExplosive) await cancelAction({ ...data, isExplosive, itemid: data.itemId } as unknown as RollData);
-        return false;
-    }
-
-    if (data.type === 'skill' && data.name === 'Dodge') {
-        data.subtype = 'dodge';
-    }
-
-    if ((data.type === 'skill') || (data.type === 'specialization')) {
-        isVisible = !game.settings.get('od6s', 'hide-skill-cards');
-        attribute = (data.actor.items.filter((i: Item) => i.id === data.itemId)[0].system as OD6SSkillItemSystem).attribute.toLowerCase();
-        if (typeof (attribute) === 'undefined') {
-            attribute = null;
-        } else {
-            if (OD6S.flatSkills) {
-                const attributeValues = od6sutilities.getDiceFromScore(data.actor.system.attributes[attribute].score);
-                if (attributeValues.dice === 0) {
-                    ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+            if (typeof distance === 'number') {
+                const bucketRange = bucketRangeFromDistance(distance, weaponRangeTable!, rangeDifficulty);
+                if (bucketRange === null) {
+                    if (isExplosive && item) {
+                        const regionId = item.getFlag('od6s', 'explosiveTemplate') as string | undefined;
+                        if (regionId) {
+                            try { await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]); } catch {/* region already gone */}
+                            await item.unsetFlag('od6s', 'explosiveSet');
+                            await item.unsetFlag('od6s', 'explosiveTemplate');
+                            await item.unsetFlag('od6s', 'explosiveRange');
+                        }
+                    }
+                    ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));
                     return false;
                 }
-                rollValues.dice = (+attributeValues.dice);
-                rollValues.pips = (+attributeValues.pips);
-            }
-        }
-    } else {
-        attribute = null;
-    }
-
-    // See if there are any effects that should add a bonus to a skill roll
-    if (data.type === 'skill') {
-        const skillName = data.actor.items.filter((i: Item) => i.id === data.itemId)[0].name;
-        bonusmod += (+getEffectMod('skill', skillName, data.actor));
-    }
-
-    if (data.type === 'specialization') {
-        const specName = data.actor.items.filter((i: Item) => i.id === data.itemId)[0].name;
-        bonusmod += (+getEffectMod('specialization', specName, data.actor));
-    }
-
-    let fatepointeffect = false;
-
-    if (data.actor.getFlag('od6s', 'fatepointeffect') && canUseFp) {
-        rollValues.dice = (+rollValues.dice) * 2;
-        rollValues.pips = (+rollValues.pips) * 2;
-        fatepointeffect = true;
-    }
-
-    if (data.subtype === 'parry' && data.type === 'weapon') {
-        data.name = data.name + " " + game.i18n.localize('OD6S.PARRY');
-    }
-
-    const canOppose =  ['skill', 'attribute', 'specialization', 'damage', 'resistance', 'toughness'];
-    if (canOppose.includes(data.type)) isOpposable = true;
-    if (data.type === 'action' && canOppose.includes(data.subtype ?? '')) isOpposable = true;
-
-    if (data.type === 'action' &&
-        data.subtype === "meleeattack" &&
-        data.name === game.i18n.localize('OD6S.ACTION_MELEE_ATTACK')) {
-        miscMod += 5;
-        damageScore = (data.actor.system as OD6SCharacterSystem).strengthdamage.score;
-    }
-
-    if (data.subtype === 'rangedattack' ||
-        data.subtype === 'vehiclerangedattack' ||
-        data.subtype === 'vehiclerangedweaponattack') {
-        range = "OD6S.RANGE_SHORT_SHORT";
-
-        const rangeDifficulty = game.settings.get('od6s', 'map_range_to_difficulty');
-        if (targets.length === 1 || (isExplosive && game.settings.get('od6s','auto_explosive'))) {
-            if (data.itemId) {
-                const item = data.actor.items.get(data.itemId);
-                if (typeof (data.token) !== 'undefined' && data.token !== '') {
-                    let distance;
-                    if (isExplosive) {
-                        distance = item?.getFlag('od6s', 'explosiveRange');
-                    } else {
-                        distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
-                    }
-                    const rangeConfig = data.range as { short: number; medium: number; long: number };
-                    const bucket = bucketRangeFromDistance(distance, rangeConfig, rangeDifficulty);
-                    if (bucket === null) {
-                        if (isExplosive) {
-                            const regionId = item?.getFlag('od6s', 'explosiveTemplate');
-                            if (regionId) {
-                                const region = canvas.scene.getEmbeddedDocument('Region', regionId);
-                                if (region) {
-                                    await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]);
-                                }
-                                await item?.unsetFlag('od6s', 'explosiveSet');
-                                await item?.unsetFlag('od6s', 'explosiveTemplate');
-                                await item?.unsetFlag('od6s', 'explosiveRange');
-                            }
-                        }
-                        ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));
-                        return false;
-                    }
-                    range = bucket.range;
-                    if (bucket.difficultyLevel !== null) difficultyLevel = bucket.difficultyLevel;
-                }
-            }
-        }
-
-        if (data.subtype.startsWith('vehicle')) {
-            const vehSys = data.actor.system as OD6SVehicleSystem;
-            const charSys = data.actor.system as OD6SCharacterSystem & { vehicle: { ranged?: { score?: number } } };
-            if (vehSys?.embedded_pilot?.value && typeof ((vehSys?.ranged as OD6SScoreField)?.score) !== 'undefined') {
-                bonusmod += (+(vehSys.ranged as OD6SScoreField).score);
-            } else if (typeof (charSys?.vehicle?.ranged?.score) !== 'undefined') {
-                bonusmod += (+charSys.vehicle.ranged.score);
-            }
-        } else {
-            bonusmod += (+(data.actor.system.ranged as OD6SModField).mod);
-        }
-    }
-
-    if (data.subtype === 'vehicleramattack') {
-        const vehicleData = selectVehicleData(data.actor);
-        if (vehicleData.ram?.score !== undefined) {
-            bonusmod += vehicleData.ram.score;
-        }
-    }
-
-    if (isCharacterActor(data.actor)) {
-        const charSys = data.actor.system;
-        if (data.subtype === 'meleeattack') {
-            bonusmod += charSys.melee.mod;
-        }
-        if (data.subtype === 'brawlattack') {
-            bonusmod += charSys.brawl.mod;
-            canStun = true;
-            damageScore = charSys.strengthdamage.score;
-            stunDamageScore = damageScore;
-            stunDamageType = 'p';
-        }
-        if (data.subtype === 'dodge') bonusmod += charSys.dodge.mod;
-        if (data.subtype === 'parry') bonusmod += charSys.parry.mod;
-        if (data.subtype === 'block') bonusmod += charSys.block.mod;
-    }
-
-    if (OD6S.flatSkills) {
-        bonusdice = { dice: 0, pips: bonusmod };
-    } else {
-        bonusdice = od6sutilities.getDiceFromScore(bonusmod);
-    }
-    const split = splitBonusForPenalty(bonusdice.dice, bonusdice.pips, OD6S.pipsPerDice);
-    bonusdice = { dice: split.bonusDice, pips: split.bonusPips };
-    penaltydice = split.penaltyDice;
-
-    if (OD6S.flatSkills) {
-        bonusdice.pips += flatSkillBonusPips(flatPips, data.score, data.type);
-    }
-
-    if (isAttack) {
-        isVisible = !game.settings.get('od6s', 'hide-combat-cards');
-        if (game.settings.get('od6s', 'dice_for_scale')) {
-            if (scaleMod < 0) {
-                data.score = data.score + (scaleMod * -1);
-                scaleDice = od6sutilities.getDiceFromScore(scaleMod).dice * -1;
-                rollValues.dice = (+rollValues.dice) + (+scaleDice);
+                rangeLabel = bucketRange.range;
+                if (bucketRange.difficultyLevel !== null) difficultyLevel = bucketRange.difficultyLevel;
             }
         }
     }
 
-    if (data.type === 'specialization' || data.type === 'weapon') {
-        if (OD6S.showSkillSpecialization) {
-            const item = data.actor.items.get(data.itemId!);
-            if (typeof (item) !== 'undefined') {
-                if (item.type === 'specialization') {
-                    specSkill = (item.system as OD6SSpecializationItemSystem).skill;
-                } else {
-                    const wsys = item.system as OD6SWeaponItemSystem;
-                    if (data.name === wsys.stats.specialization) {
-                        specSkill = wsys.stats.skill;
-                    }
-                }
-            }
+    // ---- Score adjustments after dispatch: scale / roll_mod / damaged ----
+    let scaleDice = 0;
+    let workingScoreForFinalize = workingScore;
+
+    if (classified.type === 'resistance' && settings.diceForScale) {
+        const sc = data.scale ?? 0;
+        scaleMod = sc;
+        scaleDice = od6sutilities.getDiceFromScore(sc).dice;
+    } else if (isAttackRoll && settings.diceForScale && scaleMod < 0) {
+        // Attacker-smaller: bump score, negative scaleDice flows into otherpenalty.
+        workingScoreForFinalize = workingScore + (scaleMod * -1);
+        scaleDice = od6sutilities.getDiceFromScore(scaleMod).dice * -1;
+    }
+
+    if (data.actor.system.roll_mod !== 0) {
+        workingScoreForFinalize = workingScoreForFinalize + (+data.actor.system.roll_mod);
+    }
+
+    if (classified.type === 'damage' && item) {
+        const wsys = item.system as OD6SWeaponItemSystem | undefined;
+        if (wsys && wsys.damaged > 0) {
+            workingScoreForFinalize -= OD6S.weaponDamage[wsys.damaged].penalty;
         }
     }
 
-    if (data.type === 'damage') {
-        if (data.itemId) {
-            const item = data.actor.items.get(data.itemId);
-            const wsys = item?.system as OD6SWeaponItemSystem | undefined;
-            if (wsys && wsys.damaged > 0) {
-                const score = od6sutilities.getScoreFromDice(rollValues.dice, rollValues.pips) - OD6S.weaponDamage[wsys.damaged].penalty;
-                rollValues.dice = od6sutilities.getDiceFromScore(score).dice;
-                rollValues.pips = od6sutilities.getDiceFromScore(score).pips;
-            }
+    // Flat-skills attribute swap-in for skill / specialization rolls: dice
+    // come from the parent attribute, not the skill score.
+    let flatPips = 0;
+    if (typeof data.flatpips !== 'undefined' && data.flatpips > 0) flatPips = data.flatpips;
+    if (ctx.actionSkillResolved?.flatPips !== undefined) flatPips = ctx.actionSkillResolved.flatPips;
+
+    if ((classified.type === 'skill' || classified.type === 'specialization')
+        && settings.flatSkills
+        && bucketAny.attribute) {
+        const attrKey = bucketAny.attribute as string;
+        const attrScore = +((data.actor.system as { attributes?: Record<string, { score?: number }> })
+            .attributes?.[attrKey]?.score ?? 0);
+        const attrValues = od6sutilities.getDiceFromScore(attrScore);
+        if (attrValues.dice === 0) {
+            ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+            return false;
         }
+        // Score for finalize becomes attribute score (+ roll_mod once).
+        workingScoreForFinalize = attrScore
+            + (data.actor.system.roll_mod !== 0 ? +data.actor.system.roll_mod : 0);
     }
 
-    let seller = '';
-    if (data.type === 'purchase') {
-        seller = data.seller ?? '';
-        data.type = 'funds';
-        data.subtype = 'purchase';
+    // ---- Penalties ----
+    const penalties = computePenalties({
+        rollType: classified.type,
+        actionItemCount: data.actor.itemTypes.action.length,
+        stunsCurrent: isCharacterActor(data.actor) ? (data.actor.system.stuns?.current ?? 0) : 0,
+        woundPenalty: isPenaltyBypassType(classified.type)
+            ? 0
+            : od6sutilities.getWoundPenalty(data.actor),
+    });
+
+    // ---- bonusdice / bonuspips / otherPenalty ----
+    const bonusBase = settings.flatSkills
+        ? { dice: 0, pips: bonusmod }
+        : od6sutilities.getDiceFromScore(bonusmod);
+    const split = splitBonusForPenalty(bonusBase.dice, bonusBase.pips, settings.pipsPerDice);
+    const bonusDice = split.bonusDice;
+    let bonusPips = split.bonusPips;
+    const otherPenalty = split.penaltyDice;
+
+    if (settings.flatSkills) {
+        bonusPips += flatSkillBonusPips(flatPips, workingScore, classified.type);
     }
 
-    if(data.type === 'resistance') {
-        if (game.settings.get('od6s', 'dice_for_scale')) {
-            if (typeof(data.scale) === 'undefined' || data.scale === null) {
-                data.scale = 0;
-            }
-            scaleMod = data.scale;
-            scaleDice = od6sutilities.getDiceFromScore(data.scale).dice;
-        }
+    // ---- Visibility / FP-CP gating / wild die ----
+    const isVisible = deriveVisibility(classified.key, settings, penalties.isBypass);
+    const { canUseFp, canUseCp } = deriveCanUseFpCp(classified.key, settings);
+    const fatepointEffect = !!data.actor.getFlag('od6s', 'fatepointeffect') && canUseFp;
+    const diceMultiplier = fatepointEffect ? 2 : 1;
+
+    // ---- Misc COMMON inputs ----
+    let name = data.name;
+    if (subtype === 'parry' && classified.type === 'weapon') {
+        name = `${data.name} ${game.i18n.localize('OD6S.PARRY')}`;
+    }
+    const vehicleTerrainDifficulty = OD6S.vehicleDifficulty
+        ? 'OD6S.TERRAIN_EASY'
+        : 'OD6S.DIFFICULTY_EASY';
+
+    const wildDie = !!game.settings.get('od6s', 'use_wild_die')
+        && !!(data.actor.system as { use_wild_die?: boolean }).use_wild_die;
+    const showWildDie = !!game.settings.get('od6s', 'use_wild_die');
+
+    // ---- Final bucket overrides for orchestrator-derived fields ----
+    const bucketWithOverrides: typeof bucket = { ...bucket };
+    if ((bucketAny.attackerScale !== undefined) || isAttackRoll) {
+        (bucketWithOverrides as Partial<RollData>).attackerScale = attackerScale;
+    }
+    if (RANGED_BUCKETING_SUBTYPES.has(subtype) || bucketAny.range !== undefined) {
+        (bucketWithOverrides as Partial<RollData>).range = rangeLabel;
+    }
+    if (bucketAny.difficultylevel !== undefined) {
+        (bucketWithOverrides as Partial<RollData>).difficultylevel = difficultyLevel;
+    }
+    if (bucketAny.scaledice !== undefined || classified.type === 'resistance' || isAttackRoll) {
+        (bucketWithOverrides as Partial<RollData>).scaledice = scaleDice;
+    }
+    if (classified.key === 'purchase') {
+        (bucketWithOverrides as Partial<RollData>).seller = data.seller ?? '';
     }
 
-    if(data.actor.system.roll_mod !== 0) {
-        data.score = (+data.score) + (+data.actor.system.roll_mod);
-        rollValues = od6sutilities.getDiceFromScore(data.score);
-    }
-
-    return {
-        label: data.name,
-        title: data.name,
-        dice: rollValues.dice,
-        pips: rollValues.pips,
-        specSkill: specSkill,
-        originaldice: rollValues.dice,
-        originalpips: rollValues.pips,
-        score: data.score,
-        wilddie: game.settings.get('od6s', 'use_wild_die') && data.actor.system.use_wild_die,
-        showWildDie: game.settings.get('od6s', 'use_wild_die'),
-        canusefp: canUseFp,
-        fatepoint: Boolean(false),
-        fatepointeffect: fatepointeffect,
-        characterpoints: 0,
-        canusecp: canUseCp,
-        contact: false,
-        cpcost: 0,
-        cpcostcolor: "black",
-        bonusdice: bonusdice.dice,
-        bonuspips: bonusdice.pips,
-        isvisible: isVisible,
-        isknown: false,
-        isExplosive: isExplosive,
-        type: data.type,
-        subtype: data.subtype ?? '',
-        attribute: attribute,
-        actor: data.actor,
-        token: actorToken as Token | undefined,
-        actionpenalty: actionPenalty,
-        woundpenalty: woundPenalty,
-        stunnedpenalty: stunnedPenalty,
-        otherpenalty: penaltydice,
-        multishot: false,
-        shots: 1,
-        fulldefense: false,
-        itemid: data.itemId ?? '',
-        targets: targets,
-        target: targets[0],
-        timer: 0,
-        damagetype: damageType,
-        damagescore: damageScore,
-        stundamagetype: stunDamageType,
-        stundamagescore: stunDamageScore,
-        damagemodifiers: damageModifiers,
-        difficultylevel: difficultyLevel,
-        isoppasable: isOpposable,
-        difficulty: difficulty,
-        scaledice: scaleDice,
-        seller: seller,
-        vehicle: vehicle,
-        vehiclespeed: 'cruise',
-        vehiclecollisiontype: 't_bone',
-        vehicleterraindifficulty: vehicleTerrainDifficulty,
-        source: damageSource,
-        range: range,
-        template: "systems/od6s/templates/roll.html",
-        only_stun: onlyStun,
-        can_stun: canStun,
-        stun: onlyStun,
-        attackerScale: attackerScale,
-        modifiers: {
-            range: range,
-            attackoption: 'OD6S.ATTACK_STANDARD',
-            calledshot: '',
-            cover: '',
-            coverlight: '',
-            coversmoke: '',
-            miscmod: miscMod,
-            scalemod: scaleMod
-        }
-    };
+    return runFinalize({
+        classified,
+        score: workingScoreForFinalize,
+        name,
+        itemId: data.itemId ?? '',
+        difficulty: data.difficulty ?? 0,
+        difficultyLevel,
+        isExplosive,
+        isVisible,
+        fatepointEffect,
+        canUseFp,
+        canUseCp,
+        wildDie,
+        showWildDie,
+        penalties,
+        otherPenalty,
+        bonusDice,
+        bonusPips,
+        miscMod,
+        scaleMod,
+        range: rangeLabel,
+        vehicleTerrainDifficulty,
+        pipsPerDice: settings.pipsPerDice,
+        diceMultiplier,
+        actorRef: data.actor,
+        tokenRef: actorToken,
+        targetsRef: targets,
+        targetRef: targets[0],
+        bucket: bucketWithOverrides,
+    });
 }

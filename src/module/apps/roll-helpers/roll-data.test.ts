@@ -91,7 +91,6 @@ describe('classifyRoll', () => {
             ['mortally_wounded', 'mortally_wounded'],
             ['incapacitated', 'incapacitated'],
             ['funds', 'funds'],
-            ['brawlattack', 'brawlattack'],
             // Top-level attribute roll (Actor.rollAttribute) — distinct from
             // action+attribute, which is dispatched via the action handler.
             ['attribute', 'attribute'],

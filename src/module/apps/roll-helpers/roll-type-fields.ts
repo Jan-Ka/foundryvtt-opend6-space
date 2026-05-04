@@ -102,11 +102,6 @@ export const ROLL_TYPE_FIELDS = {
     'funds': [],
     'purchase': ['seller'],
 
-    'brawlattack': [
-        'damagetype', 'damagescore', 'stundamagetype', 'stundamagescore',
-        'can_stun', 'attackerScale',
-    ],
-
     // Top-level attribute roll (Actor.rollAttribute). Flows through
     // setupRollData with no type-specific writes; score/dice come from input.
     'attribute': [],
@@ -156,9 +151,6 @@ export const ROLL_TYPE_FIELDS = {
 //                                     roll itself has a rules basis or is purely a status check
 // funds                             : funds-determination, equipment-purchase-mechanics
 // purchase                          : funds-determination, equipment-purchase-mechanics
-// brawlattack                       : attacking-and-defending, step-3-determining-damage,
-//                                     determining-strength-damage  ?  legacy top-level alias of
-//                                     action-brawlattack — candidate for removal if no caller routes here
 // attribute                         : skill-check, attribute-dice-distribution
 //
 // ---- Behaviors in roll-setup.ts with no apparent rules backing ----

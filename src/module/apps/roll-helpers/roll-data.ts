@@ -249,7 +249,6 @@ export type RollTypeKey =
     | 'incapacitated'
     | 'funds'
     | 'purchase'
-    | 'brawlattack'
     | 'attribute';
 
 /** Canonical post-normalization roll types. Output of classifyRoll. */
@@ -258,7 +257,7 @@ export type CanonicalRollType =
     | 'action' | 'skill' | 'specialization'
     | 'damage' | 'resistance'
     | 'mortally_wounded' | 'incapacitated'
-    | 'funds' | 'brawlattack' | 'attribute';
+    | 'funds' | 'attribute';
 
 export interface ClassifiedRoll {
     type: CanonicalRollType;
@@ -343,7 +342,7 @@ function isCanonicalType(type: string): type is CanonicalRollType {
         case 'action': case 'skill': case 'specialization':
         case 'damage': case 'resistance':
         case 'mortally_wounded': case 'incapacitated':
-        case 'funds': case 'brawlattack': case 'attribute':
+        case 'funds': case 'attribute':
             return true;
         default:
             return false;
@@ -363,7 +362,6 @@ function deriveRollTypeKey(type: CanonicalRollType, subtype: string): RollTypeKe
         case 'mortally_wounded': return 'mortally_wounded';
         case 'incapacitated': return 'incapacitated';
         case 'funds': return subtype === 'purchase' ? 'purchase' : 'funds';
-        case 'brawlattack': return 'brawlattack';
         case 'attribute': return 'attribute';
         case 'action':
             switch (subtype) {
