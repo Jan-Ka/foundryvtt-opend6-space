@@ -94,7 +94,7 @@ function basicRangedWeapon(overrides: Partial<ItemView> = {}): ItemView {
 }
 
 describe('weapon handler — happy path', () => {
-    it('passes through damage type, score, source, and range from the weapon item', () => {
+    it('passes through damage type, score, source from the weapon item; emits the rules-default range label (resolution to a distance-based bucket happens downstream)', () => {
         const out = HANDLERS['weapon'](
             makeInput('weapon', 'Test Blaster'),
             makeCtx(basicRangedWeapon()),
@@ -102,7 +102,16 @@ describe('weapon handler — happy path', () => {
         expect(out.damagetype).toBe('e');
         expect(out.damagescore).toBe(12);
         expect(out.source).toBe('Test Blaster');
-        expect(out.range).toEqual({ short: 10, medium: 30, long: 60 });
+        expect(out.range).toBe('OD6S.RANGE_SHORT_SHORT');
+    });
+
+    it('emits the point-blank range label for melee subtype', () => {
+        const melee = basicRangedWeapon({ range: false });
+        const out = HANDLERS['weapon'](
+            makeInput('weapon', 'X', 'meleeattack'),
+            makeCtx(melee),
+        );
+        expect(out.range).toBe('OD6S.RANGE_POINT_BLANK_SHORT');
     });
 
     it('uses weapon scale when set, falling back to actor scale otherwise', () => {

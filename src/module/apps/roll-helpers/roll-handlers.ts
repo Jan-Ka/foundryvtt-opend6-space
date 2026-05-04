@@ -21,6 +21,13 @@
 import type { ClassifiedRoll, IncomingRollData, Localize, RollData, RollTypeKey } from './roll-data';
 import type { ROLL_TYPE_FIELDS } from './roll-type-fields';
 import { getDiceFromScore } from '../../system/utilities/dice';
+import type { Modifier } from './difficulty-math';
+import {
+    applyWeaponMods,
+    buildDamagedWeaponModifier,
+    buildStrengthDamageModifier,
+    computeStunFlags,
+} from './weapon-context-math';
 
 export type HandlerOutput<K extends RollTypeKey> =
     Pick<RollData, (typeof ROLL_TYPE_FIELDS)[K][number]>;
@@ -200,21 +207,114 @@ const brawlattackDeadPathHandler: Handler<'brawlattack'> = () => {
     );
 };
 
-const resistanceVehicleToughnessHandler: Handler<'resistance-vehicletoughness'> = (input, ctx) => {
-    const vehicleUuid =
-        ctx.actor.type === 'vehicle' || ctx.actor.type === 'starship'
-            ? ctx.actor.uuid
-            : ctx.actor.vehicle?.uuid ?? '';
+const vehicleUuidForActor = (actor: ActorView): string =>
+    actor.type === 'vehicle' || actor.type === 'starship'
+        ? actor.uuid
+        : actor.vehicle?.uuid ?? '';
+
+const characterStrengthDamage = (actor: ActorView): number =>
+    (actor.type === 'character' || actor.type === 'npc') ? actor.strengthDamage ?? 0 : 0;
+
+type WeaponBucketCommon = Pick<RollData,
+    'damagetype' | 'damagescore' | 'stundamagetype' | 'stundamagescore' |
+    'damagemodifiers' | 'source' | 'range' | 'difficultylevel' |
+    'only_stun' | 'can_stun' | 'stun' | 'attackerScale' | 'specSkill'
+>;
+
+function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBucketCommon {
+    const item = ctx.item ?? {} as ItemView;
+    const weaponDamageScore = item.damage?.score ?? 0;
+    const weaponDamageType = item.damage?.type ?? '';
+    const isMelee = input.subtype === 'meleeattack';
+
+    let damagescore = weaponDamageScore;
+    let stundamagescore = item.stun?.score ?? 0;
+    if (isMelee && item.damage?.str) {
+        damagescore = weaponDamageScore + characterStrengthDamage(ctx.actor);
+        if (stundamagescore > 0) {
+            stundamagescore = stundamagescore + characterStrengthDamage(ctx.actor);
+        }
+    }
+
+    // applyWeaponMods folds weapon mod totals into damagescore. miscMod and
+    // bonusmod also flow through it in the original code but those land on
+    // COMMON-side accumulators, so they're discarded here — bucket discipline.
+    const modded = applyWeaponMods(
+        { damageScore: damagescore, miscMod: 0, bonusmod: 0 },
+        {
+            damage: item.mods?.dmg?.score ?? 0,
+            difficulty: item.mods?.misc?.score ?? 0,
+            attack: item.mods?.bonus?.score ?? 0,
+        },
+    );
+    damagescore = modded.damageScore;
+
+    const { onlyStun, canStun } = computeStunFlags({
+        stunOnly: item.stun?.stun_only,
+        weaponStunScore: item.stun?.score ?? 0,
+        isExplosive: false, // explosive preflight is upstream of dispatch
+        explosiveZonesEnabled: ctx.settings.explosiveZones,
+        blastZone1StunDamage: item.blast_radius?.['1']?.stun_damage ?? 0,
+    });
+
+    const damagemodifiers: Modifier[] = [];
+    const damagedMod = buildDamagedWeaponModifier(item.damaged ?? 0, ctx.settings.weaponDamageTable);
+    if (damagedMod) damagemodifiers.push(damagedMod);
+    if (item.damage?.muscle) {
+        damagemodifiers.push(buildStrengthDamageModifier(characterStrengthDamage(ctx.actor)));
+    }
+
+    const difficultylevel = ctx.settings.meleeDifficulty
+        ? (item.difficulty ?? 'OD6S.DIFFICULTY_EASY')
+        : 'OD6S.DIFFICULTY_EASY';
+
+    const specSkill =
+        ctx.settings.showSkillSpecialization && item.stats?.specialization === input.name
+            ? item.stats?.skill ?? ''
+            : '';
+
     return {
-        scaledice: scaleToDice(input, ctx),
-        vehicle: vehicleUuid,
+        damagetype: weaponDamageType,
+        damagescore,
+        stundamagetype: item.stun?.type ?? '',
+        stundamagescore,
+        damagemodifiers,
+        source: item.name ?? '',
+        // Range LABEL, not the per-band table (which is on input.range). The
+        // distance-to-target resolution (via bucketRangeFromDistance) happens
+        // downstream — handler emits the rules-default initial label.
+        range: input.subtype === 'meleeattack'
+            ? 'OD6S.RANGE_POINT_BLANK_SHORT'
+            : 'OD6S.RANGE_SHORT_SHORT',
+        difficultylevel,
+        only_stun: onlyStun,
+        can_stun: canStun,
+        // `stun` is a legacy duplicate of `only_stun` in RollData. Phase 3 cleanup.
+        stun: onlyStun,
+        attackerScale: item.scale?.score ?? 0,
+        specSkill,
     };
-};
+}
+
+const weaponHandler: Handler<'weapon'> = (input, ctx) => buildWeaponBucket(input, ctx);
+
+const starshipWeaponHandler: Handler<'starship-weapon'> = (input, ctx) =>
+    buildWeaponBucket(input, ctx);
+
+const vehicleWeaponHandler: Handler<'vehicle-weapon'> = (input, ctx) => ({
+    ...buildWeaponBucket(input, ctx),
+    vehicle: vehicleUuidForActor(ctx.actor),
+});
+
+const resistanceVehicleToughnessHandler: Handler<'resistance-vehicletoughness'> = (input, ctx) => ({
+    scaledice: scaleToDice(input, ctx),
+    vehicle: vehicleUuidForActor(ctx.actor),
+});
 
 export const HANDLERS = {
-    'weapon': notImplemented('weapon'),
-    'starship-weapon': notImplemented('starship-weapon'),
-    'vehicle-weapon': notImplemented('vehicle-weapon'),
+    'weapon': weaponHandler,
+    'starship-weapon': starshipWeaponHandler,
+    'vehicle-weapon': vehicleWeaponHandler,
 
     'action-meleeattack': notImplemented('action-meleeattack'),
     'action-brawlattack': notImplemented('action-brawlattack'),
