@@ -112,6 +112,106 @@ export const ROLL_TYPE_FIELDS = {
     'attribute': [],
 } as const satisfies Record<RollTypeKey, readonly (keyof RollData)[]>;
 
+// ---- Phase 0 (#98): RollTypeKey → governing rule ids ----
+//
+// Maps each handler key to the rule ids in the (gitignored) rules reference
+// that govern its behavior. Rule ids only — no rule text. The mapping is the
+// design spec the upcoming handlers (and their domain tests) are written
+// against; if a handler ends up needing logic not covered by the listed
+// rules, the discrepancy is the signal to either extend this map or remove
+// the unbacked behavior.
+//
+// `?` after an id = best-guess assignment, needs user confirmation before
+// Phase 1 tests rely on it.
+//
+// weapon                            : attacking-and-defending, base-combat-difficulty,
+//                                     combat-difficulty-modifiers-range, step-3-determining-damage,
+//                                     determining-strength-damage
+// starship-weapon                   : scale, step-3-determining-damage, combat-difficulty-modifiers-range,
+//                                     ship-weapons
+// vehicle-weapon                    : scale, step-3-determining-damage, combat-difficulty-modifiers-range,
+//                                     vehicle-damage
+// action-meleeattack                : attacking-and-defending, combat-difficulty-modifiers-range,
+//                                     skill-base-mechanics
+// action-brawlattack                : attacking-and-defending, step-3-determining-damage,
+//                                     determining-strength-damage
+// action-rangedattack               : attacking-and-defending, combat-difficulty-modifiers-range,
+//                                     combat-difficulty-modifiers-cover, base-combat-difficulty
+// action-vehiclerangedattack        : scale, combat-difficulty-modifiers-range, vehicle-damage
+// action-vehiclerangedweaponattack  : scale, step-3-determining-damage, combat-difficulty-modifiers-range
+// action-vehicleramattack           : ramming, scale, vehicle-damage, step-3-determining-damage
+// action-attribute                  : skill-check, base-combat-difficulty
+// action-other                      : skill-check, base-combat-difficulty  ?  fallback bucket — verify
+//                                     no current caller depends on action-other doing anything
+//                                     beyond a generic skill-check
+// skill                             : skill-base-mechanics, skill-check
+// skill-dodge                       : attacking-and-defending, active-defense, skill-base-mechanics
+// specialization                    : specialization-in-skills, skill-check
+// damage                            : step-3-determining-damage, body-points-damage-application
+// resistance                        : damage-resistance-total-body-points,
+//                                     damage-resistance-total-wound-levels
+// resistance-vehicletoughness       : scale, damage-resistance-total-body-points, vehicle-damage
+// mortally_wounded                  : unconsciousness-and-death, wound-level-effects
+// incapacitated                     : wound-level-effects  ?  largely UI/state — confirm whether the
+//                                     roll itself has a rules basis or is purely a status check
+// funds                             : funds-determination, equipment-purchase-mechanics
+// purchase                          : funds-determination, equipment-purchase-mechanics
+// brawlattack                       : attacking-and-defending, step-3-determining-damage,
+//                                     determining-strength-damage  ?  legacy top-level alias of
+//                                     action-brawlattack — candidate for removal if no caller routes here
+// attribute                         : skill-check, attribute-dice-distribution
+//
+// ---- Behaviors in roll-setup.ts with no apparent rules backing ----
+//
+// Each entry is a candidate for removal during the rewrite. `?` = confirm
+// with user before deletion. References use ids defined above.
+//
+// 1. roll-setup.ts:451 — `miscMod += 5` is added when action.subtype is
+//    'meleeattack' AND the localized name matches OD6S.ACTION_MELEE_ATTACK.
+//    Hardcoded +5 with no entry in attacking-and-defending or
+//    combat-difficulty-modifiers-range.  ?  confirm — looks like a fudge
+//    distinguishing "generic action menu melee" from "weapon item melee".
+//
+// 2. roll-setup.ts:434–438 — `actor.getFlag('od6s','fatepointeffect')`
+//    auto-doubles dice+pips when canUseFp. fate-points permits FP spending
+//    for bonuses but doesn't define an "always-on" flag with no cost.  ?
+//    confirm whether the flag represents a deferred-cost UI state or a
+//    rules-unsanctioned freebie.
+//
+// 3. roll-setup.ts:153 (approx) — melee range "fudge" derived from token
+//    widths and grid size. Pure Foundry grid geometry, not a rules concern;
+//    keep as a UI helper but separate from rules math.
+//
+// 4. roll-setup.ts:547–551 — when `dice_for_scale` is on and `scaleMod < 0`,
+//    score is increased by |scaleMod| AND scaleDice is set to a negative
+//    dice count. The scale rule defines modifier application to
+//    difficulty/damage/resistance but not this combined score-bump +
+//    negative-dice substitution.  ?  confirm whether dice_for_scale is a
+//    house-rule setting layered on top of the official scale rule.
+//
+// 5. roll-setup.ts:596–597 — resistance path always converts positive scale
+//    to dice unconditionally; attacks (item 4) branch on sign. Asymmetry
+//    not justified by scale rule.  ?  same disposition as item 4.
+//
+// 6. roll-setup.ts:601–603 — `actor.system.roll_mod` is added to score at
+//    the very end. No rule defines a flat global per-actor modifier.  ?
+//    confirm intent (house-rule slot? debug aid? legacy?).
+//
+// 7. roll-setup.ts:440–442 — appends localized "Parry" to weapon name when
+//    `subtype === 'parry'`, but classifyRoll never produces that subtype.
+//    Likely dead code; remove during rewrite.
+//
+// 8. roll-setup.ts:444 — `canOppose` list includes 'toughness', but no
+//    RollTypeKey produces type='toughness'. Either dead, or the list should
+//    use 'resistance-vehicletoughness' / canonical 'resistance'. Remove or
+//    correct during rewrite.
+//
+// 9. roll-setup.ts:556–569 — `specSkill` populated only when
+//    `OD6S.showSkillSpecialization` setting is true. The specialization
+//    rule doesn't gate skill-link visibility on a setting.  ?  confirm
+//    whether this is a UI display choice (keep, move to view layer) or
+//    rules-relevant (move into the handler input contract).
+//
 // ---- Compile-time partition invariants ----
 //
 // These types resolve to `never` iff the partition is well-formed; if any
