@@ -29,8 +29,7 @@ import {
     computeStunFlags,
     ramAttackContribution,
 } from './weapon-context-math';
-import type { ActionSkill } from './action-math';
-import { resolveSkillBackedAction } from './action-math';
+import type { ActionResolution } from './action-math';
 
 export type HandlerOutput<K extends RollTypeKey> =
     Pick<RollData, (typeof ROLL_TYPE_FIELDS)[K][number]>;
@@ -174,12 +173,18 @@ export interface HandlerContext {
     settings: RollSettingsView;
     localize: Localize;
     /**
-     * Pre-resolved skill backing for skill-backed action handlers
-     * (action-meleeattack / action-brawlattack). The orchestrator looks up the
-     * actor's skill item by the action's configured skill name and projects it
-     * here; null when no matching skill item exists.
+     * Pre-resolved skill-backed action result for action-meleeattack /
+     * action-brawlattack. The orchestrator runs `resolveSkillBackedAction`
+     * once at the boundary (Audit E: deduplicates the call so `flatPips` can
+     * be reused for the COMMON-side bonusdice computation) and stashes the
+     * result here. Handlers read `score` (and optionally `flatPips`) without
+     * reaching for skill / attribute fields themselves.
+     *
+     * Null/undefined when the actor isn't a character or no resolution is
+     * applicable; handlers default to score 0 in that case (the action-* keys
+     * that need this only fire for character-piloted paths).
      */
-    actionSkill?: ActionSkill | null;
+    actionSkillResolved?: ActionResolution | null;
     /**
      * Vehicle stats for vehicle-action handlers when the actor is a character
      * piloting a vehicle (the orchestrator dereferences `actor.system.vehicle`
@@ -233,20 +238,6 @@ const attributeHandler: Handler<'attribute'> = () => ({});
 const purchaseHandler: Handler<'purchase'> = (input) => ({
     seller: input.seller ?? '',
 });
-
-/**
- * Top-level `brawlattack` is unreachable in the current code: Actor.rollAction
- * wraps brawl rolls as `{type: 'action', subtype: 'brawlattack'}`, which the
- * classifier routes to action-brawlattack. The classifier still accepts a
- * top-level `brawlattack`, but no caller produces one. Phase 3 removes the
- * key from RollTypeKey entirely; until then this throws to surface any
- * caller that resurrects the path.
- */
-const brawlattackDeadPathHandler: Handler<'brawlattack'> = () => {
-    throw new Error(
-        'brawlattack: unreachable dead path — route brawl rolls through action-brawlattack',
-    );
-};
 
 const vehicleUuidForActor = (actor: ActorView): string =>
     actor.type === 'vehicle' || actor.type === 'starship'
@@ -402,31 +393,16 @@ const actionVehicleRangedAttackHandler: Handler<'action-vehiclerangedattack'> = 
     vehicle: vehicleUuidForActor(ctx.actor),
 });
 
-const actionMeleeAttackHandler: Handler<'action-meleeattack'> = (_input, ctx) => {
-    const resolved = resolveSkillBackedAction({
-        skill: ctx.actionSkill ?? null,
-        attributes: characterAttributes(ctx.actor),
-        flatSkills: ctx.settings.flatSkills,
-        // Melee uses AGI per the rules; not a configurable setting.
-        fallbackAttributeKey: 'agi',
-    });
-    return {
-        score: resolved.score,
-        attackerScale: actorScale(ctx.actor),
-        damagescore: characterStrengthDamage(ctx.actor),
-    };
-};
+const actionMeleeAttackHandler: Handler<'action-meleeattack'> = (_input, ctx) => ({
+    score: ctx.actionSkillResolved?.score ?? 0,
+    attackerScale: actorScale(ctx.actor),
+    damagescore: characterStrengthDamage(ctx.actor),
+});
 
 const actionBrawlAttackHandler: Handler<'action-brawlattack'> = (_input, ctx) => {
-    const resolved = resolveSkillBackedAction({
-        skill: ctx.actionSkill ?? null,
-        attributes: characterAttributes(ctx.actor),
-        flatSkills: ctx.settings.flatSkills,
-        fallbackAttributeKey: ctx.settings.brawlAttribute,
-    });
     const str = characterStrengthDamage(ctx.actor);
     return {
-        score: resolved.score,
+        score: ctx.actionSkillResolved?.score ?? 0,
         attackerScale: actorScale(ctx.actor),
         damagetype: 'p',
         damagescore: str,
@@ -450,8 +426,25 @@ const actionVehicleRamAttackHandler: Handler<'action-vehicleramattack'> = (_inpu
     };
 };
 
-const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweaponattack'> = (_input, ctx) => {
-    const item = ctx.item ?? {} as ItemView;
+const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweaponattack'> = (input, ctx) => {
+    // B2: character-fallback path. crew-vehicle.ts (rolling a vehicle weapon
+    // from a character pilot's sheet) passes the weapon's damage/damage_type/
+    // name on IncomingRollData when the embedded vehicle weapon item can't be
+    // resolved on the character actor. The adapter doesn't see an item; the
+    // handler reads from `input` instead. Vehicle scale comes from
+    // ctx.vehicleStats (orchestrator pre-resolved at the boundary).
+    if (!ctx.item) {
+        return {
+            damagetype: input.damage_type ?? '',
+            damagescore: input.damage ?? 0,
+            source: input.name ?? '',
+            range: 'OD6S.RANGE_SHORT_SHORT',
+            difficultylevel: defaultDifficultyLabel(ctx.settings),
+            attackerScale: vehicleScaleForActor(ctx.actor, ctx),
+            vehicle: vehicleUuidForActor(ctx.actor),
+        };
+    }
+    const item = ctx.item;
     const baseDamage = item.damage?.score ?? 0;
     const modded = applyWeaponMods(
         { damageScore: baseDamage, miscMod: 0, bonusmod: 0 },
@@ -506,6 +499,5 @@ export const HANDLERS = {
     'funds': fundsHandler,
     'purchase': purchaseHandler,
 
-    'brawlattack': brawlattackDeadPathHandler,
     'attribute': attributeHandler,
 } as const satisfies { [K in RollTypeKey]: Handler<K> };

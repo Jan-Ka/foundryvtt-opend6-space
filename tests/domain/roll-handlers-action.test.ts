@@ -52,7 +52,7 @@ import type {
     ItemView,
     RollSettingsView,
 } from '../../src/module/apps/roll-helpers/roll-handlers';
-import type { ActionSkill } from '../../src/module/apps/roll-helpers/action-math';
+import type { ActionResolution } from '../../src/module/apps/roll-helpers/action-math';
 import type { RollTypeKey } from '../../src/module/apps/roll-helpers/roll-data';
 
 type ActionSubtype =
@@ -206,34 +206,34 @@ describe('action-vehiclerangedattack handler', () => {
 });
 
 describe('action-meleeattack handler', () => {
-    it('uses skill-backed score resolution and sets damagescore to actor strength damage (no +5 — see RFC #100)', () => {
-        const skill: ActionSkill = { score: 6, attributeKey: 'str' };
+    it('reads pre-resolved score from ctx.actionSkillResolved and sets damagescore to actor strength damage (no +5 — see RFC #100)', () => {
+        const resolved: ActionResolution = { score: 15 }; // 6 (skill) + 9 (str)
         const out = HANDLERS['action-meleeattack'](
             makeInput('meleeattack', { name: 'OD6S.ACTION_MELEE_ATTACK' }),
-            makeCtx({ actor: characterWithAttrs(), actionSkill: skill }),
+            makeCtx({ actor: characterWithAttrs(), actionSkillResolved: resolved }),
         );
-        expect(out.score).toBe(15); // 6 (skill) + 9 (str)
+        expect(out.score).toBe(15);
         expect(out.damagescore).toBe(6); // actor.strengthDamage
         expect(out.attackerScale).toBe(0);
     });
 
-    it('falls back to AGI (rules-fixed for melee combat) when no skill item is present', () => {
+    it('defaults score to 0 when no resolution is supplied (orchestrator owns the AGI fallback)', () => {
         const out = HANDLERS['action-meleeattack'](
             makeInput('meleeattack'),
-            makeCtx({ actor: characterWithAttrs(), actionSkill: null }),
+            makeCtx({ actor: characterWithAttrs(), actionSkillResolved: null }),
         );
-        expect(out.score).toBe(12); // agi
+        expect(out.score).toBe(0);
     });
 });
 
 describe('action-brawlattack handler', () => {
     it('produces physical damage and stun at strength damage with can_stun true', () => {
-        const skill: ActionSkill = { score: 3, attributeKey: 'str' };
+        const resolved: ActionResolution = { score: 12 }; // 3 + 9
         const out = HANDLERS['action-brawlattack'](
             makeInput('brawlattack'),
-            makeCtx({ actor: characterWithAttrs(), actionSkill: skill }),
+            makeCtx({ actor: characterWithAttrs(), actionSkillResolved: resolved }),
         );
-        expect(out.score).toBe(12); // 3 + 9
+        expect(out.score).toBe(12);
         expect(out.damagetype).toBe('p');
         expect(out.damagescore).toBe(6); // strengthDamage
         expect(out.stundamagetype).toBe('p');
@@ -317,5 +317,27 @@ describe('action-vehiclerangedweaponattack handler', () => {
             }),
         );
         expect(out.attackerScale).toBe(3);
+    });
+
+    it('B2: when ctx.item is missing (character-pilot fallback), reads damage/damage_type/name from input and vehicle scale from ctx.vehicleStats', () => {
+        const pilot = characterWithAttrs({ vehicle: { uuid: 'Actor.embedded' } });
+        const out = HANDLERS['action-vehiclerangedweaponattack'](
+            makeInput('vehiclerangedweaponattack', {
+                itemId: 'Item.unresolvable',
+                damage: 15,
+                damage_type: 'e',
+                name: 'Pilot Vehicle Weapon',
+            }),
+            makeCtx({
+                actor: pilot,
+                vehicleStats: { scale: { score: 6 } },
+                // intentionally no item — exercises the fallback branch
+            }),
+        );
+        expect(out.damagetype).toBe('e');
+        expect(out.damagescore).toBe(15);
+        expect(out.source).toBe('Pilot Vehicle Weapon');
+        expect(out.attackerScale).toBe(6);
+        expect(out.vehicle).toBe('Actor.embedded');
     });
 });

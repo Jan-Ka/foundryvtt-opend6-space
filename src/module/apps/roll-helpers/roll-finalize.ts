@@ -67,8 +67,14 @@ export interface FinalizeInput<K extends RollTypeKey> {
     penalties: Penalties;
     /** Extra penalty (from negative scaleMod under dice_for_scale, etc.). */
     otherPenalty: number;
-    /** Accumulated bonusmod (active effects + handler-side contributions). */
-    bonusmod: number;
+    /**
+     * Pre-split bonus dice / pips. Orchestrator computes via
+     * `splitBonusForPenalty` (negative bonus folds into `otherPenalty`) and
+     * augments `bonusPips` with `flatSkillBonusPips` in flat-skills mode.
+     * Finalize is a passive forwarder for these.
+     */
+    bonusDice: number;
+    bonusPips: number;
     /** Misc modifier (weapon mods difficulty, +5 magic constants if any, etc.). */
     miscMod: number;
     /** Scale modifier between attacker and defender (post-resolution). */
@@ -79,6 +85,18 @@ export interface FinalizeInput<K extends RollTypeKey> {
     vehicleTerrainDifficulty: string;
     /** Pips per die (3 in standard OpenD6). */
     pipsPerDice: number;
+    /**
+     * Post-conversion dice multiplier (default 1). When the FP-in-effect flag
+     * doubles the roll, orchestrator passes `2`; finalize multiplies BOTH
+     * `dice` and `pips` AND the matching `originaldice`/`originalpips` after
+     * `score → dice/pips` conversion. This keeps `originaldice` aligned with
+     * the doubled values execute also re-doubles from on its FP path.
+     *
+     * Splitting score-derived dice from the multiplier closes the Audit-A
+     * timeline bug where damaged-weapon penalties / `roll_mod` re-derives
+     * could overwrite an earlier doubling.
+     */
+    diceMultiplier?: number;
     /** Opaque Foundry actor/token/targets refs — passed through unchanged. */
     actorRef: unknown;
     tokenRef: unknown;
@@ -89,8 +107,12 @@ export interface FinalizeInput<K extends RollTypeKey> {
 }
 
 export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): RollData {
-    const dicePips = getDiceFromScore(input.score, input.pipsPerDice);
-    const bonusDicePips = getDiceFromScore(input.bonusmod, input.pipsPerDice);
+    const baseDice = getDiceFromScore(input.score, input.pipsPerDice);
+    const multiplier = input.diceMultiplier ?? 1;
+    const dicePips = {
+        dice: baseDice.dice * multiplier,
+        pips: baseDice.pips * multiplier,
+    };
 
     const isOppasable =
         OPPOSABLE_TYPES.has(input.classified.type)
@@ -106,8 +128,8 @@ export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): Rol
         pips: dicePips.pips,
         originaldice: dicePips.dice,
         originalpips: dicePips.pips,
-        bonusdice: bonusDicePips.dice,
-        bonuspips: bonusDicePips.pips,
+        bonusdice: input.bonusDice,
+        bonuspips: input.bonusPips,
         score: input.score,
 
         // Wild die / FP / CP flags

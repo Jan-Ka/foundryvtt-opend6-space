@@ -38,7 +38,8 @@ function baseInput<K extends RollTypeKey>(
         showWildDie: false,
         penalties: noPenalties,
         otherPenalty: 0,
-        bonusmod: 0,
+        bonusDice: 0,
+        bonusPips: 0,
         miscMod: 0,
         scaleMod: 0,
         range: 'OD6S.RANGE_POINT_BLANK_SHORT',
@@ -65,11 +66,35 @@ describe('runFinalize — score → dice/pips conversion', () => {
         expect(out.originalpips).toBe(2);
     });
 
-    it('converts bonusmod to bonusdice/bonuspips the same way', () => {
+    it('applies diceMultiplier=2 (FP-in-effect) to dice/pips and originaldice/originalpips', () => {
         const out = runFinalize(baseInput<"skill">({
             classified: classified('skill', '', 'skill'),
             bucket: { attribute: 'agi' },
-            bonusmod: 7,
+            score: 14, // → 4D+2
+            diceMultiplier: 2,
+        }));
+        expect(out.dice).toBe(8);
+        expect(out.pips).toBe(4);
+        expect(out.originaldice).toBe(8);
+        expect(out.originalpips).toBe(4);
+    });
+
+    it('treats missing diceMultiplier as 1 (no doubling)', () => {
+        const out = runFinalize(baseInput<"skill">({
+            classified: classified('skill', '', 'skill'),
+            bucket: { attribute: 'agi' },
+            score: 14,
+        }));
+        expect(out.dice).toBe(4);
+        expect(out.pips).toBe(2);
+    });
+
+    it('forwards precomputed bonusDice/bonusPips unchanged', () => {
+        const out = runFinalize(baseInput<"skill">({
+            classified: classified('skill', '', 'skill'),
+            bucket: { attribute: 'agi' },
+            bonusDice: 2,
+            bonusPips: 1,
         }));
         expect(out.bonusdice).toBe(2);
         expect(out.bonuspips).toBe(1);

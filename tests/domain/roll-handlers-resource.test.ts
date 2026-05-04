@@ -1,23 +1,15 @@
 /**
  * Domain tests — resource / legacy family roll handlers (#98 phase 1).
  *
- * Covers funds, purchase, attribute (top-level), and brawlattack
- * (top-level — documented dead). Buckets are minimal:
- *   funds / attribute        — empty (rules-defined work is on the COMMON
- *                              path: visibility, fp/cp gating, etc.)
- *   purchase                 — `seller` only
- *   brawlattack (top-level)  — UNREACHABLE: classifier accepts it but no
- *                              caller produces it; brawl rolls always wrap
- *                              as action-brawlattack via Actor.rollAction.
- *                              Phase 3 removes the key entirely; for now
- *                              the handler throws to surface any caller
- *                              that resurrects the path.
+ * Covers funds, purchase, and top-level attribute. Buckets are minimal:
+ *   funds / attribute  — empty (rules-defined work is on the COMMON path:
+ *                        visibility, fp/cp gating, etc.)
+ *   purchase           — `seller` only
  *
  * Rules referenced (ids only):
  *   funds       — funds-determination, equipment-purchase-mechanics
  *   purchase    — funds-determination, equipment-purchase-mechanics
  *   attribute   — skill-check, attribute-dice-distribution
- *   brawlattack — n/a (dead path)
  */
 
 import { describe, expect, it } from 'vitest';
@@ -51,7 +43,7 @@ function makeCtx(settings?: Partial<RollSettingsView>): HandlerContext {
     };
 }
 
-function makeInput(key: 'funds' | 'purchase' | 'attribute' | 'brawlattack', extras: Partial<HandlerInput> = {}): HandlerInput {
+function makeInput(key: 'funds' | 'purchase' | 'attribute', extras: Partial<HandlerInput> = {}): HandlerInput {
     const type = key === 'purchase' ? 'funds' : key;
     const subtype = key === 'purchase' ? 'purchase' : '';
     return {
@@ -96,10 +88,3 @@ describe('attribute handler', () => {
     });
 });
 
-describe('brawlattack handler (top-level — documented dead)', () => {
-    it('throws — top-level brawlattack is unreachable; rolls go through action-brawlattack', () => {
-        expect(() => HANDLERS['brawlattack'](makeInput('brawlattack'), makeCtx())).toThrow(
-            /unreachable|dead|action-brawlattack/i,
-        );
-    });
-});
