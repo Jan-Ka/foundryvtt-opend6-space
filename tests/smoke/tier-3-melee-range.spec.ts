@@ -11,9 +11,12 @@
  *
  *   - far target  → gate cancels, OD6S.OUT_OF_MELEE_BRAWL_RANGE warn fires,
  *                   no RollDialog opens, no chat message is created.
- *   - near target → gate passes, RollDialog opens, submit produces a chat
- *                   message (control case proving the gate is what stops
- *                   the far-target roll, not unrelated breakage).
+ *   - same-cell target → gate passes (distance === 0 guard short-circuits),
+ *                   RollDialog opens, submit produces a chat message.
+ *                   Control case proving the gate is what stops the far-
+ *                   target roll, not unrelated breakage. Same-cell rather
+ *                   than adjacent so the test doesn't depend on the smoke
+ *                   world's `canvas.grid.distance` unit (1 vs 5).
  *
  * The gate only applies when `OD6S.meleeRange` is true and the classified
  * subtype is `meleeattack` / `brawlattack`. We toggle the `melee_range`
@@ -33,9 +36,9 @@ type GateResult = {
 
 async function runMeleeRoll(
     page: import("@playwright/test").Page,
-    targetX: number,
+    targetCells: number,
 ): Promise<GateResult> {
-    return await evalInWorld(page, async (args: {targetX: number}) => {
+    return await evalInWorld(page, async (args: {targetCells: number}) => {
         const errs: string[] = [];
         const onRej = (e: PromiseRejectionEvent) =>
             errs.push("rej: " + (e.reason?.message ?? String(e.reason)));
@@ -103,9 +106,16 @@ async function runMeleeRoll(
                 scene = await window.Scene.create({name: "test-scene"});
             }
             await scene.activate();
-            // Wait for canvas to draw the active scene — measurePath needs
-            // canvas.grid populated and getActiveTokens() needs canvas.tokens.
-            await new Promise((r) => setTimeout(r, 800));
+            // Wait for canvas to finish drawing the active scene — without
+            // this, getTokenDocument-then-create can return placeables whose
+            // x/y haven't been bound to their documents yet, and
+            // canvas.grid.measurePath reads stale 0,0 positions. The first
+            // run after a teardown is the failure mode; subsequent runs are
+            // fast because the canvas stays warm.
+            for (let i = 0; i < 50; i++) {
+                if (window.canvas.ready && window.canvas.scene?.id === scene.id) break;
+                await new Promise((r) => setTimeout(r, 200));
+            }
 
             const gridSize: number = window.canvas.grid.size;
 
@@ -118,15 +128,22 @@ async function runMeleeRoll(
             }
 
             const actorTd = await actor.getTokenDocument({x: gridSize, y: gridSize});
-            const targetTd = await target.getTokenDocument({x: args.targetX, y: gridSize});
+            const targetTd = await target.getTokenDocument({x: args.targetCells * gridSize, y: gridSize});
             const [actorTokenDoc, targetTokenDoc] = await scene.createEmbeddedDocuments(
                 "Token",
                 [actorTd.toObject(), targetTd.toObject()],
             );
-            await new Promise((r) => setTimeout(r, 300));
 
-            actorToken = actorTokenDoc.object ?? window.canvas.tokens.get(actorTokenDoc.id);
-            targetToken = targetTokenDoc.object ?? window.canvas.tokens.get(targetTokenDoc.id);
+            // Poll for the placeables to bind to their documents — the
+            // hooks that create canvas Tokens after createEmbeddedDocuments
+            // are async and can lag behind the Promise resolution.
+            for (let i = 0; i < 50; i++) {
+                actorToken = window.canvas.tokens.get(actorTokenDoc.id);
+                targetToken = window.canvas.tokens.get(targetTokenDoc.id);
+                if (actorToken?.x === actorTokenDoc.x &&
+                    targetToken?.x === targetTokenDoc.x) break;
+                await new Promise((r) => setTimeout(r, 100));
+            }
             if (!actorToken || !targetToken) {
                 throw new Error("placed tokens did not materialize on canvas");
             }
@@ -177,7 +194,7 @@ async function runMeleeRoll(
             await window.game.settings.set("od6s", "melee_range", prevMeleeRange);
             window.removeEventListener("unhandledrejection", onRej);
         }
-    }, {targetX});
+    }, {targetCells});
 }
 
 test("melee weapon roll cancels with warn when target is out of range", async ({page}) => {
@@ -185,7 +202,7 @@ test("melee weapon roll cancels with warn when target is out of range", async ({
 
     // 15 grid cells away — well beyond the 1.5-cell threshold even after
     // the token-size fudge factor for default 1×1 tokens.
-    const result = await runMeleeRoll(page, 15 * 100);
+    const result = await runMeleeRoll(page, 15);
 
     expect(result.errs, "unhandled rejections").toEqual([]);
     expect(result.warned, "OUT_OF_MELEE_BRAWL_RANGE warn fired").toBe(true);
@@ -196,8 +213,11 @@ test("melee weapon roll cancels with warn when target is out of range", async ({
 test("melee weapon roll proceeds when target is adjacent", async ({page}) => {
     await loginAndWaitReady(page);
 
-    // Adjacent cell — well inside the threshold; gate must pass.
-    const result = await runMeleeRoll(page, 2 * 100);
+    // Same cell — distance evaluates to 0, which the gate's `distance !== 0`
+    // guard short-circuits past the >1.5 threshold check. This decouples
+    // the control case from the smoke world's specific grid distance unit
+    // (which can vary between 1 and 5 depending on scene defaults).
+    const result = await runMeleeRoll(page, 1);
 
     expect(result.errs, "unhandled rejections").toEqual([]);
     expect(result.warned, "no out-of-range warn for adjacent target").toBe(false);
