@@ -79,6 +79,22 @@ const notImplemented = <K extends RollTypeKey>(key: K): Handler<K> =>
         throw new Error(`Roll handler not implemented: ${key}`);
     };
 
+const skillItemAttribute = (item: ItemView | undefined): string | null =>
+    item?.attribute ? item.attribute.toLowerCase() : null;
+
+const skillHandler: Handler<'skill'> = (_input, ctx) => ({
+    attribute: skillItemAttribute(ctx.item),
+});
+
+const skillDodgeHandler: Handler<'skill-dodge'> = (_input, ctx) => ({
+    attribute: skillItemAttribute(ctx.item),
+});
+
+const specializationHandler: Handler<'specialization'> = (_input, ctx) => ({
+    attribute: skillItemAttribute(ctx.item),
+    specSkill: ctx.settings.showSkillSpecialization && ctx.item?.skill ? ctx.item.skill : '',
+});
+
 export const HANDLERS = {
     'weapon': notImplemented('weapon'),
     'starship-weapon': notImplemented('starship-weapon'),
@@ -93,9 +109,9 @@ export const HANDLERS = {
     'action-attribute': notImplemented('action-attribute'),
     'action-other': notImplemented('action-other'),
 
-    'skill': notImplemented('skill'),
-    'skill-dodge': notImplemented('skill-dodge'),
-    'specialization': notImplemented('specialization'),
+    'skill': skillHandler,
+    'skill-dodge': skillDodgeHandler,
+    'specialization': specializationHandler,
 
     'damage': notImplemented('damage'),
     'resistance': notImplemented('resistance'),
