@@ -147,6 +147,27 @@ const resistanceHandler: Handler<'resistance'> = (input, ctx) => ({
     scaledice: scaleToDice(input, ctx),
 });
 
+const fundsHandler: Handler<'funds'> = () => ({});
+const attributeHandler: Handler<'attribute'> = () => ({});
+
+const purchaseHandler: Handler<'purchase'> = (input) => ({
+    seller: input.seller ?? '',
+});
+
+/**
+ * Top-level `brawlattack` is unreachable in the current code: Actor.rollAction
+ * wraps brawl rolls as `{type: 'action', subtype: 'brawlattack'}`, which the
+ * classifier routes to action-brawlattack. The classifier still accepts a
+ * top-level `brawlattack`, but no caller produces one. Phase 3 removes the
+ * key from RollTypeKey entirely; until then this throws to surface any
+ * caller that resurrects the path.
+ */
+const brawlattackDeadPathHandler: Handler<'brawlattack'> = () => {
+    throw new Error(
+        'brawlattack: unreachable dead path — route brawl rolls through action-brawlattack',
+    );
+};
+
 const resistanceVehicleToughnessHandler: Handler<'resistance-vehicletoughness'> = (input, ctx) => {
     const vehicleUuid =
         ctx.actor.type === 'vehicle' || ctx.actor.type === 'starship'
@@ -183,9 +204,9 @@ export const HANDLERS = {
     'mortally_wounded': mortallyWoundedHandler,
     'incapacitated': incapacitatedHandler,
 
-    'funds': notImplemented('funds'),
-    'purchase': notImplemented('purchase'),
+    'funds': fundsHandler,
+    'purchase': purchaseHandler,
 
-    'brawlattack': notImplemented('brawlattack'),
-    'attribute': notImplemented('attribute'),
+    'brawlattack': brawlattackDeadPathHandler,
+    'attribute': attributeHandler,
 } as const satisfies { [K in RollTypeKey]: Handler<K> };
