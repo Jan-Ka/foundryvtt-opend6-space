@@ -34,13 +34,14 @@ function makeSettings(overrides: Partial<RollSettingsView> = {}): RollSettingsVi
         hideCombatCards: false,
         hideSkillCards: false,
         showSkillSpecialization: true,
+        pipsPerDice: 3,
         ...overrides,
     };
 }
 
 function makeCtx(item: ItemView | undefined, settings?: Partial<RollSettingsView>): HandlerContext {
     return {
-        actor: { type: 'character' },
+        actor: { type: 'character', uuid: 'Actor.test-character' },
         item,
         targets: [],
         settings: makeSettings(settings),

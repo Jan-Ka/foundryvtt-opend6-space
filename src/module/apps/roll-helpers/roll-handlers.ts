@@ -35,13 +35,37 @@ export type HandlerInput = Omit<IncomingRollData, 'actor'> & {
 };
 
 /**
- * Read-only narrowed view of an actor for handler consumption. Empty by
- * design — fields are added as Phase 2 handlers need them, so the surface
- * stays a tight reflection of actual rules dependencies rather than a
- * Foundry-shaped god object.
+ * Read-only narrowed view of an actor for handler consumption. Discriminated
+ * by `type` so handlers branching on actor kind get exhaustive narrowing.
+ * Fields grow per family as Phase 2 handlers need them — kept tight rather
+ * than mirroring the Foundry shape.
  */
-export interface ActorView {
-    type: 'character' | 'npc' | 'vehicle' | 'starship';
+export type ActorView =
+    | CharacterActorView
+    | NpcActorView
+    | VehicleActorView
+    | StarshipActorView;
+
+export interface CharacterActorView {
+    type: 'character';
+    uuid: string;
+    /** Embedded vehicle reference when the character is piloting one. */
+    vehicle?: { uuid: string };
+}
+
+export interface NpcActorView {
+    type: 'npc';
+    uuid: string;
+}
+
+export interface VehicleActorView {
+    type: 'vehicle';
+    uuid: string;
+}
+
+export interface StarshipActorView {
+    type: 'starship';
+    uuid: string;
 }
 
 export interface ItemView {
@@ -69,6 +93,8 @@ export interface RollSettingsView {
     hideSkillCards: boolean;
     /** When true, the dialog exposes the parent-skill link for specializations. */
     showSkillSpecialization: boolean;
+    /** System-constant pips per die (3 in standard OpenD6). */
+    pipsPerDice: number;
 }
 
 export interface HandlerContext {
