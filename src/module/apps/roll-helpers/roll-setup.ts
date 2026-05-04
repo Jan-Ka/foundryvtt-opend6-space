@@ -190,6 +190,13 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     const localize = game.i18n.localize.bind(game.i18n);
     const settings = readSettings();
     const classified = classifyRoll(data, localize);
+    // `classifyRoll` does NOT mutate `data` — for weapon-item rolls coming
+    // through with a localized subtype alias (e.g. "Melee" / "Ranged"),
+    // `data.subtype` stays localized while `classified.subtype` is canonical.
+    // Always read `subtype` (canonical) downstream of the classifier; reading
+    // `data.subtype` would silently skip melee/ranged mod accumulation, range
+    // bucketing, and any branch keyed on the canonical attack subtype.
+    const subtype = classified.subtype;
 
     const item = resolveItemForDispatch(data);
     const isExplosive = !!item
@@ -200,12 +207,10 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     // range table and may cancel via false (e.g., out-of-ammo dialog).
     let weaponRangeTable: { short: number; medium: number; long: number } | undefined;
     if (item && (data.type === 'weapon' || data.type === 'starship-weapon' || data.type === 'vehicle-weapon')) {
-        const isRangedAlias = data.subtype === 'rangedattack'
-            || data.subtype === game.i18n.localize('OD6S.RANGED')
-            || data.subtype === game.i18n.localize('OD6S.THROWN')
-            || data.subtype === game.i18n.localize('OD6S.MISSILE')
-            || data.subtype === game.i18n.localize('OD6S.EXPLOSIVE');
-        if (isRangedAlias) {
+        // Classifier collapses every localized weapon-type alias (RANGED /
+        // THROWN / MISSILE / EXPLOSIVE) into canonical 'rangedattack', so a
+        // single check covers the whole alias set.
+        if (subtype === 'rangedattack') {
             const r = await od6sutilities.getWeaponRange(data.actor, item);
             if (r === false) return false;
             weaponRangeTable = r as typeof weaponRangeTable;
@@ -295,20 +300,20 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     if (isCharacterActor(data.actor)) {
         const c = data.actor.system;
-        if (data.subtype === 'meleeattack') bonusmod += c.melee.mod;
-        if (data.subtype === 'brawlattack') bonusmod += c.brawl.mod;
-        if (data.subtype === 'dodge') bonusmod += c.dodge.mod;
-        if (data.subtype === 'parry') bonusmod += c.parry.mod;
-        if (data.subtype === 'block') bonusmod += c.block.mod;
+        if (subtype === 'meleeattack') bonusmod += c.melee.mod;
+        if (subtype === 'brawlattack') bonusmod += c.brawl.mod;
+        if (subtype === 'dodge') bonusmod += c.dodge.mod;
+        if (subtype === 'parry') bonusmod += c.parry.mod;
+        if (subtype === 'block') bonusmod += c.block.mod;
     }
 
     // Ranged-attack bonus: vehicle's ranged.score for vehicle-piloted paths,
     // actor.system.ranged.mod for personal ranged.
-    const isRangedSubtype = data.subtype === 'rangedattack'
-        || data.subtype === 'vehiclerangedattack'
-        || data.subtype === 'vehiclerangedweaponattack';
+    const isRangedSubtype = subtype === 'rangedattack'
+        || subtype === 'vehiclerangedattack'
+        || subtype === 'vehiclerangedweaponattack';
     if (isRangedSubtype) {
-        if (data.subtype && data.subtype.startsWith('vehicle')) {
+        if (subtype.startsWith('vehicle')) {
             const vehSys = data.actor.system as OD6SVehicleSystem;
             const charSys = data.actor.system as OD6SCharacterSystem & {
                 vehicle: { ranged?: { score?: number } };
@@ -348,7 +353,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (typeof bucketAny.attackerScale === 'number' && bucketAny.attackerScale !== 0) {
         attackerScale = bucketAny.attackerScale;
     } else if (isAttackRoll) {
-        const isVehicleSubtype = data.subtype !== undefined && data.subtype.includes('vehicle');
+        const isVehicleSubtype = subtype.includes('vehicle');
         if (isVehicleSubtype) {
             attackerScale = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
                 ? +((data.actor.system as { scale?: { score?: number } }).scale?.score ?? 0)
@@ -375,7 +380,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         ?? data.difficultyLevel
         ?? (settings.defaultUnknownDifficulty ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY');
 
-    if (RANGED_BUCKETING_SUBTYPES.has(data.subtype ?? '')) {
+    if (RANGED_BUCKETING_SUBTYPES.has(subtype)) {
         rangeLabel = 'OD6S.RANGE_SHORT_SHORT';
         const rangeDifficulty = !!game.settings.get('od6s', 'map_range_to_difficulty');
         const autoExplosive = !!game.settings.get('od6s', 'auto_explosive');
@@ -489,7 +494,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     // ---- Misc COMMON inputs ----
     let name = data.name;
-    if (data.subtype === 'parry' && classified.type === 'weapon') {
+    if (subtype === 'parry' && classified.type === 'weapon') {
         name = `${data.name} ${game.i18n.localize('OD6S.PARRY')}`;
     }
     const vehicleTerrainDifficulty = OD6S.vehicleDifficulty
@@ -505,7 +510,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if ((bucketAny.attackerScale !== undefined) || isAttackRoll) {
         (bucketWithOverrides as Partial<RollData>).attackerScale = attackerScale;
     }
-    if (RANGED_BUCKETING_SUBTYPES.has(data.subtype ?? '') || bucketAny.range !== undefined) {
+    if (RANGED_BUCKETING_SUBTYPES.has(subtype) || bucketAny.range !== undefined) {
         (bucketWithOverrides as Partial<RollData>).range = rangeLabel;
     }
     if (bucketAny.difficultylevel !== undefined) {
