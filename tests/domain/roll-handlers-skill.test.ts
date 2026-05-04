@@ -21,10 +21,10 @@ import { describe, expect, it } from 'vitest';
 import { HANDLERS } from '../../src/module/apps/roll-helpers/roll-handlers';
 import type {
     HandlerContext,
+    HandlerInput,
     ItemView,
     RollSettingsView,
 } from '../../src/module/apps/roll-helpers/roll-handlers';
-import type { ClassifiedRoll } from '../../src/module/apps/roll-helpers/roll-data';
 
 function makeSettings(overrides: Partial<RollSettingsView> = {}): RollSettingsView {
     return {
@@ -48,27 +48,33 @@ function makeCtx(item: ItemView | undefined, settings?: Partial<RollSettingsView
     };
 }
 
-function classified(key: 'skill' | 'skill-dodge' | 'specialization'): ClassifiedRoll {
+function makeInput(key: 'skill' | 'skill-dodge' | 'specialization'): HandlerInput {
     const type = key === 'specialization' ? 'specialization' : 'skill';
     const subtype = key === 'skill-dodge' ? 'dodge' : '';
-    return { type, subtype, key };
+    return {
+        classified: { type, subtype, key },
+        name: '',
+        score: 0,
+        type,
+        subtype,
+    };
 }
 
 describe('skill handler', () => {
     it('returns the lowercase parent attribute from the skill item', () => {
         const item: ItemView = { type: 'skill', attribute: 'AGI' };
-        const out = HANDLERS['skill'](classified('skill'), makeCtx(item));
+        const out = HANDLERS['skill'](makeInput('skill'), makeCtx(item));
         expect(out.attribute).toBe('agi');
     });
 
     it('returns null when the skill item is missing', () => {
-        const out = HANDLERS['skill'](classified('skill'), makeCtx(undefined));
+        const out = HANDLERS['skill'](makeInput('skill'), makeCtx(undefined));
         expect(out.attribute).toBeNull();
     });
 
     it('returns null when the skill item has no attribute', () => {
         const item: ItemView = { type: 'skill' };
-        const out = HANDLERS['skill'](classified('skill'), makeCtx(item));
+        const out = HANDLERS['skill'](makeInput('skill'), makeCtx(item));
         expect(out.attribute).toBeNull();
     });
 });
@@ -76,7 +82,7 @@ describe('skill handler', () => {
 describe('skill-dodge handler', () => {
     it('produces the same shape as skill — only the classification differs', () => {
         const item: ItemView = { type: 'skill', attribute: 'AGI' };
-        const out = HANDLERS['skill-dodge'](classified('skill-dodge'), makeCtx(item));
+        const out = HANDLERS['skill-dodge'](makeInput('skill-dodge'), makeCtx(item));
         expect(out.attribute).toBe('agi');
     });
 });
@@ -84,7 +90,7 @@ describe('skill-dodge handler', () => {
 describe('specialization handler', () => {
     it('returns attribute and specSkill from the specialization item when the setting is on', () => {
         const item: ItemView = { type: 'specialization', attribute: 'STR', skill: 'Brawling' };
-        const out = HANDLERS['specialization'](classified('specialization'), makeCtx(item));
+        const out = HANDLERS['specialization'](makeInput('specialization'), makeCtx(item));
         expect(out.attribute).toBe('str');
         expect(out.specSkill).toBe('Brawling');
     });
@@ -92,7 +98,7 @@ describe('specialization handler', () => {
     it('omits specSkill (empty string) when the showSkillSpecialization setting is off', () => {
         const item: ItemView = { type: 'specialization', attribute: 'STR', skill: 'Brawling' };
         const out = HANDLERS['specialization'](
-            classified('specialization'),
+            makeInput('specialization'),
             makeCtx(item, { showSkillSpecialization: false }),
         );
         expect(out.attribute).toBe('str');
@@ -101,7 +107,7 @@ describe('specialization handler', () => {
 
     it('returns empty specSkill when the spec item has no parent skill', () => {
         const item: ItemView = { type: 'specialization', attribute: 'STR' };
-        const out = HANDLERS['specialization'](classified('specialization'), makeCtx(item));
+        const out = HANDLERS['specialization'](makeInput('specialization'), makeCtx(item));
         expect(out.attribute).toBe('str');
         expect(out.specSkill).toBe('');
     });

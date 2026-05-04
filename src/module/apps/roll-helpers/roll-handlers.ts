@@ -18,11 +18,21 @@
  * than silently producing partial output).
  */
 
-import type { ClassifiedRoll, Localize, RollData, RollTypeKey } from './roll-data';
+import type { ClassifiedRoll, IncomingRollData, Localize, RollData, RollTypeKey } from './roll-data';
 import type { ROLL_TYPE_FIELDS } from './roll-type-fields';
 
 export type HandlerOutput<K extends RollTypeKey> =
     Pick<RollData, (typeof ROLL_TYPE_FIELDS)[K][number]>;
+
+/**
+ * Request data the orchestrator hands to a handler. A projection of
+ * {@link IncomingRollData} minus the Foundry `actor` (which lives in
+ * {@link HandlerContext.actor} as a narrowed view) plus the classifier
+ * output. Handlers consume input + ctx; nothing else.
+ */
+export type HandlerInput = Omit<IncomingRollData, 'actor'> & {
+    classified: ClassifiedRoll;
+};
 
 /**
  * Read-only narrowed view of an actor for handler consumption. Empty by
@@ -70,7 +80,7 @@ export interface HandlerContext {
 }
 
 export type Handler<K extends RollTypeKey> = (
-    input: ClassifiedRoll,
+    input: HandlerInput,
     ctx: HandlerContext,
 ) => HandlerOutput<K>;
 
