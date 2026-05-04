@@ -172,45 +172,72 @@ export const ROLL_TYPE_FIELDS = {
 //    combat-difficulty-modifiers-range.  ?  confirm — looks like a fudge
 //    distinguishing "generic action menu melee" from "weapon item melee".
 //
-// 2. roll-setup.ts:434–438 — `actor.getFlag('od6s','fatepointeffect')`
-//    auto-doubles dice+pips when canUseFp. fate-points permits FP spending
-//    for bonuses but doesn't define an "always-on" flag with no cost.  ?
-//    confirm whether the flag represents a deferred-cost UI state or a
-//    rules-unsanctioned freebie.
+// 2. roll-setup.ts:434–438 — `fatepointeffect` flag doubling.
+//    RECLASSIFIED 2026-05-04 as rules-backed: the FP is paid for in
+//    roll-execute.ts when first spent (`rollData.fatepoint`); the flag
+//    keeps the "FP in effect for the round" state so subsequent rolls in
+//    the round are doubled without re-paying. Cleared on round advance
+//    (combat-hooks). Matches the fate-points rule's full-round duration.
+//    Phase 1 should pin the bonusmod-compounding edge case in a unit test
+//    (execute doubles originaldice/pips, setup doubles dice/pips).
 //
-// 3. roll-setup.ts:153 (approx) — melee range "fudge" derived from token
-//    widths and grid size. Pure Foundry grid geometry, not a rules concern;
-//    keep as a UI helper but separate from rules math.
+// 3. roll-setup.ts:150–160 — melee/brawl out-of-range check (gated on
+//    `OD6S.meleeRange`). Token-width "fudge" is grid-geometry correction
+//    so size-disparate tokens aren't false-positives. RECLASSIFIED: not a
+//    rules concern at all — Foundry-VTT UX validation. Phase 3 should
+//    relocate this to a pre-roll sheet/action listener so the rules
+//    pipeline doesn't carry canvas/UI logic.
 //
-// 4. roll-setup.ts:547–551 — when `dice_for_scale` is on and `scaleMod < 0`,
-//    score is increased by |scaleMod| AND scaleDice is set to a negative
-//    dice count. The scale rule defines modifier application to
-//    difficulty/damage/resistance but not this combined score-bump +
-//    negative-dice substitution.  ?  confirm whether dice_for_scale is a
-//    house-rule setting layered on top of the official scale rule.
+// 4. roll-setup.ts:547–551 — `dice_for_scale` + negative-scale combined
+//    score-bump and negative scaleDice. RECLASSIFIED 2026-05-04 as
+//    rules-backed: the score-bump is the additive scale modifier (scale
+//    rule); the negative scaleDice is fed into otherpenalty in
+//    roll-execute.ts:61 — the dice-pool reduction equivalent. The
+//    `dice_for_scale` setting selects between two equivalent
+//    presentations of the same rule, not an unbacked layer.
 //
-// 5. roll-setup.ts:596–597 — resistance path always converts positive scale
-//    to dice unconditionally; attacks (item 4) branch on sign. Asymmetry
-//    not justified by scale rule.  ?  same disposition as item 4.
+// 5. roll-setup.ts:596–597 — resistance path scaleDice always-positive.
+//    RECLASSIFIED 2026-05-04 as rules-backed: not asymmetric — items 4
+//    and 5 are the attacker-side and defender-side halves of the same
+//    scale rule. Attacker-smaller subtracts from attacker score
+//    (item 4); defender-larger adds to defender dice (item 5). Same
+//    rule, role-split application.
 //
-// 6. roll-setup.ts:601–603 — `actor.system.roll_mod` is added to score at
-//    the very end. No rule defines a flat global per-actor modifier.  ?
-//    confirm intent (house-rule slot? debug aid? legacy?).
+// 6. roll-setup.ts:601–603 — `actor.system.roll_mod` flat additive.
+//    RECLASSIFIED 2026-05-04 as not-a-rules-concern: it's a per-actor
+//    GM/admin override field declared in actor schemas (initial 0), used
+//    in init-roll.ts as well. Keep — but document as a configurable
+//    knob outside the core rule set; the rules pipeline shouldn't
+//    "delete" it. Phase 3 may move the application out of setupRollData
+//    if cleaner, but it's not a deletion candidate.
 //
-// 7. roll-setup.ts:440–442 — appends localized "Parry" to weapon name when
-//    `subtype === 'parry'`, but classifyRoll never produces that subtype.
-//    Likely dead code; remove during rewrite.
+// 7. roll-setup.ts:440–442 — "Parry" weapon-name suffix.
+//    RECLASSIFIED 2026-05-04 as rules-backed (and not dead): item.ts
+//    sets `subtype = 'parry'` directly when a weapon is rolled as parry
+//    defense, bypassing classifyRoll. roll-difficulty.ts and roll-execute
+//    both rely on the value. The label suffix is the user-facing marker
+//    of the defensive use. Keep.
 //
-// 8. roll-setup.ts:444 — `canOppose` list includes 'toughness', but no
-//    RollTypeKey produces type='toughness'. Either dead, or the list should
-//    use 'resistance-vehicletoughness' / canonical 'resistance'. Remove or
-//    correct during rewrite.
+// 8. roll-setup.ts:444 — `'toughness'` in canOppose list. CONFIRMED dead:
+//    no RollTypeKey or canonical type ever produces `type: 'toughness'`
+//    (vehicletoughness is normalized to resistance). Zero-impact deletion
+//    in rewrite — no RFC.
 //
-// 9. roll-setup.ts:556–569 — `specSkill` populated only when
-//    `OD6S.showSkillSpecialization` setting is true. The specialization
-//    rule doesn't gate skill-link visibility on a setting.  ?  confirm
-//    whether this is a UI display choice (keep, move to view layer) or
-//    rules-relevant (move into the handler input contract).
+// 9. roll-setup.ts:556–569 — `specSkill` gated on `showSkillSpecialization`
+//    setting. RECLASSIFIED 2026-05-04 as not-a-rules-concern: the rule
+//    governs *when* a specialization applies, not *whether* the dialog
+//    shows the backing skill link. The setting is a UI presentation
+//    preference. Keep; phase 3 may move the read into the dialog/view
+//    layer instead of the handler contract.
+//
+// ---- Net Phase 0 outcome ----
+// Of 9 originally-flagged behaviors:
+//   - 1 RFC filed (#100) — item 1 (+5 magic constant)
+//   - 1 dead string to delete in rewrite (item 8) — zero impact
+//   - 4 reclassified rules-backed (items 2, 4, 5, 7)
+//   - 3 reclassified not-a-rules-concern, keep / relocate (items 3, 6, 9)
+//
+// Phase 1 (domain tests) can proceed without further user gating.
 //
 // ---- Compile-time partition invariants ----
 //
