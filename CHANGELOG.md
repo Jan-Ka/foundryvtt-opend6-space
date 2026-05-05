@@ -18,6 +18,11 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `HTMLElement` rather than a single-element `HTMLElement[]`. Drops
   the `[root]` shim from `_onRender` and the `const el = html[0]`
   prologue from each listener (#83).
+- `Collection<T>` now declares its iterator as `IterableIterator<T>`
+  (matching Foundry runtime behaviour) instead of inheriting Map's
+  `[key, value]` iteration. `Document.updateDocuments` /
+  `deleteDocuments` are also typed. Removes 15 stale `as any` casts
+  in migration, explosives, and chat-log code (#56).
 
 ### Fixed
 

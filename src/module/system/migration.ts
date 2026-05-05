@@ -101,7 +101,7 @@ async function migrateStatusEffectIcons() {
 
   for (const actor of game.actors) {
     const updates = [];
-    for (const effect of (actor as any).effects) {
+    for (const effect of actor.effects) {
       const img: string = effect.img ?? "";
       if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
         updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
@@ -109,14 +109,14 @@ async function migrateStatusEffectIcons() {
     }
     if (updates.length > 0) {
       logActorBefore("icons", actor);
-      await (actor as any).updateEmbeddedDocuments("ActiveEffect", updates);
+      await actor.updateEmbeddedDocuments("ActiveEffect", updates);
       logActorAfter("icons", actor);
       count += updates.length;
     }
   }
 
   for (const scene of game.scenes) {
-    for (const token of (scene as any).tokens) {
+    for (const token of scene.tokens) {
       const updates = [];
       for (const effect of token.actor?.effects ?? []) {
         const img: string = effect.img ?? "";
@@ -125,9 +125,9 @@ async function migrateStatusEffectIcons() {
         }
       }
       if (updates.length > 0) {
-        logActorBefore("icons", token.actor, ` (token in ${(scene as any).name})`);
+        logActorBefore("icons", token.actor, ` (token in ${scene.name})`);
         await token.actor.updateEmbeddedDocuments("ActiveEffect", updates);
-        logActorAfter("icons", token.actor, ` (token in ${(scene as any).name})`);
+        logActorAfter("icons", token.actor, ` (token in ${scene.name})`);
         count += updates.length;
       }
     }
@@ -157,7 +157,7 @@ async function migrateExplosiveTemplateFlags() {
 
   for (const actor of game.actors) {
     const updates = [];
-    for (const item of (actor as any).items) {
+    for (const item of actor.items) {
       const explosiveTemplate = item.getFlag("od6s", "explosiveTemplate");
       if (explosiveTemplate) {
         updates.push({
@@ -171,7 +171,7 @@ async function migrateExplosiveTemplateFlags() {
     }
     if (updates.length > 0) {
       logActorBefore("explosive-flags", actor);
-      await (actor as any).updateEmbeddedDocuments("Item", updates);
+      await actor.updateEmbeddedDocuments("Item", updates);
       logActorAfter("explosive-flags", actor);
       count += updates.length;
     }
@@ -180,10 +180,10 @@ async function migrateExplosiveTemplateFlags() {
   // Also check unowned items in the world collection
   const worldItemUpdates = [];
   for (const item of game.items) {
-    const explosiveTemplate = (item as any).getFlag("od6s", "explosiveTemplate");
+    const explosiveTemplate = item.getFlag("od6s", "explosiveTemplate");
     if (explosiveTemplate) {
       worldItemUpdates.push({
-        _id: (item as any).id,
+        _id: item.id,
         "flags.od6s.-=explosiveTemplate": null,
         "flags.od6s.-=explosiveSet": null,
         "flags.od6s.-=explosiveOrigin": null,
@@ -192,7 +192,7 @@ async function migrateExplosiveTemplateFlags() {
     }
   }
   if (worldItemUpdates.length > 0) {
-    await (Item as any).updateDocuments(worldItemUpdates);
+    await Item.updateDocuments(worldItemUpdates);
     count += worldItemUpdates.length;
   }
 
@@ -210,9 +210,9 @@ async function migrateChatMessageFlags() {
 
   const updates = [];
   for (const message of game.messages) {
-    if ((message as any).getFlag("od6s", "isExplosive") && (message as any).getFlag("od6s", "template")) {
+    if (message.getFlag("od6s", "isExplosive") && message.getFlag("od6s", "template")) {
       updates.push({
-        _id: (message as any).id,
+        _id: message.id,
         "flags.od6s.-=template": null,
         "flags.od6s.handled": true,
       });
@@ -221,7 +221,7 @@ async function migrateChatMessageFlags() {
   }
 
   if (updates.length > 0) {
-    await (ChatMessage as any).updateDocuments(updates);
+    await ChatMessage.updateDocuments(updates);
   }
 
   console.log(`od6s | Cleaned explosive flags from ${count} chat messages.`);

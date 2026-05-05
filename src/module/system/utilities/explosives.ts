@@ -164,7 +164,7 @@ export async function detonateExplosives(combat: any): Promise<void> {
                 } else if (origMessage.whisper.length > 0) {
                     rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
                 }
-                await (ChatMessage as any).deleteDocuments([origMessage.id]);
+                await ChatMessage.deleteDocuments([origMessage.id]);
                 cloneMessage.flags.od6s.canUseCp = false;
                 cloneMessage.rolls[0].toMessage(cloneMessage, {rollMode});
             }

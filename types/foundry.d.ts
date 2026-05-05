@@ -393,6 +393,8 @@ declare class FoundryDocument {
     static metadata: { name: string; label: string; [key: string]: any };
     static create(data: any, options?: any): Promise<any>;
     static defaultName(): string;
+    static updateDocuments(updates: any[], context?: any): Promise<any[]>;
+    static deleteDocuments(ids: string[], context?: any): Promise<any[]>;
 
     getFlag(scope: string, key: string): any;
     setFlag(scope: string, key: string, value: any): Promise<this>;
@@ -855,6 +857,13 @@ declare class Collection<T> extends Map<string, T> {
     every(predicate: (value: T) => boolean): boolean;
     render(force?: boolean): void;
     _formatFolderSelectOptions(): any[];
+
+    /**
+     * Foundry's Collection overrides Map's iterator to yield values directly,
+     * not [key, value] entries. This makes `for (const x of collection)` work
+     * the way every call site expects.
+     */
+    [Symbol.iterator](): IterableIterator<T>;
 
     [key: string]: any;
 }
