@@ -14,6 +14,11 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ### Changed
 
+- Actor-sheet listener modules now take the sheet root as
+  `HTMLElement` rather than a single-element `HTMLElement[]`. Drops
+  the `[root]` shim from `_onRender` and the `const el = html[0]`
+  prologue from each listener (#83).
+
 ### Fixed
 
 ### Removed

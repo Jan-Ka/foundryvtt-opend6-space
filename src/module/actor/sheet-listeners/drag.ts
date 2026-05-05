@@ -69,33 +69,31 @@ function onDragStart(sheet: Sheet, event: DragEvent): void {
 /**
  * Register drag event listeners on the actor sheet.
  */
-export function registerDragListeners(html: HTMLElement[], sheet: Sheet): void {
-    const el = html[0];
-
+export function registerDragListeners(root: HTMLElement, sheet: Sheet): void {
     if (sheet.document.isOwner) {
         const handler = (ev: DragEvent) => onDragStart(sheet, ev);
 
         if (sheet.document.type === 'container' && !game.user.isGM) return;
 
         // Items
-        el.querySelectorAll<HTMLElement>('li.item').forEach((li) => {
+        root.querySelectorAll<HTMLElement>('li.item').forEach((li) => {
             if (li.classList.contains("inventory-header")) return;
             li.setAttribute("draggable", "true");
             li.addEventListener("dragstart", handler, false);
         });
 
         // Combat Actions
-        el.querySelectorAll<HTMLElement>('li.availableaction').forEach((li) => {
+        root.querySelectorAll<HTMLElement>('li.availableaction').forEach((li) => {
             li.setAttribute("draggable", "true");
             li.addEventListener("dragstart", dragAvailableCombatAction, false);
         });
-        el.querySelectorAll<HTMLElement>('li.assignedaction').forEach((li) => {
+        root.querySelectorAll<HTMLElement>('li.assignedaction').forEach((li) => {
             li.setAttribute("draggable", "true");
             li.addEventListener("dragstart", dragAssignedCombatAction, false);
         });
 
         // Crewmembers
-        el.querySelectorAll<HTMLElement>('li.crew-list').forEach((li) => {
+        root.querySelectorAll<HTMLElement>('li.crew-list').forEach((li) => {
             li.setAttribute('draggable', "true");
             li.addEventListener("dragstart", dragCrewMember, false);
         });

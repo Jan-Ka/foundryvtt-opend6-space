@@ -7,14 +7,13 @@ import OD6S from "../../config/config-od6s";
  * Register vehicle-related event listeners on the actor sheet.
  */
 export function registerVehicleListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     // Embedded Pilot
-    el.querySelectorAll<HTMLElement>('.embedded-pilot-add').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.embedded-pilot-add').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             const data: Record<string, unknown> = {};
@@ -23,7 +22,7 @@ export function registerVehicleListeners(
             await new OD6SAddEmbeddedCrew(data).render({force: true});
         }));
 
-    el.querySelectorAll<HTMLElement>('.embedded-pilot-remove').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.embedded-pilot-remove').forEach((elem) =>
         elem.addEventListener('click', async () => {
             // Remove skills/specs from the base actor.
             // `skills`/`specializations` are sheet-prepared item buckets, not on the Actor type.
@@ -45,14 +44,14 @@ export function registerVehicleListeners(
         }));
 
     // Force-exit from vehicle
-    el.querySelectorAll<HTMLElement>('.vehicle-exit').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.vehicle-exit').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             await sheet.document.setFlag('od6s', 'crew', '');
         }));
 
     // Open a crewmember's character sheet
-    el.querySelectorAll<HTMLElement>('.crew-member').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.crew-member').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const actor = await od6sutilities.getActorFromUuid(ct.dataset.uuid!);
@@ -60,7 +59,7 @@ export function registerVehicleListeners(
         }));
 
     // Add/remove crew to vehicles
-    el.querySelectorAll<HTMLElement>('.crew-add').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.crew-add').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             const data: Record<string, unknown> = {};
@@ -107,7 +106,7 @@ export function registerVehicleListeners(
             new OD6SAddCrew(data).render(true);
         }));
 
-    el.querySelectorAll<HTMLElement>('.crew-delete').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.crew-delete').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             const ct = ev.currentTarget as HTMLElement;
@@ -122,7 +121,7 @@ export function registerVehicleListeners(
         }));
 
     // Vehicle shield allocation
-    el.querySelectorAll<HTMLElement>('.arc').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.arc').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const arc = ct.dataset.arc!;
@@ -163,7 +162,7 @@ export function registerVehicleListeners(
         }));
 
     // Vehicle shield allocation by crew member
-    el.querySelectorAll<HTMLElement>('.c-arc').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.c-arc').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const actor = await od6sutilities.getActorFromUuid(ct.dataset.uuid!);

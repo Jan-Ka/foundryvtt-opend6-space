@@ -2,14 +2,13 @@
  * Register active effect and manifestation event listeners on the actor sheet.
  */
 export function registerEffectListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     // Update Effect
-    el.querySelectorAll<HTMLElement>('.effect-edit').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.effect-edit').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const effect = sheet.document.effects.get(ct.dataset.effectId);
@@ -17,14 +16,14 @@ export function registerEffectListeners(
         }));
 
     // Delete Effect
-    el.querySelectorAll<HTMLElement>('.effect-delete').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.effect-delete').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             await sheet.document.deleteEmbeddedDocuments('ActiveEffect', [ct.dataset.effectId]);
         }));
 
     // Activate a manifestation
-    el.querySelectorAll<HTMLElement>('.active-checkbox').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.active-checkbox').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             const ct = ev.currentTarget as HTMLElement;

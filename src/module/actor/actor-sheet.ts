@@ -142,10 +142,9 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         // Roll triggers must be bound for any owner regardless of edit mode —
         // V2 sheets render in PLAY mode by default (isEditable === false), but
         // rolling a skill/attack is a play-mode action. See issue #76.
-        const html = [root];
         if (this.actor.isOwner) {
-            registerRollListeners(html, this);
-            registerCombatRollListeners(html, this);
+            registerRollListeners(root, this);
+            registerCombatRollListeners(root, this);
         }
 
         if (!this.isEditable) return;
@@ -189,13 +188,12 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                 if (ok) await this._onClearSpeciesTemplate();
             }));
 
-        // Existing listener modules accept html[0]; pass [root] for compatibility.
-        registerInventoryListeners(html, this);
-        registerCombatActionListeners(html, this);
-        registerVehicleListeners(html, this);
-        registerScoreListeners(html, this);
-        registerEffectListeners(html, this);
-        registerDragListeners(html, this);
+        registerInventoryListeners(root, this);
+        registerCombatActionListeners(root, this);
+        registerVehicleListeners(root, this);
+        registerScoreListeners(root, this);
+        registerEffectListeners(root, this);
+        registerDragListeners(root, this);
     }
 
     _sortItems(items: Item[], sortType: string): Item[] {
