@@ -87,10 +87,10 @@ export class OD6SAddItem extends HandlebarsApplicationMixin(ApplicationV2) {
 
         let actor: any;
         if (data.token !== "") {
-            const token = (game as any).scenes.active.tokens.get(data.token);
+            const token = game.scenes.active.tokens.get(data.token);
             actor = token!.actor;
         } else {
-            actor = await (game as any).actors.get(data.actor);
+            actor = await game.actors.get(data.actor);
         }
 
         if (mode === "selected") {

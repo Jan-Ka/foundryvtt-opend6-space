@@ -52,7 +52,7 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
         formData: any,
     ): Promise<void> {
         const data = formData.object;
-        const message = (game as any).messages.get(data.messageId);
+        const message = game.messages.get(data.messageId);
         if (!message) return;
 
         if (message.getFlag("od6s", "isExplosive")) {
@@ -77,7 +77,7 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
             await message.setFlag("od6s", "targets", targets);
         } else {
             await message.setFlag("od6s", "targetId", data.choosetarget);
-            const targetName = (game as any).scenes.active.tokens
+            const targetName = game.scenes.active.tokens
                 .find((t: any) => t.id === data.choosetarget)?.name;
             await message.setFlag("od6s", "targetName", targetName);
         }

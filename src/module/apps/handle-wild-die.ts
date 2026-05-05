@@ -55,7 +55,7 @@ export class OD6SHandleWildDieForm extends HandlebarsApplicationMixin(Applicatio
         formData: any,
     ): Promise<void> {
         const data = formData.object;
-        const message: any = (game as any).messages.get(data.messageId);
+        const message: any = game.messages.get(data.messageId);
         if (!message) return;
 
         switch (data.wilddie) {
@@ -104,7 +104,7 @@ export class OD6SHandleWildDieForm extends HandlebarsApplicationMixin(Applicatio
         }
 
         if (message.getFlag("od6s", "subtype") === "purchase" && message.getFlag("od6s", "success")) {
-            const seller: any = (game as any).actors.get(message.getFlag("od6s", "seller") as string);
+            const seller: any = game.actors.get(message.getFlag("od6s", "seller") as string);
             await seller.sheet._onPurchase(message.getFlag("od6s", "purchasedItem"), message.speaker.actor);
         }
     }

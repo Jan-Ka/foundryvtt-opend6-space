@@ -135,7 +135,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     async _addActorType(): Promise<void> {
         const data = {
-            actorTypes: (game as any).od6s.OD6SActor.TYPES.filter((i: any) => !this.item.system.actor_types.includes(i)),
+            actorTypes: game.od6s.OD6SActor.TYPES.filter((i: any) => !this.item.system.actor_types.includes(i)),
         };
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-add-actor-type.html", data);

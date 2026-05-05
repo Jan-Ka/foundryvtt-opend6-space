@@ -220,7 +220,7 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
     }
 
     const rollMessage = await roll.toMessage({
-        speaker: ChatMessage.getSpeaker({actor: (game as any).actors.find((a: any) => a.id === actor.id)}),
+        speaker: ChatMessage.getSpeaker({actor: game.actors.find((a: any) => a.id === actor.id)}),
         flavor: label,
         flags: {od6s: flags},
     }, {rollMode, create: true});

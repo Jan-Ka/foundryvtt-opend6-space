@@ -25,7 +25,7 @@ type Sheet = any;
 
 export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promise<void> {
     const seller = sheet.document;
-    const buyer = (game as any).actors.get(buyerId);
+    const buyer = game.actors.get(buyerId);
     const item = seller.items.get(itemId);
 
     // The post-roll entry paths (chat-card, wild-die, difficulty-edit) can
@@ -37,12 +37,16 @@ export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promi
         return;
     }
 
+    // Buyer is always a character/npc/creature in the purchase flows;
+    // narrow off the Actor.system union to access character-only fields.
+    const buyerSystem = buyer!.system as OD6SCharacterSystem;
+    const itemSystem = item.system as OD6SEquipment;
     if (OD6S.cost === "1") {
-        if ((+buyer!.system.credits.value) < (+item.system.cost)) {
+        if ((+buyerSystem.credits.value) < (+itemSystem.cost)) {
             ui.notifications.warn(game.i18n.localize("OD6S.WARN_NOT_ENOUGH_CURRENCY"));
             return;
         }
-        await buyer!.update({"system.credits.value": (+buyer!.system.credits.value) - (+item.system.cost)});
+        await buyer!.update({"system.credits.value": (+buyerSystem.credits.value) - (+itemSystem.cost)});
     }
 
     const boughtItem = JSON.parse(JSON.stringify(item));
@@ -52,9 +56,9 @@ export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promi
         // would silently bump a non-gear (weapon/armor) of the same name
         // already on the buyer. Restrict the match to gear so cross-type
         // collisions create a fresh document instead.
-        const hasItem = buyer!.items.filter((i: any) => i.type === "gear" && i.name === item.name);
+        const hasItem = buyer!.items.filter((i: Item) => i.type === "gear" && i.name === item.name);
         if (hasItem.length > 0) {
-            await hasItem[0].update({"system.quantity": (+hasItem[0].system.quantity) + 1});
+            await hasItem[0].update({"system.quantity": (+(hasItem[0].system as OD6SEquipment).quantity) + 1});
         } else {
             await buyer!.createEmbeddedDocuments("Item", [boughtItem]);
         }
@@ -63,13 +67,13 @@ export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promi
     }
 
     const sellerUpdate: any = {};
-    if (item.system.quantity > 0) sellerUpdate["system.quantity"] = (+item.system.quantity) - 1;
+    if (itemSystem.quantity > 0) sellerUpdate["system.quantity"] = (+itemSystem.quantity) - 1;
     await item.update(sellerUpdate);
 }
 
 export async function onTransfer(sheet: Sheet, itemId: any, senderId: any, recId: any): Promise<void> {
-    const sender = (game as any).actors.get(senderId);
-    const receiver = (game as any).actors.get(recId);
+    const sender = game.actors.get(senderId);
+    const receiver = game.actors.get(recId);
     const item = sender!.items.get(itemId);
 
     const recItem = JSON.parse(JSON.stringify(item));
@@ -82,19 +86,20 @@ export async function onTransfer(sheet: Sheet, itemId: any, senderId: any, recId
     if (item!.type === "gear") {
         // Gear-only merge — same cross-type collision rationale as in
         // `onPurchase`.
-        const hasItem = receiver!.items.filter((i: any) => i.type === "gear" && i.name === item!.name);
+        const itemSystem = item!.system as OD6SEquipment;
+        const hasItem = receiver!.items.filter((i: Item) => i.type === "gear" && i.name === item!.name);
         if (hasItem.length > 0) {
-            await hasItem[0].update({"system.quantity": (+hasItem[0].system.quantity) + 1});
+            await hasItem[0].update({"system.quantity": (+(hasItem[0].system as OD6SEquipment).quantity) + 1});
         } else {
             await receiver!.createEmbeddedDocuments("Item", [recItem]);
         }
 
         const senderUpdate: any = {};
-        if (item!.system.quantity > 0) senderUpdate["system.quantity"] = (+item!.system.quantity) - 1;
+        if (itemSystem.quantity > 0) senderUpdate["system.quantity"] = (+itemSystem.quantity) - 1;
         await item!.update(senderUpdate);
 
         if ((sender!.type === "character" || sender!.type === "container")
-            && item!.system.quantity === 0) {
+            && itemSystem.quantity === 0) {
             await sender!.deleteEmbeddedDocuments("Item", [item!.id]);
         }
     } else {

@@ -53,7 +53,7 @@ export class OD6SEditDamage extends HandlebarsApplicationMixin(ApplicationV2) {
         formData: any,
     ): Promise<void> {
         const data = formData.object;
-        const message = (game as any).messages.get(data.messageId);
+        const message = game.messages.get(data.messageId);
         if (!message) return;
 
         const damageScore = od6sutilities.getScoreFromDice(data.damageDice, data.damagePips);
