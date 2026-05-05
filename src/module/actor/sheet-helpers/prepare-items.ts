@@ -55,10 +55,7 @@ interface SheetItem {
     type: string;
     img?: string;
     sort?: number;
-    // Sheet items are real Foundry Item document instances at runtime —
-    // they carry many fields beyond what these helpers read. Open the
-    // shape so callers can pass them through without repackaging.
-    [key: string]: unknown;
+    name?: string;
 }
 
 const bySort = (a: SheetItem, b: SheetItem) => (a.sort ?? 0) - (b.sort ?? 0);

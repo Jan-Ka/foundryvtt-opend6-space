@@ -37,6 +37,24 @@ import {linkCrew, unlinkCrew} from "./sheet-helpers/crew";
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
 const ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 
+/** Attribute row shape rendered by the actor-sheet template's attribute grid. */
+type ActorSheetAttributeRow = OD6SAttributeField & { id: string; sort: number; active: boolean };
+
+/** Render-context shape produced by `_prepareContext` and consumed by `actor-sheet.html`. */
+interface ActorSheetContext {
+    actor: Actor;
+    document: Actor;
+    /** Container actors are not in `Actor.system`'s union by design, so widen here. */
+    system: OD6SCharacterSystem | OD6SVehicleSystem | OD6SContainerSystem;
+    items: Item[];
+    dtypes: string[];
+    editable: boolean;
+    owner: boolean;
+    cssClass: string;
+    /** Sorted attribute rows; absent on container actors. */
+    attrs?: ActorSheetAttributeRow[];
+}
+
 /**
  * OD6S actor sheet — ApplicationV2 + HandlebarsApplicationMixin.
  * Single template (`actor-sheet.html`) handles all actor types via internal branching.
@@ -55,12 +73,12 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         body: {template: "systems/od6s/templates/actor/common/actor-sheet.html"},
     };
 
-    async _prepareContext(_options?: object): Promise<object> {
+    async _prepareContext(_options?: object): Promise<ActorSheetContext> {
         const actor = this.actor;
-        const context: any = {
+        const context: ActorSheetContext = {
             actor,
             document: actor,
-            system: actor.system,
+            system: actor.system as ActorSheetContext["system"],
             items: actor.items.contents,
             dtypes: ["String", "Number", "Boolean"],
             editable: this.isEditable,
@@ -79,12 +97,13 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             Object.assign(actor, prepareContainerItems(context.items));
         }
 
-        context.items = context.items.sort((a: any, b: any) => (a.sort || 0) - (b.sort || 0));
+        context.items = context.items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
         if (actor.type !== "container") {
-            const attributes: any[] = [];
+            const attributes: ActorSheetAttributeRow[] = [];
             for (const i in OD6S.attributes) {
-                const entry = actor.system.attributes[i];
+                const entry = (actor.system as OD6SCharacterSystem | OD6SVehicleSystem)
+                    .attributes[i] as ActorSheetAttributeRow;
                 entry.id = i;
                 entry.sort = OD6S.attributes[i].sort;
                 entry.active = OD6S.attributes[i].active;
@@ -179,16 +198,16 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         registerDragListeners(html, this);
     }
 
-    _sortItems(items: any, sortType: any) {
-        if (sortType === "alpha") return items.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    _sortItems(items: Item[], sortType: string): Item[] {
+        if (sortType === "alpha") return items.sort((a, b) => a.name.localeCompare(b.name));
         return items;
     }
 
-    _resetSortToAlpha(items: any) {
-        items = items.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    _resetSortToAlpha(items: Item[]): Item[] {
+        items = items.sort((a, b) => a.name.localeCompare(b.name));
         let sortNumber = 1000;
-        for (const i in items) {
-            items[i].sort = sortNumber;
+        for (const i of items) {
+            i.sort = sortNumber;
             sortNumber = sortNumber + 500;
         }
         return items;
@@ -196,7 +215,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     async _alphaSortAllItems() {
         const items = this._resetSortToAlpha(this.document.items.contents);
-        const updates = items.map((i: any) => ({_id: i._id, sort: i.sort}));
+        const updates = items.map((i) => ({_id: i.id, sort: i.sort}));
         await this.document.updateEmbeddedDocuments("Item", updates);
     }
 
@@ -299,12 +318,12 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         return OD6S.equippable.includes(itemType);
     }
 
-    async _createAction(data: any) {
+    async _createAction(data: { name: string; type?: string; subtype: string; rollable?: boolean | string; itemId?: string }) {
         if (data.name.startsWith("OD6S.")) {
             data.name = game.i18n.localize(data.name);
         }
         if (["dodge", "parry", "block", "vehicledodge"].includes(data.subtype)) {
-            if (this.document.itemTypes.action.find((i: any) => i.system.subtype === data.subtype)) {
+            if (this.document.itemTypes.action.find((i: Item) => (i.system as OD6SActionItemSystem).subtype === data.subtype)) {
                 ui.notifications.warn(game.i18n.localize("OD6S.ACTION_ONLY_ONE"));
                 return;
             }
