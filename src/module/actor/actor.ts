@@ -125,24 +125,27 @@ export class OD6SActor extends Actor {
         if(action === 'maneuver') {
             let score: number = vehicle.maneuverability?.score ?? 0;
             const attrKey = vehicle.attribute?.value;
+            // Vehicle attribute is user-editable; fall back to 0 when it
+            // doesn't map to one of the pilot's attributes (typo/unset/custom).
+            const attrScore = attrKey ? (pilot?.system.attributes[attrKey]?.score ?? 0) : 0;
             if (pilot && attrKey) {
                 let found = false;
                 const spec = pilot.items.find(i => i.type === "specialization" &&
                     i.name === vehicle.specialization?.value);
                 if (spec !== undefined && isSpecializationItem(spec)) {
-                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[attrKey].score);
+                    score = (+score) + (+spec.system.score) + attrScore;
                     found = true;
                 }
 
                 if (!found) {
                     const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill?.value);
                     if (skill !== undefined && isSkillItem(skill)) {
-                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[attrKey].score);
+                        score = (+score) + (+skill.system.score) + attrScore;
                         found = true;
                     }
                 }
                 if (!found) {
-                    score = (+score) + (pilot.system.attributes[attrKey].score);
+                    score = (+score) + attrScore;
                 }
             }
             return score;
