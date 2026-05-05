@@ -172,17 +172,17 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('getArmorDamageLevels', function () {
-        const levels = {};
+        const levels: Record<string, string> = {};
         for (const level in OD6S.armorDamage) {
-            (levels as any)[level] = OD6S.armorDamage[level].label;
+            levels[level] = OD6S.armorDamage[level].label;
         }
         return levels;
     })
 
     Handlebars.registerHelper('getWeaponDamageLevels', function () {
-        const levels = {};
+        const levels: Record<string, string> = {};
         for (const level in OD6S.weaponDamage) {
-            (levels as any)[level] = OD6S.weaponDamage[level].label;
+            levels[level] = OD6S.weaponDamage[level].label;
         }
         return levels;
     })

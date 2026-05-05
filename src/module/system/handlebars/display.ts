@@ -184,9 +184,9 @@ export function registerDisplayHelpers() {
     })
 
     Handlebars.registerHelper('getContainerItemCategories', function () {
-        const categories = {};
+        const categories: Record<string, string> = {};
         for (const i of OD6S.allowedItemTypes['container']) {
-            (categories as any)[i] = OD6S.itemLabels[i]
+            categories[i] = OD6S.itemLabels[i]
         }
         return categories;
     })

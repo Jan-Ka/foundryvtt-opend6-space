@@ -953,6 +953,16 @@ interface GameSocket {
 interface GameSystem {
     id: string;
     version: string;
+    /**
+     * `template.json` — the legacy schema descriptor exposed by Foundry on
+     * the GameSystem. Indexed by document type then sub-type, with a `label`
+     * the system's templates and dialogs localize against.
+     */
+    template: {
+        Actor: Record<string, { label: string; [key: string]: any }>;
+        Item: Record<string, { label: string; [key: string]: any }>;
+        [key: string]: any;
+    };
 }
 
 // ---- Hooks ----
