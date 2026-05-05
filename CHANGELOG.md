@@ -23,6 +23,11 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `[key, value]` iteration. `Document.updateDocuments` /
   `deleteDocuments` are also typed. Removes 15 stale `as any` casts
   in migration, explosives, and chat-log code (#56).
+- `OD6SCharacterSystem` now declares `credits` and `funds`, matching
+  the actual `data/actor/fields/common.ts` schema. Drops the
+  `(game as any)` and `(canvas as any)` casts that were papering over
+  the gap (14 game / 2 canvas sites) and the `(buyer.system as any)`
+  casts in inventory transfer (#56).
 
 ### Fixed
 

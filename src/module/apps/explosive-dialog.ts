@@ -70,7 +70,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
                 radius = this.data.item.system.blast_radius["3"].range;
             }
 
-            this.token = (canvas as any).tokens.controlled[0];
+            this.token = canvas.tokens.controlled[0];
             const explosiveTemplate = new ExplosivesTemplate(radius);
             await explosiveTemplate.setExplosiveData(
                 this.data,
@@ -103,7 +103,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
 
         if (this.data.stage === 1 && this.data.type === "OD6S.EXPLOSIVE_THROWN") {
             const region = regions[0];
-            const distance = Math.floor((canvas as any).grid.measurePath([
+            const distance = Math.floor(canvas.grid.measurePath([
                 {x: this.token.center.x, y: this.token.center.y},
                 {x: region.shapes[0].x, y: region.shapes[0].y},
             ]).distance);

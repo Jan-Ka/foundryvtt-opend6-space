@@ -74,6 +74,8 @@ interface OD6SCharacterSystem {
     block: OD6SModScoreField;
     pr: OD6SModScoreField;
     er: OD6SModScoreField;
+    credits: { type: string; label: string; value: number };
+    funds: { type: string; label: string; score: number };
     sheetmode: { value: string };
     scale: OD6SScoreField;
     initiative: { score: number; mod: number; formula: string };

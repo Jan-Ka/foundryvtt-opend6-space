@@ -51,7 +51,7 @@ export default class OD6SEditDifficulty extends HandlebarsApplicationMixin(Appli
         formData: any,
     ): Promise<void> {
         const data = formData.object;
-        const message = (game as any).messages.get(data.messageId);
+        const message = game.messages.get(data.messageId);
         if (!message) return;
 
         const diff = (+data.baseDifficulty) - (+message.getFlag("od6s", "baseDifficulty"));

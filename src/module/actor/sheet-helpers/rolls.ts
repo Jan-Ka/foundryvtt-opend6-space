@@ -166,7 +166,7 @@ export async function rollPurchase(sheet: Sheet, ev: any, buyerId: any): Promise
     const data: any = {
         name: game.i18n.localize("OD6S.PURCHASE") + " " + item.name,
         itemId: item.id,
-        actor: (game as any).actors.get(buyerId),
+        actor: game.actors.get(buyerId),
         seller: sheet.document.id,
         type: "purchase",
         difficultyLevel: OD6S.difficultyShort[item.system.price],
