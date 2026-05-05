@@ -206,9 +206,9 @@ export function registerConfigHelpers() {
     })
 
     Handlebars.registerHelper('getAttributes', function () {
-        const active = {};
+        const active: Record<string, OD6SAttributeField> = {};
         for (const attribute in OD6S.attributes) {
-            if (OD6S.attributes[attribute].active) (active as any)[attribute] = OD6S.attributes[attribute];
+            if (OD6S.attributes[attribute].active) active[attribute] = OD6S.attributes[attribute];
         }
         return active;
     })
@@ -218,10 +218,10 @@ export function registerConfigHelpers() {
     });
 
     Handlebars.registerHelper('getActiveAttributes', function (attributes) {
-        const active = {};
+        const active: Record<string, OD6SAttributeField> = {};
         for (const attr in attributes) {
             if(attributes[attr].active) {
-                (active as any)[attr] = attributes[attr];
+                active[attr] = attributes[attr];
             }
         }
         return active;
@@ -291,7 +291,7 @@ export function registerConfigHelpers() {
     });
 
     Handlebars.registerHelper('templateItemTypes', function (type, actorTypes) {
-        const itemTypes = {};
+        const itemTypes: Record<string, { label: string }> = {};
         let templateItems = [];
 
         // Item group, filter by actor types
@@ -319,7 +319,7 @@ export function registerConfigHelpers() {
             const defaultData = model ? model.defineSchema() : {};
             const label = (e === 'manifestation') ? OD6S.manifestationsName :
                 (defaultData.label?.initial ?? e);
-            (itemTypes as any)[e] = { label };
+            itemTypes[e] = { label };
         }
         return itemTypes;
     })

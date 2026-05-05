@@ -135,7 +135,10 @@ export class OD6SItem extends Item {
     /**
      * Filter the Create New Item dialog
      */
-    static async createDialog(data={}, {parent=null, pack=null, ...options}={}) {
+    static async createDialog(
+        data: { name?: string; folder?: string; type?: string; [key: string]: unknown } = {},
+        {parent=null, pack=null, ...options}: { parent?: Actor | null; pack?: string | null; [key: string]: unknown } = {},
+    ) {
 
         // Collect data
         const documentName = this.metadata.name;
@@ -174,13 +177,13 @@ export class OD6SItem extends Item {
             "templates/sidebar/document-create.html",
             {
                 folders,
-                name: (data as any).name || game.i18n.format("DOCUMENT.New", {type: label}),
-                folder: (data as any).folder,
+                name: data.name || game.i18n.format("DOCUMENT.New", {type: label}),
+                folder: data.folder,
                 hasFolders: folders.length >= 1,
-                type: (data as any).type || CONFIG[documentName]?.defaultType || types[0],
-                types: types.reduce((obj, t) => {
+                type: data.type || CONFIG[documentName]?.defaultType || types[0],
+                types: types.reduce<Record<string, string>>((obj, t) => {
                     const label = CONFIG[documentName]?.typeLabels?.[t] ?? t;
-                    (obj as any)[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
+                    obj[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
                     return obj;
                 }, {}),
                 hasTypes: types.length > 1
@@ -200,9 +203,9 @@ export class OD6SItem extends Item {
         if (!result) return null;
 
         foundry.utils.mergeObject(data, result, {inplace: true});
-        if (!(data as any).folder) delete (data as any).folder;
-        if (types.length === 1) (data as any).type = types[0];
-        if (!(data as any).name?.trim()) (data as any).name = this.defaultName();
+        if (!data.folder) delete data.folder;
+        if (types.length === 1) data.type = types[0];
+        if (!data.name?.trim()) data.name = this.defaultName();
         return this.create(data, {parent, pack, renderSheet: true});
     }
 

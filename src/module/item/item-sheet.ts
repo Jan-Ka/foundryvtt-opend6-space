@@ -353,7 +353,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
             "systems/od6s/templates/item/item-template-add.html",
             {templateItems});
         const label = game.i18n.localize(
-            (game.system as any).template.Item[event.currentTarget.dataset.type].label);
+            game.system.template.Item[event.currentTarget.dataset.type].label);
         const result = await DialogV2.input({
             window: {title: game.i18n.localize("OD6S.ADD") + " " + label + "!"},
             content,
@@ -398,7 +398,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
             "systems/od6s/templates/item/item-template-item-edit.html",
             itemData);
         const label = game.i18n.localize(
-            (game.system as any).template.Item[target.dataset.type!].label);
+            game.system.template.Item[target.dataset.type!].label);
         const result = await DialogV2.input({
             window: {title: game.i18n.localize("OD6S.EDIT") + " " + label + "!"},
             content,

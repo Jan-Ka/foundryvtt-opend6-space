@@ -28,6 +28,11 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `(game as any)` and `(canvas as any)` casts that were papering over
   the gap (14 game / 2 canvas sites) and the `(buyer.system as any)`
   casts in inventory transfer (#56).
+- `GameSystem.template` is now typed (Foundry's `template.json`
+  descriptor used by item-sheet creation/edit dialogs), and several
+  Handlebars accumulators are typed as `Record<string, T>` instead
+  of being indexed via `as any`. `OD6SItem.createDialog` now takes a
+  typed `data` parameter (#56).
 
 ### Fixed
 
