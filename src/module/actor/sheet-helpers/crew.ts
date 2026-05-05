@@ -18,7 +18,11 @@ import {od6sutilities} from "../../system/utilities";
 type Sheet = any;
 
 export async function linkCrew(sheet: Sheet, uuid: string): Promise<void> {
-    if (sheet.document.system.crewmembers.includes(uuid)) return;
+    // crewmembers is an array of {uuid, name, sort} objects, so .includes(uuid)
+    // would always be false — match by .uuid to actually deduplicate.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existing: any[] = sheet.document.system.crewmembers;
+    if (existing.some((c) => c.uuid === uuid)) return;
 
     const actor = await od6sutilities.getActorFromUuid(uuid);
     let result;
@@ -30,13 +34,10 @@ export async function linkCrew(sheet: Sheet, uuid: string): Promise<void> {
 
     if (result) {
         const crew = {uuid: actor!.uuid, name: actor!.name, sort: 0};
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const update: any = {
+        await sheet.document.update({
             id: sheet.document.id,
-            system: {crewmembers: sheet.document.system.crewmembers},
-        };
-        update.system.crewmembers.push(crew);
-        await sheet.document.update(update);
+            system: {crewmembers: [...existing, crew]},
+        });
     }
 }
 
