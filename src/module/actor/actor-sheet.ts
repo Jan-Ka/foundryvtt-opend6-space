@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const foundry: any;
-import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
 import OD6SCreateCharacter from "../apps/character-creation";
@@ -27,6 +26,11 @@ import {
     prepareCharacterItems, prepareVehicleItems,
     prepareStarshipItems, prepareContainerItems,
 } from "./sheet-helpers/prepare-items";
+import {
+    rollAvailableAction, rollAvailableVehicleAction,
+    rollBodyPoints, rollPurchase as rollPurchaseHelper,
+} from "./sheet-helpers/rolls";
+import {onPurchase, onTransfer} from "./sheet-helpers/inventory-transfer";
 
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
@@ -384,109 +388,15 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     /* -------------------------------------------- */
-    /*  Roll Methods                                 */
+    /*  Roll Methods (delegates)                     */
     /* -------------------------------------------- */
 
     async _rollAvailableVehicleAction(ev: any) {
-        const rollData: any = {score: 0, scale: 0};
-        const data = ev.currentTarget.dataset;
-        const actorData = this.document.system;
-
-        if (data.rollable !== "true") return;
-
-        if (["vehicleramattack", "vehiclemaneuver", "vehicledodge"].includes(data.type)) {
-            rollData.score = od6sutilities.getScoreFromSkill(this.document,
-                    actorData.vehicle.specialization.value,
-                    actorData.vehicle.skill.value, OD6S.vehicle_actions[data.id].base)
-                + actorData.vehicle.maneuverability.score;
-        } else if (data.type === "vehiclesensors") {
-            rollData.score = +(od6sutilities.getScoreFromSkill(this.document, "",
-                actorData.vehicle.sensors.skill, OD6S.vehicle_actions[data.id].base)) + (+data.score);
-        } else if (data.type === "vehicleshields") {
-            rollData.score = od6sutilities.getScoreFromSkill(this.document, "",
-                actorData.vehicle.shields.skill.value, OD6S.vehicle_actions[data.id].base);
-        } else {
-            const item = actorData.vehicle.vehicle_weapons.find((i: any) => i.id === data.id);
-            if (item !== null && typeof item !== "undefined") {
-                rollData.score = od6sutilities.getScoreFromSkill(this.document, item.system.specialization.value,
-                    game.i18n.localize(item.system.skill.value), item.system.attribute.value);
-                rollData.score += item.system.fire_control.score;
-                rollData.scale = item.system.scale.score;
-                rollData.damage = item.system.damage.score;
-                rollData.damage_type = item.system.damage.type;
-            }
-        }
-
-        if (!rollData.scale) rollData.scale = actorData.vehicle.scale.score;
-        rollData.name = game.i18n.localize(data.name);
-        rollData.type = "action";
-        rollData.actor = this.document;
-        rollData.subtype = data.type;
-        await od6sroll._onRollDialog(rollData);
+        return rollAvailableVehicleAction(this, ev);
     }
 
     async _rollAvailableAction(ev: any) {
-        const rollData: any = {token: this.token};
-        const data = ev.currentTarget.dataset;
-        let name = game.i18n.localize(data.name);
-        let flatPips = 0;
-
-        if (data.rollable !== "true") return;
-        if (data.id !== "") {
-            const item = this.document.items.find((i: any) => i.id === data.id);
-            if (item !== null && typeof item !== "undefined") {
-                return await item.roll(data.type === "parry");
-            }
-        }
-
-        if (["dodge", "parry", "block"].includes(data.type)) {
-            switch (data.type) {
-                case "dodge": name = OD6S.actions.dodge.skill; break;
-                case "parry": name = OD6S.actions.parry.skill; break;
-                case "block": name = OD6S.actions.block.skill; break;
-            }
-            name = game.i18n.localize(name);
-        }
-
-        if (data.type === "attribute") {
-            name = data.name;
-            rollData.attribute = data.id;
-        } else {
-            let skill = this.document.items.find((i: any) => i.type === "skill" && i.name === name);
-            if (skill !== null && typeof skill !== "undefined") {
-                if (OD6S.flatSkills) {
-                    rollData.score = (+this.document.system.attributes[skill.system.attribute.toLowerCase()].score);
-                    flatPips = (+skill.system.score);
-                } else {
-                    rollData.score = (+skill.system.score)
-                        + (+this.document.system.attributes[skill.system.attribute.toLowerCase()].score);
-                }
-            } else {
-                skill = await od6sutilities._getItemFromWorld(name);
-                if (skill !== null && typeof skill !== "undefined") {
-                    rollData.score = (+this.document.system.attributes[skill.system.attribute.toLowerCase()].score);
-                } else {
-                    skill = await od6sutilities._getItemFromCompendium(name);
-                    if (skill !== null && typeof skill !== "undefined") {
-                        rollData.score = (+this.document.system.attributes[skill.system.attribute.toLowerCase()].score);
-                    } else {
-                        for (const a in OD6S.actions) {
-                            if (OD6S.actions[a].type === ev.currentTarget.dataset.type) {
-                                rollData.score = (+this.document.system.attributes[OD6S.actions[a].base].score);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (flatPips > 0) rollData.flatpips = flatPips;
-        rollData.name = name;
-        rollData.type = "action";
-        rollData.actor = this.document;
-        rollData.subtype = data.type;
-        await od6sroll._onRollDialog(rollData);
+        return rollAvailableAction(this, ev);
     }
 
     async _editEffect(ev: any) {
@@ -542,110 +452,22 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     /* -------------------------------------------- */
-    /*  Rolling                                      */
+    /*  Rolling & Inventory (delegates)              */
     /* -------------------------------------------- */
 
     async _rollBodyPoints() {
-        const strDice = od6sutilities.getDiceFromScore(this.document.system.attributes.str.score
-            + this.document.system.attributes.str.mod);
-        let rollString;
-        if (game.settings.get("od6s", "use_wild_die")) {
-            if (strDice.dice < 2) rollString = "1dw";
-            else rollString = (+strDice.dice - 1) + "d6+1dw";
-        } else {
-            rollString = strDice.dice + "d6";
-        }
-        rollString += "+" + (+strDice.pips + 20);
-
-        const label = game.i18n.localize("OD6S.ROLLING") + " " + game.i18n.localize(OD6S.bodyPointsName);
-
-        let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
-        if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
-            rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
-        }
-        const roll = await new Roll(rollString).evaluate();
-        await roll.toMessage({
-            speaker: ChatMessage.getSpeaker(),
-            flavor: label,
-        }, {rollMode, create: true});
-
-        await this.document.update({"system.wounds.body_points.max": roll.total});
+        return rollBodyPoints(this);
     }
 
     async rollPurchase(ev: any, buyerId: any) {
-        const item = this.document.items.get(ev.currentTarget.dataset.itemId);
-        if (typeof item === "undefined") return ui.notifications.warn(game.i18n.localize("OD6S.ITEM_NOT_FOUND"));
-        const data: any = {
-            name: game.i18n.localize("OD6S.PURCHASE") + " " + item.name,
-            itemId: item.id,
-            actor: (game as any).actors.get(buyerId),
-            seller: this.document.id,
-            type: "purchase",
-            difficultyLevel: OD6S.difficultyShort[item.system.price],
-        };
-        data.score = data.actor.system.funds.score;
-        await od6sroll._onRollDialog(data);
+        return rollPurchaseHelper(this, ev, buyerId);
     }
 
     async _onPurchase(itemId: any, buyerId: any) {
-        const seller = this.document;
-        const buyer = (game as any).actors.get(buyerId);
-        const item = seller.items.get(itemId);
-
-        if (OD6S.cost === "1") {
-            if ((+buyer!.system.credits.value) < (+item!.system.cost)) {
-                ui.notifications.warn(game.i18n.localize("OD6S.WARN_NOT_ENOUGH_CURRENCY"));
-                return;
-            }
-            await buyer!.update({"system.credits.value": (+buyer!.system.credits.value) - (+item!.system.cost)});
-        }
-
-        const boughtItem = JSON.parse(JSON.stringify(item));
-        boughtItem.system.quantity = 1;
-        if (item!.type === "gear") {
-            const hasItem = buyer!.items.filter((i: any) => i.name === item!.name);
-            if (hasItem.length > 0) {
-                await hasItem[0].update({"system.quantity": (+hasItem[0].system.quantity) + 1});
-            } else {
-                await buyer!.createEmbeddedDocuments("Item", [boughtItem]);
-            }
-        } else {
-            await buyer!.createEmbeddedDocuments("Item", [boughtItem]);
-        }
-
-        const sellerUpdate: any = {};
-        if (item!.system.quantity > 0) sellerUpdate["system.quantity"] = (+item!.system.quantity) - 1;
-        await item!.update(sellerUpdate);
+        return onPurchase(this, itemId, buyerId);
     }
 
     async _onTransfer(itemId: any, senderId: any, recId: any) {
-        const sender = (game as any).actors.get(senderId);
-        const receiver = (game as any).actors.get(recId);
-        const item = sender!.items.get(itemId);
-
-        const recItem = JSON.parse(JSON.stringify(item));
-        recItem.quantity = 1;
-        if (item!.type === "gear") {
-            const hasItem = receiver!.items.filter((i: any) => i.name === item!.name);
-            if (hasItem.length > 0) {
-                await hasItem[0].update({"system.quantity": (+hasItem[0].system.quantity) + 1});
-            } else {
-                await receiver!.createEmbeddedDocuments("Item", [recItem]);
-            }
-
-            const senderUpdate: any = {};
-            if (item!.system.quantity > 0) senderUpdate["system.quantity"] = (+item!.system.quantity) - 1;
-            await item!.update(senderUpdate);
-
-            if ((sender!.type === "character" || sender!.type === "container")
-                && item!.system.quantity === 0) {
-                await sender!.deleteEmbeddedDocuments("Item", [item!.id]);
-            }
-        } else {
-            await receiver!.createEmbeddedDocuments("Item", [recItem]);
-            await sender!.deleteEmbeddedDocuments("Item", [item!.id]);
-        }
-
-        await this.render();
+        return onTransfer(this, itemId, senderId, recId);
     }
 }
