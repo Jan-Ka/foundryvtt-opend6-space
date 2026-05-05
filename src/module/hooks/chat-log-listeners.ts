@@ -333,8 +333,8 @@ export function registerChatLogListeners() {
                 if (game.combat) {
                     for (const t of game.combat.combatants) {
                         const target = {
-                            "id": (t as any).token.id,
-                            "name": (t as any).token.name
+                            "id": t.token.id,
+                            "name": t.token.name
                         }
                         data.targets.push(target);
 
