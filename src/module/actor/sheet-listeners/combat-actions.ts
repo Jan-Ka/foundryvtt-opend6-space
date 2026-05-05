@@ -4,18 +4,17 @@
  * sheets can still roll attacks.
  */
 export function registerCombatRollListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
-    el.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
         elem.addEventListener('click', async (ev: Event) => {
             await sheet._rollAvailableAction(ev);
         }));
 
-    el.querySelectorAll<HTMLElement>('.vehicle-action').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.vehicle-action').forEach((elem: HTMLElement) =>
         elem.addEventListener('click', async (ev: Event) => {
             await sheet._rollAvailableVehicleAction(ev);
         }));
@@ -25,25 +24,24 @@ export function registerCombatRollListeners(
  * Register combat action-related event listeners on the actor sheet.
  */
 export function registerCombatActionListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     // Add/remove actions
-    el.querySelectorAll<HTMLElement>('.addaction').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.addaction').forEach((elem: HTMLElement) =>
         elem.addEventListener('click', () => {
             sheet._onActionAdd();
         }));
 
-    el.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.combat-action').forEach((elem: HTMLElement) =>
         elem.addEventListener('contextmenu', (ev: Event) => {
             sheet._onAvailableActionAdd(ev);
         }));
 
     // Edit misc action
-    el.querySelectorAll<HTMLElement>('.editmiscaction').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.editmiscaction').forEach((elem: HTMLElement) =>
         elem.addEventListener('change', async (ev: Event) => {
             const update: Record<string, unknown> = {};
             const ct = ev.currentTarget as HTMLElement;
@@ -55,7 +53,7 @@ export function registerCombatActionListeners(
         }));
 
     // Fate point in effect checkbox
-    el.querySelectorAll<HTMLElement>('.fatepointeffect').forEach((elem: HTMLElement) =>
+    root.querySelectorAll<HTMLElement>('.fatepointeffect').forEach((elem: HTMLElement) =>
         elem.addEventListener('change', async () => {
             // Don't allow if actor has 0 points
             if (sheet.document.system.fatepoints.value < 1) {

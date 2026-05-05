@@ -41,21 +41,20 @@ function recalcScoreFromInput(
  * rolling is a play-mode action and must work for any owner.
  */
 export function registerRollListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     const rollDialog = new (od6sroll);
-    el.querySelectorAll<HTMLElement>('.rolldialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.rolldialog').forEach((elem) =>
         elem.addEventListener('click', rollDialog._onRollEvent.bind(sheet)));
-    el.querySelectorAll<HTMLElement>('.initrolldialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.initrolldialog').forEach((elem) =>
         elem.addEventListener('click', od6sInitRoll._onInitRollDialog.bind(sheet) as unknown as EventListener));
-    el.querySelectorAll<HTMLElement>('.actionroll').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.actionroll').forEach((elem) =>
         elem.addEventListener('click', rollDialog._onRollItem.bind(sheet)));
 
-    el.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
         elem.addEventListener('click', async () => {
             const ok = await foundry.applications.api.DialogV2.confirm({
                 window: {title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
@@ -70,37 +69,36 @@ export function registerRollListeners(
  * advances, funds, toughness, maneuverability, body points, etc.) on the actor sheet.
  */
 export function registerScoreListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     // Attribute/skill advances
     const advanceDialog = new (od6sadvance);
-    el.querySelectorAll<HTMLElement>('.advancedialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.advancedialog').forEach((elem) =>
         elem.addEventListener('click', advanceDialog._onAdvance.bind(sheet)));
 
     // Attribute context menu (no-op handlers preserved)
-    el.querySelectorAll<HTMLElement>('.attributedialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.attributedialog').forEach((elem) =>
         elem.addEventListener('contextmenu', () => {}));
 
     // Skill context menu (no-op handlers preserved)
-    el.querySelectorAll<HTMLElement>('.skilldialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.skilldialog').forEach((elem) =>
         elem.addEventListener('contextmenu', () => {}));
 
     // Skill specialization
     const specializeDialog = new (od6sspecialize);
-    el.querySelectorAll<HTMLElement>('.specializedialog').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.specializedialog').forEach((elem) =>
         elem.addEventListener('click', specializeDialog._onSpecialize.bind(sheet)));
 
     // Free edit attribute
     const attributeEditDialog = new od6sattributeedit();
-    el.querySelectorAll<HTMLElement>('.attribute-edit').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.attribute-edit').forEach((elem) =>
         elem.addEventListener('click', attributeEditDialog._onAttributeEdit.bind(sheet)));
 
     // Edit funds
-    el.querySelectorAll<HTMLElement>('.edit-funds').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.edit-funds').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.funds.score);
@@ -110,7 +108,7 @@ export function registerScoreListeners(
         }));
 
     // Edit maneuverability
-    el.querySelectorAll<HTMLElement>('.edit-maneuverability').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.edit-maneuverability').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.maneuverability.score);
@@ -120,7 +118,7 @@ export function registerScoreListeners(
         }));
 
     // Edit toughness
-    el.querySelectorAll<HTMLElement>('.edit-toughness').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.edit-toughness').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const target = ev.target as HTMLInputElement;
             const oldScore = od6sutilities.getDiceFromScore(sheet.document.system.toughness.score);
@@ -130,7 +128,7 @@ export function registerScoreListeners(
         }));
 
     // Edit body points
-    el.querySelectorAll<HTMLElement>('.editbodypoints').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.editbodypoints').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const target = ev.target as HTMLInputElement;
             await sheet.document.setWoundLevelFromBodyPoints(+target.value);
@@ -138,13 +136,13 @@ export function registerScoreListeners(
         }));
 
     // Edit active effect (score-related effects)
-    el.querySelectorAll<HTMLElement>('.edit-effect').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.edit-effect').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             await sheet._editEffect(ev);
         }));
 
     // Event listener for skill usage checkboxes
-    el.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox').forEach((elem) =>
+    root.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox').forEach((elem) =>
         elem.addEventListener('change', async (event: Event) => {
             const ct = event.currentTarget as HTMLInputElement;
             const itemId = ct.dataset.itemId;
@@ -157,9 +155,9 @@ export function registerScoreListeners(
         }));
 
     // Event listener for Session Reset button
-    el.querySelectorAll<HTMLElement>('.session-reset-button').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.session-reset-button').forEach((elem) =>
         elem.addEventListener('click', () => {
-            const checkboxes = el.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox');
+            const checkboxes = root.querySelectorAll<HTMLInputElement>('.skill-used-checkbox, .spec-used-checkbox');
             checkboxes.forEach((checkbox) => {
                 const itemId = checkbox.dataset.itemId;
                 const item = sheet.document.items.get(itemId);

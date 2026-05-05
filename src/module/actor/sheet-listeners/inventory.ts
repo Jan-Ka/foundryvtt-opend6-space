@@ -6,14 +6,13 @@ import OD6S from "../../config/config-od6s";
  * Register inventory-related event listeners on the actor sheet.
  */
 export function registerInventoryListeners(
-    html: HTMLElement[],
+    root: HTMLElement,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sheet: any,
 ): void {
-    const el = html[0];
 
     // Edit item quantity
-    el.querySelectorAll<HTMLElement>('.edit-quantity').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.edit-quantity').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.get(ct.dataset.itemId);
@@ -23,7 +22,7 @@ export function registerInventoryListeners(
         }));
 
     // Use a consumable
-    el.querySelectorAll<HTMLElement>('.use-consumable').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.use-consumable').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.get(ct.dataset.itemId);
@@ -58,7 +57,7 @@ export function registerInventoryListeners(
         }));
 
     // Equip an item
-    el.querySelectorAll<HTMLElement>('.equip-checkbox').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.equip-checkbox').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.find((i: Item) => i.id === ct.dataset.itemId);
@@ -117,7 +116,7 @@ export function registerInventoryListeners(
         }));
 
     // Update Inventory Item
-    el.querySelectorAll<HTMLElement>('.item-edit').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-edit').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             let itemId;
@@ -132,27 +131,27 @@ export function registerInventoryListeners(
         }));
 
     // Delete Inventory Item
-    el.querySelectorAll<HTMLElement>('.item-delete').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-delete').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             await sheet.deleteItem(ev);
         }));
 
     // Add Inventory Item
-    el.querySelectorAll<HTMLElement>('.item-create').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-create').forEach((elem) =>
         elem.addEventListener('click', sheet._onItemCreate.bind(sheet)));
-    el.querySelectorAll<HTMLElement>('.cargo-hold-add').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.cargo-hold-add').forEach((elem) =>
         elem.addEventListener('click', sheet.document.onCargoHoldItemCreate.bind(sheet.document)));
 
     // Add Item to actor using a button
-    el.querySelectorAll<HTMLElement>('.item-add').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-add').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             await sheet.addItem(ev);
         }));
 
     // Show item details
-    el.querySelectorAll<HTMLElement>('.show-item-details').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.show-item-details').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
             const ct = ev.currentTarget as HTMLElement;
@@ -175,7 +174,7 @@ export function registerInventoryListeners(
         }));
 
     // Purchase click event
-    el.querySelectorAll<HTMLElement>('.item-purchase').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-purchase').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             if (typeof game.user.character === 'undefined') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
@@ -190,7 +189,7 @@ export function registerInventoryListeners(
         }));
 
     // Transfer click event
-    el.querySelectorAll<HTMLElement>('.item-transfer').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.item-transfer').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             if (typeof game.user.character === 'undefined') {
                 ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
@@ -201,7 +200,7 @@ export function registerInventoryListeners(
         }));
 
     // Merchant owner edit quantity
-    el.querySelectorAll<HTMLElement>('.merchant-quantity-owner').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.merchant-quantity-owner').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.get(ct.dataset.itemId);
@@ -212,7 +211,7 @@ export function registerInventoryListeners(
         }));
 
     // Merchant owner edit cost
-    el.querySelectorAll<HTMLElement>('.merchant-cost-owner').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.merchant-cost-owner').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.get(ct.dataset.itemId);
@@ -223,7 +222,7 @@ export function registerInventoryListeners(
         }));
 
     // Merchant owner edit price
-    el.querySelectorAll<HTMLElement>('.merchant-price-owner').forEach((elem) =>
+    root.querySelectorAll<HTMLElement>('.merchant-price-owner').forEach((elem) =>
         elem.addEventListener('change', async (ev: Event) => {
             const ct = ev.currentTarget as HTMLElement;
             const item = sheet.document.items.get(ct.dataset.itemId);
