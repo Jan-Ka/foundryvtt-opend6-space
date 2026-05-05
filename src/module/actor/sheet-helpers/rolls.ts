@@ -1,9 +1,17 @@
 /**
- * Roll-dialog dispatchers for the actor sheet. Each function takes the sheet
- * (instead of being a method on it) so the sheet class can stay focused on
- * Foundry's V2 lifecycle while these stay testable in isolation. All four
- * funnel into `od6sroll._onRollDialog` — they assemble its input from the
- * triggering DOM event plus the actor's current state.
+ * Roll dispatchers for the actor sheet. Each function takes the sheet
+ * (instead of being a method on it) so the sheet class can stay focused
+ * on Foundry's V2 lifecycle while these stay testable in isolation.
+ *
+ * Three of the four funnel into `od6sroll._onRollDialog` — assembling its
+ * input from the triggering DOM event plus the actor's current state.
+ * Two exceptions worth noting:
+ *   - `rollAvailableAction` short-circuits via `item.roll(...)` when the
+ *     dataset row references a real owned item, never reaching the dialog
+ *     helper directly (the item path itself opens the dialog further down).
+ *   - `rollBodyPoints` posts a vanilla Foundry `Roll` straight to chat —
+ *     it's a one-shot strength-die roll that updates the actor's body-
+ *     points cap, not a player roll that needs the modifier dialog.
  */
 
 import {od6sroll} from "../../apps/roll";
