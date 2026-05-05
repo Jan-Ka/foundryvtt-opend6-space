@@ -31,6 +31,7 @@ import {
     rollBodyPoints, rollPurchase as rollPurchaseHelper,
 } from "./sheet-helpers/rolls";
 import {onPurchase, onTransfer} from "./sheet-helpers/inventory-transfer";
+import {linkCrew, unlinkCrew} from "./sheet-helpers/crew";
 
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
@@ -333,61 +334,6 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     /* -------------------------------------------- */
-    /*  Drag Handlers                                */
-    /* -------------------------------------------- */
-
-    async _dragAvailableCombatAction(event: any) {
-        const data = event.target.children[0].dataset;
-        const transferData = {
-            name: data.name,
-            type: "availableaction",
-            subtype: typeof data.subtype !== "undefined" ? data.subtype : data.type,
-            itemId: data.id,
-            rollable: data.rollable,
-        };
-        return event.dataTransfer.setData("text/plain", JSON.stringify(transferData));
-    }
-
-    async _dragAssignedCombatAction(event: any) {
-        const data = event.target.children[0].dataset;
-        const transferData = {
-            name: data.name,
-            type: "assignedaction",
-            subtype: typeof data.subtype !== "undefined" ? data.subtype : data.type,
-            itemId: data.itemId,
-            rollable: data.rollable,
-            id: data.id,
-        };
-        return event.dataTransfer.setData("text/plain", JSON.stringify(transferData));
-    }
-
-    async _dragCrewMember(event: any) {
-        const data = event.target.dataset;
-        const transferData = {crewUuid: data.crewUuid, type: "crewmember"};
-        return event.dataTransfer.setData("text/plain", JSON.stringify(transferData));
-    }
-
-    _onDragStart(event: any) {
-        const li = event.currentTarget;
-        if ("link" in event.target.dataset) return;
-
-        let dragData;
-        if (li.dataset.itemId) {
-            const item = this.document.items.get(li.dataset.itemId);
-            dragData = item!.toDragData();
-        }
-        if (li.dataset.effectId) {
-            const effect = this.document.effects.get(li.dataset.effectId);
-            dragData = effect!.toDragData();
-        }
-        if (li.dataset.crewUuid) {
-            dragData = li.dataset.crewUuid;
-        }
-        if (!dragData) return;
-        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-    }
-
-    /* -------------------------------------------- */
     /*  Roll Methods (delegates)                     */
     /* -------------------------------------------- */
 
@@ -405,50 +351,15 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     /* -------------------------------------------- */
-    /*  Crew Management                              */
+    /*  Crew Management (delegates)                  */
     /* -------------------------------------------- */
 
     async linkCrew(uuid: any) {
-        if (this.document.system.crewmembers.includes(uuid)) return;
-
-        const actor = await od6sutilities.getActorFromUuid(uuid);
-        let result;
-        if (game.user.isGM) {
-            result = await actor!.addToCrew(this.document.uuid);
-        } else {
-            result = await OD6S.socket.executeAsGM("addToVehicle", this.document.uuid, uuid);
-        }
-
-        if (result) {
-            const crew = {uuid: actor!.uuid, name: actor!.name, sort: 0};
-            const update: any = {
-                id: this.document.id,
-                system: {crewmembers: this.document.system.crewmembers},
-            };
-            update.system.crewmembers.push(crew);
-            await this.document.update(update);
-        }
+        return linkCrew(this, uuid);
     }
 
     async unlinkCrew(crewID: any) {
-        const crewMembers = this.document.system.crewmembers.filter((e: any) => e.uuid !== crewID);
-
-        if (await fromUuid(crewID)) {
-            if (game.user.isGM) {
-                const actor = await od6sutilities.getActorFromUuid(crewID);
-                await actor!.removeFromCrew(this.document.uuid);
-            } else {
-                game.socket.emit("system.od6s", {
-                    operation: "removeFromVehicle",
-                    message: {actorId: crewID, vehicleId: this.document.uuid},
-                });
-            }
-        }
-
-        await this.document.update({
-            id: this.document.id,
-            system: {crewmembers: crewMembers},
-        });
+        return unlinkCrew(this, crewID);
     }
 
     /* -------------------------------------------- */
