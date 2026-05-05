@@ -41,14 +41,12 @@ export class OD6SItem extends Item {
             this.system.score = (+this.system.base) + (+this.system.mod);
         }
         if (isVehicleWeaponItem(this) || isStarshipWeaponItem(this)) {
-            const sys = this.system as OD6SVehicleWeaponItemSystem & {
-                stats: { attribute: string; skill: string; specialization: string };
-                subtype: string;
+            const sys = this.system;
+            sys.stats = {
+                attribute: sys.attribute.value,
+                skill: sys.skill.value,
+                specialization: sys.specialization.value,
             };
-            sys.stats = {} as typeof sys.stats;
-            sys.stats.attribute = sys.attribute.value;
-            sys.stats.skill = sys.skill.value;
-            sys.stats.specialization = sys.specialization.value;
             sys.subtype = 'vehiclerangedweaponattack';
         }
     }

@@ -85,8 +85,36 @@ interface OD6SCharacterSystem {
         skills: Record<string, number>;
         specializations: Record<string, number>;
     };
-    /** Crewmember actors carry a reference back to their vehicle. */
-    vehicle: { uuid: string; name?: string; scale?: OD6SScoreField; vehicle_weapons?: any[] };
+    /**
+     * Crewmember actors carry a snapshot of their vehicle's data, pushed by
+     * `actor-helpers/crew-vehicle.ts:sendVehicleData`. Fields mirror the
+     * vehicle-common schema; all are optional because the proxy is built
+     * field-by-field at runtime.
+     */
+    vehicle: {
+        uuid: string;
+        name?: string;
+        type?: string;
+        move?: { value: number; type: string; label: string };
+        maneuverability?: { score: number; type: string; label: string };
+        toughness?: { score: number; type: string; label: string };
+        armor?: { score: number; type: string; label: string };
+        crewmembers?: Array<{ uuid: string; name?: string }>;
+        attribute?: OD6SVehicleStringField;
+        skill?: OD6SVehicleStringField;
+        specialization?: OD6SVehicleStringField;
+        damage?: { value: string; type: string; label: string };
+        shields?: Record<string, unknown>;
+        scale?: OD6SScoreField;
+        sensors?: Record<string, unknown>;
+        dodge?: { score: number; mod: number; type: string; label: string };
+        ranged?: { score: number; type: string; label: string };
+        ranged_damage?: { score: number; type: string; label: string };
+        ram?: { score: number; type: string; label: string };
+        ram_damage?: { score: number; type: string; label: string };
+        vehicle_weapons?: any[];
+        items?: unknown;
+    };
     /** Container actors expose a per-player visibility flag. */
     visible?: boolean;
     /** Created marker on character actors. */
@@ -110,6 +138,13 @@ interface OD6SContainerSystem {
     locked: boolean;
 }
 
+/** Top-level `{value, type, label}` shape used for pilot skill/spec/attribute on vehicle actors (per `vehicle-common.ts`). */
+interface OD6SVehicleStringField {
+    value: string;
+    type: string;
+    label: string;
+}
+
 /** System data for vehicle and starship actor types. */
 interface OD6SVehicleSystem {
     attributes: OD6SAttributes;
@@ -129,6 +164,32 @@ interface OD6SVehicleSystem {
     crew: { value: number };
     /** Vehicle/starship damage state — wound-table key. */
     damage: { value: string };
+    /** Pilot attribute key (top-level, from `vehicle-common.ts`). */
+    attribute: OD6SVehicleStringField;
+    /** Pilot skill name (top-level, from `vehicle-common.ts`). */
+    skill: OD6SVehicleStringField;
+    /** Pilot specialization name (top-level, from `vehicle-common.ts`). */
+    specialization: OD6SVehicleStringField;
+    /** Movement speed (top-level, from `vehicle-common.ts`). */
+    move: { value: number; type: string; label: string };
+    /** Shield state (top-level, from `vehicle-common.ts`). */
+    shields: {
+        value: number;
+        allocated: number;
+        type: string;
+        label: string;
+        skill: string;
+        arcs: Record<string, { label: string; value: number; type: string }>;
+    };
+    /** Sensor state (top-level, from `vehicle-common.ts`). */
+    sensors: {
+        value: boolean;
+        type: string;
+        label: string;
+        skill: string;
+        mod: number;
+        types: Record<string, { score: number; range: number; label: string; type: string }>;
+    };
     roll_mod: number;
     use_wild_die: boolean;
 }
@@ -337,11 +398,23 @@ interface OD6SVehicleItemSystem extends OD6SVehicleCommon {
     altitude: { value: number; type: string; label: string };
 }
 
+/**
+ * Runtime-derived fields populated by `OD6SItem.prepareDerivedData` for
+ * vehicle-weapon and starship-weapon items.
+ */
+interface OD6SVehicleWeaponDerivedFields {
+    /** Snapshot of the {attribute,skill,specialization} `.value`s as plain strings. */
+    stats: { attribute: string; skill: string; specialization: string };
+    /** Always `'vehiclerangedweaponattack'` at present. */
+    subtype: string;
+}
+
 interface OD6SVehicleWeaponItemSystem
     extends OD6SItemBase,
         OD6SEquipment,
         OD6SEquip,
-        OD6SVehicleWeaponsFields {}
+        OD6SVehicleWeaponsFields,
+        OD6SVehicleWeaponDerivedFields {}
 
 interface OD6SVehicleGearItemSystem extends OD6SItemBase, OD6SEquipment, OD6SEquip {
     quantity: number;
@@ -352,7 +425,8 @@ interface OD6SStarshipWeaponItemSystem
     extends OD6SItemBase,
         OD6SEquipment,
         OD6SEquip,
-        OD6SVehicleWeaponsFields {
+        OD6SVehicleWeaponsFields,
+        OD6SVehicleWeaponDerivedFields {
     "area-units": { type: string; value: number; label: string };
     mass: { type: string; value: number; label: string };
     energy: { type: string; value: number; label: string };

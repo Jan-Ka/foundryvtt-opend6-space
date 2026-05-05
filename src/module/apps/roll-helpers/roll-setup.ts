@@ -30,7 +30,7 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
-import {isCharacterActor} from "../../system/type-guards";
+import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
 import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
 import type {IncomingRollData, RollData, ClassifiedRoll, RollTypeKey} from "./roll-data";
 import {classifyRoll} from "./roll-data";
@@ -96,11 +96,7 @@ function resolveItemForDispatch(data: IncomingRollData): Item | undefined {
 
 function resolveVehicleStatsForCharacter(actor: Actor): HandlerContext['vehicleStats'] {
     if (!isCharacterActor(actor)) return undefined;
-    const v = actor.system.vehicle as {
-        scale?: { score: number };
-        ram?: { score: number };
-        ram_damage?: { score: number };
-    } | undefined;
+    const v = actor.system.vehicle;
     if (!v) return undefined;
     return {
         scale: v.scale ? { score: +v.scale.score } : undefined,
@@ -332,8 +328,10 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     // 245 and 487 — same condition twice).
     if (classified.key === 'action-vehicleramattack') {
         const vehicleData = isCharacterActor(data.actor)
-            ? (data.actor.system.vehicle as { ram?: { score?: number } })
-            : (data.actor.system as { ram?: { score?: number } });
+            ? data.actor.system.vehicle
+            : isVehicleActor(data.actor)
+                ? data.actor.system
+                : undefined;
         if (typeof vehicleData?.ram?.score === 'number') {
             bonusmod += vehicleData.ram.score;
         }
@@ -357,7 +355,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         if (isVehicleSubtype) {
             attackerScale = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
                 ? +((data.actor.system as { scale?: { score?: number } }).scale?.score ?? 0)
-                : +(((data.actor.system as OD6SCharacterSystem).vehicle?.scale as { score?: number } | undefined)?.score ?? 0);
+                : +((data.actor.system as OD6SCharacterSystem).vehicle?.scale?.score ?? 0);
         } else {
             attackerScale = +(((data.actor.system as { scale?: { score?: number } }).scale?.score) ?? 0);
         }
