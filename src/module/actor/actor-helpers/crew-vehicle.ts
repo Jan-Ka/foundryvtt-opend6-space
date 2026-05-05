@@ -88,10 +88,7 @@ export function isCrewMember(actor: Actor): boolean {
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
     if (!isVehicleActor(actor)) return;
     const data: any = {};
-    // OD6SVehicleSystem augmentation lacks the runtime-defined `attribute`,
-    // `skill`, `specialization` fields from vehicle-common.ts schema; keep
-    // a Record fallback until that gap is closed.
-    const sys = actor.system as typeof actor.system & Record<string, any>;
+    const sys = actor.system;
     data.uuid = actor.uuid;
     data.name = actor.name;
     data.type = actor.type;

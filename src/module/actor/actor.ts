@@ -108,9 +108,8 @@ export class OD6SActor extends Actor {
         }
     }
 
-    getVehicleActionScore(action: string) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let vehicle: any;
+    getVehicleActionScore(action: string): number | undefined {
+        let vehicle: OD6SVehicleSystem | OD6SCharacterSystem["vehicle"];
         let pilot: Actor | null;
 
         if (isCharacterActor(this)) {
@@ -124,25 +123,26 @@ export class OD6SActor extends Actor {
         }
 
         if(action === 'maneuver') {
-            let score = vehicle.maneuverability.score;
-            if (pilot) {
+            let score: number = vehicle.maneuverability?.score ?? 0;
+            const attrKey = vehicle.attribute?.value;
+            if (pilot && attrKey) {
                 let found = false;
                 const spec = pilot.items.find(i => i.type === "specialization" &&
-                    i.name === vehicle.specialization.value);
+                    i.name === vehicle.specialization?.value);
                 if (spec !== undefined && isSpecializationItem(spec)) {
-                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                    score = (+score) + (+spec.system.score) + (pilot.system.attributes[attrKey].score);
                     found = true;
                 }
 
                 if (!found) {
-                    const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill.value);
+                    const skill = pilot.items.find(i => i.type === "skill" && i.name === vehicle.skill?.value);
                     if (skill !== undefined && isSkillItem(skill)) {
-                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                        score = (+score) + (+skill.system.score) + (pilot.system.attributes[attrKey].score);
                         found = true;
                     }
                 }
                 if (!found) {
-                    score = (+score) + (pilot.system.attributes[vehicle.attribute.value].score);
+                    score = (+score) + (pilot.system.attributes[attrKey].score);
                 }
             }
             return score;
@@ -158,7 +158,7 @@ export class OD6SActor extends Actor {
     }
 
     getVehicleActionScoreText(action: string) {
-        const dice = od6sutilities.getDiceFromScore(this.getVehicleActionScore(action));
+        const dice = od6sutilities.getDiceFromScore(this.getVehicleActionScore(action) ?? 0);
         if (typeof dice.dice === 'undefined' || isNaN(dice.dice)) return;
         return `${dice.dice}D+${dice.pips}`;
     }
