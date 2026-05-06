@@ -10,10 +10,64 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+Two user-facing bug fixes (#40, #86) plus the close-out of three
+long-running internal-decomposition issues (#98 `setupRollData` →
+typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
+#57 / #56 discriminated-union narrowing across the codebase).
+
 ### Added
+
+- 25 pure typed handlers for `setupRollData` under
+  `src/module/apps/roll-helpers/` — one per `(type, subtype)` roll
+  path — plus a `runFinalize` step that owns the COMMON-fields
+  partition. The handler dispatch is exhaustiveness-checked at
+  compile-time via the `RollTypeKey` discriminated union (#98).
+- Smoke specs covering action rolls (brawlattack, vehicleramattack,
+  vehicletoughness) and the melee-range preflight gate, exercising
+  paths the unit/domain layers can't reach (#98).
+- 1010 lines of new domain tests in `tests/domain/` covering the
+  weapon, action, damage/resistance, skill, and resource (funds /
+  purchase) handler buckets (#98).
 
 ### Changed
 
+- `setupRollData` rewritten as a thin coordinator (preflight →
+  classifyRoll → adaptContext → `HANDLERS[key]` → runFinalize),
+  replacing the legacy 650-line single function with 30+ mutable
+  locals. RFCs surfaced during the cutover and applied: `+5` magic
+  constant on action-meleeattack removed (no rules backing, #100);
+  `vehicleramattack` adds `ram.score` once instead of twice (#103);
+  `attackerScale` derives unconditionally from the actor for attack
+  rolls with no targets (#104). The decomposition also unblocked
+  Audit-A — `fatepointeffect` doubling now routes through
+  `FinalizeInput.diceMultiplier` so damaged / `roll_mod` re-derives
+  can't overwrite it (#98 / closes #82).
+- `actor-sheet.ts` decomposed in four phases (#107-#109, #111):
+  788 → 401 LOC. Item categorization and sci-fi defaults extracted
+  to `actor-helpers/`; roll and inventory-transfer wiring extracted
+  to `sheet-helpers/`; drag handlers and crew helpers split into
+  `sheet-listeners/`. `_prepareContext` typed end-to-end and most
+  trivial `any` annotations dropped (closes #83).
+- `roll-setup.ts` pre-decomposition: distance→range bucketing,
+  weapon mods/stun/modifier math, and action / penalty / ram /
+  bonusdice math all extracted into pure unit-tested helpers
+  (`difficulty-math.ts`, `weapon-context-math.ts`, `action-math.ts`,
+  PRs #95-#97). 717 → 678 LOC; ~50 unit tests added (closes #82).
+- Discriminated `Actor` / `Item` unions in `types/od6s.d.ts` plus
+  type-guard helpers in `system/type-guards.ts`
+  (`isCharacterActor`, `isVehicleActor`, `isWeaponItem`, … and the
+  two combined guards added this release). Per-file narrowing
+  swept across `OD6SActor`, `OD6SItem` instance methods,
+  `roll-execute`, `roll-difficulty`, chat-log listeners, skills,
+  weapons, explosives, advance, item-crud, drops, crew-vehicle,
+  socketlib, item-sheet, chat-menu, opposed (#88-#94).
+- `OD6SVehicleSystem` now declares `skill` / `specialization` /
+  `attribute` / `move` / `shields` / `sensors`, matching
+  `vehicle-common.ts`. `OD6SVehicleWeaponItemSystem` and
+  `OD6SStarshipWeaponItemSystem` now declare the runtime-derived
+  `stats` snapshot and `subtype` populated by
+  `prepareDerivedData`. `OD6SCharacterSystem.vehicle` widened to
+  mirror the `sendVehicleData` socket payload (#57 / PR #110).
 - Actor-sheet listener modules now take the sheet root as
   `HTMLElement` rather than a single-element `HTMLElement[]`. Drops
   the `[root]` shim from `_onRender` and the `const el = html[0]`
@@ -59,6 +113,29 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `undefined > total` always returned `false` and the
   dodge-vs-explosive evade branch never fired. High-dodge targets
   now actually evade as intended (#86).
+- Advanced-skill check on action-routed rolls now consults the
+  resolved skill instead of the action item itself. Legacy code
+  cast `this.system as OD6SSkillItemSystem` and read
+  `isAdvancedSkill` off the action item, where it was always
+  undefined → falsy, so advanced skills incorrectly had their
+  linked attribute folded into the score. Surfaced during the #57
+  narrowing of `item.ts` (#57).
+- `roll-action.ts` vehicle-action dispatch tested
+  `actor.type === 'starship'` twice instead of `'vehicle'` and
+  `'starship'`, so any vehicle-action path on a vehicle actor (not
+  starship) crashed in `undefined.specialization`. Caught by the new
+  tier-3-action-rolls smoke spec (#98).
+- Stun-flag schema typo on the explosive-without-zones path was
+  writing to `flags.od6s.stuns` (existing schema field) instead of
+  the intended `stun` boolean. Surfaced while extracting weapon
+  mods/stun math; fixed inline (#82).
+- Effect-mod accumulator on weapon stats now uses an explicit
+  defined-check rather than truthiness, so a `0` effect doesn't
+  silently fall back to the base score (#82).
+- Apply-damage chat-log handler restructured to remove the
+  duplicate `actor.update` call and the asymmetric `-1D` / `-2D`
+  payload it produced; defensive early-returns added to
+  `applyDamage` / `applyWounds` for missing actors (#57 via PR #93).
 
 ### Removed
 
@@ -66,6 +143,10 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `MetaphysicsRollData` type. Zero call sites in code or templates;
   the `(actor as any).actions.length` access inside it would have
   thrown `TypeError` if reached (#86).
+- Dead `brawlattack` top-level RollTypeKey path. No caller produces
+  `type === 'brawlattack'`; `Actor.rollAction` wraps brawl as
+  `{type: 'action', subtype: 'brawlattack'}` which routes to the
+  `action-brawlattack` handler (#98).
 
 ## [2.4.0] - 2026-05-02
 
