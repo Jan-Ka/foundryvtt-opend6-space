@@ -10,6 +10,8 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-05-06
+
 Two user-facing bug fixes (#40, #86) plus the close-out of three
 long-running internal-decomposition issues (#98 `setupRollData` →
 typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
