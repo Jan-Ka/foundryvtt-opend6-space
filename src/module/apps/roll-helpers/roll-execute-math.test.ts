@@ -189,6 +189,16 @@ describe('buildRollString', () => {
         });
         expect(noWrap).toBe('3d6[base]');
     });
+
+    it('does not wrap an empty formula in max() — caller should short-circuit on empty', () => {
+        // Pinning the contract: empty pool + rollMin must NOT produce `max(,5)`,
+        // which Foundry's Roll cannot parse. Empty stays empty so the caller
+        // notifies "zero dice" and bails.
+        expect(buildRollString({
+            dice: 0, pips: 0, characterpoints: 0, bonusdice: 0, bonuspips: 0,
+            wilddie: false, rollMin: 5, labels,
+        })).toBe('');
+    });
 });
 
 describe('detectWildDieResult', () => {

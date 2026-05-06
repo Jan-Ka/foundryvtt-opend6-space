@@ -152,7 +152,9 @@ export function buildRollString(input: RollStringInput): string {
     if (characterpoints > 0) s += "+" + characterpoints + "db" + labels.cp;
     if (bonusdice > 0) s += "+" + bonusdice + "d6" + labels.bonus;
     if (bonuspips > 0) s += "+" + bonuspips;
-    if (rollMin !== undefined && rollMin > 0) {
+    // Skip the wrap on an empty formula — `max(,5)` is not parseable, and the
+    // empty return tells the caller to short-circuit with a "zero dice" warning.
+    if (s !== "" && rollMin !== undefined && rollMin > 0) {
         s = "max(" + s + "," + rollMin + ")";
     }
     return s;
@@ -163,9 +165,9 @@ export interface WildDieDetectionInput {
     terms: Array<{ flavor?: string; total?: number }>;
     /** Localized wild-die flavor with `[]` already stripped to match `term.flavor`. */
     wildFlavor: string;
-    /** OD6S.wildDieOneDefault — > 0 + auto=0 means the player picks an effect. */
+    /** OD6S.wildDieOneDefault — when > 0, a default wild-1 outcome is configured. */
     wildDieOneDefault: number;
-    /** OD6S.wildDieOneAuto — when 0, the wild-1 outcome is not auto-applied. */
+    /** OD6S.wildDieOneAuto — when 0 (combined with default > 0), the configured outcome is auto-applied (`wildHandled=true`); otherwise the player picks. */
     wildDieOneAuto: number;
 }
 
@@ -192,9 +194,9 @@ export function detectWildDieResult(input: WildDieDetectionInput): WildDieDetect
 export interface DamageAssemblyInput {
     /** Starting damage score (weapon damage, brawl strength, etc.). */
     damageScore: number;
-    /** All damage modifiers; mutated copies are returned, the input array is not modified. */
+    /** All damage modifiers — read-only; the helper iterates but does not mutate this array. */
     damageModifiers: Modifier[];
-    /** Pre-fatepoint strength damage dice; doubled in-place when fatepoint + STR-bonus modifier present. */
+    /** Pre-fatepoint strength damage dice. When fatepoint + STR-bonus modifier are present, a doubled copy is returned via `result.strModDice`; the input is not mutated. */
     strModDice?: DiceValue | null;
     /** Roll subtype — only `vehicleramattack` triggers the speed/collision recompute. */
     subtype: string;
