@@ -48,3 +48,24 @@ export function isStarshipWeaponItem(item: Item): item is OD6SStarshipWeaponItem
 export function isActionItem(item: Item): item is OD6SActionItem {
     return item.type === "action";
 }
+
+/**
+ * Combined guard for any weapon-family item. Use when the surrounding code
+ * accesses fields shared across the three weapon types (e.g. `mods`,
+ * `damaged`, `subtype`) rather than vehicle/starship-only fields.
+ */
+export function isAnyWeaponItem(
+    item: Item,
+): item is OD6SWeaponItem | OD6SVehicleWeaponItem | OD6SStarshipWeaponItem {
+    return item.type === "weapon" || item.type === "vehicle-weapon" || item.type === "starship-weapon";
+}
+
+/**
+ * Combined guard for vehicle-borne weapon items. Narrows to the union that
+ * carries vehicle-weapon-specific fields (`fire_control`, `stats`, `subtype`).
+ */
+export function isVehicleBorneWeaponItem(
+    item: Item,
+): item is OD6SVehicleWeaponItem | OD6SStarshipWeaponItem {
+    return item.type === "vehicle-weapon" || item.type === "starship-weapon";
+}
