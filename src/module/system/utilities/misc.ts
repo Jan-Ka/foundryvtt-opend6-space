@@ -27,7 +27,10 @@ export function getTemplateFromMessage(message: ChatMessage): { actor: Actor | u
         actor = game.actors.get(message.speaker.actor);
     }
     const item = actor!.items.get(message.getFlag('od6s', 'itemId'));
-    const regionId = item?.getFlag('od6s', 'explosiveTemplate');
+    // Region id stamped on the message at creation (roll-execute). Falls back
+    // to the (deprecated) item flag for messages created before #40 landed.
+    const regionId = (message.getFlag('od6s', 'template') as string | undefined)
+        ?? (item?.getFlag('od6s', 'explosiveTemplate') as string | undefined);
     const data: any = {};
     data.actor = actor;
     data.item = item;

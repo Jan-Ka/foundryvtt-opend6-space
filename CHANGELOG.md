@@ -31,6 +31,18 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ### Fixed
 
+- Throwing a second instance of the same explosive item before the
+  first resolves no longer clobbers the first throw's flags. The
+  per-throw state (`explosiveTemplate` / `explosiveOrigin` /
+  `explosiveRange` / `explosiveSet`) was scalar on the item document,
+  so throw 2 overwrote the region pointer set by throw 1 and throw 1
+  could no longer be resolved. Replaced with a per-region keyed map
+  at `flags.od6s.explosivePending.<regionId>`; the region id is
+  threaded through `OD6SItem.roll(parry, regionId)` and stamped on
+  each attack chat message as `flags.od6s.template`, so cleanup
+  paths address only their own throw's entry. Migration drops the
+  legacy scalars on world upgrade (#40).
+
 ### Removed
 
 ## [2.4.0] - 2026-05-02

@@ -88,6 +88,15 @@ export interface RollData {
     attackerScale: number;
     modifiers: RollModifiers;
     rollmode?: string;
+    /**
+     * Region id of the explosive blast template tied to this roll. Set by
+     * `OD6SItem.roll(parry, regionId)` for explosive throws routed through
+     * the auto-explosive flow. All later read sites (range/origin lookup,
+     * cleanup, scatter) address the per-throw `flags.od6s.explosivePending`
+     * map by this id, so multiple in-flight throws of the same item can't
+     * clobber each other.
+     */
+    regionId?: string;
 }
 
 /**
@@ -111,6 +120,8 @@ export interface IncomingRollData {
     damage?: number;
     damage_type?: string;
     range?: { short: number; medium: number; long: number } | false;
+    /** See {@link RollData.regionId}. */
+    regionId?: string;
 }
 
 /** Flags written into ChatMessage.flags.od6s by executeRollAction. */
@@ -170,6 +181,14 @@ export interface RollMessageFlags {
      * `whisper === [author.id]` is ambiguous.
      */
     rollMode?: string;
+    /**
+     * Region id of the blast template for explosive attack messages. Lets
+     * cleanup paths (chat preDelete, detonation, manual remove) recover the
+     * per-throw entry in `item.flags.od6s.explosivePending` without falling
+     * back to the latest scalar item flag (which is racy across multiple
+     * in-flight throws of the same item).
+     */
+    template?: string;
 }
 
 /** Minimal payload for metaphysics multi-skill roll dialogs — not a full RollData. */

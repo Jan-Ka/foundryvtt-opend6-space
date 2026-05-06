@@ -30,6 +30,10 @@ const MIGRATION_STEPS: Array<{ since: string; run: () => Promise<void> }> = [
     since: "2.2.0",
     run: () => migrateStatusEffectIcons(),
   },
+  {
+    since: "2.5.0",
+    run: () => migrateExplosivePendingFlags(),
+  },
 ];
 
 const CURRENT_MIGRATION_VERSION = MIGRATION_STEPS[MIGRATION_STEPS.length - 1]!.since;
@@ -197,6 +201,57 @@ async function migrateExplosiveTemplateFlags() {
   }
 
   console.log(`od6s | Cleaned explosive flags from ${count} items.`);
+}
+
+/**
+ * Drop the legacy scalar explosive flags (`explosiveTemplate`, `explosiveOrigin`,
+ * `explosiveRange`, `explosiveSet`). #40 replaces them with a per-region keyed
+ * map at `flags.od6s.explosivePending.<regionId>`. Stale scalars are transient
+ * pending state — the regions they pointed at have been gone since the v14
+ * migration, and the new code reads only the keyed map.
+ */
+async function migrateExplosivePendingFlags() {
+  console.log("od6s | Dropping legacy scalar explosive flags...");
+  let count = 0;
+
+  const drop = {
+    "flags.od6s.-=explosiveTemplate": null,
+    "flags.od6s.-=explosiveOrigin": null,
+    "flags.od6s.-=explosiveRange": null,
+    "flags.od6s.-=explosiveSet": null,
+  };
+
+  for (const actor of game.actors) {
+    const updates = [];
+    for (const item of actor.items) {
+      if (item.getFlag("od6s", "explosiveTemplate")
+          || item.getFlag("od6s", "explosiveOrigin")
+          || item.getFlag("od6s", "explosiveRange")
+          || item.getFlag("od6s", "explosiveSet")) {
+        updates.push({ _id: item.id, ...drop });
+      }
+    }
+    if (updates.length > 0) {
+      await actor.updateEmbeddedDocuments("Item", updates);
+      count += updates.length;
+    }
+  }
+
+  const worldItemUpdates = [];
+  for (const item of game.items) {
+    if (item.getFlag("od6s", "explosiveTemplate")
+        || item.getFlag("od6s", "explosiveOrigin")
+        || item.getFlag("od6s", "explosiveRange")
+        || item.getFlag("od6s", "explosiveSet")) {
+      worldItemUpdates.push({ _id: item.id, ...drop });
+    }
+  }
+  if (worldItemUpdates.length > 0) {
+    await Item.updateDocuments(worldItemUpdates);
+    count += worldItemUpdates.length;
+  }
+
+  console.log(`od6s | Dropped legacy scalar explosive flags from ${count} items.`);
 }
 
 /**

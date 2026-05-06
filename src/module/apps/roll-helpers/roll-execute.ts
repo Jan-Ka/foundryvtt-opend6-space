@@ -9,6 +9,7 @@ import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isW
 import type {Modifier} from "./difficulty-math";
 import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
 import {computeHighHitDamage, computeWildDieReduction, resolveRollMode} from "./roll-execute-math";
+import {clearExplosivePending, getExplosivePending} from "../../system/utilities/explosives";
 import {debug} from "../../system/logger";
 
 export async function executeRollAction(rollData: RollData): Promise<unknown> {
@@ -249,6 +250,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         "stun": rollData.stun,
         "fatepointineffect": rollData.fatepointeffect,
         "isExplosive": rollData.isExplosive,
+        "template": rollData.regionId ?? '',
         "range": rollData.modifiers.range,
         "type": rollData.type,
         "subtype": rollData.subtype ? rollData.subtype : '',
@@ -347,7 +349,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if(game.settings.get('od6s','auto_explosive')
             && !game.settings.get('od6s','explosive_end_of_round')) {
             flags.targets = await od6sutilities.getExplosiveTargets(
-                rollData.actor.isToken ? rollData.actor.token.actor : rollData.actor, rollData.itemid
+                rollData.actor.isToken ? rollData.actor.token.actor : rollData.actor, rollData.itemid, rollData.regionId
             )
         }
     }
@@ -494,9 +496,10 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     if(rollData.isExplosive) {
         const item = rollData.actor.items.find((i: Item) => i.id === rollData.itemid);
-        const origin = item!.getFlag('od6s', 'explosiveOrigin');
-        const regionId = item!.getFlag('od6s', 'explosiveTemplate');
-        const region = canvas.scene.getEmbeddedDocument('Region', regionId);
+        const regionId = rollData.regionId;
+        const pending = item && regionId ? getExplosivePending(item, regionId) : undefined;
+        const origin = pending?.origin;
+        const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
         if (region) {
             await region.setFlag('od6s','message', rollMessage.id);
 
@@ -513,7 +516,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             if (!flags.success) {
                 await od6sutilities.scatterExplosive(rollData.range, origin, regionId);
                 await od6sutilities.wait(100);
-                const newTargets = await od6sutilities.getExplosiveTargets(rollData.actor, rollData.itemid);
+                const newTargets = await od6sutilities.getExplosiveTargets(rollData.actor, rollData.itemid, regionId);
                 if (Object.keys(newTargets).length === 0) {
                     await rollMessage.unsetFlag('od6s', 'showButton');
                     await rollMessage.setFlag('od6s', 'showButton', false);
@@ -526,11 +529,10 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if (region && !game.settings.get('od6s', 'explosive_end_of_round')) {
             await region.update({ visibility: 2 });
         }
-        if (game.settings.get('od6s', 'auto_explosive')) {
-            await item?.unsetFlag('od6s', 'explosiveSet');
-            await item?.unsetFlag('od6s', 'explosiveTemplate');
-            await item?.unsetFlag('od6s', 'explosiveOrigin');
-            await item?.unsetFlag('od6s', 'explosiveRange');
+        if (game.settings.get('od6s', 'auto_explosive') && item) {
+            // Clear only this throw's pending entry so other in-flight throws
+            // of the same item document remain resolvable (#40).
+            await clearExplosivePending(item, regionId);
         }
     }
 

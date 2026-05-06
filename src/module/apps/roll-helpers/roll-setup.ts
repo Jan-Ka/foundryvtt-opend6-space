@@ -35,6 +35,7 @@ import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from 
 import type {IncomingRollData, RollData, ClassifiedRoll, RollTypeKey} from "./roll-data";
 import {classifyRoll} from "./roll-data";
 import {applyWeaponMods} from "./weapon-context-math";
+import {clearExplosivePending, getExplosivePending} from "../../system/utilities/explosives";
 import {computePenalties, isPenaltyBypassType, resolveSkillBackedAction} from "./action-math";
 import type {ActionResolution} from "./action-math";
 import {runPreflight} from "./roll-preflight";
@@ -249,7 +250,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     if (workingScore < settings.pipsPerDice && !flatSkillsBypass) {
         ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
         if (isExplosive) {
-            await cancelAction({ ...data, isExplosive, itemid: data.itemId } as unknown as RollData);
+            await cancelAction({ ...data, isExplosive, itemid: data.itemId, regionId: data.regionId } as unknown as RollData);
         }
         return false;
     }
@@ -388,22 +389,17 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             && !!weaponRangeTable;
         if (wantsBucket) {
             let distance: number | undefined;
-            if (isExplosive) {
-                distance = item?.getFlag('od6s', 'explosiveRange') as number | undefined;
+            if (isExplosive && item) {
+                distance = getExplosivePending(item, data.regionId)?.range;
             } else {
                 distance = Math.floor(canvas.grid.measurePath([(actorToken as Token).center, targets[0].center]).distance);
             }
             if (typeof distance === 'number') {
                 const bucketRange = bucketRangeFromDistance(distance, weaponRangeTable!, rangeDifficulty);
                 if (bucketRange === null) {
-                    if (isExplosive && item) {
-                        const regionId = item.getFlag('od6s', 'explosiveTemplate') as string | undefined;
-                        if (regionId) {
-                            try { await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]); } catch {/* region already gone */}
-                            await item.unsetFlag('od6s', 'explosiveSet');
-                            await item.unsetFlag('od6s', 'explosiveTemplate');
-                            await item.unsetFlag('od6s', 'explosiveRange');
-                        }
+                    if (isExplosive && item && data.regionId) {
+                        try { await canvas.scene.deleteEmbeddedDocuments('Region', [data.regionId]); } catch {/* region already gone */}
+                        await clearExplosivePending(item, data.regionId);
                     }
                     ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));
                     return false;
@@ -550,5 +546,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         targetsRef: targets,
         targetRef: targets[0],
         bucket: bucketWithOverrides,
+        regionId: data.regionId,
     });
 }

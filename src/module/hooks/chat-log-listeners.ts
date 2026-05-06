@@ -123,8 +123,13 @@ export function registerChatLogListeners() {
                 ? game.actors.get(message!.speaker.actor)
                 : game!.scenes.active.tokens.get(message!.speaker.token)?.actor;
             const item = actor!.items.get(message!.getFlag('od6s','itemId'));
-            const regionId = item!.getFlag('od6s','explosiveTemplate');
+            const regionId = message!.getFlag('od6s','template') as string | undefined;
             const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
+            if (item && regionId) {
+                await item.update({
+                    [`flags.od6s.explosivePending.-=${regionId}`]: null,
+                });
+            }
             if (region) await region.setFlag('od6s','handled', true);
             await message!.setFlag('od6s','handled', true);
             if (region) await canvas.scene.deleteEmbeddedDocuments('Region', [region.id]);
