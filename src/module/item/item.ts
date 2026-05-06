@@ -214,13 +214,11 @@ export class OD6SItem extends Item {
         const item = this;
         if (!this.actor) return;
         const actor = this.actor;
-        // `roll()` reads `attributes` (and `vehicle.*` for vehicle-weapon
-        // paths fired by an embedded pilot, where `actor` is the vehicle).
-        // The system schema for vehicles doesn't carry `attributes`, so this
-        // cast is wider than runtime is — vehicle paths through here are a
-        // pre-existing latent issue tracked elsewhere. The
-        // `Record<string, unknown>` slot lets the legacy "attribute key
-        // collision with custom labels" lookup compile (line ~295).
+        // Cast keeps the call sites uniform across actor types — vehicle and
+        // character system schemas both expose `attributes`, but the rest of
+        // `roll()` also reads character-only fields (e.g. `funds`, `credits`)
+        // in the action / purchase paths. Vehicle items normally roll through
+        // `Actor.rollAction`, not here.
         const actorData = actor.system as OD6SCharacterSystem;
         const itemData = item.system;
         let flatPips = 0;
@@ -377,7 +375,13 @@ export class OD6SItem extends Item {
                             rollData.score = (+actorData.attributes[skillSys.attribute.toLowerCase()].score);
                             flatPips = (+skillSys.score);
                         } else {
-                            if(isSkillItem(this) && this.system.isAdvancedSkill) {
+                            // Advanced-skill check is on the resolved skill, not
+                            // the action item — legacy code cast `this.system as
+                            // OD6SSkillItemSystem` and read `isAdvancedSkill`,
+                            // which was always undefined → falsy on actions, so
+                            // this branch was effectively unreachable. Now it
+                            // actually fires when a routed skill is advanced.
+                            if(skillSys.isAdvancedSkill) {
                                 rollData.score = (+skillSys.score);
                             } else {
                                 rollData.score = (+skillSys.score) + (+actorData.attributes[skillSys.attribute.toLowerCase()].score);

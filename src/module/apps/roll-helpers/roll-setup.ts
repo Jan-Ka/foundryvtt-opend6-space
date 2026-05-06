@@ -263,7 +263,14 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     // (handler already folded `damage` into bucket.damagescore via the same
     // helper — applyWeaponMods is run twice but discarded outputs differ, so no
     // double-fold happens).
-    if (item && isAnyWeaponItem(item)) {
+    // Gate on canonical `classified.type` (not item type): action-routed
+    // weapon attacks like `action-vehiclerangedweaponattack` have
+    // classified.type === 'action' and accumulate mods in the dedicated
+    // block below. Folding here too would double-count.
+    const isWeaponClassifiedType = classified.type === 'weapon'
+        || classified.type === 'starship-weapon'
+        || classified.type === 'vehicle-weapon';
+    if (item && isWeaponClassifiedType && isAnyWeaponItem(item)) {
         const wsys = item.system;
         const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
         miscMod = folded.miscMod;
