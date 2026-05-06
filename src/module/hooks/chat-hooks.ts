@@ -57,6 +57,11 @@ export function registerChatHooks() {
                         [`flags.od6s.explosivePending.-=${regionId}`]: null,
                     });
                 }
+            } else if (item) {
+                // Manual (non-auto) flow has no region. The dialog set
+                // `explosiveSet=true` to gate the resolution roll; clear it
+                // so a future throw reopens the placement dialog.
+                await item.unsetFlag('od6s', 'explosiveSet');
             }
             await od6sutilities.wait(100);
         }
@@ -84,9 +89,16 @@ export function registerChatHooks() {
                         if (message.getFlag('od6s', 'isExplosive') && item && template) {
                             const pending = (item.getFlag('od6s', 'explosivePending') as
                                 Record<string, { origin: { x: number; y: number } }> | undefined)?.[template.id];
-                            await od6sutilities.scatterExplosive(message.getFlag('od6s', 'range'), pending?.origin, template.id);
-                            await od6sutilities.wait(100);
-                            updateTargets = true;
+                            // Origin can be absent on edit-after-execute because
+                            // executeRollAction clears the pending entry once
+                            // the attack message is created (pre-existing in
+                            // the legacy scalar shape too). Skip scatter rather
+                            // than throwing in `Ray(undefined, target)`.
+                            if (pending?.origin) {
+                                await od6sutilities.scatterExplosive(message.getFlag('od6s', 'range'), pending.origin, template.id);
+                                await od6sutilities.wait(100);
+                                updateTargets = true;
+                            }
                         }
                     }
 
