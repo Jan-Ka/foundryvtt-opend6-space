@@ -47,8 +47,19 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   each attack chat message as `flags.od6s.template`, so cleanup
   paths address only their own throw's entry. Migration drops the
   legacy scalars on world upgrade (#40).
+- Auto-explosive zone-damage code now reads target dodge from
+  `actor.system.dodge.score` (via a type-guarded helper) instead of
+  flat `(actor as any).dodge`, which was always `undefined` — so
+  `undefined > total` always returned `false` and the
+  dodge-vs-explosive evade branch never fired. High-dodge targets
+  now actually evade as intended (#86).
 
 ### Removed
+
+- Dead `od6sroll._metaphysicsRollDialog` method and the
+  `MetaphysicsRollData` type. Zero call sites in code or templates;
+  the `(actor as any).actions.length` access inside it would have
+  thrown `TypeError` if reached (#86).
 
 ## [2.4.0] - 2026-05-02
 

@@ -1,16 +1,15 @@
-import OD6S from "../config/config-od6s";
 import {RollDialog} from "./roll-dialog";
 import {setupRollData} from "./roll-helpers/roll-setup";
 import {executeRollAction} from "./roll-helpers/roll-execute";
-import {isCharacterActor, isVehicleActor, isActionItem} from "../system/type-guards";
+import {isVehicleActor, isActionItem} from "../system/type-guards";
 import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-helpers/roll-difficulty";
 import {getEffectMod, getRange, cancelAction} from "./roll-helpers/roll-effects";
-import type {RollData, IncomingRollData, MetaphysicsRollData} from "./roll-helpers/roll-data";
+import type {RollData, IncomingRollData} from "./roll-helpers/roll-data";
 
 export class od6sroll {
 
-    rollData: RollData | MetaphysicsRollData | undefined;
-    static rollData: RollData | MetaphysicsRollData | undefined;
+    rollData: RollData | undefined;
+    static rollData: RollData | undefined;
 
     activateListeners(html: HTMLElement) {
         // @ts-expect-error super reference in mixin-style class
@@ -73,57 +72,6 @@ export class od6sroll {
 
     async rollPurchase(data: IncomingRollData) {
         await (this as any)._onRollDialog(data);
-    }
-
-    static async _metaphysicsRollDialog(item: Item, actor: Actor) {
-        const skills: Record<string, { difficulty: string; skill: Item }> = {};
-
-        for (const s in (item.system as any).skills) {
-            let name: string | undefined;
-            switch (s) {
-                case 'channel':
-                    name = OD6S.channelSkillName;
-                    break;
-                case 'sense':
-                    name = OD6S.senseSkillName;
-                    break;
-                case 'transform':
-                    name = OD6S.transformSkillName;
-                    break;
-                default:
-                    break;
-            }
-            if ((item.system as any).skills[s].value) {
-                const skill = actor.items.filter((i: Item) => i.name === name);
-                if (typeof (skill[0]) !== 'undefined') {
-                    skills[s] = {
-                        difficulty: OD6S.difficultyShort[(item.system as any).skills[s].difficulty],
-                        skill: skill[0],
-                    };
-                } else {
-                    return ui.notifications.warn(
-                        OD6S.metaphysicsSkills[s] + game.i18n.localize("OD6S.WARN_SKILL_NOT_FOUND")
-                    )
-                }
-            }
-        }
-
-        const actions = Object.keys(skills).length;
-        const actionpenalty = (+actions) + ((actor as any).actions.length) - 1;
-        const stunnedpenalty = isCharacterActor(actor) ? actor.system.stuns.current : 0;
-
-        this.rollData = {
-            title: item.name,
-            skills: skills,
-            wilddie: Boolean(game.settings.get('od6s', 'use_wild_die') && actor.system.use_wild_die),
-            showWildDie: game.settings.get('od6s', 'use_wild_die'),
-            actor: actor,
-            actionpenalty: actionpenalty,
-            stunnedpenalty: stunnedpenalty,
-            template: "systems/od6s/templates/metaphysicsRoll.html"
-        } satisfies MetaphysicsRollData;
-
-        new RollDialog(this, () => void od6sroll.rollAction()).render({force: true});
     }
 
     static async _onRollDialog(data: IncomingRollData) {

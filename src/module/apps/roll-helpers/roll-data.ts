@@ -191,18 +191,6 @@ export interface RollMessageFlags {
     template?: string;
 }
 
-/** Minimal payload for metaphysics multi-skill roll dialogs — not a full RollData. */
-export interface MetaphysicsRollData {
-    title: string;
-    skills: Record<string, { difficulty: string; skill: Item }>;
-    wilddie: boolean;
-    showWildDie: boolean | unknown;
-    actor: Actor;
-    actionpenalty: number;
-    stunnedpenalty: number;
-    template: string;
-}
-
 // ---- Pure helpers ----
 
 /**

@@ -3,7 +3,21 @@ import { wait } from "./converters";
 import { boolCheck } from "./converters";
 import { getDiceFromScore } from "./dice";
 import { getActorFromUuid } from "./actors";
-import { isWeaponItem } from "../type-guards";
+import { isCharacterActor, isVehicleActor, isWeaponItem } from "../type-guards";
+
+/**
+ * Resolve a target actor's dodge score for the auto-explosive evade check.
+ * Both `OD6SCharacterSystem.dodge` and `OD6SVehicleSystem.dodge` carry a
+ * `.score` field; pre-#86 code read `(actor as any).dodge` flat off the
+ * actor — always undefined, so `undefined > number` always returned false
+ * and the dodge branch never fired.
+ */
+function getDodgeScore(actor: Actor): number {
+    if (isCharacterActor(actor) || isVehicleActor(actor)) {
+        return Number(actor.system.dodge?.score ?? 0);
+    }
+    return 0;
+}
 
 /**
  * Per-throw state for an in-flight explosive, keyed by the blast region's id
@@ -294,7 +308,7 @@ export async function detonateExplosive(data: any): Promise<any> {
                 if(!message) {
                     // TODO: Figure out a better way to deal with this
                     damage = roll.total;
-                } else if ((actor as any).dodge > message.getFlag('od6s', 'total')) {
+                } else if (getDodgeScore(actor) > (message.getFlag('od6s', 'total') as number)) {
                     damage = 0;
                 } else {
                     damage = roll.total;
@@ -353,7 +367,7 @@ export async function detonateExplosive(data: any): Promise<any> {
             let actor = await game.actors.get(target.id);
             if (typeof (actor) === 'undefined') actor = game!.scenes!.active!.tokens.get(target.id)!.actor;
             if(typeof(actor) === 'undefined') continue;
-            if((actor as any).dodge > message!.getFlag('od6s','total')) {
+            if(getDodgeScore(actor) > (message!.getFlag('od6s','total') as number)) {
                 // noop
             } else {
                 switch(target.zone) {
