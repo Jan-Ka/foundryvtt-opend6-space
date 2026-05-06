@@ -2,6 +2,9 @@
  * Pure math helpers extracted from roll-execute.ts. No Foundry globals.
  * Lets tests import without dragging in Roll/Dialog/etc.
  */
+import { getDiceFromScore } from "../../system/utilities/dice";
+import type { Modifier } from "./difficulty-math";
+import type { DiceValue } from "./roll-data";
 
 export interface HighHitDamageInput {
     /** Final roll total. */
@@ -86,4 +89,221 @@ export function resolveRollMode(input: ResolveRollModeInput): string {
     if (typeof input.explicit === "string" && input.explicit.length > 0) return input.explicit;
     if (input.isGM && input.hideGmRolls) return "gmroll";
     return "publicroll";
+}
+
+export interface DicePenalties {
+    action: number;
+    wound: number;
+    stunned: number;
+    other: number;
+}
+
+/**
+ * Subtract action/wound/stun/misc penalties from a dice pool.
+ * Result may go negative — callers decide what to do (typically "no roll").
+ */
+export function applyDicePenalties(dice: number, penalties: DicePenalties): number {
+    return dice - penalties.action - penalties.wound - penalties.stunned - penalties.other;
+}
+
+export interface RollStringFlavorLabels {
+    base: string;
+    wild: string;
+    cp: string;
+    bonus: string;
+}
+
+export interface RollStringInput {
+    /**
+     * Total dice in the pool. When `wilddie` is true, this is the pool *including*
+     * the wild die — the helper subtracts 1 internally to leave room for it.
+     */
+    dice: number;
+    pips: number;
+    characterpoints: number;
+    bonusdice: number;
+    bonuspips: number;
+    wilddie: boolean;
+    /** When > 0, the formula is wrapped in `max(formula, rollMin)` to enforce a skill floor. */
+    rollMin?: number;
+    labels: RollStringFlavorLabels;
+}
+
+/**
+ * Build the dice formula string Foundry's `Roll` will parse. Returns '' when the
+ * pool is empty so the caller can short-circuit with a "zero dice" notification.
+ */
+export function buildRollString(input: RollStringInput): string {
+    const { pips, characterpoints, bonusdice, bonuspips, wilddie, rollMin, labels } = input;
+    let s: string;
+    if (wilddie) {
+        const baseDice = input.dice - 1;
+        if (baseDice === 0) {
+            s = "1dw" + labels.wild;
+        } else if (baseDice < 0) {
+            s = "";
+        } else {
+            s = baseDice + "d6" + labels.base + "+1dw" + labels.wild;
+        }
+    } else {
+        s = input.dice <= 0 ? "" : input.dice + "d6" + labels.base;
+    }
+    if (pips > 0) s += "+" + pips;
+    if (characterpoints > 0) s += "+" + characterpoints + "db" + labels.cp;
+    if (bonusdice > 0) s += "+" + bonusdice + "d6" + labels.bonus;
+    if (bonuspips > 0) s += "+" + bonuspips;
+    if (rollMin !== undefined && rollMin > 0) {
+        s = "max(" + s + "," + rollMin + ")";
+    }
+    return s;
+}
+
+export interface WildDieDetectionInput {
+    /** Roll terms — only `flavor` and `total` are read. */
+    terms: Array<{ flavor?: string; total?: number }>;
+    /** Localized wild-die flavor with `[]` already stripped to match `term.flavor`. */
+    wildFlavor: string;
+    /** OD6S.wildDieOneDefault — > 0 + auto=0 means the player picks an effect. */
+    wildDieOneDefault: number;
+    /** OD6S.wildDieOneAuto — when 0, the wild-1 outcome is not auto-applied. */
+    wildDieOneAuto: number;
+}
+
+export interface WildDieDetectionResult {
+    wild: boolean;
+    wildHandled: boolean;
+}
+
+/**
+ * Decide whether the wild die rolled a 1 and whether the resulting effect is
+ * already considered "handled" (auto-applied) vs. awaiting a player choice.
+ */
+export function detectWildDieResult(input: WildDieDetectionInput): WildDieDetectionResult {
+    const wildTerm = input.terms.find(d => d.flavor === input.wildFlavor);
+    if (wildTerm?.total === 1) {
+        return {
+            wild: true,
+            wildHandled: input.wildDieOneDefault > 0 && input.wildDieOneAuto === 0,
+        };
+    }
+    return { wild: false, wildHandled: false };
+}
+
+export interface DamageAssemblyInput {
+    /** Starting damage score (weapon damage, brawl strength, etc.). */
+    damageScore: number;
+    /** All damage modifiers; mutated copies are returned, the input array is not modified. */
+    damageModifiers: Modifier[];
+    /** Pre-fatepoint strength damage dice; doubled in-place when fatepoint + STR-bonus modifier present. */
+    strModDice?: DiceValue | null;
+    /** Roll subtype — only `vehicleramattack` triggers the speed/collision recompute. */
+    subtype: string;
+    fatepointInEffect: boolean;
+    /** Localized OD6S.SCALE label used to identify scale modifiers in the array. */
+    scaleLabel: string;
+    /** Setting `dice_for_scale`: when true, scale converts to dice; when false, to a flat bonus. */
+    diceForScale: boolean;
+    /** rollData.modifiers.scalemod — added to damageScore when diceForScale + positive. */
+    scaleMod: number;
+    /** rollData.scaledice — surfaced as `damageScaleDice` when diceForScale + scalemod <= 0. */
+    scaleDice: number;
+    /** Vehicle-ram only: OD6S.vehicle_speeds[speed].damage. */
+    vehicleRamDamage?: number;
+    /** Vehicle-ram only: OD6S.collision_types[type].score. */
+    vehicleRamCollisionScore?: number;
+    /** OD6S.pipsPerDice — passed through to dice/score conversion. */
+    pipsPerDice: number;
+}
+
+export interface DamageAssemblyResult {
+    baseDamage: number;
+    damageScore: number;
+    damageDice: DiceValue;
+    /** Possibly-doubled strength-mod dice (when fatepoint applied); pass-through otherwise. */
+    strModDice: DiceValue | null | undefined;
+    scaleBonus: number;
+    scaleDice: number;
+}
+
+/**
+ * Combine damage modifiers, fatepoint doubling, vehicle-ram override, pip bonuses,
+ * and scale handling into the final {damageScore, damageDice, scale*} payload that
+ * goes onto the chat-card flags. Pure: takes pipsPerDice as a value, no globals.
+ */
+export function assembleDamageDice(input: DamageAssemblyInput): DamageAssemblyResult {
+    const {
+        damageModifiers,
+        subtype,
+        fatepointInEffect,
+        scaleLabel,
+        diceForScale,
+        scaleMod,
+        scaleDice,
+        vehicleRamDamage = 0,
+        vehicleRamCollisionScore = 0,
+        pipsPerDice,
+    } = input;
+
+    let damageScore = input.damageScore;
+    let baseDamage = damageScore;
+    let strModDice = input.strModDice;
+
+    for (const d of damageModifiers) {
+        if (d.name === scaleLabel) {
+            if (diceForScale) damageScore += d.value;
+        } else {
+            const isStrBonusUnderFatepoint = fatepointInEffect && d.name === "OD6S.STRENGTH_DAMAGE_BONUS";
+            if (!isStrBonusUnderFatepoint) damageScore += d.value;
+        }
+    }
+
+    let damageDice = getDiceFromScore(damageScore, pipsPerDice);
+
+    if (fatepointInEffect && strModDice) {
+        const strMod = damageModifiers.find(d => d.name === "OD6S.STRENGTH_DAMAGE_BONUS");
+        if (strMod) {
+            damageDice = {
+                dice: damageDice.dice + strModDice.dice * 2,
+                pips: damageDice.pips + strModDice.pips * 2,
+            };
+            strModDice = { dice: strModDice.dice * 2, pips: strModDice.pips * 2 };
+        }
+    }
+
+    if (subtype === "vehicleramattack") {
+        damageScore = damageScore + vehicleRamDamage + vehicleRamCollisionScore;
+        baseDamage = damageScore;
+        damageDice = getDiceFromScore(damageScore, pipsPerDice);
+    }
+
+    for (const d of damageModifiers) {
+        if (d.pips !== undefined && d.pips > 0) {
+            damageDice = { dice: damageDice.dice, pips: damageDice.pips + d.pips };
+        }
+    }
+
+    let scaleBonus = 0;
+    for (const d of damageModifiers) {
+        if (d.name === scaleLabel && !diceForScale) {
+            scaleBonus = d.value;
+        }
+    }
+
+    let scaleDiceOut = 0;
+    if (diceForScale) {
+        if (scaleMod > 0) {
+            damageScore += scaleMod;
+        } else {
+            scaleDiceOut = scaleDice;
+        }
+    }
+
+    return {
+        baseDamage,
+        damageScore,
+        damageDice,
+        strModDice,
+        scaleBonus,
+        scaleDice: scaleDiceOut,
+    };
 }

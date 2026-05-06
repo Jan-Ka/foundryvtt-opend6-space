@@ -10,6 +10,16 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+### Changed
+
+- Extracted four pure helpers from `roll-execute.ts` into
+  `roll-execute-math.ts` — `applyDicePenalties`, `buildRollString`,
+  `detectWildDieResult`, `assembleDamageDice` — covered by 16 new
+  unit tests. Roll-execution behaviour unchanged; the orchestration
+  file shrinks by ~55 LOC and the damage-modifier pipeline (scale,
+  fatepoint str-doubling, vehicle-ram, pip bonuses) is now testable
+  without Foundry globals (#59 part 1).
+
 ## [2.5.0] - 2026-05-06
 
 Two user-facing bug fixes (#40, #86) plus the close-out of three
