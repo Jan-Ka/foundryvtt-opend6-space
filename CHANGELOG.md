@@ -21,7 +21,7 @@ typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
   `src/module/apps/roll-helpers/` — one per `(type, subtype)` roll
   path — plus a `runFinalize` step that owns the COMMON-fields
   partition. The handler dispatch is exhaustiveness-checked at
-  compile time via the `RollTypeKey` discriminated union (#98).
+  compile-time via the `RollTypeKey` discriminated union (#98).
 - Smoke specs covering action rolls (brawlattack, vehicleramattack,
   vehicletoughness) and the melee-range preflight gate, exercising
   paths the unit/domain layers can't reach (#98).
@@ -32,7 +32,7 @@ typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
 ### Changed
 
 - `setupRollData` rewritten as a thin coordinator (preflight →
-  classifyRoll → adaptContext → HANDLERS\[key\] → runFinalize),
+  classifyRoll → adaptContext → `HANDLERS[key]` → runFinalize),
   replacing the legacy 650-line single function with 30+ mutable
   locals. RFCs surfaced during the cutover and applied: `+5` magic
   constant on action-meleeattack removed (no rules backing, #100);
@@ -120,10 +120,11 @@ typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
   undefined → falsy, so advanced skills incorrectly had their
   linked attribute folded into the score. Surfaced during the #57
   narrowing of `item.ts` (#57).
-- `roll-action.ts` vehicle-action dispatch had `'starship'` listed
-  twice instead of `'vehicle' || 'starship'`, so any vehicle-action
-  path on a vehicle actor crashed in `undefined.specialization`.
-  Caught by the new tier-3-action-rolls smoke spec (#98).
+- `roll-action.ts` vehicle-action dispatch tested
+  `actor.type === 'starship'` twice instead of `'vehicle'` and
+  `'starship'`, so any vehicle-action path on a vehicle actor (not
+  starship) crashed in `undefined.specialization`. Caught by the new
+  tier-3-action-rolls smoke spec (#98).
 - Stun-flag schema typo on the explosive-without-zones path was
   writing to `flags.od6s.stuns` (existing schema field) instead of
   the intended `stun` boolean. Surfaced while extracting weapon
