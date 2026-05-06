@@ -49,6 +49,10 @@ async function passesExplosiveGate(data: IncomingRollData): Promise<boolean> {
     const sys = item?.system as OD6SWeaponItemSystem | undefined;
     if (sys?.subtype?.toLowerCase() !== 'explosive') return true;
     if (item!.getFlag('od6s', 'explosiveSet')) return true;
+    // Auto-explosive throws skip `explosiveSet` and stamp the pending map
+    // directly (one entry per region) so multiple in-flight throws can co-exist.
+    const pending = item!.getFlag('od6s', 'explosivePending') as Record<string, unknown> | undefined;
+    if (pending && Object.keys(pending).length > 0) return true;
 
     await new ExplosiveDialog({
         options: OD6S.explosives,

@@ -25,8 +25,8 @@ export function registerExplosiveHelpers() {
         return zones;
     });
 
-    Handlebars.registerHelper('getExplosiveTargets', async (actorId, itemId) => {
-        return await od6sutilities.getExplosiveTargets(actorId, itemId);
+    Handlebars.registerHelper('getExplosiveTargets', async (actorId, itemId, regionId) => {
+        return await od6sutilities.getExplosiveTargets(actorId, itemId, regionId);
     })
 
     Handlebars.registerHelper('checkExplosiveTargets', (targets) => {

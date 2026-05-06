@@ -19,7 +19,8 @@ export function registerRegionHooks() {
                 }
                 const targets = await od6sutilities.getExplosiveTargets(
                     actor,
-                    region.getFlag('od6s', 'item'));
+                    region.getFlag('od6s', 'item'),
+                    region.id);
                 await message.unsetFlag('od6s', 'targets');
                 await message.setFlag('od6s', 'targets', targets);
                 await message.render();
@@ -43,11 +44,10 @@ export function registerRegionHooks() {
         if (actor) {
             const item = actor.items.get(region.getFlag('od6s', 'item'));
             if (item) {
+                // Drop only the entry for this region — other in-flight
+                // throws of the same item retain their own pending state (#40).
                 await item.update({
-                    "flags.od6s.-=explosiveOrigin": null,
-                    "flags.od6s.-=explosiveRange": null,
-                    "flags.od6s.-=explosiveSet": null,
-                    "flags.od6s.-=explosiveTemplate": null,
+                    [`flags.od6s.explosivePending.-=${region.id}`]: null,
                 });
             }
         }

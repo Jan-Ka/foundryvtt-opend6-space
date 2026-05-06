@@ -5,6 +5,30 @@ import { getDiceFromScore } from "./dice";
 import { getActorFromUuid } from "./actors";
 import { isWeaponItem } from "../type-guards";
 
+/**
+ * Per-throw state for an in-flight explosive, keyed by the blast region's id
+ * on `flags.od6s.explosivePending`. One entry per throw lets multiple
+ * unresolved instances of the same explosive item co-exist (#40) — the
+ * previous scalar flags clobbered each other on the second throw.
+ */
+export interface ExplosivePending {
+    origin: { x: number; y: number };
+    range: number;
+}
+
+/** Read the per-throw pending entry for `regionId`, or undefined if absent. */
+export function getExplosivePending(item: Item, regionId: string | undefined): ExplosivePending | undefined {
+    if (!regionId) return undefined;
+    const map = item.getFlag('od6s', 'explosivePending') as Record<string, ExplosivePending> | undefined;
+    return map?.[regionId];
+}
+
+/** Delete only the entry for `regionId` from the pending map (preserves other in-flight throws). */
+export async function clearExplosivePending(item: Item, regionId: string | undefined): Promise<void> {
+    if (!regionId) return;
+    await item.update({ [`flags.od6s.explosivePending.-=${regionId}`]: null });
+}
+
 export async function scatterExplosive(range: any, origin: any, regionId: any): Promise<void> {
     let distanceTerms = '';
     let angle = 0;
@@ -91,9 +115,9 @@ export async function scatterExplosive(range: any, origin: any, regionId: any): 
     await wait(100);
 }
 
-export async function getExplosiveTargets(actor: any, itemId: any): Promise<any[]> {
+export async function getExplosiveTargets(actor: any, itemId: any, regionId: string | undefined): Promise<any[]> {
     const item = actor.isToken ? actor.token.actor.items.get(itemId) : actor.items.get(itemId);
-    const regionId = item.getFlag('od6s', 'explosiveTemplate');
+    if (!regionId) return [];
     const region = canvas.scene.getEmbeddedDocument('Region', regionId);
     if (!region) return [];
     const shape = region.shapes[0];
@@ -146,7 +170,7 @@ export async function detonateExplosives(combat: any): Promise<void> {
             tokenId: region.getFlag('od6s', 'token'),
             itemId: region.getFlag('od6s','item'),
             templateId: region.id,
-            targets: await getExplosiveTargets(actor, region.getFlag('od6s','item')),
+            targets: await getExplosiveTargets(actor, region.getFlag('od6s','item'), region.id),
             triggered: true
         }
 
@@ -182,18 +206,21 @@ export async function detonateExplosive(data: any): Promise<any> {
         actor = token!.actor;
     }
 
+    // Region id stamped on the attack message at creation; falls back to the
+    // dataset templateId for legacy / handler-driven callers.
+    const regionId = (message?.getFlag('od6s', 'template') as string | undefined) || data.templateId;
+
     let targets;
     if (message) {
         targets = await game!.messages!.get(data.messageId)!.getFlag('od6s', 'targets');
     } else {
-        targets = await getExplosiveTargets(actor, data.itemId);
+        targets = await getExplosiveTargets(actor, data.itemId, regionId);
     }
 
     const item = actor!.items.get(data.itemId);
     const wsys = item && isWeaponItem(item) ? item.system : undefined;
 
     if (game.settings.get('od6s', 'auto_explosive')) {
-        const regionId = item!.getFlag('od6s', 'explosiveTemplate');
         const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
 
         if (region) {

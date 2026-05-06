@@ -213,7 +213,7 @@ export class OD6SItem extends Item {
      * Handle clickable item rolls.
      * @private
      */
-    async roll(parry = false) {
+    async roll(parry = false, regionId?: string) {
         // Basic template rendering data
         const item = this;
         if (!this.actor) return;
@@ -224,6 +224,7 @@ export class OD6SItem extends Item {
 
         const rollData: any = {};
         rollData.token = this.parent.sheet.token;
+        if (regionId) rollData.regionId = regionId;
 
         switch (item.type) {
             case 'skill':

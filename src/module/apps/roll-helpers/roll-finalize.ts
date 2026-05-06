@@ -104,6 +104,8 @@ export interface FinalizeInput<K extends RollTypeKey> {
     targetRef?: unknown;
     /** Output of HANDLERS[classified.key]. */
     bucket: HandlerOutput<K>;
+    /** Region id for the explosive throw being resolved (auto-explosive path). */
+    regionId?: string;
 }
 
 export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): RollData {
@@ -209,6 +211,7 @@ export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): Rol
         stun: false,
         attackerScale: 0,
         specSkill: '',
+        regionId: input.regionId,
 
         // Bucket overrides — handler-owned fields take precedence over the
         // safe defaults above. The Pick-typed bucket guarantees only valid

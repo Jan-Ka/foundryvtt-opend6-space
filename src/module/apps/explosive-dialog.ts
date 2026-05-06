@@ -109,13 +109,9 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
             ]).distance);
 
             await this.data.item.update({
-                flags: {
-                    od6s: {
-                        explosiveSet: true,
-                        explosiveTemplate: region.id,
-                        explosiveRange: distance,
-                        explosiveOrigin: {x: this.token.center.x, y: this.token.center.y},
-                    },
+                [`flags.od6s.explosivePending.${region.id}`]: {
+                    origin: {x: this.token.center.x, y: this.token.center.y},
+                    range: distance,
                 },
             });
 
@@ -129,7 +125,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
                 },
             });
 
-            this.data.item.roll(false);
+            this.data.item.roll(false, region.id);
         } else if (this.data.stage === 1) {
             this.render({force: true});
         }

@@ -40,6 +40,9 @@ export const COMMON_FIELDS = [
     'isvisible', 'isknown',
     // Derived from item flag at top of setup, before dispatch.
     'isExplosive',
+    // Region id of the explosive blast template (auto-explosive throws);
+    // threaded through from `OD6SItem.roll(parry, regionId)`. See #40.
+    'regionId',
     // Produced by classifyRoll, not handlers.
     'type', 'subtype',
     'actor', 'token',

@@ -46,20 +46,22 @@ export function registerChatHooks() {
                 actor = game.actors.get(message.speaker.actor);
             }
             const item = actor!.items.find(i => i.id === message.getFlag('od6s', 'itemId'));
-            const regionId = item?.getFlag('od6s', 'explosiveTemplate');
+            const regionId = message.getFlag('od6s', 'template') as string | undefined;
             if (regionId) {
                 const region = canvas.scene.getEmbeddedDocument('Region', regionId);
                 if (region) {
                     await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]);
                 }
-            }
-            if (item) {
-                await item.update({
-                    "flags.od6s.-=explosiveSet": null,
-                    "flags.od6s.-=explosiveTemplate": null,
-                    "flags.od6s.-=explosiveOrigin": null,
-                    "flags.od6s.-=explosiveRange": null,
-                });
+                if (item) {
+                    await item.update({
+                        [`flags.od6s.explosivePending.-=${regionId}`]: null,
+                    });
+                }
+            } else if (item) {
+                // Manual (non-auto) flow has no region. The dialog set
+                // `explosiveSet=true` to gate the resolution roll; clear it
+                // so a future throw reopens the placement dialog.
+                await item.unsetFlag('od6s', 'explosiveSet');
             }
             await od6sutilities.wait(100);
         }
@@ -84,10 +86,19 @@ export function registerChatHooks() {
 
                     if (!data.flags.od6s.success && OD6S.autoExplosive) {
                         // Missed, scatter it
-                        if (message.getFlag('od6s', 'isExplosive')) {
-                            await od6sutilities.scatterExplosive(message.getFlag('od6s', 'range'), item!.getFlag('od6s', 'explosiveOrigin'), template!.id);
-                            await od6sutilities.wait(100);
-                            updateTargets = true;
+                        if (message.getFlag('od6s', 'isExplosive') && item && template) {
+                            const pending = (item.getFlag('od6s', 'explosivePending') as
+                                Record<string, { origin: { x: number; y: number } }> | undefined)?.[template.id];
+                            // Origin can be absent on edit-after-execute because
+                            // executeRollAction clears the pending entry once
+                            // the attack message is created (pre-existing in
+                            // the legacy scalar shape too). Skip scatter rather
+                            // than throwing in `Ray(undefined, target)`.
+                            if (pending?.origin) {
+                                await od6sutilities.scatterExplosive(message.getFlag('od6s', 'range'), pending.origin, template.id);
+                                await od6sutilities.wait(100);
+                                updateTargets = true;
+                            }
                         }
                     }
 
@@ -102,7 +113,7 @@ export function registerChatHooks() {
                     }
 
                     if (updateTargets) {
-                        newTargets = await od6sutilities.getExplosiveTargets(actor, item!.id);
+                        newTargets = await od6sutilities.getExplosiveTargets(actor, item!.id, template?.id);
                         if (Object.keys(newTargets).length === 0) {
                             await message.setFlag('od6s','showButton', false);
                         } else {
@@ -154,13 +165,14 @@ export function registerChatHooks() {
                     }
                     const item = actor!.items.find(i => i.id === msg.getFlag('od6s', 'item'));
 
-                    await item!.unsetFlag('od6s', 'explosiveSet');
-                    await item!.unsetFlag('od6s', 'explosiveTemplate');
-                    await item!.unsetFlag('od6s', 'explosiveOrigin');
-                    await item!.unsetFlag('od6s', 'explosiveRange');
+                    const regionId = msg.getFlag('od6s', 'template') as string | undefined;
+                    if (item && regionId) {
+                        await item.update({
+                            [`flags.od6s.explosivePending.-=${regionId}`]: null,
+                        });
+                    }
                     await od6sutilities.wait(100);
 
-                    const regionId = msg.getFlag('od6s', 'template');
                     const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
                     if (region) {
                         await region.setFlag('od6s', 'handled', true);

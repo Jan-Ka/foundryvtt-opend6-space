@@ -25,8 +25,8 @@ export const od6sutilities = {
     async scatterExplosive(range: any, origin: any, regionId: any) {
         return explosiveUtils.scatterExplosive(range, origin, regionId);
     },
-    async getExplosiveTargets(actor: any, itemId: any) {
-        return explosiveUtils.getExplosiveTargets(actor, itemId);
+    async getExplosiveTargets(actor: any, itemId: any, regionId: string | undefined) {
+        return explosiveUtils.getExplosiveTargets(actor, itemId, regionId);
     },
     async detonateExplosives(combat: any) {
         return explosiveUtils.detonateExplosives(combat);

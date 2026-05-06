@@ -4,6 +4,7 @@
 
 import type {RollData} from "./roll-data";
 import {isCharacterActor, isSpecializationItem} from "../../system/type-guards";
+import {clearExplosivePending} from "../../system/utilities/explosives";
 
 export function getEffectMod(type: string, name: string, actor: Actor): number {
     if (!isCharacterActor(actor)) return 0;
@@ -43,15 +44,15 @@ export function getRange(value: string, actor: Actor): string | number {
 export async function cancelAction(rollData: RollData): Promise<void> {
     if(rollData?.isExplosive) {
         const item = rollData.actor.items.find((i: Item) => i.id === rollData.itemid);
-        const regionId = item?.getFlag('od6s','explosiveTemplate');
+        const regionId = rollData.regionId;
         if (regionId) {
             try {
                 await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]);
-            } catch {}
+            } catch {/* region already gone */}
+            if (item) await clearExplosivePending(item, regionId);
+        } else {
+            // Manual (non-auto) path: only `explosiveSet` was written.
+            await item?.unsetFlag('od6s', 'explosiveSet');
         }
-        await item?.unsetFlag('od6s', 'explosiveSet');
-        await item?.unsetFlag('od6s', 'explosiveTemplate');
-        await item?.unsetFlag('od6s', 'explosiveOrigin');
-        await item?.unsetFlag('od6s', 'explosiveRange');
     }
 }
