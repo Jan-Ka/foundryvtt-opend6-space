@@ -30,7 +30,7 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {cancelAction, getEffectMod} from "./roll-effects";
-import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
+import {isAnyWeaponItem, isCharacterActor, isSkillItem, isVehicleActor, isVehicleBorneWeaponItem} from "../../system/type-guards";
 import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
 import type {IncomingRollData, RollData, ClassifiedRoll, RollTypeKey} from "./roll-data";
 import {classifyRoll} from "./roll-data";
@@ -138,7 +138,7 @@ function preResolveActionSkill(
         sysAttrs[k] = { score: +v.score };
     }
 
-    const skillSys = skillItem ? (skillItem.system as OD6SSkillItemSystem) : null;
+    const skillSys = skillItem && isSkillItem(skillItem) ? skillItem.system : null;
     return resolveSkillBackedAction({
         skill: skillSys
             ? { score: skillSys.score, attributeKey: skillSys.attribute.toLowerCase() }
@@ -197,7 +197,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     const item = resolveItemForDispatch(data);
     const isExplosive = !!item
-        && (item.system as OD6SWeaponItemSystem | undefined)?.subtype?.toLowerCase() === 'explosive';
+        && isAnyWeaponItem(item)
+        && item.system.subtype?.toLowerCase() === 'explosive';
 
     // For weapon-typed rolls with a localized ranged subtype alias (RANGED /
     // THROWN / MISSILE / EXPLOSIVE), getWeaponRange resolves the per-roll
@@ -211,12 +212,11 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             const r = await od6sutilities.getWeaponRange(data.actor, item);
             if (r === false) return false;
             weaponRangeTable = r as typeof weaponRangeTable;
-        } else {
-            weaponRangeTable = (item.system as OD6SWeaponItemSystem).range as unknown as typeof weaponRangeTable;
+        } else if (isAnyWeaponItem(item)) {
+            weaponRangeTable = item.system.range as unknown as typeof weaponRangeTable;
         }
-    } else if (item && classified.key === 'action-vehiclerangedweaponattack') {
-        const sys = item.system as { range?: typeof weaponRangeTable };
-        weaponRangeTable = sys.range;
+    } else if (item && classified.key === 'action-vehiclerangedweaponattack' && isVehicleBorneWeaponItem(item)) {
+        weaponRangeTable = item.system.range as unknown as typeof weaponRangeTable;
     }
 
     const actorToken = data.actor.isToken ? data.actor.token.object : data.actor.getActiveTokens()[0];
@@ -263,8 +263,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     // (handler already folded `damage` into bucket.damagescore via the same
     // helper — applyWeaponMods is run twice but discarded outputs differ, so no
     // double-fold happens).
-    if (item && (classified.type === 'weapon' || classified.type === 'starship-weapon' || classified.type === 'vehicle-weapon')) {
-        const wsys = item.system as OD6SWeaponItemSystem;
+    if (item && isAnyWeaponItem(item)) {
+        const wsys = item.system;
         const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
         miscMod = folded.miscMod;
         bonusmod = folded.bonusmod;
@@ -281,9 +281,8 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         }
     }
 
-    if (item && classified.key === 'action-vehiclerangedweaponattack') {
-        const wsys = item.system as OD6SVehicleWeaponItemSystem;
-        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
+    if (item && classified.key === 'action-vehiclerangedweaponattack' && isVehicleBorneWeaponItem(item)) {
+        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, item.system.mods);
         miscMod = folded.miscMod;
         bonusmod = folded.bonusmod;
     }
@@ -311,17 +310,16 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         || subtype === 'vehiclerangedweaponattack';
     if (isRangedSubtype) {
         if (subtype.startsWith('vehicle')) {
-            const vehSys = data.actor.system as OD6SVehicleSystem;
-            const charSys = data.actor.system as OD6SCharacterSystem & {
-                vehicle: { ranged?: { score?: number } };
-            };
-            if (vehSys?.embedded_pilot?.value && typeof ((vehSys?.ranged as OD6SScoreField)?.score) !== 'undefined') {
-                bonusmod += +(vehSys.ranged as OD6SScoreField).score;
-            } else if (typeof (charSys?.vehicle?.ranged?.score) !== 'undefined') {
-                bonusmod += +charSys.vehicle.ranged.score;
+            if (isVehicleActor(data.actor)
+                && data.actor.system.embedded_pilot?.value
+                && typeof data.actor.system.ranged?.score !== 'undefined') {
+                bonusmod += +data.actor.system.ranged.score;
+            } else if (isCharacterActor(data.actor)
+                && typeof data.actor.system.vehicle?.ranged?.score !== 'undefined') {
+                bonusmod += +data.actor.system.vehicle.ranged.score;
             }
-        } else {
-            bonusmod += +(data.actor.system.ranged as OD6SModField).mod;
+        } else if (isCharacterActor(data.actor)) {
+            bonusmod += +data.actor.system.ranged.mod;
         }
     }
 
@@ -354,11 +352,17 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     } else if (isAttackRoll) {
         const isVehicleSubtype = subtype.includes('vehicle');
         if (isVehicleSubtype) {
-            attackerScale = (data.actor.type === 'vehicle' || data.actor.type === 'starship')
-                ? +((data.actor.system as { scale?: { score?: number } }).scale?.score ?? 0)
-                : +((data.actor.system as OD6SCharacterSystem).vehicle?.scale?.score ?? 0);
+            if (isVehicleActor(data.actor)) {
+                attackerScale = +(data.actor.system.scale?.score ?? 0);
+            } else if (isCharacterActor(data.actor)) {
+                attackerScale = +(data.actor.system.vehicle?.scale?.score ?? 0);
+            } else {
+                attackerScale = 0;
+            }
+        } else if (isCharacterActor(data.actor) || isVehicleActor(data.actor)) {
+            attackerScale = +(data.actor.system.scale?.score ?? 0);
         } else {
-            attackerScale = +(((data.actor.system as { scale?: { score?: number } }).scale?.score) ?? 0);
+            attackerScale = 0;
         }
     } else {
         attackerScale = bucketAny.attackerScale ?? 0;
@@ -428,10 +432,9 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         workingScoreForFinalize = workingScoreForFinalize + (+data.actor.system.roll_mod);
     }
 
-    if (classified.type === 'damage' && item) {
-        const wsys = item.system as OD6SWeaponItemSystem | undefined;
-        if (wsys && wsys.damaged > 0) {
-            workingScoreForFinalize -= OD6S.weaponDamage[wsys.damaged].penalty;
+    if (classified.type === 'damage' && item && isAnyWeaponItem(item)) {
+        if (item.system.damaged > 0) {
+            workingScoreForFinalize -= OD6S.weaponDamage[item.system.damaged].penalty;
         }
     }
 

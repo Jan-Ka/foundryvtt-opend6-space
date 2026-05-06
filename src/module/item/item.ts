@@ -1,7 +1,7 @@
 import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
-import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
+import {isAnyWeaponItem, isActionItem, isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isVehicleBorneWeaponItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -87,30 +87,26 @@ export class OD6SItem extends Item {
                 return this.actor.system.attributes[this.system.attribute.toLowerCase()].score + this.system.score;
             }
         }
-        if (this.type.match(/weapon/)) {
-            if (this.actor && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
-                const sys = this.system as OD6SWeaponItemSystem & { fire_control?: { score: number } };
-                let score = this.actor.system.attributes[sys.stats.attribute.toLowerCase()].score;
-                const spec = this.actor.items.find(i => i.name === sys.stats.specialization && i.type === 'specialization');
-                if (spec !== undefined && isSpecializationItem(spec)) {
-                    if (typeof sys.fire_control !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
-                        score = score + sys.fire_control.score;
-                    }
-                    return score + spec.system.score;
-                } else {
-                    const skill = this.actor.items.find(i => i.name === sys.stats.skill && i.type === 'skill');
-                    if (skill !== undefined && isSkillItem(skill)) {
-                        if (typeof sys.fire_control !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
-                            score = score + sys.fire_control.score;
-                        }
-                        return score + skill.system.score;
-                    }
-                }
-                if (typeof sys.fire_control?.score !== 'undefined' && (sys.fire_control?.score as unknown) !== '') {
-                    score = score + sys.fire_control.score;
-                }
-                return score;
+        if (isAnyWeaponItem(this)
+            && this.actor && (isCharacterActor(this.actor) || isVehicleActor(this.actor))) {
+            const stats = this.system.stats;
+            // `fire_control` is only on vehicle / starship-weapon systems; for
+            // hand weapons it's absent (the legacy cast spliced it in optionally).
+            const fireControlScore = isVehicleBorneWeaponItem(this)
+                && (this.system.fire_control?.score as unknown) !== ''
+                ? this.system.fire_control.score
+                : 0;
+            let score = this.actor.system.attributes[stats.attribute.toLowerCase()].score;
+            const spec = this.actor.items.find(i => i.name === stats.specialization && i.type === 'specialization');
+            if (spec !== undefined && isSpecializationItem(spec)) {
+                return score + fireControlScore + spec.system.score;
             }
+            const skill = this.actor.items.find(i => i.name === stats.skill && i.type === 'skill');
+            if (skill !== undefined && isSkillItem(skill)) {
+                return score + fireControlScore + skill.system.score;
+            }
+            score = score + fireControlScore;
+            return score;
         }
     }
 
@@ -218,7 +214,14 @@ export class OD6SItem extends Item {
         const item = this;
         if (!this.actor) return;
         const actor = this.actor;
-        const actorData = actor.system as OD6SCharacterSystem & Record<string, any>;
+        // `roll()` reads `attributes` (and `vehicle.*` for vehicle-weapon
+        // paths fired by an embedded pilot, where `actor` is the vehicle).
+        // The system schema for vehicles doesn't carry `attributes`, so this
+        // cast is wider than runtime is — vehicle paths through here are a
+        // pre-existing latent issue tracked elsewhere. The
+        // `Record<string, unknown>` slot lets the legacy "attribute key
+        // collision with custom labels" lookup compile (line ~295).
+        const actorData = actor.system as OD6SCharacterSystem;
         const itemData = item.system;
         let flatPips = 0;
 
@@ -229,7 +232,8 @@ export class OD6SItem extends Item {
         switch (item.type) {
             case 'skill':
             case 'specialization': {
-                const sys = itemData as OD6SSkillItemSystem;
+                if (!isSkillItem(item) && !isSpecializationItem(item)) break;
+                const sys = item.system;
                 if (OD6S.flatSkills) {
                     rollData.score = +(actorData.attributes[sys.attribute.toLowerCase()].score);
                     flatPips = (+sys.score)
@@ -245,22 +249,27 @@ export class OD6SItem extends Item {
             case 'starship-weapon':
             case 'vehicle-weapon':
             case 'weapon': {
-                const sys = itemData as OD6SWeaponItemSystem;
+                if (!isAnyWeaponItem(item)) break;
+                const sys = item.system;
                 // Try a specialization first, then a skill, then an attribute
                 let found = false;
 
                 if (parry && game.settings.get('od6s','parry_skills')) {
                     let skill;
-                    if(typeof(sys.stats.parry_specialization) !== "undefined" && sys.stats.parry_specialization !== "") {
-                        skill = actor.items.find((skill: Item) => skill.name === sys.stats.parry_specialization && skill.type === 'specialization');
+                    // parry_skill / parry_specialization only exist on regular
+                    // hand/personal weapons; vehicle/starship weapons can't parry.
+                    const parrySpec = isWeaponItem(item) ? item.system.stats.parry_specialization : '';
+                    const parrySkill = isWeaponItem(item) ? item.system.stats.parry_skill : '';
+                    if(typeof parrySpec !== "undefined" && parrySpec !== "") {
+                        skill = actor.items.find((skill: Item) => skill.name === parrySpec && skill.type === 'specialization');
                     }
-                    else if(typeof(sys.stats.parry_skill) !== "undefined" && sys.stats.parry_skill !== "") {
-                    	skill = actor.items.find((skill: Item) => skill.name === sys.stats.parry_skill && skill.type === 'skill');
+                    else if(typeof parrySkill !== "undefined" && parrySkill !== "") {
+                    	skill = actor.items.find((skill: Item) => skill.name === parrySkill && skill.type === 'skill');
                      } else {
                     	skill = actor.items.find((skill: Item) => skill.name === game.i18n.localize(OD6S.actions.parry.skill) && skill.type === 'skill');
                     }
-                    if (skill) {
-                        const skillSys = skill.system as OD6SSkillItemSystem;
+                    if (skill && (isSkillItem(skill) || isSpecializationItem(skill))) {
+                        const skillSys = skill.system;
                         if(OD6S.flatSkills) {
                             rollData.score = (+actorData.attributes[skillSys.attribute.toLowerCase()].score);
                             flatPips = (+skillSys.score);
@@ -274,8 +283,9 @@ export class OD6SItem extends Item {
                 }
 
                 if (!found && sys.stats.specialization !== null) {
-                    const spec = actor.items.find((spec: Item) => spec.name === sys.stats.specialization && spec.type === 'specialization');                    if (spec) {
-                        const specSys = spec.system as OD6SSpecializationItemSystem;
+                    const spec = actor.items.find((spec: Item) => spec.name === sys.stats.specialization && spec.type === 'specialization');
+                    if (spec && isSpecializationItem(spec)) {
+                        const specSys = spec.system;
                         if(OD6S.flatSkills) {
                             rollData.score = (+actorData.attributes[specSys.attribute.toLowerCase()].score);
                             flatPips = (+specSys.score);
@@ -295,8 +305,8 @@ export class OD6SItem extends Item {
                         attr = actorData.attributes[od6sutilities.lookupAttributeKey(sys.stats.attribute.toLowerCase())];
                         if(typeof(attr?.score) === "undefined" || attr === null) return false;
                     }
-                    if (typeof (skill) !== 'undefined' && skill !== null) {
-                        const skillSys = skill.system as OD6SSkillItemSystem;
+                    if (skill && isSkillItem(skill)) {
+                        const skillSys = skill.system;
                         if(OD6S.flatSkills) {
                             rollData.score = (+attr.score);
                             flatPips = (+skillSys.score);
@@ -319,7 +329,8 @@ export class OD6SItem extends Item {
                 break;
             }
             case 'action': {
-                const sys = itemData as OD6SActionItemSystem;
+                if (!isActionItem(item)) break;
+                const sys = item.system;
                 let name = '';
                 if ((sys.subtype === 'rangedattack' || sys.subtype === 'meleeattack') && sys.itemId !== '') {
                     // Roll is linked to an inventory item, roll that instead
@@ -359,31 +370,32 @@ export class OD6SItem extends Item {
                     } else {
                         skill = actor.items.find((i: Item) => i.name === name);
                     }
-                    const skillSys = skill?.system as OD6SSkillItemSystem | undefined;
-                    if (skill !== null && typeof (skill) !== 'undefined' && typeof (skillSys?.score) !== 'undefined') {
+                    if (skill && (isSkillItem(skill) || isSpecializationItem(skill))
+                        && typeof skill.system.score !== 'undefined') {
+                        const skillSys = skill.system;
                         if(OD6S.flatSkills) {
-                            rollData.score = (+actorData.attributes[skillSys!.attribute.toLowerCase()].score);
-                            flatPips = (+skillSys!.score);
+                            rollData.score = (+actorData.attributes[skillSys.attribute.toLowerCase()].score);
+                            flatPips = (+skillSys.score);
                         } else {
-                            if((this.system as OD6SSkillItemSystem).isAdvancedSkill) {
-                                rollData.score = (+skillSys!.score);
+                            if(isSkillItem(this) && this.system.isAdvancedSkill) {
+                                rollData.score = (+skillSys.score);
                             } else {
-                                rollData.score = (+skillSys!.score) + (+actorData.attributes[skillSys!.attribute.toLowerCase()].score);
+                                rollData.score = (+skillSys.score) + (+actorData.attributes[skillSys.attribute.toLowerCase()].score);
                             }
                         }
                     } else {
                         // Search compendia for the skill and use the attribute
                         skill = (await od6sutilities._getItemFromWorld(name)) as Item | undefined;
-                        if (skill !== null && typeof (skill) !== 'undefined') {
-                            rollData.score = (+actorData.attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score);
+                        if (skill && isSkillItem(skill)) {
+                            rollData.score = (+actorData.attributes[skill.system.attribute.toLowerCase()].score);
                         } else {
                             skill = (await od6sutilities._getItemFromCompendium(name)) as Item | undefined;
-                            if (skill !== null && typeof (skill) !== 'undefined') {
-                                rollData.score = (+actorData.attributes[(skill.system as OD6SSkillItemSystem).attribute.toLowerCase()].score);
+                            if (skill && isSkillItem(skill)) {
+                                rollData.score = (+actorData.attributes[skill.system.attribute.toLowerCase()].score);
                             } else {
                                 // Cannot find, use defaults for the type
                                 for (const a in OD6S.actions) {
-                                    if (OD6S.actions[a].type === (itemData as OD6SActionItemSystem).subtype) {
+                                    if (OD6S.actions[a].type === sys.subtype) {
                                         rollData.score = (+actorData.attributes[OD6S.actions[a].base].score);
                                         break;
                                     }
@@ -397,14 +409,13 @@ export class OD6SItem extends Item {
             }
         }
 
-        if(item.type === 'starship-weapon' || item.type === 'vehicle-weapon') {
-            const sys = item.system as OD6SVehicleWeaponItemSystem;
-            if(sys?.fire_control.score > 0) {
-                rollData.score = (+rollData.score) + (+sys.fire_control.score);
+        if (isVehicleBorneWeaponItem(item)) {
+            if(item.system.fire_control.score > 0) {
+                rollData.score = (+rollData.score) + (+item.system.fire_control.score);
             }
         }
 
-        let subtype = (itemData as OD6SActionItemSystem).subtype;
+        let subtype = isActionItem(item) ? item.system.subtype : '';
         if (parry) {
             subtype = "parry";
         }

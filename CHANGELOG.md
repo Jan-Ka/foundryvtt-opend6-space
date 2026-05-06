@@ -33,6 +33,12 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   Handlebars accumulators are typed as `Record<string, T>` instead
   of being indexed via `as any`. `OD6SItem.createDialog` now takes a
   typed `data` parameter (#56).
+- `roll-setup.ts` and `item.ts` now narrow `actor` and `item` via
+  the existing type-guard helpers (plus two new combined guards
+  `isAnyWeaponItem` / `isVehicleBorneWeaponItem`) instead of
+  ad-hoc `as OD6SCharacterSystem` / `as OD6SWeaponItemSystem`
+  casts. ~25 narrowing casts removed; the remaining surface in
+  `OD6SItem.roll()` is documented (#57).
 
 ### Fixed
 
