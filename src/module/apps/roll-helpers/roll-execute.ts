@@ -8,7 +8,15 @@ import {applyDifficultyModifiers} from "./difficulty-math";
 import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
 import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
-import {computeHighHitDamage, computeWildDieReduction, resolveRollMode} from "./roll-execute-math";
+import {
+    computeHighHitDamage,
+    computeWildDieReduction,
+    resolveRollMode,
+    applyDicePenalties,
+    buildRollString,
+    detectWildDieResult,
+    assembleDamageDice,
+} from "./roll-execute-math";
 import {clearExplosivePending, getExplosivePending} from "../../system/utilities/explosives";
 import {debug} from "../../system/logger";
 
@@ -16,7 +24,6 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     const actor = rollData.actor
     let rollMin = 0;
     let rollString: string;
-    let cpString;
     let targetName;
     let targetId;
     let targetType;
@@ -66,47 +73,27 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         rollData.dice = (+rollData.dice)+(+rollData.scaledice);
     }
 
-    // Subtract Penalties
-    rollData.dice = (+rollData.dice) - (+rollData.actionpenalty) -
-        (+rollData.woundpenalty) -
-        (+rollData.stunnedpenalty) -
-        (+rollData.otherpenalty);
+    rollData.dice = applyDicePenalties(+rollData.dice, {
+        action: +rollData.actionpenalty,
+        wound: +rollData.woundpenalty,
+        stunned: +rollData.stunnedpenalty,
+        other: +rollData.otherpenalty,
+    });
 
-    // Wild die explodes on a 6
-    if (rollData.wilddie) {
-        rollData.dice = (+rollData.dice) - 1;
-        if (rollData.dice === 0) {
-            rollString = "1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
-        } else if (rollData.dice <= 0) {
-            rollString = '';
-        } else {
-            rollString = rollData.dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR") + "+1dw" +
-                game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
-        }
-    } else {
-        if (rollData.dice <= 0) {
-            rollString = ''
-        } else {
-            rollString = rollData.dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR");
-        }
-    }
-
-    if (rollData.pips > 0) {
-        rollString += "+" + rollData.pips;
-    }
-
-    if (rollData.characterpoints > 0) {
-        cpString = "+" + rollData.characterpoints + "db"
-            + game.i18n.localize("OD6S.CHARACTER_POINT_DIE_FLAVOR");
-        rollString += cpString;
-    }
-
-    if (rollData.bonusdice > 0) {
-        rollString += "+" + rollData.bonusdice + "d6" + game.i18n.localize("OD6S.BONUS_DIE_FLAVOR");
-    }
-    if (rollData.bonuspips > 0) {
-        rollString += "+" + rollData.bonuspips;
-    }
+    rollString = buildRollString({
+        dice: +rollData.dice,
+        pips: +rollData.pips,
+        characterpoints: +rollData.characterpoints,
+        bonusdice: +rollData.bonusdice,
+        bonuspips: +rollData.bonuspips,
+        wilddie: !!rollData.wilddie,
+        labels: {
+            base: game.i18n.localize("OD6S.BASE_DIE_FLAVOR"),
+            wild: game.i18n.localize("OD6S.WILD_DIE_FLAVOR"),
+            cp: game.i18n.localize("OD6S.CHARACTER_POINT_DIE_FLAVOR"),
+            bonus: game.i18n.localize("OD6S.BONUS_DIE_FLAVOR"),
+        },
+    });
 
     // Apply costs (character points / fate points only exist on character actors)
     if (isCharacterActor(actor)) {
@@ -163,71 +150,30 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         damageType = 'p';
     }
 
-    baseDamage = damageScore;
     const damageEffects = applyDamageEffects(rollData);
     rollData.damagemodifiers = rollData.damagemodifiers.concat(damageEffects);
 
-    if (typeof (rollData.damagemodifiers) !== 'undefined' && rollData.damagemodifiers.length) {
-        rollData.damagemodifiers.forEach((d: Modifier) => {
-            if (d.name === game.i18n.localize("OD6S.SCALE")) {
-                if (game.settings.get('od6s', 'dice_for_scale')) {
-                    damageScore = (+damageScore) + (d.value);
-                }
-            } else {
-                if (rollData.actor.getFlag('od6s', 'fatepointeffect') &&
-                    d.name === 'OD6S.STRENGTH_DAMAGE_BONUS') {
-                    // noop
-                } else {
-                    damageScore = (+damageScore) + (d.value);
-                }
-            }
-        })
-    }
-
-    let damageDice = od6sutilities.getDiceFromScore(damageScore);
-    if (rollData.actor.getFlag('od6s', 'fatepointeffect')) {
-        const strMod = rollData.damagemodifiers.find((d: Modifier) => d.name === 'OD6S.STRENGTH_DAMAGE_BONUS');
-        if (strMod) {
-            damageDice.dice = damageDice.dice + strModDice!.dice * 2;
-            damageDice.pips = damageDice.pips + strModDice!.pips * 2;
-            strModDice!.dice = strModDice!.dice * 2;
-            strModDice!.pips = strModDice!.pips * 2;
-        }
-    }
-
-    if (rollData.subtype === 'vehicleramattack') {
-        damageScore = (+damageScore) +
-            (+OD6S.vehicle_speeds[rollData.vehiclespeed].damage) +
-            (+OD6S.collision_types[rollData.vehiclecollisiontype].score);
-        baseDamage = damageScore;
-        damageDice = od6sutilities.getDiceFromScore(damageScore);
-    }
-
-    if (typeof (rollData.damagemodifiers) !== 'undefined' && rollData.damagemodifiers.length) {
-        rollData.damagemodifiers.forEach((d: Modifier) => {
-            if (d.pips !== undefined && d.pips > 0) {
-                damageDice.pips = damageDice.pips + (+d.pips)
-            }
-        })
-    }
-
-    let scaleBonus = 0;
-    for (let i = 0; i < rollData.damagemodifiers.length; i++) {
-        if (rollData.damagemodifiers[i].name === game.i18n.localize("OD6S.SCALE")) {
-            if (!game.settings.get('od6s', 'dice_for_scale')) {
-                scaleBonus = rollData.damagemodifiers[i].value;
-            }
-        }
-    }
-
-    let scaleDice = 0;
-    if (game.settings.get('od6s', 'dice_for_scale')) {
-        if (rollData.modifiers.scalemod > 0) {
-            damageScore = (+damageScore) + (+rollData.modifiers.scalemod);
-        } else {
-            scaleDice = rollData.scaledice;
-        }
-    }
+    const isVehicleRam = rollData.subtype === 'vehicleramattack';
+    const damageAssembly = assembleDamageDice({
+        damageScore: +damageScore,
+        damageModifiers: rollData.damagemodifiers,
+        strModDice,
+        subtype: rollData.subtype ?? '',
+        fatepointInEffect: !!rollData.actor.getFlag('od6s', 'fatepointeffect'),
+        scaleLabel: game.i18n.localize("OD6S.SCALE"),
+        diceForScale: !!game.settings.get('od6s', 'dice_for_scale'),
+        scaleMod: +rollData.modifiers.scalemod,
+        scaleDice: +rollData.scaledice,
+        vehicleRamDamage: isVehicleRam ? +OD6S.vehicle_speeds[rollData.vehiclespeed].damage : 0,
+        vehicleRamCollisionScore: isVehicleRam ? +OD6S.collision_types[rollData.vehiclecollisiontype].score : 0,
+        pipsPerDice: OD6S.pipsPerDice,
+    });
+    baseDamage = damageAssembly.baseDamage;
+    damageScore = damageAssembly.damageScore;
+    const damageDice = damageAssembly.damageDice;
+    strModDice = damageAssembly.strModDice ?? strModDice;
+    const scaleBonus = damageAssembly.scaleBonus;
+    const scaleDice = damageAssembly.scaleDice;
 
     const flags: RollMessageFlags = {
         "rollMode": rollMode,
@@ -388,16 +334,14 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     }
 
     if (useWildDie && rollMin < 1) {
-        const wildFlavor = game.i18n.localize('OD6S.WILD_DIE_FLAVOR').replace(/[[\]]/g, "");
-        const wildTerm = (roll.terms as Array<{ flavor?: string; total?: number }>).find(d => d.flavor === wildFlavor);
-        if (wildTerm?.total === 1) {
-            flags.wild = true;
-            if (OD6S.wildDieOneDefault > 0 && OD6S.wildDieOneAuto === 0) {
-                flags.wildHandled = true;
-            }
-        } else {
-            flags.wild = false;
-        }
+        const detection = detectWildDieResult({
+            terms: roll.terms as Array<{ flavor?: string; total?: number }>,
+            wildFlavor: game.i18n.localize('OD6S.WILD_DIE_FLAVOR').replace(/[[\]]/g, ""),
+            wildDieOneDefault: OD6S.wildDieOneDefault,
+            wildDieOneAuto: OD6S.wildDieOneAuto,
+        });
+        flags.wild = detection.wild;
+        if (detection.wildHandled) flags.wildHandled = true;
     }
 
     flags.success = roll.total >= difficulty;
