@@ -1,6 +1,14 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {isVehicleActor} from "../../system/type-guards";
+import {
+    isCrewMemberByFlag,
+    canRemoveFromCrew,
+    removeCrewmember,
+    buildVehicleWeaponSnapshots,
+    shouldDispatchVehicleDataAsGM,
+    selectCrewmembersForBroadcast,
+} from "./crew-vehicle-math";
 
 export async function addEmbeddedPilot(actor: Actor, pilotActor: Actor): Promise<void> {
     /* Copy attributes and items to vehicle */
@@ -62,20 +70,20 @@ export async function _verifyAddToCrew(actor: Actor, currentVehicleId: string, n
 }
 
 export async function removeFromCrew(actor: Actor, vehicleID: string): Promise<void> {
-    if (actor.getFlag('od6s', 'crew') !== vehicleID) {
+    if (!canRemoveFromCrew(actor.getFlag('od6s', 'crew') as string | null | undefined, vehicleID)) {
         ui.notifications.warn(game.i18n.localize('OD6S.NOT_CREW_MEMBER'))
-    } else {
-        try {
-            await actor.unsetFlag('od6s', 'crew');
-        } catch (error) {
-            console.error(error)
-        }
+        return;
+    }
+    try {
+        await actor.unsetFlag('od6s', 'crew');
+    } catch (error) {
+        console.error(error)
     }
 }
 
 export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promise<void> {
     if (!isVehicleActor(actor)) return;
-    const crewMembers = actor.system.crewmembers.filter((e) => e.uuid !== crewID);
+    const crewMembers = removeCrewmember(actor.system.crewmembers, crewID);
     const update: any = {};
     update.system = {};
     update.system.crewmembers = crewMembers;
@@ -83,7 +91,7 @@ export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promi
 }
 
 export function isCrewMember(actor: Actor): boolean {
-    return !!actor.getFlag('od6s', 'crew');
+    return isCrewMemberByFlag(actor.getFlag('od6s', 'crew') as string | null | undefined);
 }
 
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
@@ -111,36 +119,23 @@ export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void
     data.ranged_damage = sys.ranged_damage;
     data.ram = sys.ram;
     data.ram_damage = sys.ram_damage;
-    data.vehicle_weapons = [];
-    for (let i = 0; i < data.items.size; i++) {
-        if (actor.items.contents[i].type === "vehicle-weapon" || actor.items.contents[i].type === "starship-weapon") {
-            const newItem = actor.items.contents[i].toObject()
-            newItem.id = actor.items.contents[i].id;
-            data.vehicle_weapons.push(newItem);
-        }
-    }
+    data.vehicle_weapons = buildVehicleWeaponSnapshots(actor.items.contents);
 
-    if (game.user.isGM) {
-        let crew;
-        if(typeof uuid !== 'undefined') {
-            crew = data.crewmembers.filter((c: any) =>c.uuid === uuid);
-        } else {
-            crew = data.crewmembers;
-        }
-
-        for (const e of crew) {
-            const crewActor = await od6sutilities.getActorFromUuid(e.uuid);
-            if (crewActor) {
-                const update: any = {};
-                update.id = crewActor.id;
-                update._id = crewActor.id;
-                update.system = {}
-                update.system.vehicle = data;
-                await crewActor.update(update);
-            }
-        }
-    } else {
+    if (shouldDispatchVehicleDataAsGM(game.user.isGM)) {
         await OD6S.socket.executeAsGM("sendVehicleData", data);
+        return;
+    }
+    const crew = selectCrewmembersForBroadcast(data.crewmembers, uuid);
+    for (const e of crew) {
+        const crewActor = await od6sutilities.getActorFromUuid(e.uuid);
+        if (crewActor) {
+            const update: any = {};
+            update.id = crewActor.id;
+            update._id = crewActor.id;
+            update.system = {}
+            update.system.vehicle = data;
+            await crewActor.update(update);
+        }
     }
 }
 
