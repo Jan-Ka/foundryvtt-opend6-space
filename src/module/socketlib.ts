@@ -182,4 +182,5 @@ export async function promptResistanceRolls(msg: any) {
             }
         }
     }
+    return undefined;
 }

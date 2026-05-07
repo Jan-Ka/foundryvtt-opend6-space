@@ -108,6 +108,7 @@ export class OD6SItem extends Item {
             score = score + fireControlScore;
             return score;
         }
+        return undefined;
     }
 
     getScoreText(): string | undefined {
@@ -126,6 +127,7 @@ export class OD6SItem extends Item {
             }
             return this.actor.getActionScoreText('parry');
         }
+        return undefined;
     }
 
     /**
@@ -220,7 +222,6 @@ export class OD6SItem extends Item {
         // in the action / purchase paths. Vehicle items normally roll through
         // `Actor.rollAction`, not here.
         const actorData = actor.system as OD6SCharacterSystem;
-        const itemData = item.system;
         let flatPips = 0;
 
         const rollData: any = {};

@@ -90,7 +90,7 @@ export class OD6SActor extends Actor {
         prepareBaseActorData(this);
     }
 
-    getActionScoreText(action: string) {
+    getActionScoreText(action: string): string | undefined {
         if (['character', 'creature', 'npc'].includes(this.type)) {
             const actionData = OD6S.actions[action];
             if(typeof actionData === 'undefined') {
@@ -106,6 +106,7 @@ export class OD6SActor extends Actor {
             const dice = od6sutilities.getDiceFromScore(this.system.attributes[actionData.base].score);
             return `${dice.dice}D+${dice.pips}`;
         }
+        return undefined;
     }
 
     getVehicleActionScore(action: string): number | undefined {
@@ -149,15 +150,10 @@ export class OD6SActor extends Actor {
                 }
             }
             return score;
-        } else if (action === 'ranged_attack') {
-            // TODO
-        } else if (action === 'ram') {
-            // TODO
-        } else if (action === 'dodge') {
-            // TODO
-        } else {
-            // noop
         }
+        // ranged_attack / ram / dodge handlers not yet implemented; return
+        // undefined so callers fall back to the score-text default.
+        return undefined;
     }
 
     getVehicleActionScoreText(action: string) {

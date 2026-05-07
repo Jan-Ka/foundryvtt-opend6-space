@@ -55,21 +55,11 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('getAttackOptions', function (type) {
-        if (type === 'rangedattack') {
-            return OD6S.rangedAttackOptions;
-        }
-
-        if (type === 'meleeattack') {
-            return OD6S.meleeAttackOptions;
-        }
-
-        if (type === 'brawlattack') {
-            return OD6S.brawlAttackOptions;
-        }
-
-        if (type === 'explosive') {
-            return OD6S.explosiveAttackOptions;
-        }
+        if (type === 'rangedattack') return OD6S.rangedAttackOptions;
+        if (type === 'meleeattack') return OD6S.meleeAttackOptions;
+        if (type === 'brawlattack') return OD6S.brawlAttackOptions;
+        if (type === 'explosive') return OD6S.explosiveAttackOptions;
+        return undefined;
     })
 
     Handlebars.registerHelper('isRanged', function (type) {
@@ -192,14 +182,13 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('getHitLocation', function (type, location) {
-
         if (OD6S.randomHitLocations && location !== '') {
             if (type !== 'vehicle' && type !== 'starship') {
                 return game.i18n.localize("OD6S.LOCATION") + ":" + " " + game.i18n.localize(location);
             }
-        } else {
             return '';
         }
+        return '';
     })
 
     Handlebars.registerHelper('showWounds', function () {

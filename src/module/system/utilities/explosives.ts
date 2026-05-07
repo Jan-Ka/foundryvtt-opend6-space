@@ -436,6 +436,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
         }
         await roll.toMessage(msgData);
     }
+    return undefined;
 }
 
 /**

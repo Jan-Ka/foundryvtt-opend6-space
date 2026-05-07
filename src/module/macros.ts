@@ -83,14 +83,14 @@ export function rollItemNameMacro(name: string) {
  * @param attribute
  * @returns {string}
  */
-export function getAttributeName(attribute: string) {
+export function getAttributeName(attribute: string): string | undefined {
     attribute = attribute.toLowerCase();
     if (typeof (OD6S.attributes[attribute]) === "undefined") {
         const warnString = game.i18n.localize('OD6S.ERROR_ATTRIBUTE_KEY') + ": " + attribute;
         ui.notifications.warn(warnString);
-    } else {
-        return game.i18n.localize(OD6S.attributes[attribute].name);
+        return undefined;
     }
+    return game.i18n.localize(OD6S.attributes[attribute].name);
 }
 
 /**

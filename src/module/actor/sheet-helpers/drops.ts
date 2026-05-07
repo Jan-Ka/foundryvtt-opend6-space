@@ -164,6 +164,7 @@ export async function onDropItem(sheet: any, event: any, data: any) {
         }
     }
     sheet.render();
+    return undefined;
 }
 
 /**
@@ -190,6 +191,7 @@ export async function onDropActor(sheet: any, event: any, data: any) {
             await sheet.linkCrew(data.uuid);
         }
     }
+    return undefined;
 }
 
 /**
