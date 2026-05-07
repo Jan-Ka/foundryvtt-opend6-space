@@ -44,6 +44,7 @@ import type {RollSettingsRaw} from "./roll-context-adapter";
 import {HANDLERS} from "./roll-handlers";
 import type {HandlerContext, HandlerInput} from "./roll-handlers";
 import {runFinalize} from "./roll-finalize";
+import {error as logError} from "../../system/logger";
 
 /**
  * Roll-type keys whose rolls get the `dice_for_scale` negative-scaleMod dice
@@ -414,7 +415,11 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                 const bucketRange = bucketRangeFromDistance(distance, weaponRangeTable!, rangeDifficulty);
                 if (bucketRange === null) {
                     if (isExplosive && item && data.regionId) {
-                        try { await canvas.scene.deleteEmbeddedDocuments('Region', [data.regionId]); } catch {/* region already gone */}
+                        try {
+                            await canvas.scene.deleteEmbeddedDocuments('Region', [data.regionId]);
+                        } catch (err) {
+                            logError('explosives', 'out-of-range cleanup: region delete failed', { regionId: data.regionId, err });
+                        }
                         await clearExplosivePending(item, data.regionId);
                     }
                     ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));

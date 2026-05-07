@@ -36,6 +36,17 @@ export function isDebugEnabled(category?: string): boolean {
 
 export function debug(category: string, ...args: any[]): void {
     if (!isDebugEnabled(category)) return;
-     
+
     console.debug(`[od6s:${category}]`, ...args);
+}
+
+/**
+ * Always-on error breadcrumb for swallowed/unexpected failures at handler
+ * boundaries (sockets, sheet form-submits, post-roll cleanup). Unlike
+ * `debug`, this fires regardless of the debug flag — the point is to leave
+ * a system-tagged trace in the console when an async Foundry call rejects.
+ */
+export function error(category: string, ...args: any[]): void {
+
+    console.error(`[od6s:${category}]`, ...args);
 }
