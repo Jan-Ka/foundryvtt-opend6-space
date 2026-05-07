@@ -3,7 +3,7 @@
  * Mounted onto `OD6S` by `config-od6s.ts`.
  */
 
-export const actorTypeLabels = {
+export const actorTypeLabels: Record<string, string> = {
     "character": "ACTOR.TypeCharacter",
     "creature": "ACTOR.TypeCreature",
     "npc": "ACTOR.TypeNpc",
@@ -11,7 +11,7 @@ export const actorTypeLabels = {
     "vehicle": "ACTOR.TypeVehicle",
 };
 
-export const itemLabels = {
+export const itemLabels: Record<string, string> = {
     "skill": "OD6S.SKILL",
     "specialization": "OD6S.SPECIALIZATION",
     "advantage": "OD6S.ADVANTAGE",
@@ -32,7 +32,7 @@ export const itemLabels = {
     "vehicle-weapon": "ITEM.TypeVehicle-weapon",
 };
 
-export const templateItemTypes = {
+export const templateItemTypes: Record<string, string[]> = {
     "character-template": [
         "skill",
         "specialability",
@@ -60,7 +60,7 @@ export const templateItemTypes = {
     ],
 };
 
-export const allowedItemTypes = {
+export const allowedItemTypes: Record<string, string[]> = {
     "container": [
         "armor",
         "weapon",

@@ -2,15 +2,17 @@
  * Configuration getter Handlebars helpers.
  */
 import OD6S from "../../config/config-od6s";
+import type { AttributeDef } from "../../config/attributes";
 import {od6sutilities} from "../utilities";
 import {getAttributeName, getAttributeShortName} from "../../macros";
 
 export function registerConfigHelpers() {
     Handlebars.registerHelper('getConfig', function (key, subKey) {
+        const value = OD6S[key];
         if (typeof subKey !== 'undefined' && subKey !== '') {
-            return OD6S[key][subKey];
+            return (value as Record<string, unknown>)[subKey];
         }
-        return OD6S[key];
+        return value;
     })
 
     Handlebars.registerHelper('getSystemConfig', function (config) {
@@ -206,7 +208,7 @@ export function registerConfigHelpers() {
     })
 
     Handlebars.registerHelper('getAttributes', function () {
-        const active: Record<string, OD6SAttributeField> = {};
+        const active: Record<string, AttributeDef> = {};
         for (const attribute in OD6S.attributes) {
             if (OD6S.attributes[attribute].active) active[attribute] = OD6S.attributes[attribute];
         }
@@ -298,7 +300,6 @@ export function registerConfigHelpers() {
         if (type === "item-group") {
             for (const [key, items] of Object.entries(OD6S.allowedItemTypes)) {
                 if (actorTypes.includes(key)) {
-                    // @ts-expect-error
                     for (const i of items) {
                         if (OD6S.templateItemTypes['item-group'].includes(i)) {
                             templateItems.push(i);

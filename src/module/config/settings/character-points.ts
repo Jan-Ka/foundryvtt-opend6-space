@@ -94,6 +94,6 @@ export function registerCharacterPointSettings() {
         type: Number,
         default: 5,
         requiresReload: true,
-        onChange: (value: number) => (value ? OD6S.characterPointLimits.init = value : 2)
+        onChange: (value: number) => (value ? OD6S.characterPointLimits.initiative = value : 2)
     })
 }

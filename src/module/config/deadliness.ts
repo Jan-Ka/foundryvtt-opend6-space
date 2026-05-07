@@ -3,7 +3,13 @@
  * a wound count to a wound-level description, penalty, and core wound name.
  * Mounted onto `OD6S.deadliness` by `config-od6s.ts`.
  */
-const deadliness = {
+export interface WoundLevel {
+    description: string;
+    penalty: number;
+    core: string;
+}
+
+const deadliness: Record<number, Record<string, WoundLevel>> = {
     1: {
         0: {
             "description": "OD6S.WOUNDS_HEALTHY",
