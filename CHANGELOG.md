@@ -30,6 +30,18 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   file shrinks by ~55 LOC and the damage-modifier pipeline (scale,
   fatepoint str-doubling, vehicle-ram, pip bonuses) is now testable
   without Foundry globals (#59 part 1).
+- Tightened parameter typing across `system/utilities/*.ts` and
+  `apps/roll-helpers/*.ts`: `weapons.ts` range buckets, `actors.ts`
+  user-active access, `effects.ts` GM check, `bind-tabs.ts` (drops
+  the local `declare const foundry: any`), `opposed.ts` opposed-roll
+  state shapes, `misc.ts` template lookup, `explosives.ts` (typed
+  `ExplosiveTarget`, `DetonateExplosiveData`, scatter / detonate
+  signatures), plus `vehicle_weapons` on `OD6SCharacterSystem.vehicle`
+  narrowed to `Item[]`. Foundry shim gains `User.active`,
+  `Combat.scene`, `Scene.regions`, `ChatMessage.clone`, and the
+  `foundry.applications.ux.Tabs` namespace, with the v14
+  `StatusEffect` shape replacing the v13 `{label, icon}` form
+  (no behavioural change; lint count drops 613 → 579) (#59 part 2).
 
 ## [2.5.0] - 2026-05-06
 

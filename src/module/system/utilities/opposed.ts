@@ -63,12 +63,16 @@ export async function handleOpposedRoll(): Promise<void> {
     let type: string;
     let winner: ChatMessage;
     let loser: ChatMessage;
-    let result: any;
+    let result: string | number = 0;
     let damageFlavor;
     let stunned = false;
-    const data: any = {};
-    data.flags = {};
-    let collision: any;
+    const data: {
+        content?: string;
+        flavor?: string;
+        stun?: unknown;
+        flags: { od6s?: Record<string, unknown> };
+    } = { flags: {} };
+    let collision: boolean | string;
     let passengerDamage = '';
     const message1 = (await game.messages.get(getOpposedQueueEntry(0).messageId))!;
     const message2 = (await game.messages.get(getOpposedQueueEntry(1).messageId))!;
@@ -115,7 +119,7 @@ export async function handleOpposedRoll(): Promise<void> {
     if(messageType1 === 'explosive' || messageType2 === 'explosive') {
         if (messageType1 === 'explosive') {
             const targetId = message2!.speaker.token;
-            const damage = message1!.getFlag('od6s', 'targets').find((t: any) => t.id === targetId).damage;
+            const damage = message1!.getFlag('od6s', 'targets').find((t: { id: string; damage: number }) => t.id === targetId).damage;
             const resistance = message2!.rolls[0].total;
             if (damage > resistance) {
                 winner = message1;
@@ -126,7 +130,7 @@ export async function handleOpposedRoll(): Promise<void> {
             }
         } else {
             const targetId = message1!.speaker.token !== null ? message1!.speaker.token : message1!.speaker.actor;
-            const damage = message2!.getFlag('od6s', 'targets').find((t: any) =>t.id === targetId).damage;
+            const damage = message2!.getFlag('od6s', 'targets').find((t: { id: string; damage: number }) =>t.id === targetId).damage;
             const resistance = message1!.rolls[0].total;
             if (damage > resistance) {
                 winner = message2;
@@ -235,7 +239,7 @@ export async function handleOpposedRoll(): Promise<void> {
 
     let apply = false;
     if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
-        if (result > 0 || stunned) apply = true;
+        if ((+result) > 0 || stunned) apply = true;
     } else if (result !== 'OD6S.NO_INJURY' && result !== 'OD6S.NO_DAMAGE') {
         apply = true;
     }

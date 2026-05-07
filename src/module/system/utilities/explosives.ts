@@ -43,11 +43,23 @@ export async function clearExplosivePending(item: Item, regionId: string | undef
     await item.update({ [`flags.od6s.explosivePending.-=${regionId}`]: null });
 }
 
-export async function scatterExplosive(range: any, origin: any, regionId: any): Promise<void> {
+export interface ExplosiveTarget {
+    id: string;
+    range: number;
+    zone: number;
+    name: string;
+    damage?: number;
+}
+
+export async function scatterExplosive(
+    range: string,
+    origin: { x: number; y: number },
+    regionId: string,
+): Promise<void> {
     let distanceTerms = '';
     let angle = 0;
 
-    const region = canvas.scene.getEmbeddedDocument('Region', regionId);
+    const region = canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument;
     const shape = region.shapes[0];
     const target = {x: shape.x, y: shape.y};
     const sourceRay = new foundry.canvas.geometry.Ray(origin, target);
@@ -129,10 +141,10 @@ export async function scatterExplosive(range: any, origin: any, regionId: any): 
     await wait(100);
 }
 
-export async function getExplosiveTargets(actor: any, itemId: any, regionId: string | undefined): Promise<any[]> {
+export async function getExplosiveTargets(actor: Actor, itemId: string, regionId: string | undefined): Promise<ExplosiveTarget[]> {
     const item = actor.isToken ? actor.token.actor.items.get(itemId) : actor.items.get(itemId);
     if (!regionId) return [];
-    const region = canvas.scene.getEmbeddedDocument('Region', regionId);
+    const region = canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument | null;
     if (!region) return [];
     const shape = region.shapes[0];
     const center = { x: shape.x, y: shape.y };
@@ -152,22 +164,25 @@ export async function getExplosiveTargets(actor: any, itemId: any, regionId: str
     );
 
     // Calculate range to each
-    const targets = [];
+    const targets: ExplosiveTarget[] = [];
     for (const target of hitTokens) {
-        const thisTarget: any = {};
-        thisTarget.id = target.id;
-        thisTarget.range = canvas.grid.measurePath([center, target.center]).distance;
-        thisTarget.zone = getBlastRadius(item, thisTarget.range);
-        thisTarget.name = target.name;
-        targets.push(thisTarget);
+        const range = canvas.grid.measurePath([center, target.center]).distance;
+        targets.push({
+            id: target.id,
+            range,
+            zone: getBlastRadius(item!, range),
+            name: target.name,
+        });
     }
 
     return targets;
 }
 
-export async function detonateExplosives(combat: any): Promise<void> {
+export async function detonateExplosives(combat: Combat): Promise<void> {
     // Find all active explosive regions on the scene and detonate
-    const regions = combat.scene.regions?.filter((i: any) => i.flags?.od6s?.explosive === true) ?? [];
+    const regions: RegionDocument[] = combat.scene?.regions?.filter(
+        (i: RegionDocument) => i.flags?.od6s?.explosive === true,
+    ) ?? [];
     for (const region of regions) {
         await region.update({ visibility: 2 }); // Make visible to all
         let actor;
@@ -177,14 +192,13 @@ export async function detonateExplosives(combat: any): Promise<void> {
             actor = game!.scenes!.active!.tokens.get(region.getFlag('od6s', 'token'))!.actor;
         }
 
-        const data: any = {};
-        data.flags = {};
+        const data: { flags: { od6s: Record<string, unknown> } } = { flags: { od6s: {} } };
         data.flags.od6s = {
             actorId: region.getFlag('od6s','actor'),
             tokenId: region.getFlag('od6s', 'token'),
             itemId: region.getFlag('od6s','item'),
             templateId: region.id,
-            targets: await getExplosiveTargets(actor, region.getFlag('od6s','item'), region.id),
+            targets: actor ? await getExplosiveTargets(actor, region.getFlag('od6s','item'), region.id) : [],
             triggered: true
         }
 
@@ -192,7 +206,7 @@ export async function detonateExplosives(combat: any): Promise<void> {
         if(region.getFlag('od6s','message')) {
             const origMessage = game.messages.get(region.getFlag('od6s','message'));
             if(typeof(origMessage) !== 'undefined') {
-                const cloneMessage = (origMessage as any).clone(data);
+                const cloneMessage = origMessage.clone(data);
                 await origMessage.unsetFlag('od6s', 'isExplosive');
                 // Blind rolls also populate `whisper`, so the blind check
                 // must come first or it would never be reached.
@@ -210,23 +224,33 @@ export async function detonateExplosives(combat: any): Promise<void> {
     }
 }
 
-export async function detonateExplosive(data: any): Promise<any> {
-    const message = game.messages.get(data.messageId);
+export interface DetonateExplosiveData {
+    messageId?: string;
+    actorId?: string;
+    tokenId?: string;
+    itemId: string;
+    templateId?: string;
+    stun?: unknown;
+}
+
+export async function detonateExplosive(data: DetonateExplosiveData): Promise<unknown> {
+    const message = data.messageId ? game.messages.get(data.messageId) : undefined;
     let actor;
     if (typeof(data.tokenId) === 'undefined' || data.tokenId === '') {
-        actor = await getActorFromUuid(data.actorId);
+        actor = data.actorId ? await getActorFromUuid(data.actorId) : undefined;
     } else {
         const token = game.scenes!.active!.tokens.get(data.tokenId);
         actor = token!.actor;
     }
+    if (!actor) return false;
 
     // Region id stamped on the attack message at creation; falls back to the
     // dataset templateId for legacy / handler-driven callers.
     const regionId = (message?.getFlag('od6s', 'template') as string | undefined) || data.templateId;
 
-    let targets;
+    let targets: ExplosiveTarget[];
     if (message) {
-        targets = await game!.messages!.get(data.messageId)!.getFlag('od6s', 'targets');
+        targets = message.getFlag('od6s', 'targets') as ExplosiveTarget[];
     } else {
         targets = await getExplosiveTargets(actor, data.itemId, regionId);
     }
@@ -249,29 +273,36 @@ export async function detonateExplosive(data: any): Promise<any> {
 
 
     // Create damage chat message
-    const msgData: any = {};
-
-    msgData.flags = {};
-    msgData.flags.od6s = {};
-    msgData.flags.od6s.targets = [];
-    msgData.flags.od6s.item = item!.id;
-    msgData.flags.od6s.isOpposable = true;
-    msgData.flags.od6s.damageType = wsys?.damage.type;
-    msgData.flags.od6s.stun = data.stun;
-    msgData.flags.od6s.attackMessage = data.messageId;
-
-    msgData.flags.od6s.type = "explosive";
+    interface ExplosiveMsgData {
+        flags: { od6s: Record<string, unknown> & { targets: ExplosiveTarget[] } };
+        flavor?: string;
+        speaker?: { alias?: string; actor?: string; token?: string; scene?: string };
+    }
+    const msgData: ExplosiveMsgData = {
+        flags: {
+            od6s: {
+                targets: [],
+                item: item!.id,
+                isOpposable: true,
+                damageType: wsys?.damage.type,
+                stun: data.stun,
+                attackMessage: data.messageId,
+                type: "explosive",
+            },
+        },
+    };
 
     if (boolCheck(data.stun)) {
         msgData.flavor = game.i18n.localize("OD6S.EXPLOSIVE_STUN_DAMAGE");
     } else {
         msgData.flavor = game.i18n.localize("OD6S.EXPLOSIVE_DAMAGE");
     }
-    msgData.speaker = {};
-    msgData.speaker.alias = actor!.name;
-    msgData.speaker.actor = actor!.id;
-    msgData.speaker.token = actor!.isToken ? actor!.token.id : '';
-    msgData.speaker.scene = game.scenes!.active!.id;
+    msgData.speaker = {
+        alias: actor!.name,
+        actor: actor!.id,
+        token: actor!.isToken ? actor!.token.id : '',
+        scene: game.scenes!.active!.id,
+    };
 
     let rollString;
 
@@ -280,7 +311,7 @@ export async function detonateExplosive(data: any): Promise<any> {
         // Separate rolls for each zone; damage score represents whole dice
         for (const i in wsys.blast_radius) {
             const zone = wsys.blast_radius[i as "1" | "2" | "3" | "4"];
-            const zoneTargets = targets.filter((target: any) => target.zone === (+i));
+            const zoneTargets = targets.filter((target: ExplosiveTarget) => target.zone === (+i));
             if (zoneTargets.length < 1) continue;
             if (zone.damage < 1) {
                 ui.notifications.warn(game.i18n.localize("OD6S.WARN_NO_DICE_FOR_ZONE"));
@@ -300,7 +331,7 @@ export async function detonateExplosive(data: any): Promise<any> {
                 rollString = dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR');
             }
             const roll  = await new Roll(rollString).evaluate();
-            for (const target in zoneTargets) {
+            for (let target = 0; target < zoneTargets.length; target++) {
                 const targetId = zoneTargets[target].id;
                 if (typeof (actor) === 'undefined') actor = game!.scenes!.active!.tokens.get(targetId)!.actor;
                 if (typeof (actor) === 'undefined') continue;
@@ -361,7 +392,7 @@ export async function detonateExplosive(data: any): Promise<any> {
         }
         const roll = await new Roll(rollString).evaluate();
         // Iterate over targets
-        for (const i in targets) {
+        for (let i = 0; i < targets.length; i++) {
             const target = targets[i];
             let damage = roll.total;
             let actor = await game.actors.get(target.id);
@@ -402,12 +433,13 @@ export async function detonateExplosive(data: any): Promise<any> {
  * @param range (in meters)
  * @returns zone
  */
-export function getBlastRadius(item: any, range: any): number {
+export function getBlastRadius(item: Item, range: number): number {
     let zone = 1;
+    if (!isWeaponItem(item)) return zone;
     const maxZone = game.settings.get('od6s', 'explosive_zones') ? 4 : 3;
 
     for (let i=1; i < maxZone + 1; i++) {
-        if (range > item.system.blast_radius[i].range) {
+        if (range > item.system.blast_radius[String(i) as "1" | "2" | "3" | "4"].range) {
             zone++;
         } else {
             break;

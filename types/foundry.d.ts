@@ -172,6 +172,20 @@ declare namespace foundry {
             function loadTemplates(paths: string[] | Record<string, string>): Promise<Function[]>;
             function renderTemplate(path: string, data?: object): Promise<string>;
         }
+
+        namespace ux {
+            interface TabsOptions {
+                navSelector: string;
+                contentSelector: string;
+                initial?: string;
+                group?: string;
+                callback?: (event: Event, tabs: unknown, active: string) => void;
+            }
+            class Tabs {
+                constructor(options: TabsOptions);
+                bind(html: HTMLElement): void;
+            }
+        }
     }
 
     namespace abstract {
@@ -506,6 +520,7 @@ declare class ChatMessage extends FoundryDocument {
     static getSpeaker(options?: any): ChatSpeaker;
     static create(data: any, options?: any): Promise<ChatMessage>;
 
+    clone(data?: any, context?: any): ChatMessage;
     getRollData(): any;
 }
 
@@ -515,6 +530,7 @@ declare class Combat extends FoundryDocument {
     turn: number;
     active: boolean;
     started: boolean;
+    scene: Scene | null;
     combatants: Collection<Combatant>;
     combatant: Combatant;
     turns: Combatant[];
@@ -542,6 +558,7 @@ declare class Combatant extends FoundryDocument {
 /** Scene document */
 declare class Scene extends FoundryDocument {
     tokens: Collection<TokenDocument>;
+    regions: Collection<RegionDocument>;
     dimensions: any;
     grid: { distance: number; size: number; type: number; [key: string]: any };
 
@@ -560,6 +577,7 @@ declare class TokenDocument extends FoundryDocument {
 /** User document */
 declare class User extends FoundryDocument {
     isGM: boolean;
+    active: boolean;
     character: Actor | null;
     assignHotbarMacro(macro: Macro, slot: number): Promise<void>;
 }

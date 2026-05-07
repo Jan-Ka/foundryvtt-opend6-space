@@ -40,7 +40,7 @@ export async function rollAvailableVehicleAction(sheet: Sheet, ev: any): Promise
         rollData.score = od6sutilities.getScoreFromSkill(sheet.document, "",
             actorData.vehicle.shields.skill.value, OD6S.vehicle_actions[data.id].base);
     } else {
-        const item = actorData.vehicle.vehicle_weapons.find((i: any) => i.id === data.id);
+        const item = actorData.vehicle.vehicle_weapons.find((i: Item) => i.id === data.id);
         if (item !== null && typeof item !== "undefined") {
             rollData.score = od6sutilities.getScoreFromSkill(sheet.document, item.system.specialization.value,
                 game.i18n.localize(item.system.skill.value), item.system.attribute.value);

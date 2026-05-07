@@ -114,7 +114,7 @@ interface OD6SCharacterSystem {
         ranged_damage?: { score: number; type: string; label: string };
         ram?: { score: number; type: string; label: string };
         ram_damage?: { score: number; type: string; label: string };
-        vehicle_weapons?: any[];
+        vehicle_weapons?: Item[];
         items?: unknown;
     };
     /** Container actors expose a per-player visibility flag. */

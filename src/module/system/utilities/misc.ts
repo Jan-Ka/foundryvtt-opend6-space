@@ -31,11 +31,11 @@ export function getTemplateFromMessage(message: ChatMessage): { actor: Actor | u
     // to the (deprecated) item flag for messages created before #40 landed.
     const regionId = (message.getFlag('od6s', 'template') as string | undefined)
         ?? (item?.getFlag('od6s', 'explosiveTemplate') as string | undefined);
-    const data: any = {};
-    data.actor = actor;
-    data.item = item;
-    data.template = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
-    return data;
+    return {
+        actor,
+        item,
+        template: regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument : null,
+    };
 }
 
 export function lookupAttributeKey(id: string): string | false {

@@ -43,7 +43,7 @@ async function passesExplosiveGate(data: IncomingRollData): Promise<boolean> {
         && data.type === 'action'
         && data.subtype === 'vehiclerangedweaponattack') {
         item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!
-            .find((i: any) => i.id === data.itemId);
+            .find((i) => i.id === data.itemId);
     }
 
     const sys = item?.system as OD6SWeaponItemSystem | undefined;

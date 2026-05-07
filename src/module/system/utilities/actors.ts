@@ -40,7 +40,7 @@ export function getActorOwner(actor: Actor): User | undefined {
     const playerOwners = Object.entries(permissionObject)
         .filter(
             ([id, level]) =>
-                !game.users.get(id)?.isGM && (game.users.get(id) as any)?.active && level === 3
+                !game.users.get(id)?.isGM && game.users.get(id)?.active && level === 3
         )
         .map(([id]) => id);
 
