@@ -30,6 +30,16 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   file shrinks by ~55 LOC and the damage-modifier pipeline (scale,
   fatepoint str-doubling, vehicle-ram, pip bonuses) is now testable
   without Foundry globals (#59 part 1).
+- Extracted six pure helpers from
+  `actor/actor-helpers/crew-vehicle.ts` into
+  `crew-vehicle-math.ts` — `isCrewMemberByFlag`, `canRemoveFromCrew`,
+  `removeCrewmember`, `buildVehicleWeaponSnapshots`,
+  `shouldDispatchVehicleDataAsGM`, `selectCrewmembersForBroadcast` —
+  covered by 24 new domain tests in
+  `tests/domain/crew-vehicle.test.ts`. The orchestrator still owns
+  the document mutations and socket dispatch; what runs around them
+  (crew flag predicates, weapon-snapshot projection, GM-vs-player
+  branching) is now exercised without a Foundry runtime (#84).
 - Polish batch (#60): extracted blast-radius damage falloff to
   named constants in `explosives.ts`; added an `error()` breadcrumb
   to `system/logger.ts` and wired it into the three swallowed-failure
