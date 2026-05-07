@@ -12,9 +12,9 @@ export async function onDropCharacterTemplate(sheet: any, event: any, item: any,
     if (sheet.document.items.find((E: Item) => E.type === 'character-template')) {
         ui.notifications.error(game.i18n.localize("OD6S.ERROR_TEMPLATE_ALREADY_ASSIGNED"));
         return false;
-    } else {
-        await addCharacterTemplate(sheet, item);
     }
+    await addCharacterTemplate(sheet, item);
+    return undefined;
 }
 
 /**
@@ -47,6 +47,7 @@ export async function onDropSpeciesTemplate(sheet: any, event: any, item: any, _
     if (templateItemsList.length) {
         await sheet.document.createEmbeddedDocuments('Item', templateItemsList);
     }
+    return undefined;
 }
 
 /**
@@ -62,6 +63,7 @@ export async function onDropItemGroup(sheet: any, event: any, item: any, _data: 
             await sheet.document.createEmbeddedDocuments('Item', templateItemsList);
         }
     }
+    return undefined;
 }
 
 /**

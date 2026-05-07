@@ -5,6 +5,7 @@
 import type {RollData} from "./roll-data";
 import {isCharacterActor, isSpecializationItem} from "../../system/type-guards";
 import {clearExplosivePending} from "../../system/utilities/explosives";
+import {error as logError} from "../../system/logger";
 
 export function getEffectMod(type: string, name: string, actor: Actor): number {
     if (!isCharacterActor(actor)) return 0;
@@ -48,7 +49,12 @@ export async function cancelAction(rollData: RollData): Promise<void> {
         if (regionId) {
             try {
                 await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]);
-            } catch {/* region already gone */}
+            } catch (err) {
+                // Region may already be gone (race / permission / stale id).
+                // Leave a tagged breadcrumb so a stuck explosive marker can
+                // be traced; cleanup of the item flag still runs below.
+                logError('explosives', 'cancelAction: region delete failed', { regionId, err });
+            }
             if (item) await clearExplosivePending(item, regionId);
         } else {
             // Manual (non-auto) path: only `explosiveSet` was written.

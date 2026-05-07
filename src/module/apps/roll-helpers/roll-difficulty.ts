@@ -25,7 +25,6 @@ async function getDifficultyImpl(rollData: RollData): Promise<number> {
         return 5;
     }
 
-    const target = typeof (rollData.target) !== 'undefined';
     switch (rollData.subtype) {
         case 'vehiclemaneuver':
             if (OD6S.vehicleDifficulty) {

@@ -7,7 +7,7 @@ import {getDifficulty, applyDifficultyEffects, applyDamageEffects} from "./roll-
 import {applyDifficultyModifiers} from "./difficulty-math";
 import {isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isWeaponItem} from "../../system/type-guards";
 import type {Modifier} from "./difficulty-math";
-import type {RollData, RollMessageFlags, DiceValue} from "./roll-data";
+import type {RollData, RollMessageFlags} from "./roll-data";
 import {
     computeHighHitDamage,
     computeWildDieReduction,

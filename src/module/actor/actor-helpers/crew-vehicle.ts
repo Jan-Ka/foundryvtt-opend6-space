@@ -34,6 +34,7 @@ export async function addToCrew(actor: Actor, vehicleId: string): Promise<unknow
             yes: { label: game.i18n.localize("OD6S.OK") },
         });
         if (confirmed) await actor._verifyAddToCrew(currentVehicle.uuid, vehicleId);
+        return undefined;
     } else {
         return await actor.setFlag('od6s', 'crew', vehicleId);
     }

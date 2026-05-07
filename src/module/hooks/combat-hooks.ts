@@ -23,6 +23,7 @@ export function registerCombatHooks() {
             !combatant.actor.system?.embedded_pilot.value) {
             return false;
         }
+        return undefined;
     })
 
     Hooks.on("updateCombat", async (Combat, _data, _options, _userId) => {

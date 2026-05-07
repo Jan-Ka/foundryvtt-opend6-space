@@ -38,23 +38,16 @@ export function registerConfigHelpers() {
 
     Handlebars.registerHelper('getCustomField1Type', function () {
         const thisType = game.settings.get('od6s', 'custom_field_1_type');
-        if (thisType === "string") {
-            return "text";
-        }
-        if (thisType === "number") {
-            return "number";
-        }
+        if (thisType === "string") return "text";
+        if (thisType === "number") return "number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField1FType', function () {
         const thisType = game.settings.get('od6s', 'custom_field_1_type')
-        if (thisType === "string") {
-            return "String";
-        }
-
-        if (thisType === "number") {
-            return "Number";
-        }
+        if (thisType === "string") return "String";
+        if (thisType === "number") return "Number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField2', function () {
@@ -76,24 +69,17 @@ export function registerConfigHelpers() {
 
     Handlebars.registerHelper('getCustomField2Type', function () {
         const thisType = game.settings.get('od6s', 'custom_field_2_type');
-        if (thisType === "string") {
-            return "text";
-        }
-        if (thisType === "number") {
-            return "number";
-        }
+        if (thisType === "string") return "text";
+        if (thisType === "number") return "number";
+        return "";
     })
 
 
     Handlebars.registerHelper('getCustomField2FType', function () {
         const thisType = game.settings.get('od6s', 'custom_field_2_type')
-        if (thisType === "string") {
-            return "String";
-        }
-
-        if (thisType === "number") {
-            return "Number";
-        }
+        if (thisType === "string") return "String";
+        if (thisType === "number") return "Number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField3', function () {
@@ -115,23 +101,16 @@ export function registerConfigHelpers() {
 
     Handlebars.registerHelper('getCustomField3Type', function () {
         const thisType = game.settings.get('od6s', 'custom_field_3_type');
-        if (thisType === "string") {
-            return "text";
-        }
-        if (thisType === "number") {
-            return "number";
-        }
+        if (thisType === "string") return "text";
+        if (thisType === "number") return "number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField3FType', function () {
         const thisType = game.settings.get('od6s', 'custom_field_3_type')
-        if (thisType === "string") {
-            return "String";
-        }
-
-        if (thisType === "number") {
-            return "Number";
-        }
+        if (thisType === "string") return "String";
+        if (thisType === "number") return "Number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField4', function () {
@@ -153,23 +132,16 @@ export function registerConfigHelpers() {
 
     Handlebars.registerHelper('getCustomField4Type', function () {
         const thisType = game.settings.get('od6s', 'custom_field_4_type');
-        if (thisType === "string") {
-            return "text";
-        }
-        if (thisType === "number") {
-            return "number";
-        }
+        if (thisType === "string") return "text";
+        if (thisType === "number") return "number";
+        return "";
     })
 
     Handlebars.registerHelper('getCustomField4FType', function () {
         const thisType = game.settings.get('od6s', 'custom_field_4_type')
-        if (thisType === "string") {
-            return "String";
-        }
-
-        if (thisType === "number") {
-            return "Number";
-        }
+        if (thisType === "string") return "String";
+        if (thisType === "number") return "Number";
+        return "";
     })
 
     Handlebars.registerHelper('isCustomFieldUsed', function (fieldNum, type) {

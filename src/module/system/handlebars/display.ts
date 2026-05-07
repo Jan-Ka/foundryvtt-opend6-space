@@ -97,13 +97,8 @@ export function registerDisplayHelpers() {
 
     Handlebars.registerHelper('displayCharacterTemplateClear', function (actor) {
         const template = actor.items.find((E: any) => E.type === 'character-template');
-        if (actor.sheetmode === 'freeedit') {
-            if (template) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        if (actor.sheetmode === 'freeedit') return !!template;
+        return false;
     })
 
     Handlebars.registerHelper('displaySpeciesTemplateClear', function (actor) {

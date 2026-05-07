@@ -94,6 +94,7 @@ export function registerVehicleHelpers() {
                 return actions;
             }
         }
+        return undefined;
     })
 
     Handlebars.registerHelper('getVehicleDamageLevels', function () {
@@ -166,5 +167,6 @@ export function registerVehicleHelpers() {
     Handlebars.registerHelper('getToughnessName', function (type) {
         if (type === 'vehicle') return game.i18n.localize(OD6S.vehicleToughnessName);
         if (type === 'starship') return game.i18n.localize(OD6S.starshipToughnessName);
+        return '';
     })
 }

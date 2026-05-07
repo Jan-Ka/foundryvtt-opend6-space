@@ -20,6 +20,14 @@ function getDodgeScore(actor: Actor): number {
 }
 
 /**
+ * Damage falloff multipliers for the single-roll blast model: zone 1 takes
+ * full damage, zone 2 takes half, zone 3 takes a quarter, anything beyond
+ * deals nothing. (Book p115, "Explosives — blast radius zones".)
+ */
+const BLAST_HALF_DAMAGE_MULTIPLIER = 0.5;
+const BLAST_QUARTER_DAMAGE_MULTIPLIER = 0.25;
+
+/**
  * Per-throw state for an in-flight explosive, keyed by the blast region's id
  * on `flags.od6s.explosivePending`. One entry per throw lets multiple
  * unresolved instances of the same explosive item co-exist (#40) — the
@@ -408,10 +416,10 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
                         // full damage
                         break;
                     case 2:
-                        damage = Math.floor(damage * 0.5);
+                        damage = Math.floor(damage * BLAST_HALF_DAMAGE_MULTIPLIER);
                         break;
                     case 3:
-                        damage = Math.floor(damage *0.25);
+                        damage = Math.floor(damage * BLAST_QUARTER_DAMAGE_MULTIPLIER);
                         break;
                     default:
                         damage = 0;
@@ -428,6 +436,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
         }
         await roll.toMessage(msgData);
     }
+    return undefined;
 }
 
 /**
