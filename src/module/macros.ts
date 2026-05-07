@@ -79,9 +79,9 @@ export function rollItemNameMacro(name: string) {
 }
 
 /**
- * Return either the customized or translated name of an attribute
- * @param attribute
- * @returns {string}
+ * Return either the customized or translated name of an attribute, or
+ * `undefined` if the key isn't registered (the call also surfaces a
+ * `ui.notifications.warn` in that case).
  */
 export function getAttributeName(attribute: string): string | undefined {
     attribute = attribute.toLowerCase();
