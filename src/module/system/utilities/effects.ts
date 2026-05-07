@@ -34,7 +34,7 @@ export function evaluateChange(change: ActiveEffectChange, caller: Actor | Item)
             newValue = newValue.replace(match, value);
         }
     }
-    if (typeof(newValue) === 'undefined' || newValue.includes('undefined') && (game.user as any).isGM()) {
+    if (typeof(newValue) === 'undefined' || newValue.includes('undefined') && game.user.isGM) {
         ui.notifications.warn(game.i18n.localize('OD6S.WARN_EFFECT_PARSE') + ' ' + change.value);
         return 0;
     }

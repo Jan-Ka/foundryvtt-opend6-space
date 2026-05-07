@@ -38,25 +38,24 @@ export async function runPreflight(data: IncomingRollData): Promise<boolean> {
 async function passesExplosiveGate(data: IncomingRollData): Promise<boolean> {
     if (typeof data.itemId === 'undefined' || data.itemId === '') return true;
 
-    let item = data.actor.items.get(data.itemId);
-    if (typeof item === 'undefined'
-        && data.type === 'action'
-        && data.subtype === 'vehiclerangedweaponattack') {
-        item = (data.actor.system as OD6SCharacterSystem).vehicle.vehicle_weapons!
-            .find((i: any) => i.id === data.itemId);
-    }
+    const item = data.actor.items.get(data.itemId);
+    // Vehicle-mounted weapon path: `system.vehicle.vehicle_weapons` holds
+    // `Item#toObject()` snapshots, not real documents (`getFlag` would throw),
+    // and vehicle-mounted explosives don't go through the placement-template
+    // flow anyway — let the gate pass.
+    if (typeof item === 'undefined') return true;
 
-    const sys = item?.system as OD6SWeaponItemSystem | undefined;
+    const sys = item.system as OD6SWeaponItemSystem | undefined;
     if (sys?.subtype?.toLowerCase() !== 'explosive') return true;
-    if (item!.getFlag('od6s', 'explosiveSet')) return true;
+    if (item.getFlag('od6s', 'explosiveSet')) return true;
     // Auto-explosive throws skip `explosiveSet` and stamp the pending map
     // directly (one entry per region) so multiple in-flight throws can co-exist.
-    const pending = item!.getFlag('od6s', 'explosivePending') as Record<string, unknown> | undefined;
+    const pending = item.getFlag('od6s', 'explosivePending') as Record<string, unknown> | undefined;
     if (pending && Object.keys(pending).length > 0) return true;
 
     await new ExplosiveDialog({
         options: OD6S.explosives,
-        item: item!,
+        item: item,
         actor: data.actor,
         type: 'OD6S.EXPLOSIVE_THROWN',
         auto: game.settings.get('od6s', 'auto_explosive'),

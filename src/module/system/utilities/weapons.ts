@@ -16,17 +16,16 @@ export function strengthDamageFromDice(strengthDice: number): number {
  */
 export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<string, number> | false> {
     const regex = /[A-Za-z]/;
-    const foundRange: any = {};
-    foundRange.short = '';
-    foundRange.medium = '';
-    foundRange.long = '';
+    type RangeBucket = { short: string; medium: string; long: string };
+    const foundRange: RangeBucket = { short: '', medium: '', long: '' };
 
     if (!isWeaponItem(item)) return false;
     const itemRange = item.system.range;
-    const range: any = {};
-    range.short = itemRange.short;
-    range.medium = itemRange.medium;
-    range.long = itemRange.long;
+    const range: RangeBucket = {
+        short: itemRange.short,
+        medium: itemRange.medium,
+        long: itemRange.long,
+    };
 
     const numericRange = {
         short: Number(itemRange.short),
@@ -72,16 +71,16 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
         return false;
     }
 
-    const newRanges = {};
+    const newRanges: Record<string, number> = {};
     const dice = getDiceFromScore(baseDice, OD6S.pipsPerDice);
 
     if (game.settings.get('od6s', 'static_str_range')) {
-        for (const r in range) {
+        for (const r of Object.keys(range) as (keyof RangeBucket)[]) {
             const e = range[r].match(/([+|-][0-9])$/);
             if (e) {
-                (newRanges as any)[r] = (dice.dice * 4) + dice.pips + (+e[0]);
+                newRanges[r] = (dice.dice * 4) + dice.pips + (+e[0]);
             } else {
-                (newRanges as any)[r] = (dice.dice * 4) + dice.pips;
+                newRanges[r] = (dice.dice * 4) + dice.pips;
             }
         }
     } else {
@@ -90,19 +89,20 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
         if (dice.pips > 0) rollString = rollString + "+" + dice.pips;
         const roll = await new Roll(rollString).evaluate();
 
-        for (const r in range) {
+        for (const r of Object.keys(range) as (keyof RangeBucket)[]) {
             const e = range[r].match(/([+|-][0-9])$/);
             if (e) {
-                (newRanges as any)[r] = roll.total + (+e[0]);
+                newRanges[r] = roll.total + (+e[0]);
             } else {
-                (newRanges as any)[r] = roll.total;
+                newRanges[r] = roll.total;
             }
         }
 
-        const flags: any = {}
-        flags.type = "range";
-        flags.range = newRanges;
-        flags.origRange = range;
+        const flags = {
+            type: "range",
+            range: newRanges,
+            origRange: range,
+        };
         const label = game.i18n.localize('OD6S.RANGE_ROLL') + ": " + item.name;
         let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
         if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
