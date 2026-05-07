@@ -1066,8 +1066,9 @@ interface ChatSpeaker {
 
 interface StatusEffect {
     id: string;
-    label: string;
-    icon: string;
+    name: string;
+    img: string;
+    hud?: boolean;
     [key: string]: any;
 }
 

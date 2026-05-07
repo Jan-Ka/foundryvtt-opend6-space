@@ -43,6 +43,7 @@ import {
     terrainDifficulty,
     result,
     type DifficultyBand,
+    type DifficultyKey,
     type ResultTier,
     type TerrainModifier,
 } from "./difficulty";
@@ -77,7 +78,6 @@ export interface CharacterPointLimits {
     block: number;
     dr: number;
     initiative: number;
-    init?: number;
 }
 
 /**
@@ -237,7 +237,7 @@ export interface Od6sConfig {
     actions: Record<string, ActionDef>;
     vehicle_actions: Record<string, ActionDef>;
     difficulty: Record<string, DifficultyBand>;
-    difficultyShort: Record<string, string>;
+    difficultyShort: Record<string, DifficultyKey>;
     terrain_difficulty: Record<string, TerrainModifier>;
     result: Record<string, ResultTier>;
     cover: Record<string, Record<string, CoverModifier>>;

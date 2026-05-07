@@ -133,7 +133,7 @@ Hooks.once('init', async function () {
     CONFIG.Combat.documentClass = OD6SCombat;
     CONFIG.ui.combat = OD6SCombatTracker;
     CONFIG.ui.compendium = OD6SCompendiumDirectory;
-    CONFIG.statusEffects = OD6S.statusEffects as unknown as StatusEffect[];
+    CONFIG.statusEffects = OD6S.statusEffects;
     CONFIG.Dice.terms["w"] = WildDie;
     CONFIG.Dice.terms["b"] = CharacterPointDie;
     CONFIG.Token.objectClass = OD6SToken;
