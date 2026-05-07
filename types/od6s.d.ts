@@ -60,6 +60,22 @@ interface OD6SAttributes {
     [key: string]: OD6SAttributeField;
 }
 
+/**
+ * Snapshot shape of a vehicle/starship weapon stored on a crewmember's
+ * `system.vehicle.vehicle_weapons` array. Built by `crew-vehicle.ts:sendVehicleData`
+ * via `Item#toObject()` plus an injected `id`, so these are plain data records,
+ * not real `Item` documents — `getFlag` / `update` etc. are not available.
+ */
+interface VehicleWeaponSnapshot {
+    _id: string;
+    id: string;
+    name: string;
+    type: string;
+    img?: string;
+    system: OD6SWeaponItemSystem;
+    flags?: Record<string, unknown>;
+}
+
 /** System data shared by character, npc, and creature actor types. */
 interface OD6SCharacterSystem {
     attributes: OD6SAttributes;
@@ -114,7 +130,7 @@ interface OD6SCharacterSystem {
         ranged_damage?: { score: number; type: string; label: string };
         ram?: { score: number; type: string; label: string };
         ram_damage?: { score: number; type: string; label: string };
-        vehicle_weapons?: Item[];
+        vehicle_weapons?: VehicleWeaponSnapshot[];
         items?: unknown;
     };
     /** Container actors expose a per-player visibility flag. */

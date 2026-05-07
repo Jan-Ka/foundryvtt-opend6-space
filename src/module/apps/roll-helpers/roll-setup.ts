@@ -84,15 +84,20 @@ function readSettings(): RollSettingsRaw {
  */
 function resolveItemForDispatch(data: IncomingRollData): Item | undefined {
     if (!data.itemId) return undefined;
-    let item = data.actor.items.get(data.itemId);
-    if (!item
-        && data.type === 'action'
+    const item = data.actor.items.get(data.itemId);
+    if (item) return item;
+    if (data.type === 'action'
         && data.subtype === 'vehiclerangedweaponattack'
         && isCharacterActor(data.actor)) {
-        item = data.actor.system.vehicle.vehicle_weapons
-            ?.find((i: { id?: string }) => i.id === data.itemId);
+        // `vehicle_weapons` holds `Item#toObject()` snapshots, not real
+        // documents — but the downstream readers in this file only touch
+        // data fields (`type`, `name`, `system.*`), never document methods.
+        // Cast for shape compatibility; do not call `getFlag` / `update` on it.
+        const snapshot = data.actor.system.vehicle.vehicle_weapons
+            ?.find((i) => i.id === data.itemId);
+        if (snapshot) return snapshot as unknown as Item;
     }
-    return item;
+    return undefined;
 }
 
 function resolveVehicleStatsForCharacter(actor: Actor): HandlerContext['vehicleStats'] {

@@ -59,7 +59,8 @@ export async function scatterExplosive(
     let distanceTerms = '';
     let angle = 0;
 
-    const region = canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument;
+    const region = canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument | undefined;
+    if (!region) return;
     const shape = region.shapes[0];
     const target = {x: shape.x, y: shape.y};
     const sourceRay = new foundry.canvas.geometry.Ray(origin, target);
@@ -143,6 +144,7 @@ export async function scatterExplosive(
 
 export async function getExplosiveTargets(actor: Actor, itemId: string, regionId: string | undefined): Promise<ExplosiveTarget[]> {
     const item = actor.isToken ? actor.token.actor.items.get(itemId) : actor.items.get(itemId);
+    if (!item) return [];
     if (!regionId) return [];
     const region = canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument | null;
     if (!region) return [];
@@ -170,7 +172,7 @@ export async function getExplosiveTargets(actor: Actor, itemId: string, regionId
         targets.push({
             id: target.id,
             range,
-            zone: getBlastRadius(item!, range),
+            zone: getBlastRadius(item, range),
             name: target.name,
         });
     }
