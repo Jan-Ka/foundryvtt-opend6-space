@@ -394,7 +394,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         {rollMode, create: true}
     );
 
-    if (flags.wild === true && parseInt(OD6S.wildDieOneDefault) === 2 && parseInt(OD6S.wildDieOneAuto) === 0) {
+    if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));

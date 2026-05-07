@@ -2,7 +2,14 @@
  * Status effects displayed in the token HUD and applied via wound/stun automation.
  * Mounted onto `OD6S.statusEffects` by `config-od6s.ts`.
  */
-const statusEffects = [
+export interface StatusEffectDef {
+    id: string;
+    name: string;
+    img: string;
+    hud?: boolean;
+}
+
+const statusEffects: StatusEffectDef[] = [
     {
         id: "dead",
         name: "EFFECT.StatusDead",

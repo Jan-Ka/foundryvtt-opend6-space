@@ -3,7 +3,25 @@
  * Mounted onto `OD6S` by `config-od6s.ts`.
  */
 
-export const weaponTypes = [
+export interface WeaponTypeKey {
+    key: string;
+    name: string;
+}
+
+export interface AttackOption {
+    attack: number;
+    damage: number;
+    multi?: boolean;
+}
+
+export interface RangeBand {
+    name: string;
+    difficulty: number;
+    map: string;
+    item: string;
+}
+
+export const weaponTypes: readonly string[] = [
     "OD6S.RANGED",
     "OD6S.MELEE",
     "OD6S.MISSILE",
@@ -11,7 +29,7 @@ export const weaponTypes = [
     "OD6S.EXPLOSIVE",
 ];
 
-export const weaponTypeKeys = [
+export const weaponTypeKeys: readonly WeaponTypeKey[] = [
     { "key": "OD6S.RANGED", "name": "Ranged" },
     { "key": "OD6S.MELEE", "name": "Melee" },
     { "key": "OD6S.MISSILE", "name": "Missile" },
@@ -19,7 +37,7 @@ export const weaponTypeKeys = [
     { "key": "OD6S.EXPLOSIVE", "name": "Explosive" },
 ];
 
-export const meleeDifficulties = [
+export const meleeDifficulties: readonly string[] = [
     "OD6S.DIFFICULTY_VERY_EASY",
     "OD6S.DIFFICULTY_EASY",
     "OD6S.DIFFICULTY_MODERATE",
@@ -28,7 +46,7 @@ export const meleeDifficulties = [
     "OD6S.DIFFICULTY_HEROIC",
 ];
 
-export const rangedAttackOptions = {
+export const rangedAttackOptions: Record<string, AttackOption> = {
     "OD6S.ATTACK_STANDARD": {
         "attack": 0,
         "damage": 0,
@@ -56,7 +74,7 @@ export const rangedAttackOptions = {
     },
 };
 
-export const meleeAttackOptions = {
+export const meleeAttackOptions: Record<string, AttackOption> = {
     "OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
     "OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
     "OD6S.ATTACK_LUNGE": { "attack": 3, "damage": -3 },
@@ -64,7 +82,7 @@ export const meleeAttackOptions = {
     "OD6S.ATTACK_PUSH": { "attack": 3, "damage": 0 },
 };
 
-export const brawlAttackOptions = {
+export const brawlAttackOptions: Record<string, AttackOption> = {
     "OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
     "OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
     "OD6S.ATTACK_GRAB": { "attack": 9, "damage": 0 },
@@ -75,7 +93,7 @@ export const brawlAttackOptions = {
     "OD6S.ATTACK_TACKLE": { "attack": 3, "damage": 0 },
 };
 
-export const ranges = {
+export const ranges: Record<string, RangeBand> = {
     "OD6S.RANGE_POINT_BLANK_SHORT": {
         "name": "OD6S.RANGE_POINT_BLANK",
         "difficulty": -5,

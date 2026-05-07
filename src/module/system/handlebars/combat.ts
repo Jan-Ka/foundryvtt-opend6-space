@@ -249,10 +249,6 @@ export function registerCombatHelpers() {
         return OD6S.difficultyShort;
     })
 
-    Handlebars.registerHelper('getDifficultyFromShort', function () {
-        return OD6S.difficulty.filter()
-    })
-
     Handlebars.registerHelper('getRanges', function () {
         return OD6S.ranges;
     })

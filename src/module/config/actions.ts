@@ -3,14 +3,23 @@
  * (`vehicleActions`). Mounted onto OD6S by `config-od6s.ts`.
  */
 
-export const actions = {
+export interface ActionDef {
+    name: string;
+    type: string;
+    rollable: boolean;
+    base: string;
+    skill: string;
+    subtype: string;
+}
+
+export const actions: Record<string, ActionDef> = {
     "ranged_attack": {
         "name": "OD6S.ACTION_RANGED_ATTACK",
         "type": "rangedattack",
         "rollable": true,
         "base": "agi",
         "skill": "",
-        "subtype": "rangedattack"
+        "subtype": "rangedattack",
     },
     "melee_attack": {
         "name": "OD6S.ACTION_MELEE_ATTACK",
@@ -19,7 +28,6 @@ export const actions = {
         "base": "agi",
         "skill": "Melee Combat",
         "subtype": "meleeattack",
-
     },
     "brawl_attack": {
         "name": "OD6S.ACTION_BRAWL_ATTACK",
@@ -57,45 +65,59 @@ export const actions = {
         "name": "OD6S.ACTION_OTHER",
         "type": "action",
         "rollable": false,
-        "subtype": "misc"
-    }
+        "base": "",
+        "skill": "",
+        "subtype": "misc",
+    },
 };
 
-export const vehicleActions = {
+export const vehicleActions: Record<string, ActionDef> = {
     "ranged_attack": {
         "name": "OD6S.ACTION_VEHICLE_RANGED_ATTACK",
         "type": "vehiclerangedattack",
         "rollable": true,
-        "base": "mec"
+        "base": "mec",
+        "skill": "",
+        "subtype": "",
     },
     "ram": {
         "name": "OD6S.ACTION_VEHICLE_RAM",
         "type": "vehicleramattack",
         "rollable": true,
-        "base": "mec"
+        "base": "mec",
+        "skill": "",
+        "subtype": "",
     },
     "dodge": {
         "name": "OD6S.ACTION_VEHICLE_DODGE",
         "type": "vehicledodge",
         "rollable": true,
-        "base": "mec"
+        "base": "mec",
+        "skill": "",
+        "subtype": "",
     },
     "maneuver": {
         "name": "OD6S.ACTION_VEHICLE_MANEUVER",
         "type": "vehiclemaneuver",
         "rollable": true,
-        "base": "mec"
+        "base": "mec",
+        "skill": "",
+        "subtype": "",
     },
     "sensors": {
         "name": "OD6S.ACTION_VEHICLE_SENSORS",
         "type": "vehiclesensors",
         "base": "mec",
         "skill": "OD6S.SENSORS",
-        "rollable": true
+        "rollable": true,
+        "subtype": "",
     },
     "other": {
         "name": "OD6S.ACTION_VEHICLE_OTHER",
         "type": "action",
-        "rollable": false
-    }
+        "rollable": false,
+        "base": "",
+        "skill": "",
+        "subtype": "",
+    },
 };

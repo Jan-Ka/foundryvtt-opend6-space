@@ -3,7 +3,16 @@
  * `name` and `shortName` are populated from settings at module init.
  * Mounted onto `OD6S.attributes` by `config-od6s.ts`.
  */
-const attributes = {
+export interface AttributeDef {
+    name: string;
+    shortName: string;
+    active: boolean;
+    sort: number;
+}
+
+export type Attributes = Record<string, AttributeDef>;
+
+const attributes: Attributes = {
     "agi": {
         "name": '',
         "shortName": '',

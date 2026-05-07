@@ -12,6 +12,17 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ### Changed
 
+- Replaced the `Record<string, any>` typing on the central `OD6S`
+  config object with a typed `Od6sConfig` interface, and split the
+  remaining inline tables out of `config-od6s.ts` into typed
+  submodules (`difficulty.ts`, `modifiers.ts`, `vehicles.ts`,
+  `wounds.ts`). Existing submodules (`attributes`, `damage`,
+  `weapons`, `actions`, `status-effects`, `labels`, `deadliness`)
+  gained explicit interfaces. The public surface for the ~60
+  import sites is unchanged; one pre-existing typo
+  (`starshipToughessName` → `starshipToughnessName`) was unified,
+  the dead `OD6S.metaphysicsSkills` write and the unused/broken
+  `getDifficultyFromShort` Handlebars helper were removed (#58).
 - Extracted four pure helpers from `roll-execute.ts` into
   `roll-execute-math.ts` — `applyDicePenalties`, `buildRollString`,
   `detectWildDieResult`, `assembleDamageDice` — covered by 16 new

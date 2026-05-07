@@ -4,7 +4,13 @@
  * Mounted onto OD6S by `config-od6s.ts`.
  */
 
-export const weaponDamage = {
+export interface DamageLevel {
+    label: string;
+    woundLevel?: string;
+    penalty: number;
+}
+
+export const weaponDamage: Record<number, DamageLevel> = {
     0: {
         label: "OD6S.NO_DAMAGE",
         penalty: 0
@@ -27,7 +33,7 @@ export const weaponDamage = {
     }
 };
 
-export const armorDamage = {
+export const armorDamage: Record<number, DamageLevel> = {
     0: {
         label: "OD6S.NO_DAMAGE",
         woundLevel: "",
@@ -52,7 +58,7 @@ export const armorDamage = {
     }
 };
 
-export const damage = {
+export const damage: Record<string, number> = {
     "OD6S.WOUNDS_STUNNED": 1,
     "OD6S.WOUNDS_WOUNDED": 4,
     "OD6S.WOUNDS_INCAPACITATED": 9,
@@ -60,7 +66,13 @@ export const damage = {
     "OD6S.WOUNDS_DEAD": 16
 };
 
-export const vehicleDamage = {
+export interface VehicleDamageLevel {
+    damage: number;
+    passenger_damage: string;
+    passenger_damage_dice: number;
+}
+
+export const vehicleDamage: Record<string, VehicleDamageLevel> = {
     "OD6S.NO_DAMAGE": {
         "damage": 0,
         "passenger_damage": "OD6S.PASSENGER_NO_DAMAGE",
@@ -93,7 +105,7 @@ export const vehicleDamage = {
     }
 };
 
-export const damageTypes = {
+export const damageTypes: Record<string, string> = {
     "p": "OD6S.PHYSICAL",
     "e": "OD6S.ENERGY"
 };
