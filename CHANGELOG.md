@@ -30,6 +30,15 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   file shrinks by ~55 LOC and the damage-modifier pipeline (scale,
   fatepoint str-doubling, vehicle-ram, pip bonuses) is now testable
   without Foundry globals (#59 part 1).
+- Polish batch (#60): extracted blast-radius damage falloff to
+  named constants in `explosives.ts`; added an `error()` breadcrumb
+  to `system/logger.ts` and wired it into the three swallowed-failure
+  sites the issue called out (`roll-effects.ts:cancelAction`,
+  `roll-setup.ts` out-of-range cleanup, the `od6s.ts` socket
+  dispatcher); enabled `noUnusedLocals`, `noImplicitReturns`, and
+  `noFallthroughCasesInSwitch` in `tsconfig.json` and fixed the ~30
+  errors that surfaced (mostly explicit fall-through `return undefined`
+  on Handlebars helpers / drop handlers; no behavioural change).
 - Tightened parameter typing across `system/utilities/*.ts` and
   `apps/roll-helpers/*.ts`: `weapons.ts` range buckets, `actors.ts`
   user-active access, `effects.ts` GM check, `bind-tabs.ts` (drops
