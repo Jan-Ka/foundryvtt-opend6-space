@@ -217,11 +217,7 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
             await rollMessage.setFlag("od6s", "originalroll", rollMessage.rolls[0]);
             await rollMessage.update(rollMessageUpdate, {diff: true});
         } else {
-            game.socket.emit("system.od6s", {
-                operation: "updateRollMessage",
-                message: rollMessage,
-                update: rollMessageUpdate,
-            });
+            await OD6S.socket.executeAsGM("updateRollMessage", rollMessage.id, rollMessageUpdate);
         }
     }
 }

@@ -1,24 +1,69 @@
 import {od6sutilities} from "./system/utilities";
 import OD6S from "./config/config-od6s";
 import {isVehicleActor} from "./system/type-guards";
+import {error as logError} from "./system/logger";
+
+// Wrap each handler so failures leave an `[od6s:socket]` breadcrumb instead of
+// surfacing as bare "Uncaught (in promise)" rejections through socketlib.
+function register(name: string, handler: (...args: any[]) => unknown): void {
+    OD6S.socket.register(name, async (...args: unknown[]) => {
+        try {
+            return await handler(...args);
+        } catch (err) {
+            logError('socket', `${name} handler failed`, err);
+            throw err;
+        }
+    });
+}
 
 export function registerSocketlib() {
     Hooks.once("socketlib.ready", () => {
         OD6S.socket = socketlib.registerSystem("od6s");
-        OD6S.socket.register("checkCrewStatus", checkCrewStatus);
-        OD6S.socket.register("sendVehicleData", sendVehicleData);
-        OD6S.socket.register("modifyShields", modifyShields);
-        OD6S.socket.register("unlinkCrew", unlinkCrew);
-        OD6S.socket.register("addToVehicle", addToVehicle);
-        OD6S.socket.register("updateVehicle", updateVehicle);
-        OD6S.socket.register("triggerRoll", triggerRoll);
-        OD6S.socket.register("triggerRollAction", triggerRollAction);
-        OD6S.socket.register('updateExplosiveRegion', updateExplosiveRegion);
-        OD6S.socket.register('deleteExplosiveRegion', deleteExplosiveRegion);
-        OD6S.socket.register('getVehicleFlag', getVehicleFlag);
-        OD6S.socket.register('setVehicleFlag', setVehicleFlag);
-        OD6S.socket.register('unsetVehicleFlag', unsetVehicleFlag);
+        register("checkCrewStatus", checkCrewStatus);
+        register("sendVehicleData", sendVehicleData);
+        register("modifyShields", modifyShields);
+        register("unlinkCrew", unlinkCrew);
+        register("addToVehicle", addToVehicle);
+        register("updateVehicle", updateVehicle);
+        register("triggerRoll", triggerRoll);
+        register("triggerRollAction", triggerRollAction);
+        register('updateExplosiveRegion', updateExplosiveRegion);
+        register('deleteExplosiveRegion', deleteExplosiveRegion);
+        register('getVehicleFlag', getVehicleFlag);
+        register('setVehicleFlag', setVehicleFlag);
+        register('unsetVehicleFlag', unsetVehicleFlag);
+        register('updateRollMessage', updateRollMessage);
+        register('updateInitRoll', updateInitRoll);
+        register('removeFromVehicle', removeFromVehicle);
     });
+}
+
+async function updateRollMessage(messageId: string, update: any) {
+    const message = game.messages.get(messageId);
+    if (!message) return;
+    await message.update(update, {diff: true});
+    await message.setFlag('od6s', 'total', update.content);
+    await message.setFlag('od6s', 'originalroll', message.rolls[0]);
+    const difficulty = message.getFlag('od6s', 'difficulty') as number | undefined;
+    if (typeof difficulty === 'number') {
+        await message.setFlag('od6s', 'success', (+update.content) >= difficulty);
+    }
+}
+
+async function updateInitRoll(messageId: string, initiative: number) {
+    const message = game.messages.get(messageId);
+    if (!message || !game.combat) return;
+    const actorId = message.speaker.actor;
+    if (!actorId) return;
+    const combatant = game.combat.combatants.find((c: any) => c.actor?.id === actorId);
+    if (!combatant) return;
+    await combatant.update({initiative});
+}
+
+async function removeFromVehicle(actorId: string, vehicleId: string) {
+    const actor = await od6sutilities.getActorFromUuid(actorId);
+    if (!actor) return;
+    return await actor.removeFromCrew(vehicleId);
 }
 
 async function triggerRoll(type: string, actorId: string) {
@@ -39,7 +84,7 @@ async function triggerRollAction(type: string, actorId: string) {
     return await actor.rollAction(type);
 }
 
-export async function updateExplosiveRegion(data: any) {
+async function updateExplosiveRegion(data: any) {
     const region = canvas.scene.getEmbeddedDocument('Region', data.regionId);
     if (!region) return;
     if (data.operation === "update") {
@@ -54,7 +99,7 @@ export async function updateExplosiveRegion(data: any) {
     }
 }
 
-export async function deleteExplosiveRegion(data: any) {
+async function deleteExplosiveRegion(data: any) {
     const regionId = data.regionId;
     if (regionId) {
         await canvas.scene.deleteEmbeddedDocuments('Region', [regionId]);

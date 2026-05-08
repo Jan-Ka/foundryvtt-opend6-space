@@ -1,3 +1,5 @@
+import OD6S from "../../config/config-od6s";
+
 export async function useCharacterPointOnRoll(actor: any, message: any): Promise<void> {
     // Roll 1d6x6 and deduct a character point from the actor
     //const actor = game.actors.get(message.speaker.actor);
@@ -56,11 +58,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
             await message.setFlag('od6s', 'success', true);
         }
     } else {
-        game.socket.emit('system.od6s', {
-            operation: 'updateRollMessage',
-            message: message,
-            update: messageUpdate
-        })
+        await OD6S.socket.executeAsGM('updateRollMessage', message.id, messageUpdate);
     }
 
     // Is this an init roll?
@@ -76,11 +74,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
                 await combatant!.update(update);
             }
         } else {
-            game.socket.emit('system.od6s', {
-                operation: "updateInitRoll",
-                message: message,
-                update: messageUpdate
-            })
+            await OD6S.socket.executeAsGM('updateInitRoll', message.id, replacementRoll.total);
         }
     }
 }
