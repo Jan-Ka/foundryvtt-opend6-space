@@ -12,6 +12,7 @@
  */
 
 import { debug, isDebugEnabled } from "./logger";
+import { SCHEMA_VERSION_KEY } from "./schema-version";
 
 /**
  * Migration steps in version order. Each entry runs when the world's stored
@@ -33,6 +34,10 @@ const MIGRATION_STEPS: Array<{ since: string; run: () => Promise<void> }> = [
   {
     since: "2.5.0",
     run: () => migrateExplosivePendingFlags(),
+  },
+  {
+    since: "2.6.0",
+    run: () => stampAllSchemaVersions(),
   },
 ];
 
@@ -280,4 +285,51 @@ async function migrateChatMessageFlags() {
   }
 
   console.log(`od6s | Cleaned explosive flags from ${count} chat messages.`);
+}
+
+/**
+ * #85: Stamp every actor + item with the running system version. Runs once
+ * for any world upgrading past 2.6.0 — after this, new docs are stamped on
+ * `_preCreate` and warning logic in `system/schema-version.ts` can rely on
+ * the field being populated for in-world docs.
+ *
+ * We overwrite any existing stamp. The field didn't exist before 2.6.0, so
+ * any pre-existing value can only come from a doc imported from a future
+ * (>=2.6.0) world into a still-pre-2.6.0 world — vanishingly rare, and the
+ * world's migration history (in the settings store) is the source of truth
+ * at this point. New docs from 2.6.0 onward stamp themselves on `_preCreate`.
+ */
+async function stampAllSchemaVersions() {
+  const version = game.system.version;
+  console.log(`od6s | Stamping all docs with system schema version ${version}...`);
+  let count = 0;
+
+  const actorUpdates: Array<Record<string, unknown>> = [];
+  for (const actor of game.actors) {
+    actorUpdates.push({ _id: actor.id, [`system.${SCHEMA_VERSION_KEY}`]: version });
+
+    const itemUpdates: Array<Record<string, unknown>> = [];
+    for (const item of actor.items) {
+      itemUpdates.push({ _id: item.id, [`system.${SCHEMA_VERSION_KEY}`]: version });
+    }
+    if (itemUpdates.length > 0) {
+      await actor.updateEmbeddedDocuments("Item", itemUpdates);
+      count += itemUpdates.length;
+    }
+  }
+  if (actorUpdates.length > 0) {
+    await Actor.updateDocuments(actorUpdates);
+    count += actorUpdates.length;
+  }
+
+  const worldItemUpdates: Array<Record<string, unknown>> = [];
+  for (const item of game.items) {
+    worldItemUpdates.push({ _id: item.id, [`system.${SCHEMA_VERSION_KEY}`]: version });
+  }
+  if (worldItemUpdates.length > 0) {
+    await Item.updateDocuments(worldItemUpdates);
+    count += worldItemUpdates.length;
+  }
+
+  console.log(`od6s | Stamped ${count} docs.`);
 }

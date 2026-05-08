@@ -1,8 +1,11 @@
+import { schemaVersionField } from "../fields/schema-version";
+
 const fields = foundry.data.fields;
 
 export default class ContainerData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
+      ...schemaVersionField(),
       itemtypes: new fields.SchemaField({
         armor: new fields.BooleanField({ initial: true }),
         weapon: new fields.BooleanField({ initial: true }),
