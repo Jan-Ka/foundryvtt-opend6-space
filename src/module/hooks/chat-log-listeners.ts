@@ -36,6 +36,24 @@ export function registerChatLogListeners() {
             await message!.setFlag('od6s','targets',targets);
         })
 
+        // Keyboard activation for chat-card controls that aren't native <button>s
+        // (header anchors without href, plus role="button" <div>/<span> nodes).
+        // The selector mirrors the elements we make focusable via tabindex/role
+        // in the chat templates.
+        delegateEvent(
+            html,
+            "keydown",
+            ".message-delete, .message-reveal, .message-oppose-button, " +
+                ".modifiers-button, .damage-modifiers-button, " +
+                ".edit-difficulty, .edit-damage, .choose-target",
+            (ev: any) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    (ev.currentTarget as HTMLElement).click();
+                }
+            },
+        )
+
         delegateEvent(html, "click", ".modifiers-button", async (ev: any) => {
             const content = document.getElementById("modifiers-display-" + ev.currentTarget.dataset.messageId);
             if (content!.style.display === "block") {

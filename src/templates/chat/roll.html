@@ -5,10 +5,12 @@
         {{#if user.isGM}}
             {{# if (eq message.flags.od6s.isVisible false)}}
                 <a class="button message-reveal" data-message-id="{{message._id}}"
-                   title="{{localize 'OD6S.REVEAL_DIFFICULTY'}}">
-                        <i class="fas fa-eye"></i></a>
+                   title="{{localize 'OD6S.REVEAL_DIFFICULTY'}}"
+                   role="button" tabindex="0"
+                   aria-label="{{localize 'OD6S.REVEAL_DIFFICULTY'}}">
+                        <i class="fas fa-eye" aria-hidden="true"></i></a>
             {{/if}}
-            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
         {{/if}}
         </span>
     {{#if message.flavor}}
@@ -17,10 +19,12 @@
         </span>
         {{#unless message.flags.od6s.isExplosive}}
             {{#if (isAttack message.flags.od6s.subtype) }}
-                {{localize "OD6S.ATTACKING"}}&nbsp
+                {{localize "OD6S.ATTACKING"}}&nbsp;
                 {{#if user.isGM}}
                 <span class="choose-target" title="{{localize "OD6S.CHANGE_TARGET"}}"
-                      data-message-id="{{message._id}}">
+                      data-message-id="{{message._id}}"
+                      role="button" tabindex="0"
+                      aria-label="{{localize "OD6S.CHANGE_TARGET"}}">
                 {{else}}
                 <span>
                 {{/if}}
@@ -95,12 +99,15 @@
                     {{#if message.flags.od6s.modifiers.length}}
                         <div class="flexrow">
                             <div{{#if user.isGM}}
-                            class="edit-difficulty" data-message-id="{{message._id}}"{{/if}}>{{localize
+                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
                                     "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
                             <div class="modifiers-button"
                                  data-message-id="{{message._id}}"
-                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}">
-                                <i class="fas fa-plus modifier-button"></i>
+                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}"
+                                 role="button"
+                                 tabindex="0"
+                                 aria-label="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                <i class="fas fa-plus modifier-button" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="modifiers-display" id="modifiers-display-{{message._id}}">
@@ -114,7 +121,7 @@
                     {{else}}
                         {{#unless (eq message.flags.od6s.type 'simple')}}
                             <div{{#if user.isGM}}
-                            class="edit-difficulty" data-message-id="{{message._id}}"{{/if}}>{{localize
+                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
                                     "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
                         {{/unless}}
                     {{/if}}
@@ -169,7 +176,7 @@
                     <div class="damage-display flexrow">
                         <div{{#if (isGmOrOwner message.speaker.actor)}}
                         class="edit-damage" data-message-id="{{message._id}}"
-                        data-damage="{{message.flags.od6s.damageScore}}"{{/if}}>
+                        data-damage="{{message.flags.od6s.damageScore}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DAMAGE"}}"{{/if}}>
                             {{message.flags.od6s.damageDice.dice}}D+{{
                         message.flags.od6s.damageDice.pips}}{{#if (ne message.flags.od6s.damageScaleBonus 0)}}
                             {{~showScaleDamage message.flags.od6s.damageScaleBonus}}
@@ -178,8 +185,11 @@
                     {{#if message.flags.od6s.damageModifiers.length}}
                             <div class="damage-modifiers-button"
                                  data-message-id="{{message._id}}"
-                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}">
-                                <i class="fas fa-plus modifier-button"></i>
+                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}"
+                                 role="button"
+                                 tabindex="0"
+                                 aria-label="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                <i class="fas fa-plus modifier-button" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="damage-modifiers-display" id="damage-modifiers-display-{{message._id}}">
@@ -233,8 +243,8 @@
         {{#unless message.flags.od6s.isOpposed}}
             <div class="message-oppose" style="text-align: right"
                  data-message-id="{{message._id}}">
-                <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}"><i
-                        class="fas fa-exchange-alt"></i></a>
+                <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.OPPOSE"}}"><i
+                        class="fas fa-exchange-alt" aria-hidden="true"></i></a>
             </div>
         {{/unless}}
     {{/if}}
