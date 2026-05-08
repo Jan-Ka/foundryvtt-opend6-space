@@ -411,7 +411,7 @@ interface OD6SActionItemSystem extends OD6SItemBase {
     itemId: string;
 }
 
-interface OD6SVehicleItemSystem extends OD6SVehicleCommon {
+interface OD6SVehicleItemSystem extends OD6SVehicleCommon, OD6SItemBase {
     cover: { value: string; type: string; label: string };
     altitude: { value: number; type: string; label: string };
 }

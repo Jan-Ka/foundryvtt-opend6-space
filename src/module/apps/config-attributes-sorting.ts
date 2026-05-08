@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const foundry: any;
+ 
 import OD6S from "../config/config-od6s";
 
 
