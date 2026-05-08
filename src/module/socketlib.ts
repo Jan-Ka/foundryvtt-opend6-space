@@ -169,16 +169,33 @@ async function triggerRollAction(type: string, actorId: string) {
     return await actor.rollAction(type);
 }
 
+// A region mutation is authorized when the caller is GM, originally placed
+// the region (`flags.od6s.originalOwner === userId`), or owns the token
+// recorded on the region. The supplied `actorUuid` ties the call to a
+// specific detonator, but on its own it would let any actor-owner mutate
+// any region — so it must agree with one of the region-side bindings.
+async function userMayMutateRegion(user: User, region: RegionDocument, actorUuid: string): Promise<boolean> {
+    if (user.isGM) return true;
+    if (region.getFlag('od6s', 'originalOwner') === user.id) return true;
+    const tokenId = region.getFlag('od6s', 'token') as string | undefined;
+    if (tokenId) {
+        const token = canvas.scene?.tokens.get(tokenId);
+        const tokenActor = token?.actor;
+        if (tokenActor && tokenActor.uuid === actorUuid && tokenActor.testUserPermission(user, 'OWNER')) {
+            return true;
+        }
+    }
+    return false;
+}
+
 async function updateExplosiveRegion(userId: string, data: ExplosiveRegionPayload) {
     const user = game.users.get(userId);
     if (!user) return denied('updateExplosiveRegion', userId, 'unknown user');
-    const actor = await od6sutilities.getActorFromUuid(data.actorUuid);
-    if (!actor) return denied('updateExplosiveRegion', userId, `unknown actor ${data.actorUuid}`);
-    if (!user.isGM && !actor.testUserPermission(user, 'OWNER')) {
-        return denied('updateExplosiveRegion', userId, `not owner of actor ${data.actorUuid}`);
-    }
     const region = canvas.scene.getEmbeddedDocument('Region', data.regionId);
     if (!region) return;
+    if (!(await userMayMutateRegion(user, region, data.actorUuid))) {
+        return denied('updateExplosiveRegion', userId, `not authorized for region ${data.regionId}`);
+    }
     if (data.operation === "update") {
         const updatedShapes = foundry.utils.deepClone(region.shapes);
         if (data.update.x !== undefined) updatedShapes[0].x = data.update.x;
@@ -194,14 +211,13 @@ async function updateExplosiveRegion(userId: string, data: ExplosiveRegionPayloa
 async function deleteExplosiveRegion(userId: string, data: DeleteExplosiveRegionPayload) {
     const user = game.users.get(userId);
     if (!user) return denied('deleteExplosiveRegion', userId, 'unknown user');
-    const actor = await od6sutilities.getActorFromUuid(data.actorUuid);
-    if (!actor) return denied('deleteExplosiveRegion', userId, `unknown actor ${data.actorUuid}`);
-    if (!user.isGM && !actor.testUserPermission(user, 'OWNER')) {
-        return denied('deleteExplosiveRegion', userId, `not owner of actor ${data.actorUuid}`);
+    if (!data.regionId) return;
+    const region = canvas.scene.getEmbeddedDocument('Region', data.regionId);
+    if (!region) return;
+    if (!(await userMayMutateRegion(user, region, data.actorUuid))) {
+        return denied('deleteExplosiveRegion', userId, `not authorized for region ${data.regionId}`);
     }
-    if (data.regionId) {
-        await canvas.scene.deleteEmbeddedDocuments('Region', [data.regionId]);
-    }
+    await canvas.scene.deleteEmbeddedDocuments('Region', [data.regionId]);
 }
 
 /**
@@ -227,7 +243,11 @@ async function sendVehicleData(userId: string, data: VehicleDataPayload) {
     if (!(await userMayMutateVehicle(user, vehicle))) {
         return denied('sendVehicleData', userId, `not authorized for vehicle ${data.uuid}`);
     }
-    for (const e of data.crewmembers) {
+    // Recipients come from the authoritative vehicle document, not the
+    // payload — otherwise a crew-member-owning caller could push the
+    // `system.vehicle` cache onto arbitrary actor uuids in `data.crewmembers`.
+    const recipients = isVehicleActor(vehicle) ? vehicle.system.crewmembers ?? [] : [];
+    for (const e of recipients) {
         const actor = await od6sutilities.getActorFromUuid(e.uuid);
         if (!actor) continue;
         const update: any = {};
@@ -272,6 +292,10 @@ async function addToVehicle(userId: string, vehicleId: string, crewId: string) {
     if (!actor) return;
     if (!user.isGM && !actor.testUserPermission(user, 'OWNER')) {
         return denied('addToVehicle', userId, `not owner of actor ${crewId}`);
+    }
+    const vehicle = await od6sutilities.getActorFromUuid(vehicleId);
+    if (!vehicle || !isVehicleActor(vehicle)) {
+        return denied('addToVehicle', userId, `target ${vehicleId} is not a vehicle`);
     }
     return await actor.addToCrew(vehicleId);
 }
