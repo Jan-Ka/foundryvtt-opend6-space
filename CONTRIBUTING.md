@@ -55,6 +55,24 @@ override via `FOUNDRY_URL`, `FOUNDRY_USER`, `FOUNDRY_PASSWORD`.
 
 The probes are documented in [docs/test-runbook.md](docs/test-runbook.md).
 
+## Migrating data shape changes
+
+Two paths depending on what changed:
+
+- **Renaming, removing, or retyping a `system.*` field on a single
+  document type** → override `static migrateData(source)` on the
+  `TypeDataModel` subclass. Foundry calls it during construction
+  *before* validation, so old documents stop tripping the validator
+  the first time they load. Keep the body pure (just shuffle keys on
+  `source`) and extract it to an exported helper so it can be unit-
+  tested without Foundry globals — see `src/module/data/item/weapon.ts`
+  + `weapon.test.ts` for the worked example.
+- **Anything that needs to iterate documents, touch flags, edit
+  scenes, or update embedded effects** → add a step to
+  `MIGRATION_STEPS` in `src/module/system/migration.ts`. These run
+  once per world on upgrade, gated by the stored `migrationVersion`
+  setting.
+
 ## Code style
 
 - TypeScript across `src/module/`. The bundle is built with esbuild
