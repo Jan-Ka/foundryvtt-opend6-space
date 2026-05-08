@@ -36,6 +36,14 @@ export function registerChatLogListeners() {
             await message!.setFlag('od6s','targets',targets);
         })
 
+        // Keyboard activation for role="button" elements that aren't native <button>s.
+        delegateEvent(html, "keydown", ".modifiers-button, .damage-modifiers-button", (ev: any) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                (ev.currentTarget as HTMLElement).click();
+            }
+        })
+
         delegateEvent(html, "click", ".modifiers-button", async (ev: any) => {
             const content = document.getElementById("modifiers-display-" + ev.currentTarget.dataset.messageId);
             if (content!.style.display === "block") {

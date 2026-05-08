@@ -7,14 +7,18 @@ import {deriveRollMode} from "./chat-mode";
 function tagRollMode(msg: any, html: HTMLElement) {
     const mode = deriveRollMode(msg);
     html.classList.add(`od6s-roll-${mode}`);
+    if (!html.hasAttribute('role')) html.setAttribute('role', 'article');
     if (mode === 'public') return;
+
+    const label = game.i18n.localize(`OD6S.ROLL_BADGE_${mode.toUpperCase()}`);
+    html.setAttribute('aria-label', `${label} — ${msg.alias ?? ''}`.trim());
 
     const header = html.querySelector('.message-header');
     if (!header || header.querySelector('.od6s-roll-badge')) return;
 
     const badge = document.createElement('span');
     badge.classList.add('od6s-roll-badge', `od6s-roll-badge--${mode}`);
-    badge.textContent = game.i18n.localize(`OD6S.ROLL_BADGE_${mode.toUpperCase()}`);
+    badge.textContent = label;
 
     const sender = header.querySelector('.message-sender');
     if (sender) sender.after(badge);
