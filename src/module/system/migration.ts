@@ -2,6 +2,21 @@
  * System data migration for world upgrades.
  * Runs once per version bump via the system version stored in world settings.
  *
+ * Two-tier migration policy
+ * -------------------------
+ * 1. **Per-document field-shape changes** (rename a `system.*` field, change
+ *    a default, switch a field type): override `static migrateData(source)`
+ *    on the relevant `TypeDataModel` subclass. Foundry calls it during
+ *    construction, *before* validation, so old documents load cleanly the
+ *    first time the world opens. See `data/item/weapon.ts` for an example
+ *    (range NumberField → StringField, subtype i18n-key → localized).
+ *
+ * 2. **Cross-document, flag-level, or scene-level changes** stay in this
+ *    file as a `MIGRATION_STEPS` entry. These run once per world via the
+ *    stored `migrationVersion` setting and can iterate `game.actors`,
+ *    `game.scenes.tokens`, etc. — things `migrateData` can't reach because
+ *    it only sees one document's `source` object.
+ *
  * To audit before/after document state, persist the debug flag *before*
  * reloading the world (otherwise migrations fire on the `ready` hook before
  * you can touch the console):

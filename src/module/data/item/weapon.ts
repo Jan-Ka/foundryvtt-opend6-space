@@ -1,6 +1,7 @@
 import { baseSchema } from "./fields/base";
 import { equipmentSchema } from "./fields/equipment";
 import { equipSchema } from "./fields/equip";
+import { migrateWeaponSource } from "./weapon-migration";
 
 const fields = foundry.data.fields;
 
@@ -15,25 +16,9 @@ function blastZoneSchema() {
 
 export default class WeaponData extends foundry.abstract.TypeDataModel {
   static migrateData(source: Record<string, unknown>) {
-    if (source.range && typeof source.range === "object") {
-      const range = source.range as Record<string, unknown>;
-      for (const key of ["short", "medium", "long"]) {
-        if (typeof range[key] !== "string") range[key] = String(range[key] ?? "0");
-      }
-    }
-    // Normalize subtype to the localized form. Helpers (isRanged,
-    // isMuscle, isExplosive) and the weapon-sheet <option> values all
-    // operate on localized strings, but the schema's initial is the
-    // raw i18n key — so a brand-new weapon's stored subtype never
-    // matches any rendered option until the user manually picks one.
-    // localize() is a no-op when called before i18n is ready (returns
-    // the key); we re-run it on every construction so the value
-    // self-heals once i18n is up.
-    if (typeof source.subtype === "string" && source.subtype.startsWith("OD6S.")) {
-      const localized = (game as { i18n?: { localize?: (k: string) => string } } | undefined)
-        ?.i18n?.localize?.(source.subtype);
-      if (localized && localized !== source.subtype) source.subtype = localized;
-    }
+    const localize = (game as { i18n?: { localize?: (k: string) => string } } | undefined)
+      ?.i18n?.localize?.bind((game as { i18n?: unknown }).i18n);
+    migrateWeaponSource(source, localize);
     return super.migrateData(source);
   }
 
