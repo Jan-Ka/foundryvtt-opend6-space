@@ -62,19 +62,17 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
     }
 
     // Is this an init roll?
-    if (message.getFlag('core', 'initiativeRoll')) {
-        if (game.user.isGM) {
-            if (game.combat !== null) {
-                const combatant = game.combat.combatants.find(c => c.actor.id === actor.id);
-                const update = {
-                    id: combatant!.id,
-                    _id: combatant!.id,
-                    initiative: replacementRoll.total
-                }
-                await combatant!.update(update);
+    if (message.getFlag('core', 'initiativeRoll') && game.combat !== null) {
+        // Resolve the combatant on the *caller's* side so token speakers and
+        // multi-combatant unlinked actors map to the right row. The GM-side
+        // handler then just needs the combatant id.
+        const combatant = game.combat.combatants.find(c => c.actor?.id === actor.id);
+        if (combatant) {
+            if (game.user.isGM) {
+                await combatant.update({id: combatant.id, _id: combatant.id, initiative: replacementRoll.total});
+            } else {
+                await OD6S.socket.executeAsGM('updateInitRoll', combatant.id, replacementRoll.total);
             }
-        } else {
-            await OD6S.socket.executeAsGM('updateInitRoll', message.id, replacementRoll.total);
         }
     }
 }

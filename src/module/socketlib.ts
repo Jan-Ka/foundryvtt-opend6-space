@@ -50,12 +50,9 @@ async function updateRollMessage(messageId: string, update: any) {
     }
 }
 
-async function updateInitRoll(messageId: string, initiative: number) {
-    const message = game.messages.get(messageId);
-    if (!message || !game.combat) return;
-    const actorId = message.speaker.actor;
-    if (!actorId) return;
-    const combatant = game.combat.combatants.find((c: any) => c.actor?.id === actorId);
+async function updateInitRoll(combatantId: string, initiative: number) {
+    if (!game.combat) return;
+    const combatant = game.combat.combatants.get(combatantId);
     if (!combatant) return;
     await combatant.update({initiative});
 }
