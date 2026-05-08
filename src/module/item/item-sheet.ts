@@ -421,6 +421,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         const newItem = {name: data.name, type: data.type, description: desc};
         const itemIndex = itemSheet.item.system.items.findIndex(
             (i: any) => i.name === data.name && i.type === data.type);
+        if (itemIndex < 0) return;
         itemSheet.item.system.items[itemIndex] = newItem;
         await itemSheet.item.update(
             {id: itemSheet.item.id, system: itemSheet.item.system},
@@ -440,6 +441,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         const target = event.currentTarget as HTMLElement;
         const itemIndex = item.system.items.findIndex(
             (i: any) => i.name === target.dataset.name && i.type === target.dataset.type);
+        if (itemIndex < 0) return;
         item.system.items.splice(itemIndex, 1);
         await item.update(
             {id: item.id, system: item.system},

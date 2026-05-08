@@ -64,10 +64,7 @@ export function isCharacterTemplateItem(item: Item): item is OD6SCharacterTempla
  */
 export function isTemplateLikeItem(
     item: Item,
-): item is OD6SItemGroupItem | OD6SCharacterTemplateItem | (Item & {
-    type: "species-template";
-    system: OD6SSpeciesTemplateItemSystem;
-}) {
+): item is OD6SItemGroupItem | OD6SCharacterTemplateItem | OD6SSpeciesTemplateItem {
     return (
         item.type === "item-group" ||
         item.type === "character-template" ||
