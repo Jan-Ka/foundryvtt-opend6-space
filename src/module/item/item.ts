@@ -40,9 +40,11 @@ export class OD6SItem extends Item {
      * Augment the basic Item data model with additional dynamic data.
      */
     prepareData() {
+        // Warn before super so a mismatch is logged even when downstream
+        // preparation throws — that's exactly the case the diagnostic exists for.
+        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
         super.prepareData();
         (this.system as unknown as Record<string, unknown>).config = OD6S;
-        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
     }
 
     prepareBaseData() {

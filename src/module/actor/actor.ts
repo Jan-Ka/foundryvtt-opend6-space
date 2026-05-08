@@ -86,12 +86,14 @@ export class OD6SActor extends Actor {
 
     /** @override */
     prepareData() {
+        // Warn before super so a mismatch is logged even when downstream
+        // preparation throws — that's exactly the case the diagnostic exists for.
+        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
         // Prepare data for the actor. Calling the super version of this executes
         // the following, in order: data reset (to clear active effects),
         // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
         // prepareDerivedData().
         super.prepareData();
-        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
     }
 
     /** @override */
