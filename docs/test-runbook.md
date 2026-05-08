@@ -115,9 +115,12 @@ actors/items. Any failure prints a screenshot path and trace zip for
   PIXI placement preview bypassed — pre-creates the Region + pending flag,
   then asserts the four branches the manual smoke covered: success stamps
   `originalOwner`/`templateId`; failure runs `scatterExplosive` without
-  `ReferenceError` and moves the region; `explosive_end_of_round=false`
-  reveals the region (`visibility=2`); `explosive_end_of_round=true` defers
-  the reveal (`visibility=1`).
+  `ReferenceError` and stamps `originalX`/`originalY` on the region (the
+  canonical "scatter ran" sentinel — post-scatter shape position is
+  unreliable because a 1d6 scatter against the scene-boundary
+  `testCollision` wall is clipped back to ~origin);
+  `explosive_end_of_round=false` reveals the region (`visibility=2`);
+  `explosive_end_of_round=true` defers the reveal (`visibility=1`).
 
 ---
 

@@ -11,8 +11,10 @@
  *
  * Determinism over dice: the resolution branch is gated on `flags.success`,
  * which is `roll.total >= difficulty`. We mutate `dlg.rollData.difficulty`
- * directly before submitting (0 for guaranteed success, 9999 for guaranteed
- * failure) so the four assertions don't depend on RNG.
+ * directly before submitting (1 for guaranteed success, 9999 for guaranteed
+ * failure) so the four assertions don't depend on RNG. 1 (not 0) for the
+ * success path: roll-execute.ts:117 is `if (rollData.difficulty)`, which
+ * treats 0 as falsy and falls back to getDifficulty().
  *
  * The four branches run as phases of a single test rather than four separate
  * tests to avoid inter-test races: the auto-explosive flow updates regions,
