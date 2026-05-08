@@ -99,16 +99,19 @@ declare namespace foundry {
             class ApplicationV2 {
                 static DEFAULT_OPTIONS: ApplicationV2Options;
                 static PARTS: Record<string, ApplicationV2Part>;
+                constructor(options?: object);
                 get element(): HTMLElement;
-                render(options?: object): Promise<this>;
-                close(options?: object): Promise<void>;
+                /** v14 accepts boolean (legacy `force`) or an options object */
+                render(options?: object | boolean, _options?: object): Promise<this>;
+                close(options?: object): Promise<this>;
                 _onRender(context: object, options: object): void;
                 _prepareContext(options?: object): Promise<object>;
+                _configureRenderOptions(options: object): void;
             }
 
             function HandlebarsApplicationMixin<T extends new (...args: any[]) => any>(
                 base: T
-            ): T & typeof ApplicationV2;
+            ): T;
 
             class DialogV2 {
                 static input(options: any): Promise<any>;
@@ -128,10 +131,13 @@ declare namespace foundry {
             class ActorSheetV2 extends applications.api.ApplicationV2 {
                 get actor(): Actor;
                 get document(): Actor;
+                get isEditable(): boolean;
             }
             class ItemSheetV2 extends applications.api.ApplicationV2 {
                 get item(): Item;
                 get document(): Item;
+                get actor(): Actor | null;
+                get isEditable(): boolean;
             }
         }
 
@@ -184,6 +190,20 @@ declare namespace foundry {
             class Tabs {
                 constructor(options: TabsOptions);
                 bind(html: HTMLElement): void;
+            }
+            /** Drag/drop helper used by sheets that accept dropped documents */
+            class DragDrop {
+                static implementation: typeof DragDrop;
+                constructor(options?: any);
+                bind(html: HTMLElement | JQuery): void;
+                [key: string]: any;
+            }
+            /** v14-namespaced TextEditor utility (replaces the global `TextEditor`) */
+            class TextEditor {
+                static getDragEventData(event: DragEvent): any;
+                static enrichHTML(content: string, options?: any): Promise<string>;
+                static create(options?: any): Promise<any>;
+                [key: string]: any;
             }
         }
     }
@@ -366,7 +386,18 @@ interface ApplicationV2Options {
     };
     actions?: Record<string, (event: Event, target: HTMLElement) => void>;
     form?: {
-        handler?: (event: Event, form: HTMLFormElement, formData: FormDataExtended) => void;
+        /**
+         * Foundry calls form handlers with a SubmitEvent at runtime; subclasses may
+         * narrow to that. Accept either Event or SubmitEvent and a permissive form
+         * data shape so call sites that read `formData.object` (FormDataExtended)
+         * or treat it as a plain record both type-check.
+         */
+        handler?: (
+            this: any,
+            event: any,
+            form: HTMLFormElement,
+            formData: any,
+        ) => void | Promise<void>;
         submitOnChange?: boolean;
         closeOnSubmit?: boolean;
     };
