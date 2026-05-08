@@ -8,8 +8,10 @@
  *    a default, switch a field type): override `static migrateData(source)`
  *    on the relevant `TypeDataModel` subclass. Foundry calls it during
  *    construction, *before* validation, so old documents load cleanly the
- *    first time the world opens. See `data/item/weapon.ts` for an example
- *    (range NumberField → StringField, subtype i18n-key → localized).
+ *    first time the world opens. See `src/module/data/item/weapon.ts` for
+ *    an example (range NumberField → StringField, subtype i18n-key →
+ *    localized) and `src/module/data/item/weapon-migration.ts` +
+ *    `weapon.test.ts` for the pure-helper / unit-test pattern.
  *
  * 2. **Cross-document, flag-level, or scene-level changes** stay in this
  *    file as a `MIGRATION_STEPS` entry. These run once per world via the
