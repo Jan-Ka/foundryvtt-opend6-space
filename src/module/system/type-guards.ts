@@ -49,6 +49,32 @@ export function isActionItem(item: Item): item is OD6SActionItem {
     return item.type === "action";
 }
 
+export function isItemGroupItem(item: Item): item is OD6SItemGroupItem {
+    return item.type === "item-group";
+}
+
+export function isCharacterTemplateItem(item: Item): item is OD6SCharacterTemplateItem {
+    return item.type === "character-template";
+}
+
+/**
+ * Combined guard for the three template-shaped item types whose system data
+ * carries a `system.items` array (item-group, character-template, species-template).
+ * Use when the surrounding code reads/writes that nested item list.
+ */
+export function isTemplateLikeItem(
+    item: Item,
+): item is OD6SItemGroupItem | OD6SCharacterTemplateItem | (Item & {
+    type: "species-template";
+    system: OD6SSpeciesTemplateItemSystem;
+}) {
+    return (
+        item.type === "item-group" ||
+        item.type === "character-template" ||
+        item.type === "species-template"
+    );
+}
+
 /**
  * Combined guard for any weapon-family item. Use when the surrounding code
  * accesses fields shared across the three weapon types (e.g. `mods`,
