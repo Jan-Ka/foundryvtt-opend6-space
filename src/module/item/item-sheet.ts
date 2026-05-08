@@ -1,9 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const foundry: any;
+ 
 import {od6sutilities} from "../system/utilities";
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
 import OD6S from "../config/config-od6s";
-import {isWeaponItem} from "../system/type-guards";
+import {isItemGroupItem, isTemplateLikeItem, isWeaponItem} from "../system/type-guards";
 
 
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
@@ -134,8 +133,10 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     /* -------------------------------------------- */
 
     async _addActorType(): Promise<void> {
+        if (!isItemGroupItem(this.item)) return;
+        const item = this.item;
         const data = {
-            actorTypes: game.od6s.OD6SActor.TYPES.filter((i: any) => !this.item.system.actor_types.includes(i)),
+            actorTypes: game.od6s.OD6SActor.TYPES.filter((i: any) => !item.system.actor_types.includes(i)),
         };
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-add-actor-type.html", data);
@@ -148,23 +149,27 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
 
     async _addActorTypeAction(type: any): Promise<void> {
-        const update: any = {id: this.item.id, system: {actor_types: this.item.system.actor_types}};
+        if (!isItemGroupItem(this.item)) return;
+        const item = this.item;
+        const update: any = {id: item.id, system: {actor_types: item.system.actor_types}};
         update.system.actor_types.push(type);
-        await this.item.update(update);
+        await item.update(update);
     }
 
     async _deleteActorType(ev: any): Promise<void> {
+        if (!isItemGroupItem(this.item)) return;
+        const item = this.item;
         const type = ev.currentTarget.dataset.type;
         const update: any = {
-            id: this.item.id,
+            id: item.id,
             system: {
-                actor_types: this.item.system.actor_types.filter((i: any) => i !== type),
+                actor_types: item.system.actor_types.filter((i: any) => i !== type),
                 items: [],
             },
         };
-        for (const i of this.item.system.items) {
+        for (const i of item.system.items) {
             for (const t of update.system.actor_types) {
-                if (OD6S.allowedItemTypes[t].includes(i.type)) {
+                if (OD6S.allowedItemTypes[t].includes(i.type as string)) {
                     update.system.items.push(i);
                     break;
                 }
@@ -363,10 +368,11 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
 
     async _addTemplateItemAction(name: any, type: any, itemSheet: any): Promise<void> {
-        if (this.item.type === "item-group") {
+        if (isItemGroupItem(this.item)) {
+            const item = this.item;
             let allowed = false;
             for (const [key, items] of Object.entries(OD6S.allowedItemTypes)) {
-                if (this.item.system.actor_types.includes(key)) {
+                if (item.system.actor_types.includes(key)) {
                     for (const i of (items as string[])) {
                         if (OD6S.templateItemTypes["item-group"].includes(i)) {
                             allowed = true;
@@ -391,9 +397,10 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
 
     async _editTemplateItem(event: any): Promise<void> {
+        if (!isTemplateLikeItem(this.item)) return;
         const target = event.currentTarget as HTMLElement;
         const item = this.item.system.items.find((i: any) => i.name === target.dataset.name);
-        const itemData = {name: target.dataset.name, type: target.dataset.type, description: item.description};
+        const itemData = {name: target.dataset.name, type: target.dataset.type, description: item?.description};
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-template-item-edit.html",
             itemData);
@@ -414,6 +421,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         const newItem = {name: data.name, type: data.type, description: desc};
         const itemIndex = itemSheet.item.system.items.findIndex(
             (i: any) => i.name === data.name && i.type === data.type);
+        if (itemIndex < 0) return;
         itemSheet.item.system.items[itemIndex] = newItem;
         await itemSheet.item.update(
             {id: itemSheet.item.id, system: itemSheet.item.system},
@@ -422,6 +430,8 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
 
     async _deleteTemplateItem(event: any): Promise<void> {
+        if (!isTemplateLikeItem(this.item)) return;
+        const item = this.item;
         const result = await DialogV2.confirm({
             window: {title: game.i18n.localize("OD6S.DELETE")},
             content: `<p>${game.i18n.localize("OD6S.DELETE_CONFIRM")}</p>`,
@@ -429,11 +439,12 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (!result) return;
 
         const target = event.currentTarget as HTMLElement;
-        const itemIndex = this.item.system.items.findIndex(
+        const itemIndex = item.system.items.findIndex(
             (i: any) => i.name === target.dataset.name && i.type === target.dataset.type);
-        this.item.system.items.splice(itemIndex, 1);
-        await this.item.update(
-            {id: this.item.id, system: this.item.system},
+        if (itemIndex < 0) return;
+        item.system.items.splice(itemIndex, 1);
+        await item.update(
+            {id: item.id, system: item.system},
             {diff: true});
         await this.render();
     }

@@ -6,8 +6,7 @@ import {od6sattributeedit} from "../attribute-edit";
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const foundry: any;
+ 
 
 interface DiceScore { dice: number; pips: number }
 
