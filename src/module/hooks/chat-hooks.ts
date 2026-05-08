@@ -46,7 +46,7 @@ export function registerChatHooks() {
         if(message.getFlag('od6s','isExplosive') && game.user.isGM) {
             // Delete the template and clear the flag from the item
             let actor;
-            if (message.speaker.token !== '') {
+            if (message.speaker.token !== null && message.speaker.token !== '') {
                 // @ts-expect-error
                 actor = game!.scenes.get(message.speaker.scene).tokens.get(message.speaker.token).object.actor;
             } else {
