@@ -58,7 +58,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
             await message.setFlag('od6s', 'success', true);
         }
     } else {
-        await OD6S.socket.executeAsGM('updateRollMessage', message.id, messageUpdate);
+        await OD6S.socket.executeAsGM('updateRollMessage', game.user.id, message.id, messageUpdate);
     }
 
     // Is this an init roll?
@@ -71,7 +71,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
             if (game.user.isGM) {
                 await combatant.update({id: combatant.id, _id: combatant.id, initiative: replacementRoll.total});
             } else {
-                await OD6S.socket.executeAsGM('updateInitRoll', combatant.id, replacementRoll.total);
+                await OD6S.socket.executeAsGM('updateInitRoll', game.user.id, combatant.id, replacementRoll.total);
             }
         }
     }

@@ -52,7 +52,7 @@ export async function unlinkCrew(sheet: Sheet, crewID: string): Promise<void> {
             const actor = await od6sutilities.getActorFromUuid(crewID);
             await actor!.removeFromCrew(sheet.document.uuid);
         } else {
-            await OD6S.socket.executeAsGM("removeFromVehicle", crewID, sheet.document.uuid);
+            await OD6S.socket.executeAsGM("removeFromVehicle", game.user.id, crewID, sheet.document.uuid);
         }
     }
 

@@ -422,7 +422,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             rollMessageUpdate.flags.od6s.wildHandled = true;
             await rollMessage.update(rollMessageUpdate);
         } else {
-            await OD6S.socket.executeAsGM('updateRollMessage', rollMessage.id, rollMessageUpdate);
+            await OD6S.socket.executeAsGM('updateRollMessage', game.user.id, rollMessage.id, rollMessageUpdate);
         }
 
         if (rollData.type === 'incapacitated' && !newSuccess && flags.success) {

@@ -38,9 +38,24 @@ export function registerSocketlib() {
     });
 }
 
-async function updateRollMessage(messageId: string, update: any) {
+// The requesting user is passed explicitly by the caller because socketlib
+// does not surface the originator to handlers. A determined client could
+// forge `userId` on the wire — that's the same trust model every
+// socketlib-using system has. The check still defeats casual misuse: a
+// non-author can't edit your roll message, a non-owner can't set your
+// initiative, etc.
+function denied(name: string, userId: string, reason: string): void {
+    logError('socket', `${name} denied for user=${userId}: ${reason}`);
+}
+
+async function updateRollMessage(userId: string, messageId: string, update: any) {
+    const user = game.users.get(userId);
+    if (!user) return denied('updateRollMessage', userId, 'unknown user');
     const message = game.messages.get(messageId);
     if (!message) return;
+    if (!user.isGM && message.author?.id !== userId) {
+        return denied('updateRollMessage', userId, `not author of message ${messageId}`);
+    }
     await message.update(update, {diff: true});
     await message.setFlag('od6s', 'total', update.content);
     await message.setFlag('od6s', 'originalroll', message.rolls[0]);
@@ -50,17 +65,27 @@ async function updateRollMessage(messageId: string, update: any) {
     }
 }
 
-async function updateInitRoll(combatantId: string, initiative: number) {
+async function updateInitRoll(userId: string, combatantId: string, initiative: number) {
+    const user = game.users.get(userId);
+    if (!user) return denied('updateInitRoll', userId, 'unknown user');
     if (!game.combat) return;
     const combatant = game.combat.combatants.get(combatantId);
     if (!combatant) return;
+    if (!user.isGM && !combatant.actor?.testUserPermission(user, 'OWNER')) {
+        return denied('updateInitRoll', userId, `not owner of combatant ${combatantId}`);
+    }
     await combatant.update({initiative});
 }
 
-async function removeFromVehicle(actorId: string, vehicleId: string) {
-    const actor = await od6sutilities.getActorFromUuid(actorId);
+async function removeFromVehicle(userId: string, actorUuid: string, vehicleUuid: string) {
+    const user = game.users.get(userId);
+    if (!user) return denied('removeFromVehicle', userId, 'unknown user');
+    const actor = await od6sutilities.getActorFromUuid(actorUuid);
     if (!actor) return;
-    return await actor.removeFromCrew(vehicleId);
+    if (!user.isGM && !actor.testUserPermission(user, 'OWNER')) {
+        return denied('removeFromVehicle', userId, `not owner of actor ${actorUuid}`);
+    }
+    return await actor.removeFromCrew(vehicleUuid);
 }
 
 async function triggerRoll(type: string, actorId: string) {
