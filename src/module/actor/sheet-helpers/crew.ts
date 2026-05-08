@@ -29,7 +29,7 @@ export async function linkCrew(sheet: Sheet, uuid: string): Promise<void> {
     if (game.user.isGM) {
         result = await actor!.addToCrew(sheet.document.uuid);
     } else {
-        result = await OD6S.socket.executeAsGM("addToVehicle", sheet.document.uuid, uuid);
+        result = await OD6S.socket.executeAsGM("addToVehicle", game.user.id, sheet.document.uuid, uuid);
     }
 
     if (result) {

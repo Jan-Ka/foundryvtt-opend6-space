@@ -122,7 +122,7 @@ export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void
     data.vehicle_weapons = buildVehicleWeaponSnapshots(actor.items.contents);
 
     if (shouldDispatchVehicleDataAsGM(game.user.isGM)) {
-        await OD6S.socket.executeAsGM("sendVehicleData", data);
+        await OD6S.socket.executeAsGM("sendVehicleData", game.user.id, data);
         return;
     }
     const crew = selectCrewmembersForBroadcast(data.crewmembers, uuid);
@@ -140,7 +140,7 @@ export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void
 }
 
 export async function modifyShields(actor: Actor, update: any): Promise<void> {
-    await OD6S.socket.executeAsGM("modifyShields", update);
+    await OD6S.socket.executeAsGM("modifyShields", game.user.id, update);
 }
 
 export async function vehicleCollision(actor: Actor): Promise<void> {
