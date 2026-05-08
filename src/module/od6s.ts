@@ -4,8 +4,6 @@ import {OD6SActorSheet} from "./actor/actor-sheet";
 import {OD6SItem} from "./item/item";
 import {OD6SItemSheet} from "./item/item-sheet";
 import {OD6SToken} from "./overrides/token";
-import OD6SSocketHandler from "./system/socket";
-import {error as logError} from "./system/logger";
 import OD6S from "./config/config-od6s";
 import od6sSettings from "./config/settings-od6s";
 import od6sHandlebars from "./system/handlebars"
@@ -48,7 +46,7 @@ import ItemGroupData from "./data/item/item-group";
 
 // Import extracted modules
 import {rollItemMacro, rollItemNameMacro, simpleRoll} from "./macros";
-import {registerSocketlib, getActorFromUuid, updateExplosiveRegion, deleteExplosiveRegion} from "./socketlib";
+import {registerSocketlib, getActorFromUuid} from "./socketlib";
 import {registerRegionHooks} from "./hooks/region-hooks";
 import {registerChatHooks} from "./hooks/chat-hooks";
 import {registerChatLogListeners} from "./hooks/chat-log-listeners";
@@ -74,24 +72,6 @@ Hooks.once('init', async function () {
     };
 
     //CONFIG.debug.hooks = true
-
-    // Each handler is fire-and-forget; without a logged catch, async rejections
-    // surface as bare "Uncaught (in promise)" with no system context. Wrap once
-    // here so any handler failure leaves an `[od6s:socket]` breadcrumb.
-    const dispatchSocket = async (data: { operation: string }): Promise<void> => {
-        if (data.operation === 'updateRollMessage') await OD6SSocketHandler.updateRollMessage(data);
-        else if (data.operation === 'updateInitRoll') await OD6SSocketHandler.updateInitRoll(data);
-        else if (data.operation === 'addToVehicle') await OD6SSocketHandler.addToVehicle(data);
-        else if (data.operation === 'removeFromVehicle') await OD6SSocketHandler.removeFromVehicle(data);
-        else if (data.operation === 'sendVehicleStats') await OD6SSocketHandler.sendVehicleStats(data);
-        else if (data.operation === 'updateExplosiveRegion') await updateExplosiveRegion(data);
-        else if (data.operation === 'deleteExplosiveRegion') await deleteExplosiveRegion(data);
-    };
-    game.socket.on('system.od6s', (data) => {
-        dispatchSocket(data).catch((err) => {
-            logError('socket', `dispatch failed for operation=${data?.operation}`, err);
-        });
-    });
 
     // Register TypeDataModel classes for all actor and item types.
     // Without these, newly created actors/items get an empty `system` object
