@@ -19,6 +19,7 @@ or Foundry version bumps.
 | 3f   | Vehicle actor & item schema        | `pnpm run test:smoke`              |
 | 3g   | Weapon roll (item.roll)            | `pnpm run test:smoke`              |
 | 3h   | Edit-difficulty chat-card flow     | `pnpm run test:smoke`              |
+| 3i   | Auto-explosive resolution flow     | `pnpm run test:smoke`              |
 | 4    | Multi-user / socket flows          | Manual (requires two clients)      |
 | 5    | Migration from pre-v2 world        | Manual (requires backup world)     |
 
@@ -110,6 +111,13 @@ actors/items. Any failure prints a screenshot path and trace zip for
 - **Tier 3h** (`tier-3-edit-difficulty`): attribute roll → message stamped
   with known difficulty → edit-difficulty dialog → submit → `difficulty` and
   `baseDifficulty` flags updated on the message.
+- **Tier 3i** (`tier-3-explosive`): auto-explosive resolution flow with the
+  PIXI placement preview bypassed — pre-creates the Region + pending flag,
+  then asserts the four branches the manual smoke covered: success stamps
+  `originalOwner`/`templateId`; failure runs `scatterExplosive` without
+  `ReferenceError` and moves the region; `explosive_end_of_round=false`
+  reveals the region (`visibility=2`); `explosive_end_of_round=true` defers
+  the reveal (`visibility=1`).
 
 ---
 
@@ -320,8 +328,10 @@ If a backup of a pre-v2 world exists:
 - **Edit-difficulty / edit-damage on chat cards** — hooks fire from DOM events
   on rendered chat messages; click the modify buttons on a live roll manually.
 - **Choose-target dialog** — requires a token + target + opposed roll.
-- **Explosives placement** (PIXI preview → Region creation) — requires a scene
-  with grid and a weapon with `explosive` subtype.
+- **Explosives placement preview** (PIXI mouse-track → click-to-confirm) —
+  the canvas placement UI itself. The post-placement resolution flow is
+  covered by Tier 3i; this gap is just the preview layer that drives
+  `ExplosivesTemplate.drawPreview()`.
 - **Character creation wizard** — multi-step stateful UI; open
   `OD6SCharacterCreation` against a fresh character actor and step through
   manually.
