@@ -2,6 +2,7 @@ import {od6sutilities} from "../system/utilities";
 import {od6sroll} from "../apps/roll";
 import OD6S from "../config/config-od6s";
 import {isCharacterActor, isVehicleActor, isContainerActor, isSkillItem, isSpecializationItem} from "../system/type-guards";
+import {warnIfSchemaVersionMismatch, SCHEMA_VERSION_KEY} from "../system/schema-version";
 
 import {resolveRollAction} from "./actor-helpers/roll-action";
 import {prepareBaseActorData, prepareDerivedActorData, applyMods as applyModsHelper, setStrengthDamageBonus as setStrengthDamageBonusHelper, setInitiative as setInitiativeHelper, setResistance as setResistanceHelper} from "./actor-helpers/prepare-actor";
@@ -28,6 +29,17 @@ export class OD6SActor extends Actor {
      */
     async _preCreate(data: object, options: object, user: User) {
         await super._preCreate(data, options, user);
+        // Stamp the schema version of the running system on new docs (#85).
+        // updateSource is the V2 way to seed fields before insert; project
+        // type stubs predate it.
+        const version = game.system?.version;
+        if (version) {
+            const sys = (this.system ?? {}) as unknown as Record<string, unknown>;
+            if (!sys[SCHEMA_VERSION_KEY]) {
+                (this as unknown as { updateSource: (changes: Record<string, unknown>) => void })
+                    .updateSource({ [`system.${SCHEMA_VERSION_KEY}`]: version });
+            }
+        }
     }
 
     async _onCreate(data: object, options: object, user: User) {
@@ -74,6 +86,9 @@ export class OD6SActor extends Actor {
 
     /** @override */
     prepareData() {
+        // Warn before super so a mismatch is logged even when downstream
+        // preparation throws — that's exactly the case the diagnostic exists for.
+        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
         // Prepare data for the actor. Calling the super version of this executes
         // the following, in order: data reset (to clear active effects),
         // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),

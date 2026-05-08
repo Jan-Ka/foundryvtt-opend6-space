@@ -2,6 +2,8 @@
  * Shared vehicle_common schema fields used by vehicle and starship actors.
  */
 
+import { schemaVersionField } from "../../fields/schema-version";
+
 const fields = foundry.data.fields;
 
 function numScoreField(label: string) {
@@ -56,6 +58,7 @@ function shieldArcField(label: any) {
 
 export function vehicleCommonSchema() {
   return {
+    ...schemaVersionField(),
     vehicle_type: strValueField("OD6S.VEHICLE_TYPE"),
     initiative: new fields.SchemaField({
       type: new fields.StringField({ initial: "String" }),

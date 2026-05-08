@@ -2,6 +2,8 @@
  * Shared "common" schema fields used by character, NPC, and creature actors.
  */
 
+import { schemaVersionField } from "../../fields/schema-version";
+
 const fields = foundry.data.fields;
 
 function modField(label: string, shortLabel: string) {
@@ -25,6 +27,7 @@ function modScoreField(label: string, shortLabel: string) {
 
 export function commonSchema() {
   return {
+    ...schemaVersionField(),
     move: new fields.SchemaField({
       type: new fields.StringField({ initial: "Number" }),
       label: new fields.StringField({ initial: "OD6S.CHAR_MOVE" }),

@@ -2,6 +2,7 @@ import {od6sroll} from "../apps/roll";
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
 import {isAnyWeaponItem, isActionItem, isCharacterActor, isVehicleActor, isSkillItem, isSpecializationItem, isVehicleBorneWeaponItem, isWeaponItem, isVehicleWeaponItem, isStarshipWeaponItem} from "../system/type-guards";
+import {warnIfSchemaVersionMismatch, SCHEMA_VERSION_KEY} from "../system/schema-version";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -21,10 +22,27 @@ export class OD6SItem extends Item {
         return await super.create(data, options);
     }
 
+    async _preCreate(data: object, options: object, user: User) {
+        await super._preCreate(data, options, user);
+        // #85: stamp the schema version of the running system on new items.
+        // updateSource is V2; project type stubs predate it.
+        const version = game.system?.version;
+        if (version) {
+            const sys = (this.system ?? {}) as unknown as Record<string, unknown>;
+            if (!sys[SCHEMA_VERSION_KEY]) {
+                (this as unknown as { updateSource: (changes: Record<string, unknown>) => void })
+                    .updateSource({ [`system.${SCHEMA_VERSION_KEY}`]: version });
+            }
+        }
+    }
+
     /*
      * Augment the basic Item data model with additional dynamic data.
      */
     prepareData() {
+        // Warn before super so a mismatch is logged even when downstream
+        // preparation throws — that's exactly the case the diagnostic exists for.
+        warnIfSchemaVersionMismatch(this, this.system as unknown as Record<string, unknown>);
         super.prepareData();
         (this.system as unknown as Record<string, unknown>).config = OD6S;
     }
