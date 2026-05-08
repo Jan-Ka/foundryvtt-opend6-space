@@ -3,7 +3,7 @@
     <span class="message-metadata">
           <time class="message-timestamp">{{timeSince message.timestamp}}</time>
         {{#if user.isGM}}
-            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
         {{/if}}
       </span>
     {{#if message.flavor}}
@@ -38,7 +38,7 @@
     <div class="message-oppose" style="text-align: right"
 				data-message-id="{{../message._id}}" data-target="{{target.id}}">
         {{#if ../user.isGM}}
-        <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}" aria-label="{{localize "OD6S.OPPOSE"}}">&nbsp<i
+        <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.OPPOSE"}}">&nbsp;<i
                 class="fas fa-exchange-alt" aria-hidden="true"></i></a>
         {{/if}}
     </div>

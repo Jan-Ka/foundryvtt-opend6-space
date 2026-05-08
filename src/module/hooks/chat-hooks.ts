@@ -11,7 +11,8 @@ function tagRollMode(msg: any, html: HTMLElement) {
     if (mode === 'public') return;
 
     const label = game.i18n.localize(`OD6S.ROLL_BADGE_${mode.toUpperCase()}`);
-    html.setAttribute('aria-label', `${label} — ${msg.alias ?? ''}`.trim());
+    const alias = (msg.alias ?? msg.speaker?.alias ?? '').trim();
+    html.setAttribute('aria-label', alias ? `${label} — ${alias}` : label);
 
     const header = html.querySelector('.message-header');
     if (!header || header.querySelector('.od6s-roll-badge')) return;
