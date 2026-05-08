@@ -12,6 +12,21 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ### Changed
 
+- v14 polish batch (#132): dropped the dead V1
+  `foundry.appv1.sheets.ActorSheet` / `ItemSheet` `unregisterSheet`
+  calls in `od6s.ts`; routed `system/migration.ts` and
+  `system/schema-version.ts` console output through `logger.ts` so
+  output is debug-flag-gated (`localStorage.od6sDebug`) and tagged
+  consistently; wrapped the async `chat-hooks` (`preDeleteChatMessage`,
+  `updateChatMessage`, `createChatMessage`), `region-hooks`
+  (`updateRegion`, `deleteRegion`), and the `chat-log-listeners`
+  `delegateEvent` shared helper in error boundaries that emit an
+  `[od6s:…]` breadcrumb instead of surfacing as bare unhandled
+  rejections; and replaced the per-actor crew-broadcast `actor.update()`
+  loops in `crew-vehicle.ts` and `socketlib.ts:sendVehicleData` with a
+  single `Actor.updateDocuments` batch (token-actor sync stays
+  per-doc since synthetic actors don't live in `game.actors`).
+
 - Replaced the `Record<string, any>` typing on the central `OD6S`
   config object with a typed `Od6sConfig` interface, and split the
   remaining inline tables out of `config-od6s.ts` into typed

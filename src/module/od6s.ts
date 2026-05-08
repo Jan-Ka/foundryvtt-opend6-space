@@ -137,9 +137,7 @@ Hooks.once('init', async function () {
     registerMigrationSetting();
 
     // Register sheet application classes
-    foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
     foundry.documents.collections.Actors.registerSheet("od6s", OD6SActorSheet, {makeDefault: true});
-    foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
     foundry.documents.collections.Items.registerSheet("od6s", OD6SItemSheet, {makeDefault: true});
 });
 

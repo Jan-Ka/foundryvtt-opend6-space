@@ -3,6 +3,7 @@ import OD6S from "../config/config-od6s";
 import { isOpposedQueueEmpty, setOpposedQueueEntry } from "../system/utilities/opposed";
 import {promptResistanceRolls} from "../socketlib";
 import {deriveRollMode} from "./chat-mode";
+import {error as logError} from "../system/logger";
 
 function tagRollMode(msg: any, html: HTMLElement) {
     const mode = deriveRollMode(msg);
@@ -41,10 +42,11 @@ export function registerChatHooks() {
     })
 
     Hooks.on("preDeleteChatMessage", async (message, _data, _diff, _id) => {
+        try {
         if(message.getFlag('od6s','isExplosive') && game.user.isGM) {
             // Delete the template and clear the flag from the item
             let actor;
-            if (message.speaker.token !== '') {
+            if (message.speaker.token !== null && message.speaker.token !== '') {
                 // @ts-expect-error
                 actor = game!.scenes.get(message.speaker.scene).tokens.get(message.speaker.token).object.actor;
             } else {
@@ -70,9 +72,13 @@ export function registerChatHooks() {
             }
             await od6sutilities.wait(100);
         }
+        } catch (err) {
+            logError('chat-hooks', 'preDeleteChatMessage failed', err);
+        }
     })
 
     Hooks.on("updateChatMessage", async (message, data, _diff, _id) => {
+        try {
         if (data.blind === false) {
             const messageLi = document.querySelector(`.message[data-message-id="${data._id}"]`);
             if (messageLi) (messageLi as any).style.display = '';
@@ -132,6 +138,9 @@ export function registerChatHooks() {
         }
 
         await promptResistanceRolls(message);
+        } catch (err) {
+            logError('chat-hooks', 'updateChatMessage failed', err);
+        }
     });
 
     Hooks.on('renderChatMessageHTML', (_message, _html, _data) => {
@@ -139,7 +148,7 @@ export function registerChatHooks() {
     })
 
     Hooks.on('createChatMessage', async function (msg) {
-
+        try {
         if (game.user.isGM) {
             if (msg.getFlag('od6s', 'isOpposable') && OD6S.autoOpposed) {
                 if ((msg.getFlag('od6s', 'type') === 'damage') ||
@@ -198,5 +207,8 @@ export function registerChatHooks() {
         }
 
         await promptResistanceRolls(msg);
+        } catch (err) {
+            logError('chat-hooks', 'createChatMessage failed', err);
+        }
     })
 }

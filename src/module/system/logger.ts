@@ -41,6 +41,16 @@ export function debug(category: string, ...args: any[]): void {
 }
 
 /**
+ * Always-on warning breadcrumb for non-fatal mismatches the user should
+ * see (schema-version drift, deprecated flag shapes). Sits between
+ * `debug` (gated) and `error` (failure), and routes through `console.warn`
+ * so dev-tools severity filters still distinguish it from hard errors.
+ */
+export function warn(category: string, ...args: any[]): void {
+    console.warn(`[od6s:${category}]`, ...args);
+}
+
+/**
  * Always-on error breadcrumb for swallowed/unexpected failures at handler
  * boundaries (sockets, sheet form-submits, post-roll cleanup). Unlike
  * `debug`, this fires regardless of the debug flag — the point is to leave
