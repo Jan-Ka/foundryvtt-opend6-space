@@ -28,7 +28,7 @@
  * Each touched actor will then log a `[before]` and `[after]` snapshot.
  */
 
-import { debug, isDebugEnabled } from "./logger";
+import { debug, error as logError, isDebugEnabled } from "./logger";
 import { SCHEMA_VERSION_KEY } from "./schema-version";
 
 /**
@@ -96,7 +96,7 @@ export async function migrateWorld() {
     await game.settings.set("od6s", "migrationVersion", CURRENT_MIGRATION_VERSION);
     ui.notifications.info("OpenD6 Space: Migration complete.");
   } catch (err) {
-    console.error("od6s | Migration failed:", err);
+    logError("migration", "Migration failed:", err);
     ui.notifications.error("OpenD6 Space: Migration failed. Check the console for details.");
   } finally {
     inProgress?.remove?.();
@@ -122,7 +122,7 @@ export function registerMigrationSetting() {
  * Affects any effect whose img is under systems/od6s/ and ends with .png.
  */
 async function migrateStatusEffectIcons() {
-  console.log("od6s | Migrating status effect icons from .png to .svg...");
+  debug("migration", "Migrating status effect icons from .png to .svg...");
   let count = 0;
 
   for (const actor of game.actors) {
@@ -159,7 +159,7 @@ async function migrateStatusEffectIcons() {
     }
   }
 
-  console.log(`od6s | Updated ${count} status effect icons.`);
+  debug("migration", `Updated ${count} status effect icons.`);
 }
 
 /** Snapshot an actor's full document state (deep-cloned via toObject) for audit logs. */
@@ -178,7 +178,7 @@ function logActorAfter(step: string, actor: any, suffix = "") {
  * Clear the explosive flags so items are in a clean state.
  */
 async function migrateExplosiveTemplateFlags() {
-  console.log("od6s | Migrating explosive template flags on items...");
+  debug("migration", "Migrating explosive template flags on items...");
   let count = 0;
 
   for (const actor of game.actors) {
@@ -222,7 +222,7 @@ async function migrateExplosiveTemplateFlags() {
     count += worldItemUpdates.length;
   }
 
-  console.log(`od6s | Cleaned explosive flags from ${count} items.`);
+  debug("migration", `Cleaned explosive flags from ${count} items.`);
 }
 
 /**
@@ -233,7 +233,7 @@ async function migrateExplosiveTemplateFlags() {
  * migration, and the new code reads only the keyed map.
  */
 async function migrateExplosivePendingFlags() {
-  console.log("od6s | Dropping legacy scalar explosive flags...");
+  debug("migration", "Dropping legacy scalar explosive flags...");
   let count = 0;
 
   const drop = {
@@ -273,7 +273,7 @@ async function migrateExplosivePendingFlags() {
     count += worldItemUpdates.length;
   }
 
-  console.log(`od6s | Dropped legacy scalar explosive flags from ${count} items.`);
+  debug("migration", `Dropped legacy scalar explosive flags from ${count} items.`);
 }
 
 /**
@@ -282,7 +282,7 @@ async function migrateExplosivePendingFlags() {
  * so they don't try to interact with non-existent templates.
  */
 async function migrateChatMessageFlags() {
-  console.log("od6s | Migrating chat message explosive flags...");
+  debug("migration", "Migrating chat message explosive flags...");
   let count = 0;
 
   const updates = [];
@@ -301,7 +301,7 @@ async function migrateChatMessageFlags() {
     await ChatMessage.updateDocuments(updates);
   }
 
-  console.log(`od6s | Cleaned explosive flags from ${count} chat messages.`);
+  debug("migration", `Cleaned explosive flags from ${count} chat messages.`);
 }
 
 /**
@@ -318,7 +318,7 @@ async function migrateChatMessageFlags() {
  */
 async function stampAllSchemaVersions() {
   const version = game.system.version;
-  console.log(`od6s | Stamping all docs with system schema version ${version}...`);
+  debug("migration", `Stamping all docs with system schema version ${version}...`);
   let count = 0;
 
   const actorUpdates: Array<Record<string, unknown>> = [];
@@ -348,5 +348,5 @@ async function stampAllSchemaVersions() {
     count += worldItemUpdates.length;
   }
 
-  console.log(`od6s | Stamped ${count} docs.`);
+  debug("migration", `Stamped ${count} docs.`);
 }

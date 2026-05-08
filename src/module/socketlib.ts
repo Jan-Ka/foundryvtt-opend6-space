@@ -247,14 +247,18 @@ async function sendVehicleData(userId: string, data: VehicleDataPayload) {
     // payload — otherwise a crew-member-owning caller could push the
     // `system.vehicle` cache onto arbitrary actor uuids in `data.crewmembers`.
     const recipients = isVehicleActor(vehicle) ? vehicle.system.crewmembers ?? [] : [];
+    const worldUpdates: Array<Record<string, unknown>> = [];
     for (const e of recipients) {
         const actor = await od6sutilities.getActorFromUuid(e.uuid);
         if (!actor) continue;
-        const update: any = {};
-        update.system = {};
-        update.id = actor.id;
-        update.system.vehicle = data;
-        await actor.update(update);
+        if (actor.isToken) {
+            await actor.update({_id: actor.id, system: {vehicle: data}});
+        } else {
+            worldUpdates.push({_id: actor.id, system: {vehicle: data}});
+        }
+    }
+    if (worldUpdates.length > 0) {
+        await Actor.updateDocuments(worldUpdates);
     }
 }
 

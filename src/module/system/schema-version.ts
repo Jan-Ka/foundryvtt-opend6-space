@@ -6,6 +6,8 @@
  * `src/module/system/migration.ts` (which bumps stamps after migrations).
  */
 
+import { error as logError } from "./logger";
+
 export const SCHEMA_VERSION_KEY = "_systemSchemaVersion";
 
 export type SchemaVersionState = "ok" | "unstamped" | "lag" | "ahead";
@@ -58,12 +60,14 @@ export function warnIfSchemaVersionMismatch(doc: { id?: string | null; name?: st
 
   const label = `${doc.type ?? "doc"} "${doc.name ?? doc.id}"`;
   if (state === "lag") {
-    console.warn(
-      `[od6s:schema-version] ${label} was stamped ${stamp} but system is ${current}; world migrations may not have run yet.`,
+    logError(
+      "schema-version",
+      `${label} was stamped ${stamp} but system is ${current}; world migrations may not have run yet.`,
     );
   } else {
-    console.warn(
-      `[od6s:schema-version] ${label} was stamped ${stamp} which is newer than the running system ${current}; this world was opened in a newer system version. Schema fields may render incorrectly.`,
+    logError(
+      "schema-version",
+      `${label} was stamped ${stamp} which is newer than the running system ${current}; this world was opened in a newer system version. Schema fields may render incorrectly.`,
     );
   }
 

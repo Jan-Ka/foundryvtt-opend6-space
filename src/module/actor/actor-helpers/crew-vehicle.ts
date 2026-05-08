@@ -126,16 +126,22 @@ export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void
         return;
     }
     const crew = selectCrewmembersForBroadcast(data.crewmembers, uuid);
+    // Batch world-actor updates through Actor.updateDocuments to cut socket
+    // chatter and avoid partial-failure half-states. Token-actor (synthetic)
+    // updates fall back to the per-doc path because they live on a scene's
+    // token collection, not in `game.actors`.
+    const worldUpdates: Array<Record<string, unknown>> = [];
     for (const e of crew) {
         const crewActor = await od6sutilities.getActorFromUuid(e.uuid);
-        if (crewActor) {
-            const update: any = {};
-            update.id = crewActor.id;
-            update._id = crewActor.id;
-            update.system = {}
-            update.system.vehicle = data;
-            await crewActor.update(update);
+        if (!crewActor) continue;
+        if (crewActor.isToken) {
+            await crewActor.update({_id: crewActor.id, system: {vehicle: data}});
+        } else {
+            worldUpdates.push({_id: crewActor.id, system: {vehicle: data}});
         }
+    }
+    if (worldUpdates.length > 0) {
+        await Actor.updateDocuments(worldUpdates);
     }
 }
 

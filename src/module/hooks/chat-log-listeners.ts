@@ -6,21 +6,32 @@ import OD6SEditDifficulty from "../apps/edit-difficulty";
 import {OD6SEditDamage} from "../apps/edit-damage";
 import {OD6SChooseTarget} from "../apps/choose-target";
 import {OD6SHandleWildDieForm} from "../apps/handle-wild-die";
+import {error as logError} from "../system/logger";
 
-// Delegated event helper: attaches a listener on a parent that fires when a child matching selector is the target
+// Delegated event helper: attaches a listener on a parent that fires when a child matching selector is the target.
+// Wraps the handler so async failures leave a `[od6s:chat-log]` breadcrumb instead of unhandled rejections.
 function delegateEvent(
     parent: HTMLElement,
     eventType: string,
     selector: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handler: (ev: any) => void,
+    handler: (ev: any) => void | Promise<void>,
 ) {
     parent.addEventListener(eventType, (ev: Event) => {
         const target = (ev.target as Element | null)?.closest(selector);
         if (target && parent.contains(target)) {
             // Make ev.currentTarget behave like jQuery delegation
             Object.defineProperty(ev, 'currentTarget', { value: target, configurable: true });
-            handler(ev);
+            try {
+                const result = handler(ev);
+                if (result && typeof (result as Promise<void>).catch === 'function') {
+                    (result as Promise<void>).catch(err =>
+                        logError('chat-log', `${eventType} ${selector} handler failed`, err),
+                    );
+                }
+            } catch (err) {
+                logError('chat-log', `${eventType} ${selector} handler failed`, err);
+            }
         }
     });
 }
