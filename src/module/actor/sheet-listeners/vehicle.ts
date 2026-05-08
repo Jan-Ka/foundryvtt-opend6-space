@@ -111,7 +111,7 @@ export function registerVehicleListeners(
             ev.preventDefault();
             const ct = ev.currentTarget as HTMLElement;
             if (!game.user.isGM && sheet.document.uuid === ct.dataset.crewid) {
-                return await OD6S.socket.executeAsGM('unlinkCrew', ct.dataset.crewid, ct.dataset.vehicleid);
+                return await OD6S.socket.executeAsGM('unlinkCrew', game.user.id, ct.dataset.crewid, ct.dataset.vehicleid);
             } else if (game.user.isGM && sheet.document.uuid === ct.dataset.crewid) {
                 const vehicle = await od6sutilities.getActorFromUuid(ct.dataset.vehicleid!)
                 await vehicle!.sheet.unlinkCrew(sheet.document.uuid);

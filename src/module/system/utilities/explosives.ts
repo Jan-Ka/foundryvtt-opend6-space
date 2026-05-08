@@ -275,7 +275,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
             if (region.isOwner) {
                 await canvas.scene.deleteEmbeddedDocuments('Region', [region.id]);
             } else {
-                await OD6S.socket.executeAsGM('deleteExplosiveRegion', {regionId: region.id});
+                await OD6S.socket.executeAsGM('deleteExplosiveRegion', game.user.id, {actorUuid: actor.uuid, regionId: region.id});
             }
         }
     }

@@ -509,7 +509,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         if (game.user.isGM) {
             await vehicle?.update(vehicleUpdate);
         } else if (vehicleUuid) {
-            await OD6S.socket.executeAsGM('updateVehicle', vehicleUuid, vehicleUpdate);
+            await OD6S.socket.executeAsGM('updateVehicle', game.user.id, vehicleUuid, vehicleUpdate);
         }
     }
 

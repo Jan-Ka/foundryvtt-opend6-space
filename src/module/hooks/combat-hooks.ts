@@ -67,8 +67,8 @@ export function registerCombatHooks() {
                                 vUpdate.system = {};
                                 vUpdate.system.dodge = {};
                                 vUpdate.system.dodge.score = 0;
-                                await OD6S.socket.executeAsGM('updateVehicle', vehicleId, vUpdate);
-                                await OD6S.socket.executeAsGM('unsetVehicleFlag', vehicleId, 'dodge_actor');
+                                await OD6S.socket.executeAsGM('updateVehicle', game.user.id, vehicleId, vUpdate);
+                                await OD6S.socket.executeAsGM('unsetVehicleFlag', game.user.id, vehicleId, 'dodge_actor');
                             }
                         }
                     }
