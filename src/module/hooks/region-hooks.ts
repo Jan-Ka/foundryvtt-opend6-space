@@ -19,6 +19,7 @@ export function registerRegionHooks() {
                     } else {
                         actor = game.actors.get(message.speaker.actor);
                     }
+                    if (!actor) return;
                     const targets = await od6sutilities.getExplosiveTargets(
                         actor,
                         region.getFlag('od6s', 'item'),

@@ -7,6 +7,7 @@ import * as itemUtils from "./utilities/items";
 import * as actorUtils from "./utilities/actors";
 import * as skillUtils from "./utilities/skills";
 import * as explosiveUtils from "./utilities/explosives";
+import type { DetonateExplosiveData } from "./utilities/explosives";
 import * as effectUtils from "./utilities/effects";
 import * as weaponUtils from "./utilities/weapons";
 import * as opposedUtils from "./utilities/opposed";
@@ -22,19 +23,19 @@ export const od6sutilities = {
     lookupAttributeKey(id: string) {
         return miscUtils.lookupAttributeKey(id);
     },
-    async scatterExplosive(range: any, origin: any, regionId: any) {
+    async scatterExplosive(range: string, origin: { x: number; y: number }, regionId: string) {
         return explosiveUtils.scatterExplosive(range, origin, regionId);
     },
-    async getExplosiveTargets(actor: any, itemId: any, regionId: string | undefined) {
+    async getExplosiveTargets(actor: Actor, itemId: string, regionId: string | undefined) {
         return explosiveUtils.getExplosiveTargets(actor, itemId, regionId);
     },
-    async detonateExplosives(combat: any) {
+    async detonateExplosives(combat: Combat) {
         return explosiveUtils.detonateExplosives(combat);
     },
-    async detonateExplosive(data: any) {
+    async detonateExplosive(data: DetonateExplosiveData) {
         return explosiveUtils.detonateExplosive(data);
     },
-    getBlastRadius(item: any, range: any) {
+    getBlastRadius(item: Item, range: number) {
         return explosiveUtils.getBlastRadius(item, range);
     },
     getDiceFromScore(score: number) {
@@ -88,7 +89,7 @@ export const od6sutilities = {
     getAllItemsByType(itemType: OD6SItemType) {
         return itemUtils.getAllItemsByType(itemType);
     },
-    mergeByProperty(target: any, source: any, prop: any) {
+    mergeByProperty<T extends Record<string, unknown>>(target: T[], source: T[], prop: keyof T) {
         return itemUtils.mergeByProperty(target, source, prop);
     },
     async getActorFromUuid(uuid: string) {

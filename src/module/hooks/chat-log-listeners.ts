@@ -149,7 +149,9 @@ export function registerChatLogListeners() {
         delegateEvent(html, "click", ".explosive-damage-button", async (ev: Event) => {
             ev.preventDefault();
             const target = ev.currentTarget as HTMLElement;
-            await od6sutilities.detonateExplosive(target.dataset);
+            const { itemId, messageId, actorId, tokenId, templateId, stun } = target.dataset;
+            if (!itemId) return;
+            await od6sutilities.detonateExplosive({ itemId, messageId, actorId, tokenId, templateId, stun });
         })
 
         delegateEvent(html, 'click', '.remove-template-button', async (ev: Event) => {
