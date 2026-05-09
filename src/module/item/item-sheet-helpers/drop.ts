@@ -47,8 +47,7 @@ export async function onDropItem(
 
         case "weapon":
             if (item.type === "specialization" && isWeaponItem(sheet.item)) {
-                sheet.item.system.stats.specialization = item.name;
-                await sheet.item.update(sheet.item.system, {diff: true});
+                await sheet.item.update({"system.stats.specialization": item.name}, {diff: true});
             }
     }
     return undefined;

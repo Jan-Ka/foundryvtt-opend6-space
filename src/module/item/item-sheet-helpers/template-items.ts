@@ -27,7 +27,7 @@ async function getGameItemsByType(
 export async function addTemplateItem(sheet: SheetLike, event: Event): Promise<void> {
     const target = event.currentTarget as HTMLElement;
     const type = target.dataset.type!;
-    const templateItems = await Promise.all(await getGameItemsByType(type));
+    const templateItems = await getGameItemsByType(type);
     const content = await foundry.applications.handlebars.renderTemplate(
         "systems/od6s/templates/item/item-template-add.html",
         {templateItems});

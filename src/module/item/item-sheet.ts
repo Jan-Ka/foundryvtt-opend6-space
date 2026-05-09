@@ -17,7 +17,7 @@ const ItemSheetV2 = foundry.applications.sheets.ItemSheetV2;
  * load the right template instead of declaring a multi-PARTS entry per type.
  *
  * Per-domain handlers live in `item-sheet-helpers/`; this class wires them
- * to DOM events and exposes them as methods for legacy callers.
+ * to DOM events and delegates without holding handler state.
  */
 export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
