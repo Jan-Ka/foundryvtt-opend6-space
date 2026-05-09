@@ -93,10 +93,12 @@ jobs:
           #     joined with a single space (leading indent stripped)
           # If the version isn't found (e.g. someone tagged without
           # updating CHANGELOG), fall back to a bare link.
-          SECTION=$(awk -v v="$VERSION" '
+          # `index($0, header) == 1` is a literal-substring check — avoids
+          # treating the dots in `VERSION` as regex metacharacters.
+          SECTION=$(awk -v header="## [$VERSION]" '
             BEGIN              { capture=0; buf="" }
             function flush()   { if (buf != "") { print buf; buf="" } }
-            $0 ~ "^## \\[" v "\\]" { capture=1; next }
+            index($0, header) == 1 { capture=1; next }
             capture && /^## \[/    { flush(); exit }
             !capture           { next }
             /^$/               { flush(); print ""; next }
