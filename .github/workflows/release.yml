@@ -82,13 +82,29 @@ jobs:
           set -eu
           VERSION="${{ steps.meta.outputs.version }}"
           TAG="${{ steps.meta.outputs.tag }}"
-          # Pull the section bounded by `## [VERSION]` and the next `## [`.
+          # Pull the section bounded by `## [VERSION]` and the next `## [`,
+          # then reflow paragraphs and list items so hard wraps in the
+          # source CHANGELOG don't render as visible <br>s in release
+          # notes (GitHub Releases honor GFM `breaks: true`).
+          # Reflow rules:
+          #   - blank lines and headers (`#`) flush + pass through
+          #   - lines starting `- ` / `* ` start a new buffered list item
+          #   - any other non-empty line appends to the current buffer,
+          #     joined with a single space (leading indent stripped)
           # If the version isn't found (e.g. someone tagged without
           # updating CHANGELOG), fall back to a bare link.
           SECTION=$(awk -v v="$VERSION" '
-            $0 ~ "^## \\[" v "\\]" {capture=1; next}
-            capture && /^## \[/      {exit}
-            capture                  {print}
+            BEGIN              { capture=0; buf="" }
+            function flush()   { if (buf != "") { print buf; buf="" } }
+            $0 ~ "^## \\[" v "\\]" { capture=1; next }
+            capture && /^## \[/    { flush(); exit }
+            !capture           { next }
+            /^$/               { flush(); print ""; next }
+            /^#+ /             { flush(); print; next }
+            /^[-*] /           { flush(); buf=$0; next }
+                               { line=$0; sub(/^[ \t]+/, "", line);
+                                 buf = (buf == "" ? line : buf " " line) }
+            END                { flush() }
           ' CHANGELOG.md)
           CHANGELOG_URL="https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/CHANGELOG.md"
           {
