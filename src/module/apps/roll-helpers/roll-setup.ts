@@ -29,12 +29,11 @@
 
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
-import {cancelAction, getEffectMod} from "./roll-effects";
-import {isAnyWeaponItem, isCharacterActor, isSkillItem, isVehicleActor, isVehicleBorneWeaponItem} from "../../system/type-guards";
+import {cancelAction} from "./roll-effects";
+import {isAnyWeaponItem, isCharacterActor, isSkillItem, isVehicleBorneWeaponItem} from "../../system/type-guards";
 import {bucketRangeFromDistance, flatSkillBonusPips, splitBonusForPenalty} from "./difficulty-math";
 import type {IncomingRollData, RollData, ClassifiedRoll, RollTypeKey} from "./roll-data";
-import {classifyRoll} from "./roll-data";
-import {applyWeaponMods} from "./weapon-context-math";
+import {classifyRoll, computeScaleMod} from "./roll-data";
 import {clearExplosivePending, getExplosivePending} from "../../system/utilities/explosives";
 import {computePenalties, isPenaltyBypassType, resolveSkillBackedAction} from "./action-math";
 import type {ActionResolution} from "./action-math";
@@ -44,18 +43,9 @@ import type {RollSettingsRaw} from "./roll-context-adapter";
 import {HANDLERS} from "./roll-handlers";
 import type {HandlerContext, HandlerInput} from "./roll-handlers";
 import {runFinalize} from "./roll-finalize";
+import {accumulateRollMods} from "./roll-mod-accumulator";
+import {deriveAttackerScale, isAttackRollKey} from "./roll-attacker-scale";
 import {error as logError} from "../../system/logger";
-
-/**
- * Roll-type keys whose rolls get the `dice_for_scale` negative-scaleMod dice
- * adjustment (Audit D enumeration).
- */
-const ATTACK_KEYS: ReadonlySet<RollTypeKey> = new Set<RollTypeKey>([
-    'weapon', 'starship-weapon', 'vehicle-weapon',
-    'action-brawlattack',
-    'action-vehicleramattack',
-    'action-vehiclerangedweaponattack',
-]);
 
 const RANGED_BUCKETING_SUBTYPES = new Set([
     'rangedattack', 'vehiclerangedattack', 'vehiclerangedweaponattack',
@@ -261,132 +251,32 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
         return false;
     }
 
-    // ---- bonusmod / miscMod accumulation (orchestrator-side) ----
-    let bonusmod = 0;
-    let miscMod = 0;
-
-    // Weapon family: weapon mod difficulty / attack land on miscMod / bonusmod
-    // (handler already folded `damage` into bucket.damagescore via the same
-    // helper — applyWeaponMods is run twice but discarded outputs differ, so no
-    // double-fold happens).
-    // Gate on canonical `classified.type` (not item type): action-routed
-    // weapon attacks like `action-vehiclerangedweaponattack` have
-    // classified.type === 'action' and accumulate mods in the dedicated
-    // block below. Folding here too would double-count.
-    const isWeaponClassifiedType = classified.type === 'weapon'
-        || classified.type === 'starship-weapon'
-        || classified.type === 'vehicle-weapon';
-    if (item && isWeaponClassifiedType && isAnyWeaponItem(item)) {
-        const wsys = item.system;
-        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, wsys.mods);
-        miscMod = folded.miscMod;
-        bonusmod = folded.bonusmod;
-
-        const stats = wsys.stats;
-        const ownsSpec = !!stats?.specialization
-            && data.actor.items.some((i: Item) => i.type === 'specialization' && i.name === stats.specialization);
-        const ownsSkill = !!stats?.skill
-            && data.actor.items.some((i: Item) => i.type === 'skill' && i.name === stats.skill);
-        if (ownsSpec) {
-            bonusmod += +getEffectMod('specialization', stats.specialization!, data.actor);
-        } else if (ownsSkill) {
-            bonusmod += +getEffectMod('skill', stats.skill!, data.actor);
-        }
-    }
-
-    if (item && classified.key === 'action-vehiclerangedweaponattack' && isVehicleBorneWeaponItem(item)) {
-        const folded = applyWeaponMods({ damageScore: 0, miscMod, bonusmod }, item.system.mods);
-        miscMod = folded.miscMod;
-        bonusmod = folded.bonusmod;
-    }
-
-    if (classified.type === 'skill' && item) {
-        bonusmod += +getEffectMod('skill', item.name ?? '', data.actor);
-    }
-    if (classified.type === 'specialization' && item) {
-        bonusmod += +getEffectMod('specialization', item.name ?? '', data.actor);
-    }
-
-    if (isCharacterActor(data.actor)) {
-        const c = data.actor.system;
-        if (subtype === 'meleeattack') bonusmod += c.melee.mod;
-        if (subtype === 'brawlattack') bonusmod += c.brawl.mod;
-        if (subtype === 'dodge') bonusmod += c.dodge.mod;
-        if (subtype === 'parry') bonusmod += c.parry.mod;
-        if (subtype === 'block') bonusmod += c.block.mod;
-    }
-
-    // Ranged-attack bonus: vehicle's ranged.score for vehicle-piloted paths,
-    // actor.system.ranged.mod for personal ranged.
+    // ---- bonusmod / miscMod accumulation ----
     const isRangedSubtype = subtype === 'rangedattack'
         || subtype === 'vehiclerangedattack'
         || subtype === 'vehiclerangedweaponattack';
-    if (isRangedSubtype) {
-        if (subtype.startsWith('vehicle')) {
-            if (isVehicleActor(data.actor)
-                && data.actor.system.embedded_pilot?.value
-                && typeof data.actor.system.ranged?.score !== 'undefined') {
-                bonusmod += +data.actor.system.ranged.score;
-            } else if (isCharacterActor(data.actor)
-                && typeof data.actor.system.vehicle?.ranged?.score !== 'undefined') {
-                bonusmod += +data.actor.system.vehicle.ranged.score;
-            }
-        } else if (isCharacterActor(data.actor)) {
-            bonusmod += +data.actor.system.ranged.mod;
-        }
-    }
-
-    // RFC #103: vehicleramattack adds ram.score ONCE (legacy added at lines
-    // 245 and 487 — same condition twice).
-    if (classified.key === 'action-vehicleramattack') {
-        const vehicleData = isCharacterActor(data.actor)
-            ? data.actor.system.vehicle
-            : isVehicleActor(data.actor)
-                ? data.actor.system
-                : undefined;
-        if (typeof vehicleData?.ram?.score === 'number') {
-            bonusmod += vehicleData.ram.score;
-        }
-    }
+    const {bonusmod, miscMod} = accumulateRollMods({
+        actor: data.actor,
+        item,
+        classified,
+        subtype,
+        isRangedSubtype,
+    });
 
     // ---- attackerScale / scaleMod ----
-    // RFC #104: derive attackerScale from the actor unconditionally for attack
-    // rolls (legacy gated on `targets.length === 1 && isAttack`, leaving
-    // attackerScale=0 for no-target attacks).
-    const isAttackRoll = ATTACK_KEYS.has(classified.key)
-        || (isRangedSubtype && (classified.type === 'weapon' || classified.type === 'starship-weapon' || classified.type === 'vehicle-weapon'))
-        || classified.key === 'action-rangedattack'
-        || classified.key === 'action-vehiclerangedattack'
-        || classified.key === 'action-meleeattack';
-
-    let attackerScale: number;
-    if (typeof bucketAny.attackerScale === 'number' && bucketAny.attackerScale !== 0) {
-        attackerScale = bucketAny.attackerScale;
-    } else if (isAttackRoll) {
-        const isVehicleSubtype = subtype.includes('vehicle');
-        if (isVehicleSubtype) {
-            if (isVehicleActor(data.actor)) {
-                attackerScale = +(data.actor.system.scale?.score ?? 0);
-            } else if (isCharacterActor(data.actor)) {
-                attackerScale = +(data.actor.system.vehicle?.scale?.score ?? 0);
-            } else {
-                attackerScale = 0;
-            }
-        } else if (isCharacterActor(data.actor) || isVehicleActor(data.actor)) {
-            attackerScale = +(data.actor.system.scale?.score ?? 0);
-        } else {
-            attackerScale = 0;
-        }
-    } else {
-        attackerScale = bucketAny.attackerScale ?? 0;
-    }
+    const isAttackRoll = isAttackRollKey(classified.key, classified.type, isRangedSubtype);
+    const attackerScale = deriveAttackerScale({
+        actor: data.actor,
+        classifiedKey: classified.key,
+        subtype,
+        isAttackRoll,
+        bucketAttackerScale: bucketAny.attackerScale,
+    });
 
     let scaleMod = 0;
     if (targets.length === 1) {
         const defenderScale = +((targets[0].actor.system as { scale?: { score?: number } }).scale?.score ?? 0);
-        if (attackerScale !== defenderScale) {
-            scaleMod = attackerScale - defenderScale;
-        }
+        scaleMod = computeScaleMod(attackerScale, defenderScale);
     }
 
     // ---- Range bucketing (orchestrator-side) ----
