@@ -13,6 +13,7 @@ import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
+import {isCharacterActor} from "../system/type-guards";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
     onDropCharacterTemplate, onDropSpeciesTemplate, onDropItemGroup,
@@ -163,6 +164,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         root.querySelectorAll(".create-character").forEach((elem) =>
             elem.addEventListener("click", async () => {
+                if (!isCharacterActor(this.document)) return;
                 const newChar = new OD6SCreateCharacter(this.document,
                     od6sutilities.getAllItemsByType("character-template"));
                 newChar.render({force: true});

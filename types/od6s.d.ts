@@ -137,6 +137,12 @@ interface OD6SCharacterSystem {
     visible?: boolean;
     /** Created marker on character actors. */
     created?: { value: boolean };
+    /** Character profile fields (some shared with vehicles via the common schema). */
+    chartype: { type: string; label: string; content: string };
+    species: { type: string; label: string; content: string };
+    move: { type: string; label: string; mod: number; value: number };
+    background: { type: string; label: string; content: string };
+    metaphysicsextranormal: { type: string; label: string; value: boolean };
 }
 
 /** System data for the container actor type. */

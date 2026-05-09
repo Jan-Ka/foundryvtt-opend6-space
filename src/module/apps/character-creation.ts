@@ -13,6 +13,21 @@ import {debug} from "../system/logger";
 
 const {ApplicationV2, HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
 
+/** Lightweight summary objects returned by `getAllItemsByType("character-template")`. */
+type CharacterTemplateSummary = {_id: string; name: string; type: string; description?: string};
+
+/** State of the in-progress custom-template form. */
+interface CustomTemplateState {
+    templateName: string;
+    attributeScore: number;
+    characterPoints: number;
+    fatePoints: number;
+    move: number;
+    attributeDice: number;
+    attributes: Record<string, number>;
+    me: boolean;
+}
+
 function getAllocationConfig(): AllocationConfig {
     return {
         pipsPerDice: OD6S.pipsPerDice,
@@ -24,33 +39,37 @@ function getAllocationConfig(): AllocationConfig {
 
 export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(ApplicationV2) {
 
-    actor: any;
-    characterTemplates: any;
-    selectedTemplate: any = "";
-    templateData: any = {};
+    actor: OD6SCharacterActor;
+    characterTemplates: CharacterTemplateSummary[];
+    selectedTemplate: string | null = "";
+    templateData: OD6SCharacterTemplateItem | Record<string, never>;
     skillScore: number;
     specScore = 0;
-    custom: any = {};
+    custom: CustomTemplateState;
     done = false;
     step = 1;
-    customTemplate: any = {};
+    customTemplate: { name?: string } = {};
 
-    constructor(actor: any, templates: any, options: any = {}) {
+    constructor(actor: OD6SCharacterActor, templates: CharacterTemplateSummary[], options: object = {}) {
         super(options);
         this.actor = actor;
         this.characterTemplates = templates;
         this.skillScore = OD6S.initialSkills;
-        this.custom.templateName = game.i18n.localize("OD6S.CREATE_CUSTOM_TEMPLATE");
-        this.custom.attributeScore = OD6S.initialAttributes;
-        this.custom.characterPoints = OD6S.initialCharacterPoints;
-        this.custom.fatePoints = OD6S.initialFatePoints;
-        this.custom.move = OD6S.initialMove;
-        this.custom.attributeDice = OD6S.initialAttributes;
-        this.custom.attributes = {};
+        this.templateData = {};
+        const attributes: Record<string, number> = {};
         for (const a in OD6S.attributes) {
-            this.custom.attributes[a] = 0;
+            attributes[a] = 0;
         }
-        this.custom.me = false;
+        this.custom = {
+            templateName: game.i18n.localize("OD6S.CREATE_CUSTOM_TEMPLATE"),
+            attributeScore: OD6S.initialAttributes,
+            characterPoints: OD6S.initialCharacterPoints,
+            fatePoints: OD6S.initialFatePoints,
+            move: OD6S.initialMove,
+            attributeDice: OD6S.initialAttributes,
+            attributes,
+            me: false,
+        };
     }
 
     static DEFAULT_OPTIONS = {
@@ -82,26 +101,32 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
 
     async _prepareContext(_options?: object): Promise<object> {
         if (this.actor.system.chartype.content !== "") {
-            const idx = this.characterTemplates.findIndex((t: any) => t.name === this.actor.system.chartype.content);
+            const idx = this.characterTemplates.findIndex((t) => t.name === this.actor.system.chartype.content);
             this.selectedTemplate = idx >= 0 ? this.characterTemplates[idx]._id : null;
             const matchedTemplate = this.selectedTemplate
-                ? this.characterTemplates.find((i: any) => i._id === this.selectedTemplate)
+                ? this.characterTemplates.find((i) => i._id === this.selectedTemplate)
                 : null;
-            this.templateData = matchedTemplate
+            const loaded = matchedTemplate
                 ? await od6sutilities.getItemByName(matchedTemplate.name)
                 : null;
-            if (!this.templateData) {
+            if (!loaded) {
                 ui.notifications.error(game.i18n.localize("OD6S.ERROR_TEMPLATE_NOT_FOUND"));
                 this.templateData = {};
+            } else {
+                this.templateData = loaded as OD6SCharacterTemplateItem;
             }
         }
 
-        const attrs: any[] = [];
-        if (Object.keys(this.templateData).length !== 0) {
-            for (const attribute in this.templateData.system.attributes) {
+        const attrs: Array<{id: string; score: number; sort: number; active: boolean}> = [];
+        const tpl = this.templateData;
+        const isLoaded = (t: typeof tpl): t is OD6SCharacterTemplateItem =>
+            Object.keys(t).length !== 0;
+        if (isLoaded(tpl)) {
+            for (const attribute in tpl.system.attributes) {
+                const key = attribute as keyof typeof tpl.system.attributes;
                 attrs.push({
                     id: attribute,
-                    score: this.templateData.system.attributes[attribute],
+                    score: tpl.system.attributes[key],
                     sort: OD6S.attributes[attribute].sort,
                     active: OD6S.attributes[attribute].active,
                 });
@@ -111,7 +136,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
 
         this.done = this.skillScore === 0 && this.specScore === 0;
 
-        const data: any = {
+        const data: Record<string, unknown> = {
             attrs,
             done: this.done,
             characterTemplates: this.characterTemplates,
@@ -124,10 +149,9 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             custom: this.custom,
         };
 
-        if (typeof this.templateData.system !== "undefined"
-            && typeof this.templateData.system.items !== "undefined") {
+        if (isLoaded(tpl) && typeof tpl.system.items !== "undefined") {
             data.skills = await od6sutilities.getSkillsFromTemplate(
-                this.templateData.system.items.filter((i: any) => i.type === "skill"),
+                tpl.system.items.filter((i) => i.type === "skill") as unknown as Item[],
             );
         }
         return data;
@@ -146,7 +170,8 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             } else {
                 this.selectedTemplate = value;
                 this.templateData = await od6sutilities.getItemByName(
-                    this.characterTemplates.find((i: any) => i._id === this.selectedTemplate).name);
+                    this.characterTemplates.find((i) => i._id === this.selectedTemplate)!.name) as
+                    OD6SCharacterTemplateItem;
             }
             await this.actor.sheet._onClearCharacterTemplate();
             await this.render();
@@ -163,7 +188,9 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             elem.addEventListener("click", async (ev) => {
                 ev.preventDefault();
                 const target = ev.currentTarget as HTMLElement;
-                const skill = this.actor.items.find((s: any) => s._id === target.dataset.itemId);
+                const skill = this.actor.items.find((s: Item) => s._id === target.dataset.itemId) as
+                    OD6SSkillItem | undefined;
+                if (!skill) return;
                 this.skillScore = applySkillDelete(skill.system.base, this.skillScore);
                 await this.actor.sheet.deleteItem(ev);
                 await this.actor.sheet.getData();
@@ -175,8 +202,12 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             elem.addEventListener("click", async (ev) => {
                 ev.preventDefault();
                 const target = ev.currentTarget as HTMLElement;
-                const spec = this.actor.items.find((s: any) => s._id === target.dataset.itemId);
-                const skill = this.actor.items.find((s: any) => s.name === spec.system.skill);
+                const spec = this.actor.items.find((s: Item) => s._id === target.dataset.itemId) as
+                    OD6SSpecializationItem | undefined;
+                if (!spec) return;
+                const skill = this.actor.items.find((s: Item) => s.name === spec.system.skill) as
+                    OD6SSkillItem | undefined;
+                if (!skill) return;
                 const updated = applySpecDelete(
                     spec.system.base,
                     skill.system.base,
@@ -200,15 +231,16 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
                     return;
                 }
                 const target = ev.currentTarget as HTMLElement;
-                const skill = this.actor.items.find((i: any) => i._id === target.dataset.itemId);
-                if (typeof skill !== "undefined" && skill !== "") {
-                    const updates: any[] = [{
+                const skill = this.actor.items.find((i: Item) => i._id === target.dataset.itemId);
+                if (skill) {
+                    const updates: Array<Record<string, unknown>> = [{
                         _id: skill._id,
                         id: skill.id,
                         "system.base": (+target.dataset.base!) + 1,
                     }];
                     const specs = this.actor.items
-                        .filter((i: any) => i.type === "specialization" && i.system.skill === skill.name);
+                        .filter((i: Item) => i.type === "specialization"
+                            && (i as OD6SSpecializationItem).system.skill === skill.name) as OD6SSpecializationItem[];
                     for (const spec of specs) {
                         updates.push({_id: spec.id, "system.base": spec.system.base + 1});
                     }
@@ -225,8 +257,8 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
                 ev.preventDefault();
                 if (this.specScore < 1) return;
                 const target = ev.currentTarget as HTMLElement;
-                const spec = this.actor.items.find((i: any) => i._id === target.dataset.itemId);
-                if (typeof spec !== "undefined" && spec !== "") {
+                const spec = this.actor.items.find((i: Item) => i._id === target.dataset.itemId);
+                if (spec) {
                     await spec.update({"system.base": (+target.dataset.base!) + 1});
                     await this.actor.sheet.getData();
                     this.specScore = this.specScore - 1;
@@ -241,15 +273,16 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
                 if (this.skillScore >= OD6S.initialSkills) return;
                 const target = ev.currentTarget as HTMLElement;
                 if (+target.dataset.base! < 1) return;
-                const skill = this.actor.items.find((i: any) => i._id === target.dataset.itemId);
-                if (typeof skill !== "undefined" && skill !== "") {
-                    const updates: any[] = [{
+                const skill = this.actor.items.find((i: Item) => i._id === target.dataset.itemId);
+                if (skill) {
+                    const updates: Array<Record<string, unknown>> = [{
                         _id: skill._id,
                         id: skill.id,
                         "system.base": (+target.dataset.base!) - 1,
                     }];
                     const specs = this.actor.items
-                        .filter((i: any) => i.type === "specialization" && i.system.skill === skill.name);
+                        .filter((i: Item) => i.type === "specialization"
+                            && (i as OD6SSpecializationItem).system.skill === skill.name) as OD6SSpecializationItem[];
                     for (const spec of specs) {
                         updates.push({_id: spec.id, "system.base": spec.system.base - 1});
                     }
@@ -266,8 +299,8 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
                 ev.preventDefault();
                 const target = ev.currentTarget as HTMLElement;
                 if (+target.dataset.base! <= 1) return;
-                const spec = this.actor.items.find((i: any) => i._id === target.dataset.itemId);
-                if (typeof spec !== "undefined" && spec !== "") {
+                const spec = this.actor.items.find((i: Item) => i._id === target.dataset.itemId);
+                if (spec) {
                     await spec.update({"system.base": (+target.dataset.base!) - 1});
                     await this.actor.sheet.getData();
                     this.specScore = this.specScore + 1;
@@ -302,17 +335,17 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
         });
 
         find(".fate-points")?.addEventListener("change", async (ev) => {
-            this.custom.fatePoints = (ev.target as HTMLInputElement).value;
+            this.custom.fatePoints = Number((ev.target as HTMLInputElement).value);
             await this.render();
         });
 
         find(".character-points")?.addEventListener("change", async (ev) => {
-            this.custom.characterPoints = (ev.target as HTMLInputElement).value;
+            this.custom.characterPoints = Number((ev.target as HTMLInputElement).value);
             await this.render();
         });
 
         find(".move")?.addEventListener("change", async (ev) => {
-            this.custom.move = (ev.target as HTMLInputElement).value;
+            this.custom.move = Number((ev.target as HTMLInputElement).value);
             await this.render();
         });
 
@@ -353,9 +386,9 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
     static async #onNext(this: OD6SCreateCharacter): Promise<void> {
         if (this.step === 1) {
             await this.actor.sheet._onClearCharacterTemplate();
-            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: any) => i.id));
+            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: Item) => i.id));
             const template = await od6sutilities.getItemByName(
-                this.characterTemplates.find((i: any) => i._id === this.selectedTemplate).name);
+                this.characterTemplates.find((i) => i._id === this.selectedTemplate)!.name);
             await this.actor.sheet._addCharacterTemplate(template);
             await this.actor.sheet.getData();
         }
@@ -366,7 +399,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
     static async #onBack(this: OD6SCreateCharacter): Promise<void> {
         if (this.step === 2) {
             await this.actor.sheet._onClearCharacterTemplate();
-            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: any) => i.id));
+            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: Item) => i.id));
         }
         this.skillScore = OD6S.initialSkills;
         this.specScore = 0;
@@ -395,7 +428,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             ui.notifications.warn(game.i18n.localize("OD6S.ERR_SPECIALIZATION_NAME"));
             return;
         }
-        if (this.actor.specializations.find((s: any) => s.name === name)) {
+        if ((this.actor as unknown as { specializations: Item[] }).specializations.find((s) => s.name === name)) {
             ui.notifications.warn(game.i18n.localize("OD6S.ERR_SPECIALIZATION_EXISTS"));
             return;
         }
@@ -442,7 +475,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             this.actor.sheet.render(true);
         } else {
             await this.actor.sheet._onClearCharacterTemplate();
-            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: any) => i.id));
+            await this.actor.deleteEmbeddedDocuments("Item", this.actor.items.map((i: Item) => i.id));
         }
         return this;
     }
