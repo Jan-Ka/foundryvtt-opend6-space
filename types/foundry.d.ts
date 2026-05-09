@@ -107,6 +107,7 @@ declare namespace foundry {
                 _onRender(context: object, options: object): void;
                 _prepareContext(options?: object): Promise<object>;
                 _configureRenderOptions(options: object): void;
+                tabGroups?: Record<string, string>;
             }
 
             function HandlebarsApplicationMixin<T extends new (...args: any[]) => any>(
@@ -138,6 +139,9 @@ declare namespace foundry {
                 get document(): Item;
                 get actor(): Actor | null;
                 get isEditable(): boolean;
+            }
+            class ActiveEffectConfig extends applications.api.ApplicationV2 {
+                constructor(options?: { document?: ActiveEffect } & Record<string, unknown>);
             }
         }
 
@@ -200,7 +204,8 @@ declare namespace foundry {
             }
             /** v14-namespaced TextEditor utility (replaces the global `TextEditor`) */
             class TextEditor {
-                static getDragEventData(event: DragEvent): any;
+                static implementation: typeof TextEditor;
+                static getDragEventData(event: DragEvent): Record<string, unknown>;
                 static enrichHTML(content: string, options?: any): Promise<string>;
                 static create(options?: any): Promise<any>;
                 [key: string]: any;

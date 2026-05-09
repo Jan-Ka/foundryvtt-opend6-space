@@ -392,6 +392,17 @@ interface OD6SManifestationItemSystem extends OD6SItemBase {
     >;
 }
 
+/**
+ * Entry shape for `system.items` arrays carried by item-group / template items.
+ * The runtime objects also accumulate ad-hoc keys, so an index signature is included.
+ */
+interface OD6STemplateItemEntry {
+    name: string;
+    type: string;
+    description?: string;
+    [key: string]: unknown;
+}
+
 interface OD6SCharacterTemplateItemSystem extends OD6SItemBase {
     species: string;
     attributes: Record<"agi" | "str" | "kno" | "mec" | "per" | "tec" | "met", number>;
@@ -401,7 +412,7 @@ interface OD6SCharacterTemplateItemSystem extends OD6SItemBase {
     credits: number;
     move: number;
     me: boolean;
-    items: Array<Record<string, unknown>>;
+    items: OD6STemplateItemEntry[];
 }
 
 interface OD6SActionItemSystem extends OD6SItemBase {
@@ -457,12 +468,12 @@ interface OD6SStarshipGearItemSystem extends OD6SItemBase, OD6SEquipment, OD6SEq
 
 interface OD6SSpeciesTemplateItemSystem extends OD6SItemBase {
     attributes: Record<"agi" | "str" | "kno" | "mec" | "per" | "tec" | "met", { min: number; max: number }>;
-    items: Array<Record<string, unknown>>;
+    items: OD6STemplateItemEntry[];
 }
 
 interface OD6SItemGroupSystem extends OD6SItemBase {
     actor_types: string[];
-    items: Array<Record<string, unknown>>;
+    items: OD6STemplateItemEntry[];
 }
 
 /** Discriminated union of all 18 OD6S item subtype system shapes. */

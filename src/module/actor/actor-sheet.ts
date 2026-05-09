@@ -136,7 +136,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         const root = this.element as HTMLElement;
 
-        bindPrimaryTabs(this as any, root);
+        bindPrimaryTabs(this, root);
 
         // Roll triggers must be bound for any owner regardless of edit mode —
         // V2 sheets render in PLAY mode by default (isEditable === false), but
@@ -241,13 +241,14 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         await this.render();
     }
 
-    async _onAvailableActionAdd(event: any) {
+    async _onAvailableActionAdd(event: Event) {
+        const target = event.currentTarget as HTMLElement;
         await this._createAction({
-            name: event.currentTarget.dataset.name,
+            name: target.dataset.name!,
             type: "availableaction",
-            subtype: event.currentTarget.dataset.type,
-            itemId: event.currentTarget.dataset.id,
-            rollable: event.currentTarget.dataset.rollable,
+            subtype: target.dataset.type!,
+            itemId: target.dataset.id,
+            rollable: target.dataset.rollable,
         });
     }
 
@@ -311,7 +312,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Utility Methods                              */
     /* -------------------------------------------- */
 
-    _isEquippable(itemType: any) {
+    _isEquippable(itemType: string) {
         return OD6S.equippable.includes(itemType);
     }
 
@@ -361,9 +362,10 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         return rollAvailableAction(this, ev);
     }
 
-    async _editEffect(ev: any) {
-        const effect = this.document.effects.find((e: any) => e.id === ev.currentTarget.dataset.effectId);
-        new (foundry.applications.sheets as any).ActiveEffectConfig({document: effect}).render({force: true});
+    async _editEffect(ev: Event) {
+        const target = ev.currentTarget as HTMLElement;
+        const effect = this.document.effects.find((e: ActiveEffect) => e.id === target.dataset.effectId);
+        new foundry.applications.sheets.ActiveEffectConfig({document: effect}).render({force: true});
     }
 
     /* -------------------------------------------- */

@@ -3,9 +3,23 @@ import OD6S from "../../config/config-od6s";
 import {isSkillItem} from "../../system/type-guards";
 
 /**
+ * Minimal sheet shape used by the template helpers. Avoiding `OD6SActorSheet`
+ * here breaks the actor-sheet ↔ helpers import cycle.
+ */
+interface ActorSheetLike {
+    document: Actor;
+    render: () => unknown;
+}
+
+/**
  * Add a character template to an actor via drop.
  */
-export async function onDropCharacterTemplate(sheet: any, event: any, item: any, _data: any) {
+export async function onDropCharacterTemplate(
+    sheet: ActorSheetLike,
+    _event: Event,
+    item: OD6SCharacterTemplateItem,
+    _data: Record<string, unknown>,
+): Promise<false | undefined> {
     if (!sheet.document.isOwner) return false;
     if (sheet.document.type !== 'character') return false;
     // Check if a template has already been assigned to this actor
@@ -20,10 +34,12 @@ export async function onDropCharacterTemplate(sheet: any, event: any, item: any,
 /**
  * Add a species template to an actor via drop.
  */
-export async function onDropSpeciesTemplate(sheet: any, event: any, item: any, _data: any) {
-    const update: any = {};
-    update.system = {};
-
+export async function onDropSpeciesTemplate(
+    sheet: ActorSheetLike,
+    _event: Event,
+    item: OD6SSpeciesTemplateItem,
+    _data: Record<string, unknown>,
+): Promise<false | undefined> {
     if (!sheet.document.isOwner) return false;
     if (sheet.document.type !== 'character' && sheet.document.type !== 'npc') return false;
     if (sheet.document.items.find((E: Item) => E.type === 'species-template')) {
@@ -31,13 +47,15 @@ export async function onDropSpeciesTemplate(sheet: any, event: any, item: any, _
         return false;
     }
 
-    update.system.attributes = {};
+    const update: Record<string, unknown> = {};
+    const attributes: Record<string, { min: number; max: number }> = {};
     for (const attribute in item.system.attributes) {
-        update.system.attributes[attribute] = {};
-        update.system.attributes[attribute].min = item.system.attributes[attribute].min;
-        update.system.attributes[attribute].max = item.system.attributes[attribute].max;
+        attributes[attribute] = {
+            min: item.system.attributes[attribute as keyof typeof item.system.attributes].min,
+            max: item.system.attributes[attribute as keyof typeof item.system.attributes].max,
+        };
     }
-
+    update.system = {attributes};
     update['system.species.content'] = item.name;
     update.id = sheet.document.id;
     await sheet.document.update(update, {diff: true});
@@ -53,7 +71,12 @@ export async function onDropSpeciesTemplate(sheet: any, event: any, item: any, _
 /**
  * Add an item group to an actor via drop.
  */
-export async function onDropItemGroup(sheet: any, event: any, item: any, _data: any) {
+export async function onDropItemGroup(
+    sheet: ActorSheetLike,
+    _event: Event,
+    item: OD6SItemGroupItem,
+    _data: Record<string, unknown>,
+): Promise<false | undefined> {
     if (!sheet.document.isOwner) return false;
 
     // Compare group target type to actor type
@@ -69,27 +92,31 @@ export async function onDropItemGroup(sheet: any, event: any, item: any, _data: 
 /**
  * Apply a character template to an actor.
  */
-export async function addCharacterTemplate(sheet: any, item: any) {
+export async function addCharacterTemplate(
+    sheet: ActorSheetLike,
+    item: OD6SCharacterTemplateItem,
+): Promise<void> {
     const itemData = item.system;
-    const update: any = {};
-    update.system = {};
+    const update: Record<string, unknown> = {};
+    const system: Record<string, unknown> = {};
 
     // Set the actor's data to be equal to the data found in the template
-    update.system['chartype.content'] = item.name;
-    if (update.system['species.content'] === '') {
-        update.system['species.content'] = itemData.species;
+    system['chartype.content'] = item.name;
+    if (system['species.content'] === '') {
+        system['species.content'] = itemData.species;
     }
-    update.system['fatepoints.value'] = itemData.fp;
-    update.system['characterpoints.value'] = itemData.cp;
-    update.system['credits.value'] = itemData.credits;
-    update.system['funds.score'] = itemData.funds;
-    update.system['move.value'] = itemData.move;
-    update.system['background.content'] = itemData.description;
-    update.system['metaphysicsextranormal.value'] = itemData.me;
+    system['fatepoints.value'] = itemData.fp;
+    system['characterpoints.value'] = itemData.cp;
+    system['credits.value'] = itemData.credits;
+    system['funds.score'] = itemData.funds;
+    system['move.value'] = itemData.move;
+    system['background.content'] = itemData.description;
+    system['metaphysicsextranormal.value'] = itemData.me;
 
     for (const attribute in itemData.attributes) {
-        update.system[`attributes.${attribute}.base`] = itemData.attributes[attribute];
+        system[`attributes.${attribute}.base`] = itemData.attributes[attribute as keyof typeof itemData.attributes];
     }
+    update.system = system;
     update.id = sheet.document.id;
     await sheet.document.update(update, {diff: true});
 
@@ -103,10 +130,13 @@ export async function addCharacterTemplate(sheet: any, item: any) {
 /**
  * Takes an array of item names and returns an array of items.
  */
-export async function templateItems(sheet: any, itemList: any) {
+export async function templateItems(
+    sheet: ActorSheetLike,
+    itemList: OD6STemplateItemEntry[],
+): Promise<Item[]> {
     // Loop through template items and add to actor from world, then compendia.
     // Filter out items if config is set to do so.
-    const result = [];
+    const result: Item[] = [];
     for (const i of itemList) {
         let templateItem: Item | null | undefined = await od6sutilities._getItemFromWorld(i.name);
         if (typeof (templateItem) === 'undefined' || templateItem === null) {
@@ -119,7 +149,7 @@ export async function templateItems(sheet: any, itemList: any) {
         if ((i.type === 'advantage' || i.type === 'disadvantage') &&
             game.settings.get('od6s', 'hide_advantages_disadvantages')) continue;
         if (typeof i.description !== 'undefined' && i.description !== '' && i.description !== null) {
-            templateItem.description = i.description;
+            (templateItem as Item & { description?: string }).description = i.description;
         }
 
         // Filter out duplicate skills/specializations by name
@@ -143,33 +173,33 @@ export async function templateItems(sheet: any, itemList: any) {
 /**
  * Clear the character template from an actor.
  */
-export async function onClearCharacterTemplate(sheet: any) {
+export async function onClearCharacterTemplate(sheet: ActorSheetLike): Promise<boolean> {
     // Find the template
-    const item = sheet.document.items.find((E: Item) => E.type === 'character-template');
+    const item = sheet.document.items.find((E: Item) => E.type === 'character-template') as
+        OD6SCharacterTemplateItem | undefined;
     if (item) {
         const itemData = item.system;
-        const update: any = {};
-        update.system = {};
+        const system: Record<string, unknown> = {};
 
         // Clear template stuff from the actor
         for (const attribute in itemData.attributes) {
-            update.system[`attributes.${attribute}.base`] = 0;
+            system[`attributes.${attribute}.base`] = 0;
         }
 
-        update.system['chartype.content'] = "";
+        system['chartype.content'] = "";
         const speciesTemplate = sheet.document.items.find((E: Item) => E.type === 'species-template');
-        if (!speciesTemplate) update.system['species.content'] = "";
-        update.system['fatepoints.value'] = 0;
-        update.system['characterpoints.value'] = 0;
-        update.system['credits.value'] = 0;
-        update.system['funds.score'] = 0;
-        update.system['background.content'] = "";
-        update.system['metaphysicsextranormal.value'] = false;
-        update.system['move.value'] = 10;
-        update.id = sheet.document.id;
+        if (!speciesTemplate) system['species.content'] = "";
+        system['fatepoints.value'] = 0;
+        system['characterpoints.value'] = 0;
+        system['credits.value'] = 0;
+        system['funds.score'] = 0;
+        system['background.content'] = "";
+        system['metaphysicsextranormal.value'] = false;
+        system['move.value'] = 10;
+        const update: Record<string, unknown> = {system, id: sheet.document.id};
         await sheet.document.update(update, {diff: true});
 
-        if (itemData.items !== null && typeof(itemData.items !== 'undefined')) {
+        if (itemData.items != null) {
             for (const templateItem of itemData.items) {
                 const actorItem = sheet.document.items.find((I: Item) => I.name === templateItem.name);
                 if (typeof (actorItem) !== 'undefined') {
@@ -190,26 +220,27 @@ export async function onClearCharacterTemplate(sheet: any) {
 /**
  * Clear the species template from an actor.
  */
-export async function onClearSpeciesTemplate(sheet: any) {
-    // Find the template
-    const update: any = {};
-    update.system = {};
-
-    const item = sheet.document.items.find((E: Item) => E.type === 'species-template');
+export async function onClearSpeciesTemplate(sheet: ActorSheetLike): Promise<boolean> {
+    const item = sheet.document.items.find((E: Item) => E.type === 'species-template') as
+        OD6SSpeciesTemplateItem | undefined;
     if (item) {
         const itemData = item.system;
+        const update: Record<string, unknown> = {};
 
         // Set attribute min/max to default
-        for (const attribute in sheet.document.system.attributes) {
+        const docSystem = sheet.document.system as { attributes?: Record<string, unknown> };
+        for (const attribute in docSystem.attributes ?? {}) {
             if (attribute !== 'met') {
-                update[`system.attributes.${attribute}`] = {};
-                update[`system.attributes.${attribute}`].min = OD6S.pipsPerDice * OD6S.speciesMinDice;
-                update[`system.attributes.${attribute}`].max = OD6S.pipsPerDice * OD6S.speciesMaxDice;
+                update[`system.attributes.${attribute}`] = {
+                    min: OD6S.pipsPerDice * OD6S.speciesMinDice,
+                    max: OD6S.pipsPerDice * OD6S.speciesMaxDice,
+                };
             }
         }
 
         // Clear the species name from the template; check if a character template is applied and replace it from there
-        const characterTemplate = sheet.document.items.find((E: Item) => E.type === 'character-template');
+        const characterTemplate = sheet.document.items.find((E: Item) => E.type === 'character-template') as
+            OD6SCharacterTemplateItem | undefined;
         if (characterTemplate) {
             update[`system.species.content`] = characterTemplate.system.species;
         } else {
@@ -217,7 +248,7 @@ export async function onClearSpeciesTemplate(sheet: any) {
         }
 
         // Remove items
-        if (itemData.items !== null && typeof(itemData.items !== 'undefined')) {
+        if (itemData.items != null) {
             for (const templateItem of itemData.items) {
                 const actorItem = sheet.document.items.find((I: Item) => I.name === templateItem.name);
                 if (typeof (actorItem) !== 'undefined') {

@@ -1,7 +1,13 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {onDropCharacterTemplate, onDropItemGroup, onDropSpeciesTemplate} from "./templates";
-import {isSkillItem, isSpecializationItem} from "../../system/type-guards";
+import {
+    isCharacterTemplateItem,
+    isItemGroupItem,
+    isSkillItem,
+    isSpecializationItem,
+    isSpeciesTemplateItem,
+} from "../../system/type-guards";
 
 /**
  * Override for the _onDrop handler.
@@ -32,11 +38,14 @@ export async function onDrop(sheet: any, event: any) {
             const item = await Item.fromDropData(data);
             switch (item.type) {
                 case "character-template":
-                    return onDropCharacterTemplate(sheet, event, item, data);
+                    if (isCharacterTemplateItem(item)) return onDropCharacterTemplate(sheet, event, item, data);
+                    return;
                 case "item-group":
-                    return onDropItemGroup(sheet, event, item, data);
+                    if (isItemGroupItem(item)) return onDropItemGroup(sheet, event, item, data);
+                    return;
                 case "species-template":
-                    return onDropSpeciesTemplate(sheet, event, item, data);
+                    if (isSpeciesTemplateItem(item)) return onDropSpeciesTemplate(sheet, event, item, data);
+                    return;
                 case "skill": {
                     if (!isSkillItem(item)) return;
                     const sys = item.system;

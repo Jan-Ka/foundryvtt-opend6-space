@@ -57,6 +57,10 @@ export function isCharacterTemplateItem(item: Item): item is OD6SCharacterTempla
     return item.type === "character-template";
 }
 
+export function isSpeciesTemplateItem(item: Item): item is OD6SSpeciesTemplateItem {
+    return item.type === "species-template";
+}
+
 /**
  * Combined guard for the three template-shaped item types whose system data
  * carries a `system.items` array (item-group, character-template, species-template).

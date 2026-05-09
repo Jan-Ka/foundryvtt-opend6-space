@@ -8,6 +8,9 @@ import {isItemGroupItem, isTemplateLikeItem, isWeaponItem} from "../system/type-
 const {HandlebarsApplicationMixin, DialogV2} = foundry.applications.api;
 const ItemSheetV2 = foundry.applications.sheets.ItemSheetV2;
 
+/** Drop payload returned by TextEditor.getDragEventData — type/uuid plus arbitrary extras. */
+type DropData = Record<string, unknown> & { type?: string; uuid?: string };
+
 /**
  * OD6S item sheet — ApplicationV2 with HandlebarsApplicationMixin.
  *
@@ -43,7 +46,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         };
     }
 
-    async _renderHTML(_context: any, options: any): Promise<Record<string, HTMLElement>> {
+    async _renderHTML(_context: object, options: object): Promise<Record<string, HTMLElement>> {
         const context = await this._prepareContext(options);
         const html = await foundry.applications.handlebars.renderTemplate(this.template, context);
         const tempEl = document.createElement("div");
@@ -54,7 +57,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         return {body: element};
     }
 
-    _replaceHTML(result: Record<string, HTMLElement>, content: HTMLElement, _options: any): void {
+    _replaceHTML(result: Record<string, HTMLElement>, content: HTMLElement, _options: object): void {
         content.replaceChildren(result.body);
     }
 
@@ -63,7 +66,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
         const root = this.element as HTMLElement;
 
-        bindPrimaryTabs(this as any, root);
+        bindPrimaryTabs(this, root);
 
         if (!this.isEditable) return;
         const $ = (sel: string): NodeListOf<HTMLElement> => root.querySelectorAll(sel);
@@ -94,23 +97,23 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     async _onDrop(event: DragEvent): Promise<void> {
         event.preventDefault();
-        let data: any;
+        let data: DropData;
         try {
-            data = (foundry.applications.ux.TextEditor as any).implementation.getDragEventData(event);
+            data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event) as DropData;
         } catch {
             return;
         }
 
-        let item: any = "";
+        let item: Item | undefined;
         if (data.type === "Item") {
             item = await this._onDropItem(event, data);
         }
-        if (typeof item === "undefined") return;
+        if (!item) return;
 
         await this._addTemplateItemAction(item.name, item.type, this);
     }
 
-    async _onDropItem(_event: DragEvent, data: any): Promise<any> {
+    async _onDropItem(_event: DragEvent, data: DropData): Promise<Item | undefined> {
         const item = await Item.implementation.fromDropData(data);
 
         switch (this.item.type) {
@@ -121,7 +124,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
             case "weapon":
                 if (item.type === "specialization" && isWeaponItem(this.item)) {
-                    this.item.system.stats.specialization = (item as Item).name;
+                    this.item.system.stats.specialization = item.name;
                     await this.item.update(this.item.system, {diff: true});
                 }
         }
@@ -136,7 +139,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (!isItemGroupItem(this.item)) return;
         const item = this.item;
         const data = {
-            actorTypes: game.od6s.OD6SActor.TYPES.filter((i: any) => !item.system.actor_types.includes(i)),
+            actorTypes: game.od6s.OD6SActor.TYPES.filter((i: string) => !item.system.actor_types.includes(i)),
         };
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-add-actor-type.html", data);
@@ -148,37 +151,32 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (result?.["actor-type"]) await this._addActorTypeAction(result["actor-type"]);
     }
 
-    async _addActorTypeAction(type: any): Promise<void> {
+    async _addActorTypeAction(type: string): Promise<void> {
         if (!isItemGroupItem(this.item)) return;
         const item = this.item;
-        const update: any = {id: item.id, system: {actor_types: item.system.actor_types}};
-        update.system.actor_types.push(type);
-        await item.update(update);
+        const actorTypes = [...item.system.actor_types, type];
+        await item.update({id: item.id, system: {actor_types: actorTypes}});
     }
 
-    async _deleteActorType(ev: any): Promise<void> {
+    async _deleteActorType(ev: Event): Promise<void> {
         if (!isItemGroupItem(this.item)) return;
         const item = this.item;
-        const type = ev.currentTarget.dataset.type;
-        const update: any = {
-            id: item.id,
-            system: {
-                actor_types: item.system.actor_types.filter((i: any) => i !== type),
-                items: [],
-            },
-        };
-        for (const i of item.system.items) {
-            for (const t of update.system.actor_types) {
-                if (OD6S.allowedItemTypes[t].includes(i.type as string)) {
-                    update.system.items.push(i);
+        const target = ev.currentTarget as HTMLElement;
+        const type = target.dataset.type;
+        const actorTypes = item.system.actor_types.filter((i: string) => i !== type);
+        const items: OD6STemplateItemEntry[] = [];
+        for (const i of item.system.items as OD6STemplateItemEntry[]) {
+            for (const t of actorTypes) {
+                if (OD6S.allowedItemTypes[t].includes(i.type)) {
+                    items.push(i);
                     break;
                 }
             }
         }
-        await this.item.update(update);
+        await this.item.update({id: item.id, system: {actor_types: actorTypes, items}});
     }
 
-    async _addLabel(_ev: any): Promise<void> {
+    async _addLabel(): Promise<void> {
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-add-label.html",
             {id: this.item.id});
@@ -190,7 +188,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (result?.key) await this._addLabelAction(result.key, result.value);
     }
 
-    async _addLabelAction(key: any, value: any): Promise<void> {
+    async _addLabelAction(key: string, value: string): Promise<void> {
         if (this.item.system.labels[key]) {
             ui.notifications.warn(game.i18n.localize("OD6S.LABEL_ALREADY_EXISTS"));
             return;
@@ -198,48 +196,55 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         await this.item.update({id: this.item.id, [`system.labels.${key}`]: value});
     }
 
-    async _editLabel(ev: any): Promise<void> {
+    async _editLabel(ev: Event): Promise<void> {
+        const target = ev.currentTarget as HTMLElement;
+        const input = ev.target as HTMLInputElement;
         await this.item.update({
             id: this.item.id,
-            [`system.labels.${ev.currentTarget.dataset.key}`]: ev.target.value,
+            [`system.labels.${target.dataset.key}`]: input.value,
         });
     }
 
-    async _deleteLabel(ev: any): Promise<void> {
+    async _deleteLabel(ev: Event): Promise<void> {
+        const target = ev.currentTarget as HTMLElement;
         await this.item.update({
             id: this.item.id,
             system: this.item.system,
-            [`system.labels.-=${ev.currentTarget.dataset.key}`]: null,
+            [`system.labels.-=${target.dataset.key}`]: null,
         });
     }
 
     async _addEffect(): Promise<void> {
         const name = game.i18n.localize("OD6S.NEW_ACTIVE_EFFECT");
         const effect = await this.document.createEmbeddedDocuments("ActiveEffect", [{label: name}]);
-        new (foundry.applications.sheets as any).ActiveEffectConfig({document: effect[0]}).render({force: true});
+        new foundry.applications.sheets.ActiveEffectConfig({document: effect[0]}).render({force: true});
     }
 
-    async _editEffect(ev: any): Promise<void> {
-        const effect = this.document.getEmbeddedDocument("ActiveEffect", ev.currentTarget.dataset.effectId);
-        new (foundry.applications.sheets as any).ActiveEffectConfig({document: effect}).render({force: true});
+    async _editEffect(ev: Event): Promise<void> {
+        const target = ev.currentTarget as HTMLElement;
+        const effect = this.document.getEmbeddedDocument("ActiveEffect", target.dataset.effectId!);
+        new foundry.applications.sheets.ActiveEffectConfig({document: effect}).render({force: true});
     }
 
-    async _deleteEffect(ev: any): Promise<void> {
-        await this.document.deleteEmbeddedDocuments("ActiveEffect", [ev.currentTarget.dataset.effectId]);
+    async _deleteEffect(ev: Event): Promise<void> {
+        const target = ev.currentTarget as HTMLElement;
+        await this.document.deleteEmbeddedDocuments("ActiveEffect", [target.dataset.effectId!]);
     }
 
     /* -------------------------------------------- */
     /*  Numeric edit handlers (skill/spec/damage…)   */
     /* -------------------------------------------- */
 
-    async _editSkill(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        const oldDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.base);
-        let newScore: any;
-        if (event.target.id === "dice") {
-            newScore = od6sutilities.getScoreFromDice(event.target.value, oldDice.pips);
-        } else if (event.target.id === "pips") {
-            newScore = od6sutilities.getScoreFromDice(oldDice.dice, event.target.value);
+    async _editSkill(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        const oldDice = od6sutilities.getDiceFromScore(Number(target.dataset.base ?? 0));
+        let newScore: number | undefined;
+        if (input.id === "dice") {
+            newScore = od6sutilities.getScoreFromDice(Number(input.value), oldDice.pips);
+        } else if (input.id === "pips") {
+            newScore = od6sutilities.getScoreFromDice(oldDice.dice, Number(input.value));
         }
         if (this.actor != null) {
             await this.actor.updateEmbeddedDocuments("Item", [{id: itemId, _id: itemId, "system.base": newScore}]);
@@ -249,14 +254,16 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         }
     }
 
-    async _editSpecialization(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        const oldDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.score);
-        let newScore: any;
-        if (event.target.id === "system.die.dice") {
-            newScore = od6sutilities.getScoreFromDice(event.target.value, oldDice.pips);
-        } else if (event.target.id === "system.die.pips") {
-            newScore = od6sutilities.getScoreFromDice(oldDice.dice, event.target.value);
+    async _editSpecialization(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        const oldDice = od6sutilities.getDiceFromScore(Number(target.dataset.score ?? 0));
+        let newScore: number | undefined;
+        if (input.id === "system.die.dice") {
+            newScore = od6sutilities.getScoreFromDice(Number(input.value), oldDice.pips);
+        } else if (input.id === "system.die.pips") {
+            newScore = od6sutilities.getScoreFromDice(oldDice.dice, Number(input.value));
         }
         if (this.actor != null) {
             await this.actor.updateEmbeddedDocuments("Item", [{id: itemId, _id: itemId, "system.base": newScore}]);
@@ -266,45 +273,49 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         }
     }
 
-    async _editWeaponDamage(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        if (event.currentTarget.dataset.score === "") event.currentTarget.dataset.score = 0;
-        const oldDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.score);
-        let newDamage: any;
-        if (event.target.id === "dice") newDamage = od6sutilities.getScoreFromDice(event.target.value, oldDice.pips);
-        else if (event.target.id === "pips") newDamage = od6sutilities.getScoreFromDice(oldDice.dice, event.target.value);
+    async _editWeaponDamage(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        if (target.dataset.score === "") target.dataset.score = "0";
+        const oldDice = od6sutilities.getDiceFromScore(Number(target.dataset.score ?? 0));
+        let newDamage: number | undefined;
+        if (input.id === "dice") newDamage = od6sutilities.getScoreFromDice(Number(input.value), oldDice.pips);
+        else if (input.id === "pips") newDamage = od6sutilities.getScoreFromDice(oldDice.dice, Number(input.value));
 
-        const update: any = {_id: itemId, system: {damage: {score: newDamage}}};
         if (this.actor != null) {
-            await this.actor.updateEmbeddedDocuments("Item", [update]);
+            await this.actor.updateEmbeddedDocuments("Item", [{_id: itemId, system: {damage: {score: newDamage}}}]);
         } else {
             await this.item.update({"system.damage.score": newDamage}, {diff: true});
         }
     }
 
-    async _editWeaponStunDamage(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        if (event.currentTarget.dataset.score === "") event.currentTarget.dataset.score = 0;
-        const oldDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.score);
-        let newDamage: any;
-        if (event.target.id === "dice") newDamage = od6sutilities.getScoreFromDice(event.target.value, oldDice.pips);
-        else if (event.target.id === "pips") newDamage = od6sutilities.getScoreFromDice(oldDice.dice, event.target.value);
+    async _editWeaponStunDamage(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        if (target.dataset.score === "") target.dataset.score = "0";
+        const oldDice = od6sutilities.getDiceFromScore(Number(target.dataset.score ?? 0));
+        let newDamage: number | undefined;
+        if (input.id === "dice") newDamage = od6sutilities.getScoreFromDice(Number(input.value), oldDice.pips);
+        else if (input.id === "pips") newDamage = od6sutilities.getScoreFromDice(oldDice.dice, Number(input.value));
 
-        const update: any = {_id: itemId, system: {stun: {score: newDamage}}};
         if (this.actor != null) {
-            await this.actor.updateEmbeddedDocuments("Item", [update]);
+            await this.actor.updateEmbeddedDocuments("Item", [{_id: itemId, system: {stun: {score: newDamage}}}]);
         } else {
             await this.item.update({"system.stun.score": newDamage}, {diff: true});
         }
     }
 
-    async _editWeaponFireControl(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        if (event.currentTarget.dataset.score === "") event.currentTarget.dataset.score = 0;
-        const oldDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.score);
-        let newScore: any;
-        if (event.target.id === "dice") newScore = od6sutilities.getScoreFromDice(event.target.value, oldDice.pips);
-        else if (event.target.id === "pips") newScore = od6sutilities.getScoreFromDice(oldDice.dice, event.target.value);
+    async _editWeaponFireControl(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        if (target.dataset.score === "") target.dataset.score = "0";
+        const oldDice = od6sutilities.getDiceFromScore(Number(target.dataset.score ?? 0));
+        let newScore: number | undefined;
+        if (input.id === "dice") newScore = od6sutilities.getScoreFromDice(Number(input.value), oldDice.pips);
+        else if (input.id === "pips") newScore = od6sutilities.getScoreFromDice(oldDice.dice, Number(input.value));
 
         if (this.actor != null) {
             await this.actor.updateEmbeddedDocuments("Item",
@@ -314,25 +325,23 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         }
     }
 
-    async _editArmor(event: any): Promise<void> {
-        const itemId = event.currentTarget.dataset.itemId;
-        const update: any = {id: itemId, _id: itemId, system: {}};
-        const oldPrDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.pr);
-        const oldErDice = od6sutilities.getDiceFromScore(event.currentTarget.dataset.er);
-        let newScore: any;
-        if (event.target.id === "prDice") {
-            newScore = od6sutilities.getScoreFromDice(event.target.value, oldPrDice.pips);
-            update.system.pr = newScore;
-        } else if (event.target.id === "prPips") {
-            newScore = od6sutilities.getScoreFromDice(oldPrDice.dice, event.target.value);
-            update.system.pr = newScore;
-        } else if (event.target.id === "erDice") {
-            newScore = od6sutilities.getScoreFromDice(event.target.value, oldErDice.pips);
-            update.system.er = newScore;
-        } else if (event.target.id === "erPips") {
-            newScore = od6sutilities.getScoreFromDice(oldErDice.dice, event.target.value);
-            update.system.er = newScore;
+    async _editArmor(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const input = event.target as HTMLInputElement;
+        const itemId = target.dataset.itemId;
+        const system: { pr?: number; er?: number } = {};
+        const oldPrDice = od6sutilities.getDiceFromScore(Number(target.dataset.pr ?? 0));
+        const oldErDice = od6sutilities.getDiceFromScore(Number(target.dataset.er ?? 0));
+        if (input.id === "prDice") {
+            system.pr = od6sutilities.getScoreFromDice(Number(input.value), oldPrDice.pips);
+        } else if (input.id === "prPips") {
+            system.pr = od6sutilities.getScoreFromDice(oldPrDice.dice, Number(input.value));
+        } else if (input.id === "erDice") {
+            system.er = od6sutilities.getScoreFromDice(Number(input.value), oldErDice.pips);
+        } else if (input.id === "erPips") {
+            system.er = od6sutilities.getScoreFromDice(oldErDice.dice, Number(input.value));
         }
+        const update = {id: itemId, _id: itemId, system};
         if (this.actor != null) {
             await this.actor.updateEmbeddedDocuments("Item", [update]);
         } else {
@@ -344,21 +353,24 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     /*  Template item handlers                       */
     /* -------------------------------------------- */
 
-    async _getGameItemsByType(type: any): Promise<any[]> {
-        const compendia = await od6sutilities.getItemsFromCompendiumByType(type);
-        const world = await od6sutilities.getItemsFromWorldByType(type);
-        const data = compendia.concat(world);
-        return data.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    async _getGameItemsByType(
+        type: string,
+    ): Promise<Array<{_id: string; name: string; type: string; description?: string}>> {
+        const compendia = await od6sutilities.getItemsFromCompendiumByType(type as OD6SItemType);
+        const world = await od6sutilities.getItemsFromWorldByType(type as OD6SItemType);
+        const data = [...compendia, ...world];
+        return data.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    async _addTemplateItem(event: any): Promise<void> {
-        const type = event.currentTarget.dataset.type;
+    async _addTemplateItem(event: Event): Promise<void> {
+        const target = event.currentTarget as HTMLElement;
+        const type = target.dataset.type!;
         const templateItems = await Promise.all(await this._getGameItemsByType(type));
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-template-add.html",
             {templateItems});
         const label = game.i18n.localize(
-            game.system.template.Item[event.currentTarget.dataset.type].label);
+            game.system.template.Item[type].label);
         const result = await DialogV2.input({
             window: {title: game.i18n.localize("OD6S.ADD") + " " + label + "!"},
             content,
@@ -367,7 +379,7 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (result?.itemname) await this._addTemplateItemAction(result.itemname, type, this);
     }
 
-    async _addTemplateItemAction(name: any, type: any, itemSheet: any): Promise<void> {
+    async _addTemplateItemAction(name: string, type: string, itemSheet: OD6SItemSheet): Promise<void> {
         if (isItemGroupItem(this.item)) {
             const item = this.item;
             let allowed = false;
@@ -386,20 +398,23 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
             return;
         }
 
+        if (!isTemplateLikeItem(itemSheet.item)) return;
+        const sheetItem = itemSheet.item;
         const item = await od6sutilities.getItemByName(name);
-        const description = item ? (item.system as { description?: string }).description ?? "" : "";
-        const newItem = {name, type, description};
-        (itemSheet.item.system as { items: unknown[] }).items.push(newItem);
-        await itemSheet.item.update(
-            {id: itemSheet.id, system: itemSheet.item.system},
+        const description = item?.system.description ?? "";
+        const newItem: OD6STemplateItemEntry = {name, type, description};
+        (sheetItem.system.items as OD6STemplateItemEntry[]).push(newItem);
+        await sheetItem.update(
+            {id: sheetItem.id, system: sheetItem.system},
             {diff: true});
         await this.render();
     }
 
-    async _editTemplateItem(event: any): Promise<void> {
+    async _editTemplateItem(event: Event): Promise<void> {
         if (!isTemplateLikeItem(this.item)) return;
         const target = event.currentTarget as HTMLElement;
-        const item = this.item.system.items.find((i: any) => i.name === target.dataset.name);
+        const items = this.item.system.items as OD6STemplateItemEntry[];
+        const item = items.find((i) => i.name === target.dataset.name);
         const itemData = {name: target.dataset.name, type: target.dataset.type, description: item?.description};
         const content = await foundry.applications.handlebars.renderTemplate(
             "systems/od6s/templates/item/item-template-item-edit.html",
@@ -416,20 +431,22 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         }
     }
 
-    async _editTemplateItemAction(desc: any, event: any, itemSheet: any): Promise<void> {
-        const data = event.currentTarget.dataset;
-        const newItem = {name: data.name, type: data.type, description: desc};
-        const itemIndex = itemSheet.item.system.items.findIndex(
-            (i: any) => i.name === data.name && i.type === data.type);
+    async _editTemplateItemAction(desc: string, event: Event, itemSheet: OD6SItemSheet): Promise<void> {
+        if (!isTemplateLikeItem(itemSheet.item)) return;
+        const target = event.currentTarget as HTMLElement;
+        const data = target.dataset;
+        const newItem: OD6STemplateItemEntry = {name: data.name!, type: data.type!, description: desc};
+        const items = itemSheet.item.system.items as OD6STemplateItemEntry[];
+        const itemIndex = items.findIndex((i) => i.name === data.name && i.type === data.type);
         if (itemIndex < 0) return;
-        itemSheet.item.system.items[itemIndex] = newItem;
+        items[itemIndex] = newItem;
         await itemSheet.item.update(
             {id: itemSheet.item.id, system: itemSheet.item.system},
             {diff: false});
         await this.render();
     }
 
-    async _deleteTemplateItem(event: any): Promise<void> {
+    async _deleteTemplateItem(event: Event): Promise<void> {
         if (!isTemplateLikeItem(this.item)) return;
         const item = this.item;
         const result = await DialogV2.confirm({
@@ -439,17 +456,18 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (!result) return;
 
         const target = event.currentTarget as HTMLElement;
-        const itemIndex = item.system.items.findIndex(
-            (i: any) => i.name === target.dataset.name && i.type === target.dataset.type);
+        const items = item.system.items as OD6STemplateItemEntry[];
+        const itemIndex = items.findIndex(
+            (i) => i.name === target.dataset.name && i.type === target.dataset.type);
         if (itemIndex < 0) return;
-        item.system.items.splice(itemIndex, 1);
+        items.splice(itemIndex, 1);
         await item.update(
             {id: item.id, system: item.system},
             {diff: true});
         await this.render();
     }
 
-    async _editTemplateAttribute(event: any): Promise<void> {
+    async _editTemplateAttribute(event: Event): Promise<void> {
         const target = event.currentTarget as HTMLElement;
         const score = target.dataset.score;
         const content = await foundry.applications.handlebars.renderTemplate(
@@ -463,14 +481,20 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
         if (result) await this._editAttributeAction(result.dice, result.pips, event, this);
     }
 
-    async _editAttributeAction(dice: any, pips: any, event: any, itemSheet: any): Promise<void> {
-        const newScore = od6sutilities.getScoreFromDice(dice, pips);
+    async _editAttributeAction(
+        dice: string,
+        pips: string,
+        event: Event,
+        itemSheet: OD6SItemSheet,
+    ): Promise<void> {
+        const newScore = od6sutilities.getScoreFromDice(Number(dice), Number(pips));
         const target = event.currentTarget as HTMLElement;
         const attrname = target.dataset.attrname!;
+        const attributes = (itemSheet.item.system as { attributes: Record<string, unknown> }).attributes;
         switch (target.dataset.sub) {
-            case "base": itemSheet.item.system.attributes[attrname] = newScore; break;
-            case "min": itemSheet.item.system.attributes[attrname].min = newScore; break;
-            case "max": itemSheet.item.system.attributes[attrname].max = newScore; break;
+            case "base": attributes[attrname] = newScore; break;
+            case "min": (attributes[attrname] as { min: number }).min = newScore; break;
+            case "max": (attributes[attrname] as { max: number }).max = newScore; break;
         }
         await itemSheet.item.update(
             {id: itemSheet.item.id, system: itemSheet.item.system},
