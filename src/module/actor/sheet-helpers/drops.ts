@@ -169,7 +169,7 @@ export async function onDropItem(sheet: DropSheetLike, event: DragEvent, data: D
 
     // Handle item sorting within the same Actor
     if (item.parent !== null && data.uuid!.startsWith(item.parent.uuid)) {
-        if (sheet.document.type === 'starship' || sheet.document.type === 'vehicle' &&
+        if ((sheet.document.type === 'starship' || sheet.document.type === 'vehicle') &&
             !OD6S.allowedItemTypes[sheet.document.type].includes(itemData.type)) {
             await sheet._onSortItem(event, itemData);
             await sheet._onSortCargoItem(event, itemData);

@@ -222,7 +222,10 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     async _editEffect(ev: Event): Promise<void> {
         const target = ev.currentTarget as HTMLElement;
-        const effect = this.document.getEmbeddedDocument("ActiveEffect", target.dataset.effectId!);
+        const effectId = target.dataset.effectId;
+        if (!effectId) return;
+        const effect = this.document.getEmbeddedDocument("ActiveEffect", effectId);
+        if (!effect) return;
         new foundry.applications.sheets.ActiveEffectConfig({document: effect}).render({force: true});
     }
 

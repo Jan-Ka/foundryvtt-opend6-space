@@ -100,9 +100,13 @@ export async function addCharacterTemplate(
     const update: Record<string, unknown> = {};
     const system: Record<string, unknown> = {};
 
-    // Set the actor's data to be equal to the data found in the template
+    // Set the actor's data to be equal to the data found in the template.
+    // Only fill species from the template if the actor doesn't already have one
+    // (e.g. from a previously-applied species-template item).
     system['chartype.content'] = item.name;
-    if (system['species.content'] === '') {
+    const currentSpecies = (sheet.document.system as { species?: { content?: string } })
+        .species?.content ?? '';
+    if (currentSpecies === '') {
         system['species.content'] = itemData.species;
     }
     system['fatepoints.value'] = itemData.fp;
@@ -154,7 +158,7 @@ export async function templateItems(
 
         // Filter out duplicate skills/specializations by name
         if (i.type === 'skill' || i.type === 'specialization' || i.type === 'specialability' ||
-            i.type === 'disadvantage' || i.type === 'advanatage') {
+            i.type === 'disadvantage' || i.type === 'advantage') {
             if (sheet.document.items.filter((e: Item) => e.type === i.type && e.name === i.name).length) {
                 continue;
             }

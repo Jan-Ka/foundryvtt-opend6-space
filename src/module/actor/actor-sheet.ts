@@ -367,6 +367,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     async _editEffect(ev: Event) {
         const target = ev.currentTarget as HTMLElement;
         const effect = this.document.effects.find((e: ActiveEffect) => e.id === target.dataset.effectId);
+        if (!effect) return;
         new foundry.applications.sheets.ActiveEffectConfig({document: effect}).render({force: true});
     }
 
