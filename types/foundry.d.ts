@@ -1299,10 +1299,10 @@ declare var FormDataExtended: {
 // ---- SortingHelpers ----
 
 declare class SortingHelpers {
-    static performIntegerSort(
-        event: Event,
-        options: { target: any; siblings: any[]; sortKey?: string; sortBefore?: boolean }
-    ): { target: any; update: Record<string, any> }[];
+    static performIntegerSort<T>(
+        source: T,
+        options: { target: T | undefined | null; siblings: T[]; sortKey?: string; sortBefore?: boolean }
+    ): { target: T; update: Record<string, any> }[];
 }
 
 // ---- jQuery (for v1 Application migration period) ----

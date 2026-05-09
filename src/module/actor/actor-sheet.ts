@@ -294,19 +294,19 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Sorting Methods (delegates)                  */
     /* -------------------------------------------- */
 
-    _onSortItem(event: any, itemData: any) {
+    _onSortItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortItem(this, event, itemData);
     }
 
-    async _onSortCrew(event: any, data: any) {
+    async _onSortCrew(event: DragEvent, data: { crewUuid: string }) {
         return onSortCrew(this, event, data);
     }
 
-    async _onSortContainerItem(event: any, itemData: any) {
+    async _onSortContainerItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortContainerItem(this, event, itemData);
     }
 
-    async _onSortCargoItem(event: any, itemData: any) {
+    async _onSortCargoItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortCargoItem(this, event, itemData);
     }
 
