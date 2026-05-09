@@ -14,50 +14,47 @@
 import OD6S from "../../config/config-od6s";
 import {od6sutilities} from "../../system/utilities";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Sheet = any;
+type CrewmemberRef = {uuid: string; name?: string; sort?: number};
 
-export async function linkCrew(sheet: Sheet, uuid: string): Promise<void> {
+export async function linkCrew(vehicle: Actor, uuid: string): Promise<void> {
     // crewmembers is an array of {uuid, name, sort} objects, so .includes(uuid)
     // would always be false — match by .uuid to actually deduplicate.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existing: any[] = sheet.document.system.crewmembers;
+    const existing: CrewmemberRef[] = (vehicle.system as {crewmembers: CrewmemberRef[]}).crewmembers;
     if (existing.some((c) => c.uuid === uuid)) return;
 
     const actor = await od6sutilities.getActorFromUuid(uuid);
     let result;
     if (game.user.isGM) {
-        result = await actor!.addToCrew(sheet.document.uuid);
+        result = await actor!.addToCrew(vehicle.uuid);
     } else {
-        result = await OD6S.socket.executeAsGM("addToVehicle", game.user.id, sheet.document.uuid, uuid);
+        result = await OD6S.socket.executeAsGM("addToVehicle", game.user.id, vehicle.uuid, uuid);
     }
 
     if (result) {
-        const crew = {uuid: actor!.uuid, name: actor!.name, sort: 0};
-        await sheet.document.update({
-            id: sheet.document.id,
+        const crew: CrewmemberRef = {uuid: actor!.uuid, name: actor!.name, sort: 0};
+        await vehicle.update({
+            id: vehicle.id,
             system: {crewmembers: [...existing, crew]},
         });
     }
 }
 
-export async function unlinkCrew(sheet: Sheet, crewID: string): Promise<void> {
-    const crewMembers = sheet.document.system.crewmembers.filter(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (e: any) => e.uuid !== crewID,
+export async function unlinkCrew(vehicle: Actor, crewID: string): Promise<void> {
+    const crewMembers = (vehicle.system as {crewmembers: CrewmemberRef[]}).crewmembers.filter(
+        (e) => e.uuid !== crewID,
     );
 
     if (await fromUuid(crewID)) {
         if (game.user.isGM) {
             const actor = await od6sutilities.getActorFromUuid(crewID);
-            await actor!.removeFromCrew(sheet.document.uuid);
+            await actor!.removeFromCrew(vehicle.uuid);
         } else {
-            await OD6S.socket.executeAsGM("removeFromVehicle", game.user.id, crewID, sheet.document.uuid);
+            await OD6S.socket.executeAsGM("removeFromVehicle", game.user.id, crewID, vehicle.uuid);
         }
     }
 
-    await sheet.document.update({
-        id: sheet.document.id,
+    await vehicle.update({
+        id: vehicle.id,
         system: {crewmembers: crewMembers},
     });
 }
