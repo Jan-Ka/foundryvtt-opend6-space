@@ -1,13 +1,19 @@
 import OD6S from "../../config/config-od6s";
 import {isSkillItem} from "../../system/type-guards";
 
- 
+/**
+ * Minimal sheet shape consumed by these helpers — avoids the actor-sheet ↔
+ * helpers cycle that would result from importing `OD6SActorSheet` here.
+ */
+interface ItemCrudSheetLike {
+    document: Actor;
+    render: (force?: boolean) => unknown;
+}
 
 /**
  * Delete an item from the actor, with confirmation dialog.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function deleteItem(sheet: any, ev: Event) {
+export async function deleteItem(sheet: ItemCrudSheetLike, ev: Event) {
     const ct = ev.currentTarget as HTMLElement;
     // If this is a skill, deny if there are existing specializations.
     if (ct.dataset.type === "skill") {
@@ -37,10 +43,10 @@ export async function deleteItem(sheet: any, ev: Event) {
             content: `<p>${game.i18n.localize("OD6S.DELETE_CONFIRM")}</p>`,
         });
         if (!ok) return;
-        await sheet.document.deleteEmbeddedDocuments('Item', [itemId]);
+        if (itemId) await sheet.document.deleteEmbeddedDocuments('Item', [itemId]);
         sheet.render(false);
     } else {
-        await sheet.document.deleteEmbeddedDocuments('Item', [ct.dataset.itemId]);
+        if (ct.dataset.itemId) await sheet.document.deleteEmbeddedDocuments('Item', [ct.dataset.itemId]);
         sheet.render(false);
     }
 }
@@ -49,11 +55,9 @@ export async function deleteItem(sheet: any, ev: Event) {
  * Add an item to the actor using the add-item dialog.
  */
 export async function addItem(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sheet: any,
+    sheet: ItemCrudSheetLike,
     ev: Event,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    caller?: any,
+    caller?: unknown,
 ) {
     // Lazy-import to avoid circular dependency
     const {OD6SAddItem} = await import("../add-item.js");
@@ -61,21 +65,23 @@ export async function addItem(
 
     caller = caller ?? sheet;
     const ct = ev.currentTarget as HTMLElement;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data: Record<string, any> = {};
-    data.type = ct.dataset.type!;
+    // Templates also pass `'spec'` as a shorthand alongside the real OD6S
+    // item types, so widen the literal here.
+    const itemType = ct.dataset.type! as OD6SItemType | 'spec';
+    const data: Record<string, unknown> = {};
+    data.type = itemType;
     data.attrname = ct.dataset.attrname;
     data.new = !(typeof ct.dataset.new !== 'undefined' && ct.dataset.new === 'false');
     let worldItems: Item[] = [];
     let compendiumItems: Item[] = [];
 
-    data.label = game.i18n.localize('OD6S.ADD') + " " + game.i18n.localize(OD6S.itemLabels[data.type])
-    data.label_empty = game.i18n.localize('OD6S.ADD_EMPTY') + " " + game.i18n.localize(OD6S.itemLabels[data.type])
+    data.label = game.i18n.localize('OD6S.ADD') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
+    data.label_empty = game.i18n.localize('OD6S.ADD_EMPTY') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
 
-    worldItems = game.items.filter((i: Item) => i.type === data.type);
-    const cEntries = od6sutilities.getItemsFromCompendiumByType(data.type);
+    worldItems = game.items.filter((i: Item) => i.type === itemType);
+    const cEntries = od6sutilities.getItemsFromCompendiumByType(itemType as OD6SItemType);
 
-    if (data.type === 'skill') {
+    if (itemType === 'skill') {
         worldItems = worldItems.filter((i: Item) => isSkillItem(i) && i.system.attribute === data.attrname);
         for (const i of cEntries) {
             const item = await od6sutilities._getItemFromCompendium((i as Item).name);
@@ -91,7 +97,7 @@ export async function addItem(
     }
 
     //if it is a skill, do not include skills the actor already has
-    if (data.type === 'skill') {
+    if (itemType === 'skill') {
         worldItems = worldItems.filter((i: Item) => !sheet.document.items.find((r: Item) => r.name === i.name));
         compendiumItems = compendiumItems.filter((i: Item) => !sheet.document.items.find((r: Item) => r.name === i.name));
     }
@@ -110,12 +116,13 @@ export async function addItem(
     data.token = sheet.document.isToken === true ? sheet.document.token._id : '';
     data.actorType = sheet.document.type;
 
-    if (data.type === 'skill' || data.type === 'spec') {
-        if (data.type === 'skill' && data.attrname === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+    if (itemType === 'skill' || itemType === 'spec') {
+        if (itemType === 'skill' && data.attrname === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
             // No metaphysics attribute, set skill to default of 1D
             data.score = OD6S.pipsPerDice;
         } else {
-            data.score = sheet.document.system.attributes[data.attrname].base;
+            const attrs = (sheet.document.system as OD6SCharacterSystem).attributes;
+            data.score = attrs[data.attrname as string].base;
         }
     } else {
         data.score = 0;
@@ -127,8 +134,7 @@ export async function addItem(
 /**
  * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function onItemCreate(sheet: any, event: Event) {
+export function onItemCreate(sheet: ItemCrudSheetLike, event: Event) {
     event.preventDefault();
     const header = event.currentTarget as HTMLElement;
     // Get the type of item to create.

@@ -20,10 +20,16 @@
 
 import OD6S from "../../config/config-od6s";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Sheet = any;
+/**
+ * Minimal sheet shape used by these helpers — keeps them decoupled from
+ * `OD6SActorSheet` to avoid the actor-sheet ↔ helpers cycle.
+ */
+interface InventorySheetLike {
+    document: Actor;
+    render: () => unknown;
+}
 
-export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promise<void> {
+export async function onPurchase(sheet: InventorySheetLike, itemId: string, buyerId: string): Promise<void> {
     const seller = sheet.document;
     const buyer = game.actors.get(buyerId);
     const item = seller.items.get(itemId);
@@ -66,12 +72,17 @@ export async function onPurchase(sheet: Sheet, itemId: any, buyerId: any): Promi
         await buyer!.createEmbeddedDocuments("Item", [boughtItem]);
     }
 
-    const sellerUpdate: any = {};
+    const sellerUpdate: Record<string, number> = {};
     if (itemSystem.quantity > 0) sellerUpdate["system.quantity"] = (+itemSystem.quantity) - 1;
     await item.update(sellerUpdate);
 }
 
-export async function onTransfer(sheet: Sheet, itemId: any, senderId: any, recId: any): Promise<void> {
+export async function onTransfer(
+    sheet: InventorySheetLike,
+    itemId: string,
+    senderId: string,
+    recId: string,
+): Promise<void> {
     const sender = game.actors.get(senderId);
     const receiver = game.actors.get(recId);
     const item = sender!.items.get(itemId);
@@ -94,7 +105,7 @@ export async function onTransfer(sheet: Sheet, itemId: any, senderId: any, recId
             await receiver!.createEmbeddedDocuments("Item", [recItem]);
         }
 
-        const senderUpdate: any = {};
+        const senderUpdate: Record<string, number> = {};
         if (itemSystem.quantity > 0) senderUpdate["system.quantity"] = (+itemSystem.quantity) - 1;
         await item!.update(senderUpdate);
 
