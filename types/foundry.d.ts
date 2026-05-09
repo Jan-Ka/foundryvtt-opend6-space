@@ -1232,6 +1232,16 @@ declare namespace PIXI {
         removeChild(child: any): void;
         children: any[];
         destroy(options?: any): void;
+        on(event: string, handler: (...args: any[]) => void): this;
+        off(event: string, handler: (...args: any[]) => void): this;
+    }
+    /** Federated pointer/wheel/etc event delivered by the PIXI display tree. */
+    interface FederatedEvent {
+        data: { getLocalPosition(parent: Container): { x: number; y: number } };
+        stopPropagation(): void;
+        preventDefault(): void;
+        currentTarget: unknown;
+        target: unknown;
     }
     class Application {
         view: HTMLCanvasElement;
