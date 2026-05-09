@@ -1,6 +1,6 @@
 {
   "name": "opend6-space",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "type": "module",
   "description": "OpenD6 Space system for Foundry VTT v14. Uses the rules from the OpenD6 Project SRD.",
   "scripts": {
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.3",
     "@commitlint/config-conventional": "^20.5.3",
-    "@cyclonedx/cdxgen": "^12.3.1",
+    "@cyclonedx/cdxgen": "^12.3.3",
     "@eslint/js": "^10.0.1",
     "@foundryvtt/foundryvtt-cli": "^3.0.3",
     "@iconify-json/game-icons": "^1.2.4",
@@ -56,7 +56,7 @@
     "lint-staged": "^16.4.0",
     "sass": "^1.99.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1",
+    "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.5"
   },
   "dependencies": {
@@ -66,5 +66,10 @@
     "src/**/*.ts": [
       "eslint --max-warnings 1100 --fix"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "fast-uri@<3.1.2": ">=3.1.2"
+    }
   }
 }

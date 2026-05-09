@@ -10,6 +10,54 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-05-09
+
+Internal-quality release: socket transport consolidated onto socketlib
+with authorization gates and typed payloads (#129, #130), per-document
+schema-version stamping with GM-visible lag warnings (#85), chat-card
+accessibility (#80), the V14-typing cleanup (#137), and dev-dependency
+advisories cleared. No new rules content; one user-visible feature
+surface (chat-card a11y) and one new GM-visible notification
+(schema-version mismatch).
+
+### Added
+
+- Chat-card accessibility (#80): icon-only buttons in
+  `templates/chat/*.html` carry localized `aria-label` with their inner
+  `<i>` marked `aria-hidden`; `.modifiers-button` /
+  `.damage-modifiers-button` are now keyboard-activatable
+  (`role="button"` + `tabindex="0"` + delegated Enter/Space handler in
+  `chat-log-listeners.ts`); each chat message gets `role="article"`
+  with an `aria-label` combining roll-mode + speaker for
+  whispered/private rolls; hover styles on header / oppose /
+  choose-target / edit-difficulty / edit-damage / modifier-toggle
+  buttons are mirrored under `:focus-visible` with an accent outline
+  (WCAG 2.4.7); `.roll.max/.success` get bold + underline and
+  `.roll.min/.failure` bold + line-through so the dice success/failure
+  cue no longer depends on green-vs-red alone.
+- Per-document schema version stamping (#85): every actor and item
+  DataModel gains a `system._systemSchemaVersion` field (via a shared
+  `schemaVersionField()` factory) stamped on `_preCreate`. A new
+  `compareSchemaVersion` helper plus a `prepareData`-time check warn
+  the GM once per (doc, state) when a stored doc lags or runs ahead of
+  the system version, surfacing pre-migration drift before it causes
+  downstream errors. The 2.6.0 migration step bulk-stamps every
+  in-world doc on first load so the warn logic has a populated field
+  to compare against.
+
+### Security
+
+- Cleared the three open dev-dependency advisories (none of these
+  ship to users): `@cyclonedx/cdxgen` 12.3.1 → 12.3.3 (moderate
+  Docker registry credential-forwarding, GHSA-qhh4-458h-xwh2);
+  transitive `fast-uri` `<3.1.2` pinned to `>=3.1.2` via a
+  `pnpm.overrides` entry (host-confusion GHSA-v39h-62p7-jpjc plus
+  the path-traversal companion, both high — reaches us through
+  `@commitlint/cli > ajv > fast-uri`, override is scoped to
+  `<3.1.2` so it lifts automatically once the upstream chain
+  catches up). Rolling patch on `typescript-eslint` 8.59.1 → 8.59.2
+  alongside.
+
 ### Changed
 
 - v14 polish batch (#132): dropped the dead V1
@@ -76,6 +124,41 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
   `foundry.applications.ux.Tabs` namespace, with the v14
   `StatusEffect` shape replacing the v13 `{label, icon}` form
   (no behavioural change; lint count drops 613 → 579) (#59 part 2).
+- Socket transport consolidated onto socketlib (#130): the three live
+  native-socket ops (`updateRollMessage`, `updateInitRoll`,
+  `removeFromVehicle`) migrated to `OD6S.socket.executeAsGM`, with
+  four dead ops removed (`addToVehicle`-native, `sendVehicleStats`,
+  and the dead native branches of the two explosive-region ops).
+  `src/module/system/socket.ts` and the
+  `game.socket.on('system.od6s', …)` dispatcher in `od6s.ts` are
+  gone. Every socketlib handler is now wrapped in a small `register()`
+  helper that catches handler exceptions and routes them through
+  `logError('socket', …)` — same `[od6s:socket]` breadcrumb the
+  native dispatcher had, now applied uniformly.
+- Authorization + payload typing across all mutating socketlib
+  handlers (#129): `sendVehicleData`, `modifyShields`, `updateVehicle`,
+  `unlinkCrew`, `addToVehicle`, `updateExplosiveRegion`,
+  `deleteExplosiveRegion`, `setVehicleFlag`, `unsetVehicleFlag` now
+  take `userId` as their first argument and validate with
+  `testUserPermission` before mutating. Vehicle ops route through a
+  new `userMayMutateVehicle()` helper (GM, vehicle OWNER, or owner of
+  any current crewmember — the crew fallback covers the dodge handoff
+  in `combat-hooks.ts`); region ops require the caller to own the
+  supplied detonator `actorUuid`. `data: any` parameters replaced
+  with a discriminated `SocketPayload` union (`VehicleDataPayload`,
+  `ModifyShieldsPayload`, `ExplosiveRegionPayload`,
+  `DeleteExplosiveRegionPayload`). Trust model documented at the top
+  of `socketlib.ts`. The follow-up tightening (#142) finished
+  removing the last `any[]` from the `register()` wrapper signature
+  and dropped the socket handler's residual dependency on the vehicle
+  sheet by retyping `linkCrew` / `unlinkCrew` sheet-helpers to take
+  the vehicle document directly.
+- Foundry typing cleanup (#137 / PRs #138, #140): widened the
+  ambient `foundry.applications.api` / `.sheets` / `.ux` namespace
+  shadow to cover the V14 sheet + dialog API surface, and retired
+  the per-file shadow declarations that had accumulated during the
+  V1→V2 migration. `OD6SItemSystem` narrowed; structural change
+  only, no behavioural diff.
 
 ## [2.5.0] - 2026-05-06
 
