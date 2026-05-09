@@ -15,9 +15,10 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 Internal-quality release: socket transport consolidated onto socketlib
 with authorization gates and typed payloads (#129, #130), per-document
 schema-version stamping with GM-visible lag warnings (#85), chat-card
-accessibility (#80), and the V14-typing cleanup (#137). No new rules
-content; one user-visible feature surface (chat-card a11y) and one new
-GM-visible notification (schema-version mismatch).
+accessibility (#80), the V14-typing cleanup (#137), and dev-dependency
+advisories cleared. No new rules content; one user-visible feature
+surface (chat-card a11y) and one new GM-visible notification
+(schema-version mismatch).
 
 ### Added
 
@@ -43,6 +44,19 @@ GM-visible notification (schema-version mismatch).
   downstream errors. The 2.6.0 migration step bulk-stamps every
   in-world doc on first load so the warn logic has a populated field
   to compare against.
+
+### Security
+
+- Cleared the three open dev-dependency advisories (none of these
+  ship to users): `@cyclonedx/cdxgen` 12.3.1 → 12.3.3 (moderate
+  Docker registry credential-forwarding, GHSA-qhh4-458h-xwh2);
+  transitive `fast-uri` `<3.1.2` pinned to `>=3.1.2` via a
+  `pnpm.overrides` entry (host-confusion GHSA-v39h-62p7-jpjc plus
+  the path-traversal companion, both high — reaches us through
+  `@commitlint/cli > ajv > fast-uri`, override is scoped to
+  `<3.1.2` so it lifts automatically once the upstream chain
+  catches up). Rolling patch on `typescript-eslint` 8.59.1 → 8.59.2
+  alongside.
 
 ### Changed
 
