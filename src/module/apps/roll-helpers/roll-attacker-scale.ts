@@ -9,7 +9,18 @@
  */
 
 import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
-import type {RollData, RollTypeKey} from "./roll-data";
+import type {CanonicalRollType, RollTypeKey} from "./roll-data";
+
+/**
+ * Roll-type keys that always count as attacks for scale derivation. Hoisted
+ * to module scope so `isAttackRollKey` doesn't reallocate the set per call.
+ */
+const ATTACK_KEYS: ReadonlySet<RollTypeKey> = new Set<RollTypeKey>([
+    'weapon', 'starship-weapon', 'vehicle-weapon',
+    'action-brawlattack',
+    'action-vehicleramattack',
+    'action-vehiclerangedweaponattack',
+]);
 
 export interface AttackerScaleInput {
     actor: Actor;
@@ -45,15 +56,9 @@ export function deriveAttackerScale(input: AttackerScaleInput): number {
  */
 export function isAttackRollKey(
     key: RollTypeKey,
-    classifiedType: RollData['type'] | string,
+    classifiedType: CanonicalRollType,
     isRangedSubtype: boolean,
 ): boolean {
-    const ATTACK_KEYS: ReadonlySet<string> = new Set<string>([
-        'weapon', 'starship-weapon', 'vehicle-weapon',
-        'action-brawlattack',
-        'action-vehicleramattack',
-        'action-vehiclerangedweaponattack',
-    ]);
     if (ATTACK_KEYS.has(key)) return true;
     if (isRangedSubtype && (classifiedType === 'weapon' || classifiedType === 'starship-weapon' || classifiedType === 'vehicle-weapon')) {
         return true;
