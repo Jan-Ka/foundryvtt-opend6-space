@@ -106,20 +106,21 @@ export function calculateNewWoundLevel(actor: Actor, wound: string): string | nu
 
 export async function triggerMortallyWoundedCheck(actor: Actor): Promise<void> {
     if (!isCharacterActor(actor)) return;
-    if (actor.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-        const rollData = {
-            name: game.i18n.localize('OD6S.RESIST_MORTALLY_WOUNDED'),
-            actor: actor,
-            score: actor.system.attributes.str.score,
-            type: 'mortally_wounded',
-            difficulty: actor.getFlag('od6s', 'mortally_wounded'),
-            difficultyLevel: 'OD6S.DIFFICULTY_CUSTOM'
-        };
-        await od6sroll._onRollDialog(rollData);
-    }
+    const flag = actor.getFlag('od6s', 'mortally_wounded');
+    if (flag === undefined) return;
+    const rollData = {
+        name: game.i18n.localize('OD6S.RESIST_MORTALLY_WOUNDED'),
+        actor: actor,
+        score: actor.system.attributes.str.score,
+        type: 'mortally_wounded',
+        difficulty: flag,
+        difficultyLevel: 'OD6S.DIFFICULTY_CUSTOM'
+    };
+    await od6sroll._onRollDialog(rollData);
 }
 
 export async function applyMortallyWoundedFailure(actor: Actor): Promise<void> {
+    if (!isCharacterActor(actor)) return;
     if (game.settings.get('od6s', 'auto_status')) {
         await actor.toggleStatusEffect('dead', {overlay: false, active: true});
     }
