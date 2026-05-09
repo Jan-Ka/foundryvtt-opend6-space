@@ -453,7 +453,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             await region.setFlag('od6s', 'originalOwner', game.user.id);
             await region.setFlag('od6s', 'templateId', rollMessage._id);
 
-            if (!flags.success) {
+            if (!flags.success && origin && regionId) {
                 await od6sutilities.scatterExplosive(rollData.range, origin, regionId);
                 await od6sutilities.wait(100);
                 const newTargets = await od6sutilities.getExplosiveTargets(rollData.actor, rollData.itemid, regionId);

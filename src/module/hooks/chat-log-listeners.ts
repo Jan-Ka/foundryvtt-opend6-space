@@ -1,4 +1,5 @@
 import {od6sutilities} from "../system/utilities";
+import type { DetonateExplosiveData } from "../system/utilities/explosives";
 import OD6S from "../config/config-od6s";
 import {isCharacterActor} from "../system/type-guards";
 import { isOpposedQueueEmpty, pushOpposedQueue } from "../system/utilities/opposed";
@@ -149,7 +150,7 @@ export function registerChatLogListeners() {
         delegateEvent(html, "click", ".explosive-damage-button", async (ev: Event) => {
             ev.preventDefault();
             const target = ev.currentTarget as HTMLElement;
-            await od6sutilities.detonateExplosive(target.dataset);
+            await od6sutilities.detonateExplosive(target.dataset as unknown as DetonateExplosiveData);
         })
 
         delegateEvent(html, 'click', '.remove-template-button', async (ev: Event) => {

@@ -123,7 +123,7 @@ export function registerChatHooks() {
                         updateTargets = true;
                     }
 
-                    if (updateTargets) {
+                    if (updateTargets && actor) {
                         newTargets = await od6sutilities.getExplosiveTargets(actor, item!.id, template?.id);
                         if (Object.keys(newTargets).length === 0) {
                             await message.setFlag('od6s','showButton', false);
