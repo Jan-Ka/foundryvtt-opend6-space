@@ -1,6 +1,6 @@
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
-import {AdvanceDialog} from "./advance-dialog";
+import {AdvanceDialog, type AdvanceData} from "./advance-dialog";
 import {isCharacterActor, isSpecializationItem} from "../system/type-guards";
 
 export class od6sadvance {
@@ -59,10 +59,10 @@ export class od6sadvance {
         }
 
         /* Structure to pass to dialog */
-        const advanceData = {
+        const advanceData: AdvanceData = {
             label: dataset.label,
             score: originalScore,
-            base: base,
+            base: +(base ?? 0),
             cpcost: cpcost,
             cpcostcolor: "black",
             freeadvance: freeAdvance,
@@ -75,9 +75,13 @@ export class od6sadvance {
             metaphysicsteacher: metaphysicsteacher
         }
 
+        // od6sadvance is mixed into the actor sheet at runtime, so `this`
+        // exposes `actor` even though TS doesn't see it on the bare class.
+        const sheet = this as unknown as { actor: Actor };
+
         if (OD6S.flatSkills) {
             new AdvanceDialog(
-                this,
+                sheet,
                 advanceData,
                 (dlg, formData) => od6sadvance.advanceAction(
                     dlg.actorSheet.actor,
@@ -87,7 +91,7 @@ export class od6sadvance {
             ).render({force: true});
         } else {
             new AdvanceDialog(
-                this,
+                sheet,
                 advanceData,
                 (dlg, formData) => od6sadvance.advanceAction(
                     dlg.actorSheet.actor,

@@ -1,21 +1,54 @@
- 
 import {od6sutilities} from "../system/utilities";
 import OD6S from "../config/config-od6s";
 
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
+/**
+ * Shape of the rolling state passed in/out of the dialog. Mutated in place
+ * across `pipUp`/`pipDown`/`cpCost` and finally by `od6sadvance.advanceAction`.
+ */
+export interface AdvanceData {
+    label: string | undefined;
+    score: number;
+    /** Coerced to a number at construction in `advance.ts`. */
+    base: number;
+    cpcost: number;
+    cpcostcolor: string;
+    freeadvance: boolean;
+    type: string | undefined;
+    attrname: string | undefined;
+    originalscore: number;
+    itemid: string | number;
+    used: boolean;
+    metaPhysicsSkill?: boolean;
+    metaphysicsteacher: boolean;
+}
+
+/** Sheet shape consumed by the dialog — only `actor` is read here. */
+interface AdvanceActorSheetLike {
+    actor: Actor;
+}
+
+/** Form-submission payload from the advance dialog template. */
+export interface AdvanceFormData {
+    base?: number;
+    dice?: number;
+    pips?: number;
+    [key: string]: unknown;
+}
+
 export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
-    actorSheet: any;
-    advanceData: any;
-    onSubmit: (dialog: AdvanceDialog, formData: any) => void | Promise<void>;
+    actorSheet: AdvanceActorSheetLike;
+    advanceData: AdvanceData;
+    onSubmit: (dialog: AdvanceDialog, formData: AdvanceFormData) => void | Promise<void>;
 
     constructor(
-        actorSheet: any,
-        advanceData: any,
-        onSubmit: (dialog: AdvanceDialog, formData: any) => void | Promise<void>,
-        options: any = {},
+        actorSheet: AdvanceActorSheetLike,
+        advanceData: AdvanceData,
+        onSubmit: (dialog: AdvanceDialog, formData: AdvanceFormData) => void | Promise<void>,
+        options: object = {},
     ) {
         super(options);
         this.actorSheet = actorSheet;
@@ -50,8 +83,8 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     };
 
     async _prepareContext(_options?: object): Promise<object> {
-        this.advanceData.cpcostcolor =
-            this.advanceData.cpcost > this.actorSheet.actor.system.characterpoints.value ? "red" : "black";
+        const cp = (this.actorSheet.actor.system as OD6SCharacterSystem).characterpoints.value;
+        this.advanceData.cpcostcolor = this.advanceData.cpcost > cp ? "red" : "black";
         return this.advanceData;
     }
 
@@ -90,7 +123,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         this: AdvanceDialog,
         _event: Event,
         _form: HTMLFormElement,
-        formData: any,
+        formData: { object: AdvanceFormData },
     ): Promise<void> {
         await this.onSubmit(this, formData.object);
     }
@@ -100,7 +133,8 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             return;
         }
 
-        const item = this.actorSheet.actor.items.get(this.advanceData.itemid);
+        const item = this.actorSheet.actor.items.get(String(this.advanceData.itemid)) as
+            (Item & { system: { attribute: string; isAdvancedSkill?: boolean } }) | undefined;
         let skillAttr = "";
         if (typeof item !== "undefined") {
             skillAttr = item.system.attribute;
@@ -110,8 +144,12 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             teacherCostMultiplier = 1;
         }
 
-        let score: any;
-        OD6S.flatSkills ? (score = this.advanceData.base)
+        // `score.dice`/`score.pips` reads below are guarded by !OD6S.flatSkills;
+        // under flatSkills the property reads still happen on the numeric
+        // base but `Math.ceil(+number * X)` matches the previous (any) behaviour.
+        let score: { dice: number; pips: number };
+        OD6S.flatSkills
+            ? (score = {dice: this.advanceData.base, pips: 0})
             : (score = od6sutilities.getDiceFromScore(this.advanceData.score));
 
         if (up) {
@@ -133,7 +171,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
                     OD6S.flatSkills
                         ? (this.advanceData.cpcost += Math.ceil((+this.advanceData.base) * OD6S.advanceCostSkill))
                         : (this.advanceData.cpcost += Math.ceil((+score.dice) * OD6S.advanceCostSkill));
-                    if (item.system.isAdvancedSkill) this.advanceData.cpcost = this.advanceData.cpcost * 2;
+                    if (item?.system.isAdvancedSkill) this.advanceData.cpcost = this.advanceData.cpcost * 2;
                 }
             } else if (this.advanceData.type === "specialization") {
                 OD6S.flatSkills
@@ -177,7 +215,8 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     pipUp() {
-        const item = this.actorSheet.actor.items.get(this.advanceData.itemid);
+        const item = this.actorSheet.actor.items.get(String(this.advanceData.itemid)) as
+            (Item & { system: { attribute: string } }) | undefined;
         let skillAttr = "";
         if (typeof item !== "undefined") {
             skillAttr = item.system.attribute;
@@ -215,7 +254,9 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             }
 
             if (attr !== "") {
-                if ((this.advanceData.score + 1) > this.actorSheet.actor.system.attributes[attr].max) {
+                const attrs = (this.actorSheet.actor.system as OD6SCharacterSystem).attributes;
+                const max = attrs[attr]!.max;
+                if (max !== undefined && (this.advanceData.score + 1) > max) {
                     ui.notifications.warn(game.i18n.localize("OD6S.WARN_ADVANCE_GREATER_THAN_MAX"));
                     return false;
                 }

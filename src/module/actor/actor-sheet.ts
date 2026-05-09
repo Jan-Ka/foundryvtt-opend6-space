@@ -222,15 +222,15 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Item CRUD Methods (delegates)                */
     /* -------------------------------------------- */
 
-    async deleteItem(ev: any) {
+    async deleteItem(ev: Event) {
         return deleteItem(this, ev);
     }
 
-    async addItem(ev: any, caller: any = this) {
+    async addItem(ev: Event, caller: unknown = this) {
         return addItem(this, ev, caller);
     }
 
-    _onItemCreate(event: any) {
+    _onItemCreate(event: Event) {
         return onItemCreate(this, event);
     }
 
@@ -356,11 +356,11 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Roll Methods (delegates)                     */
     /* -------------------------------------------- */
 
-    async _rollAvailableVehicleAction(ev: any) {
+    async _rollAvailableVehicleAction(ev: Event) {
         return rollAvailableVehicleAction(this, ev);
     }
 
-    async _rollAvailableAction(ev: any) {
+    async _rollAvailableAction(ev: Event) {
         return rollAvailableAction(this, ev);
     }
 
@@ -391,15 +391,15 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         return rollBodyPoints(this);
     }
 
-    async rollPurchase(ev: any, buyerId: any) {
+    async rollPurchase(ev: Event, buyerId: string) {
         return rollPurchaseHelper(this, ev, buyerId);
     }
 
-    async _onPurchase(itemId: any, buyerId: any) {
+    async _onPurchase(itemId: string, buyerId: string) {
         return onPurchase(this, itemId, buyerId);
     }
 
-    async _onTransfer(itemId: any, senderId: any, recId: any) {
+    async _onTransfer(itemId: string, senderId: string, recId: string) {
         return onTransfer(this, itemId, senderId, recId);
     }
 }

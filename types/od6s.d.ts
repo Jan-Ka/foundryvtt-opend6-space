@@ -74,9 +74,15 @@ interface VehicleWeaponSnapshot {
     _id: string;
     id: string;
     name: string;
-    type: string;
+    /** Snapshots are produced from `vehicle-weapon` and `starship-weapon` items only. */
+    type: "vehicle-weapon" | "starship-weapon" | string;
     img?: string;
-    system: OD6SWeaponItemSystem;
+    /**
+     * Snapshots come from `item.toObject()` on vehicle-weapon / starship-weapon
+     * items, both backed by `OD6SVehicleWeaponsFields`-shaped systems — not the
+     * regular character-weapon `OD6SWeaponItemSystem`.
+     */
+    system: OD6SVehicleWeaponItemSystem | OD6SStarshipWeaponItemSystem;
     flags?: Record<string, unknown>;
 }
 
