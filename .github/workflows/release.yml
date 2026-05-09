@@ -76,6 +76,50 @@ jobs:
           --output build/artifacts/sbom.cdx.json
           .
 
+      - name: Extract CHANGELOG section
+        id: changelog
+        run: |
+          set -eu
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          # Pull the section bounded by `## [VERSION]` and the next `## [`,
+          # then reflow paragraphs and list items so hard wraps in the
+          # source CHANGELOG don't render as visible <br>s in release
+          # notes (GitHub Releases honor GFM `breaks: true`).
+          # Reflow rules:
+          #   - blank lines and headers (`#`) flush + pass through
+          #   - lines starting `- ` / `* ` start a new buffered list item
+          #   - any other non-empty line appends to the current buffer,
+          #     joined with a single space (leading indent stripped)
+          # If the version isn't found (e.g. someone tagged without
+          # updating CHANGELOG), fall back to a bare link.
+          # `index($0, header) == 1` is a literal-substring check — avoids
+          # treating the dots in `VERSION` as regex metacharacters.
+          SECTION=$(awk -v header="## [$VERSION]" '
+            BEGIN              { capture=0; buf="" }
+            function flush()   { if (buf != "") { print buf; buf="" } }
+            index($0, header) == 1 { capture=1; next }
+            capture && /^## \[/    { flush(); exit }
+            !capture           { next }
+            /^$/               { flush(); print ""; next }
+            /^#+ /             { flush(); print; next }
+            /^[-*] /           { flush(); buf=$0; next }
+                               { line=$0; sub(/^[ \t]+/, "", line);
+                                 buf = (buf == "" ? line : buf " " line) }
+            END                { flush() }
+          ' CHANGELOG.md)
+          CHANGELOG_URL="https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/CHANGELOG.md"
+          {
+            if [ -n "$SECTION" ]; then
+              printf '%s\n' "$SECTION"
+              echo
+              echo "[Full changelog →](${CHANGELOG_URL})"
+            else
+              echo "[Release notes in CHANGELOG.md →](${CHANGELOG_URL})"
+            fi
+          } > release-body.md
+          echo "body_path=release-body.md" >> "$GITHUB_OUTPUT"
+
       - uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
 
       - name: Sign artifacts (cosign keyless)
@@ -94,6 +138,9 @@ jobs:
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
+          # `body_path` is prepended; `generate_release_notes: true`
+          # then appends GitHub's auto-generated "What's Changed" PR list.
+          body_path: ${{ steps.changelog.outputs.body_path }}
           generate_release_notes: true
           files: |
             build/artifacts/od6s.zip
