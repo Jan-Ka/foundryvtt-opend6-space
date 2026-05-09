@@ -49,7 +49,7 @@ export async function rollAvailableVehicleAction(sheet: RollSheetLike, ev: Event
             OD6S.vehicle_actions[data.id!].base)) + (+data.score!);
     } else if (data.type === "vehicleshields") {
         rollData.score = od6sutilities.getScoreFromSkill(sheet.document, "",
-            (actorData.vehicle.shields as Record<string, {value: string}>).skill.value,
+            game.i18n.localize((actorData.vehicle.shields as Record<string, string>).skill),
             OD6S.vehicle_actions[data.id!].base);
     } else {
         const item = actorData.vehicle.vehicle_weapons?.find(

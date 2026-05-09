@@ -144,9 +144,6 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             teacherCostMultiplier = 1;
         }
 
-        // `score.dice`/`score.pips` reads below are guarded by !OD6S.flatSkills;
-        // under flatSkills the property reads still happen on the numeric
-        // base but `Math.ceil(+number * X)` matches the previous (any) behaviour.
         let score: { dice: number; pips: number };
         OD6S.flatSkills
             ? (score = {dice: this.advanceData.base, pips: 0})
