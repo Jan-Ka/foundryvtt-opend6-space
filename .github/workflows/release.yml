@@ -76,6 +76,32 @@ jobs:
           --output build/artifacts/sbom.cdx.json
           .
 
+      - name: Extract CHANGELOG section
+        id: changelog
+        run: |
+          set -eu
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          # Pull the section bounded by `## [VERSION]` and the next `## [`.
+          # If the version isn't found (e.g. someone tagged without
+          # updating CHANGELOG), fall back to a bare link.
+          SECTION=$(awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {capture=1; next}
+            capture && /^## \[/      {exit}
+            capture                  {print}
+          ' CHANGELOG.md)
+          CHANGELOG_URL="https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/CHANGELOG.md"
+          {
+            if [ -n "$SECTION" ]; then
+              printf '%s\n' "$SECTION"
+              echo
+              echo "[Full changelog →](${CHANGELOG_URL})"
+            else
+              echo "[Release notes in CHANGELOG.md →](${CHANGELOG_URL})"
+            fi
+          } > release-body.md
+          echo "body_path=release-body.md" >> "$GITHUB_OUTPUT"
+
       - uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
 
       - name: Sign artifacts (cosign keyless)
@@ -94,6 +120,9 @@ jobs:
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
+          # `body_path` is prepended; `generate_release_notes: true`
+          # then appends GitHub's auto-generated "What's Changed" PR list.
+          body_path: ${{ steps.changelog.outputs.body_path }}
           generate_release_notes: true
           files: |
             build/artifacts/od6s.zip
