@@ -43,6 +43,9 @@ export const COMMON_FIELDS = [
     // Region id of the explosive blast template (auto-explosive throws);
     // threaded through from `OD6SItem.roll(parry, regionId)`. See #40.
     'regionId',
+    // Per-skill difficulty map for metaphysics rolls; populated by metaphysics
+    // setup, mutated by the dialog's per-skill difficultylevel handler.
+    'skills',
     // Produced by classifyRoll, not handlers.
     'type', 'subtype',
     'actor', 'token',
