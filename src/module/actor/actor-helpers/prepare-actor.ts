@@ -136,12 +136,11 @@ export function applyMods(actor: Actor): void {
 
     for (const a in actorData.attributes) {
         actorData.attributes[a].score = actorData.attributes[a].base + actorData.attributes[a].mod;
-        if (isCharacterActor(actor)) {
-            actor.system.strengthdamage.score = setStrengthDamageBonus(actor);
-        }
     }
 
     if (isCharacterActor(actor)) {
+        // Compute after the attribute loop so str.score reflects base+mod.
+        actor.system.strengthdamage.score = setStrengthDamageBonus(actor);
         actor.system.pr.score = setResistance(actor, 'pr');
         actor.system.pr.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(actor.system.pr.score));
         actor.system.er.score = setResistance(actor, 'er');
@@ -178,7 +177,7 @@ export function setStrengthDamageBonus(actor: Actor): number {
         // Calculate based on dice conversion and then apply half dice logic
         const dice = Math.ceil(base / OD6S.pipsPerDice);
         const halfDice = OD6S.strDamRound ? Math.floor(dice / 2) : Math.ceil(dice / 2);
-        damage = (halfDice * OD6S.pipsPerDice) + actor.system.strengthdamage.mod;
+        damage = halfDice * OD6S.pipsPerDice;
     }
 
     damage += actor.system.strengthdamage.mod; // Always add modifier to the damage
@@ -201,7 +200,9 @@ export function setInitiative(actor: Actor): OD6SCharacterSystem | OD6SVehicleSy
     return actor.system;
 }
 
-export function setResistance(actor: Actor, type: string): number {
+export type ResistanceKey = 'pr' | 'er' | 'noArmor';
+
+export function setResistance(actor: Actor, type: ResistanceKey): number {
     if (!isCharacterActor(actor)) return 0;
     let dr = 0;
 

@@ -6,6 +6,7 @@ import {warnIfSchemaVersionMismatch, SCHEMA_VERSION_KEY} from "../system/schema-
 
 import {resolveRollAction} from "./actor-helpers/roll-action";
 import {prepareBaseActorData, prepareDerivedActorData, applyMods as applyModsHelper, setStrengthDamageBonus as setStrengthDamageBonusHelper, setInitiative as setInitiativeHelper, setResistance as setResistanceHelper} from "./actor-helpers/prepare-actor";
+import type {ResistanceKey} from "./actor-helpers/prepare-actor";
 import {applyDamage as applyDamageHelper, calculateNewDamageLevel as calculateNewDamageLevelHelper, applyWounds as applyWoundsHelper, calculateNewWoundLevel as calculateNewWoundLevelHelper, triggerMortallyWoundedCheck as triggerMortallyWoundedCheckHelper, applyMortallyWoundedFailure as applyMortallyWoundedFailureHelper, applyIncapacitatedFailure as applyIncapacitatedFailureHelper, findFirstWoundLevel as findFirstWoundLevelHelper, getWoundLevelFromBodyPoints as getWoundLevelFromBodyPointsHelper, setWoundLevelFromBodyPoints as setWoundLevelFromBodyPointsHelper} from "./actor-helpers/wounds";
 import {addEmbeddedPilot as addEmbeddedPilotHelper, addToCrew as addToCrewHelper, _verifyAddToCrew as _verifyAddToCrewHelper, removeFromCrew as removeFromCrewHelper, forceRemoveCrewmember as forceRemoveCrewmemberHelper, isCrewMember as isCrewMemberHelper, sendVehicleData as sendVehicleDataHelper, modifyShields as modifyShieldsHelper, vehicleCollision as vehicleCollisionHelper, onCargoHoldItemCreate as onCargoHoldItemCreateHelper} from "./actor-helpers/crew-vehicle";
 import {useCharacterPointOnRoll as useCharacterPointOnRollHelper} from "./actor-helpers/resources";
@@ -248,7 +249,7 @@ export class OD6SActor extends Actor {
         return setWoundLevelFromBodyPointsHelper(this, bp);
     }
 
-    setResistance(type: string) {
+    setResistance(type: ResistanceKey) {
         return setResistanceHelper(this, type);
     }
 

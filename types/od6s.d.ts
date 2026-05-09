@@ -592,8 +592,8 @@ interface Actor {
     /** Recalculate initiative score. */
     setInitiative(): void;
 
-    /** Recalculate physical/energy resistance (`type` is "p" | "e"). */
-    setResistance(type: string): void;
+    /** Recalculate physical/energy/no-armor resistance. */
+    setResistance(type: 'pr' | 'er' | 'noArmor'): void;
 
     /** Apply incoming damage; updates BP / wound levels. */
     applyDamage(damage: any): Promise<unknown>;
