@@ -25,6 +25,16 @@ export interface DiceValue {
     pips: number;
 }
 
+/**
+ * One row in `RollData.skills` (metaphysics rolls). Drives the per-skill
+ * dice/pips/difficulty UI in `templates/metaphysicsRoll.html`.
+ */
+export interface MetaphysicsSkillRollEntry {
+    skill: { name: string };
+    system: { total: number };
+    difficulty: string;
+}
+
 export interface RollData {
     label: string;
     title: string;
@@ -83,11 +93,13 @@ export interface RollData {
     range: string;
     template: string;
     /**
-     * Per-skill difficulty selection used by metaphysics rolls. Keyed by skill
-     * id; populated by metaphysics roll setup and mutated by the dialog's
-     * `.difficultylevel select` change handler. Absent for non-metaphysics rolls.
+     * Per-skill entries used by metaphysics rolls. Keyed by skill id; populated
+     * by metaphysics roll setup and mutated by the dialog's `.difficultylevel
+     * select` change handler. Absent for non-metaphysics rolls. Shape matches
+     * `templates/metaphysicsRoll.html`'s reads of `.skill.name`,
+     * `.system.total`, and `.difficulty`.
      */
-    skills?: Record<string, { difficulty: string }>;
+    skills?: Record<string, MetaphysicsSkillRollEntry>;
     only_stun: boolean;
     can_stun: boolean;
     stun: boolean;

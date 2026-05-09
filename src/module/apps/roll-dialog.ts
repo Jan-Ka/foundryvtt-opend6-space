@@ -299,7 +299,8 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
 
         find("#miscmod")?.addEventListener("change", async (ev) => {
-            this.rollData.modifiers.miscmod = (ev.target as HTMLInputElement).valueAsNumber;
+            const raw = (ev.target as HTMLInputElement).valueAsNumber;
+            this.rollData.modifiers.miscmod = Number.isFinite(raw) ? raw : 0;
             await this.render();
         });
 
