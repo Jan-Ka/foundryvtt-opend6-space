@@ -1,1 +1,24 @@
+# Block staged paths that look like AI-coding-tool workspace files.
+# These should be gitignored, but `git add -f` or a misconfigured ignore
+# can sneak them in. Hard-fail before they're committed.
+#
+# Bypass (with caution): `git commit --no-verify`.
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if printf '%s\n' "$staged" | grep -qiE '^(\.claude/|CLAUDE\.md$|\.cursor/|\.vscode/|\.aider|\.continue/|\.windsurf/|\.codeium/|\.github/copilot-instructions\.md$)'; then
+    cat >&2 <<'EOF'
+error: refusing to commit AI-coding-tool workspace files.
+
+The following staged paths look like agent / IDE-assistant workspace data
+that must not land in this repo:
+EOF
+    printf '%s\n' "$staged" | grep -iE '^(\.claude/|CLAUDE\.md$|\.cursor/|\.vscode/|\.aider|\.continue/|\.windsurf/|\.codeium/|\.github/copilot-instructions\.md$)' >&2
+    cat >&2 <<'EOF'
+
+Unstage them (`git restore --staged <path>`) and ensure they stay
+gitignored. To bypass intentionally: git commit --no-verify
+EOF
+    exit 1
+fi
+
 pnpm exec lint-staged
