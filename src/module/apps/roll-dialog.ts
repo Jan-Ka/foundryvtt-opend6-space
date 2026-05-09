@@ -1,19 +1,30 @@
  
 import {od6sutilities} from "../system/utilities";
-import OD6S from "../config/config-od6s";
+import OD6S, {type CharacterPointLimits} from "../config/config-od6s";
 import {od6sroll} from "./roll";
 
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
+/** Minimal sheet handle the dialog reads `rollData` from. */
+interface RollDialogActorSheet {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rollData: any;
+}
+
 export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
-    actorSheet: any;
+    actorSheet: RollDialogActorSheet;
+    // The roll dialog's runtime rollData is a wider blob than the typed
+    // `RollData` interface (it carries metaphysics `skills`, mutated
+    // `target = string`, etc); narrowing here would cascade through
+    // ~30 access chains. Keep `any` until rollData is unified.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rollData: any;
-    cpLimit: any;
+    cpLimit: CharacterPointLimits;
     onSubmit: () => void | Promise<void>;
 
-    constructor(actorSheet: any, onSubmit: () => void | Promise<void>, options: any = {}) {
+    constructor(actorSheet: RollDialogActorSheet, onSubmit: () => void | Promise<void>, options: object = {}) {
         super(options);
         this.actorSheet = actorSheet;
         this.rollData = this.actorSheet.rollData;
@@ -50,7 +61,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         },
     };
 
-    _configureRenderOptions(options: any): void {
+    _configureRenderOptions(options: { parts?: string[] } & Record<string, unknown>): void {
         super._configureRenderOptions(options);
         const isMetaphysics = this.rollData?.template?.includes("metaphysics");
         options.parts = [isMetaphysics ? "metaphysics" : "standard"];
@@ -71,7 +82,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     async _onClose(_options: object): Promise<void> {
         if (!this.#submitted) {
-            await od6sroll.cancelAction(null as any);
+            await od6sroll.cancelAction();
         }
     }
 
@@ -105,7 +116,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             if (this.rollData.subtype === "vehicledodge") rollType = "dodge";
             if (this.rollData.subtype === "parry") rollType = "parry";
 
-            if ((+this.rollData.characterpoints) >= this.cpLimit[rollType]) {
+            if ((+this.rollData.characterpoints) >= this.cpLimit[rollType as keyof CharacterPointLimits]) {
                 ui.notifications.warn(game.i18n.localize("OD6S.MAX_CP"));
             } else if ((+this.rollData.characterpoints) >= actor.system.characterpoints.value) {
                 ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_ROLL"));

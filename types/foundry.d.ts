@@ -107,6 +107,7 @@ declare namespace foundry {
                 _onRender(context: object, options: object): void;
                 _prepareContext(options?: object): Promise<object>;
                 _configureRenderOptions(options: object): void;
+                tabGroups?: Record<string, string>;
             }
 
             function HandlebarsApplicationMixin<T extends new (...args: any[]) => any>(
@@ -138,6 +139,9 @@ declare namespace foundry {
                 get document(): Item;
                 get actor(): Actor | null;
                 get isEditable(): boolean;
+            }
+            class ActiveEffectConfig extends applications.api.ApplicationV2 {
+                constructor(options?: { document?: ActiveEffect } & Record<string, unknown>);
             }
         }
 
@@ -200,7 +204,8 @@ declare namespace foundry {
             }
             /** v14-namespaced TextEditor utility (replaces the global `TextEditor`) */
             class TextEditor {
-                static getDragEventData(event: DragEvent): any;
+                static implementation: typeof TextEditor;
+                static getDragEventData(event: DragEvent): Record<string, unknown>;
                 static enrichHTML(content: string, options?: any): Promise<string>;
                 static create(options?: any): Promise<any>;
                 [key: string]: any;
@@ -527,6 +532,9 @@ declare class ActiveEffect extends FoundryDocument {
     icon: string;
     duration: any;
     toDragData(): any;
+    toObject(): Record<string, unknown>;
+    static implementation: typeof ActiveEffect;
+    static fromDropData(data: unknown): Promise<ActiveEffect | undefined>;
 }
 
 interface ActiveEffectChange {
@@ -638,7 +646,10 @@ interface CompendiumPack {
 declare class Folder extends FoundryDocument {
     type: string;
     displayed: boolean;
-    children: Folder[];
+    children: Array<Folder | { folder: Folder; depth?: number; root?: boolean }>;
+    contents?: FoundryDocument[];
+    static implementation: typeof Folder;
+    static fromDropData(data: unknown): Promise<Folder | undefined>;
 }
 
 // ---- Region (v14 - replaces MeasuredTemplate) ----
@@ -1227,6 +1238,16 @@ declare namespace PIXI {
         removeChild(child: any): void;
         children: any[];
         destroy(options?: any): void;
+        on(event: string, handler: (...args: any[]) => void): this;
+        off(event: string, handler: (...args: any[]) => void): this;
+    }
+    /** Federated pointer/wheel/etc event delivered by the PIXI display tree. */
+    interface FederatedEvent {
+        data: { getLocalPosition(parent: Container): { x: number; y: number } };
+        stopPropagation(): void;
+        preventDefault(): void;
+        currentTarget: unknown;
+        target: unknown;
     }
     class Application {
         view: HTMLCanvasElement;
@@ -1284,10 +1305,10 @@ declare var FormDataExtended: {
 // ---- SortingHelpers ----
 
 declare class SortingHelpers {
-    static performIntegerSort(
-        event: Event,
-        options: { target: any; siblings: any[]; sortKey?: string; sortBefore?: boolean }
-    ): { target: any; update: Record<string, any> }[];
+    static performIntegerSort<T>(
+        source: T,
+        options: { target: T | undefined | null; siblings: T[]; sortKey?: string; sortBefore?: boolean }
+    ): { target: T; update: Record<string, any> }[];
 }
 
 // ---- jQuery (for v1 Application migration period) ----

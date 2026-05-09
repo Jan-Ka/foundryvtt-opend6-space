@@ -12,12 +12,12 @@ import {
 
 export async function addEmbeddedPilot(actor: Actor, pilotActor: Actor): Promise<void> {
     /* Copy attributes and items to vehicle */
-    const update = {};
-
     await actor.createEmbeddedDocuments('Item',
-        pilotActor.items.filter((s: any) => s.type === 'skill' || s.type === "specialization"));
-    (update as any)[`system.attributes`] = pilotActor.system.attributes;
-    (update as any)[`system.embedded_pilot.actor`] = pilotActor;
+        pilotActor.items.filter((s: Item) => s.type === 'skill' || s.type === "specialization"));
+    const update: Record<string, unknown> = {
+        "system.attributes": (pilotActor.system as { attributes: unknown }).attributes,
+        "system.embedded_pilot.actor": pilotActor,
+    };
     await actor.update(update);
 }
 
@@ -84,10 +84,7 @@ export async function removeFromCrew(actor: Actor, vehicleID: string): Promise<v
 export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promise<void> {
     if (!isVehicleActor(actor)) return;
     const crewMembers = removeCrewmember(actor.system.crewmembers, crewID);
-    const update: any = {};
-    update.system = {};
-    update.system.crewmembers = crewMembers;
-    await actor.update(update);
+    await actor.update({system: {crewmembers: crewMembers}});
 }
 
 export function isCrewMember(actor: Actor): boolean {
@@ -96,36 +93,38 @@ export function isCrewMember(actor: Actor): boolean {
 
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
     if (!isVehicleActor(actor)) return;
-    const data: any = {};
     const sys = actor.system;
-    data.uuid = actor.uuid;
-    data.name = actor.name;
-    data.type = actor.type;
-    data.move = sys.move;
-    data.maneuverability = sys.maneuverability;
-    data.toughness = sys.toughness;
-    data.crewmembers = sys.crewmembers;
-    data.items = actor.items;
-    data.attribute = sys.attribute;
-    data.skill = sys.skill;
-    data.specialization = sys.specialization;
-    data.damage = sys.damage;
-    data.shields = sys.shields;
-    data.scale = sys.scale;
-    data.sensors = sys.sensors;
-    data.armor = sys.armor;
-    data.dodge = sys.dodge;
-    data.ranged = sys.ranged;
-    data.ranged_damage = sys.ranged_damage;
-    data.ram = sys.ram;
-    data.ram_damage = sys.ram_damage;
-    data.vehicle_weapons = buildVehicleWeaponSnapshots(actor.items.contents);
+    const data: Record<string, unknown> = {
+        uuid: actor.uuid,
+        name: actor.name,
+        type: actor.type,
+        move: sys.move,
+        maneuverability: sys.maneuverability,
+        toughness: sys.toughness,
+        crewmembers: sys.crewmembers,
+        items: actor.items,
+        attribute: sys.attribute,
+        skill: sys.skill,
+        specialization: sys.specialization,
+        damage: sys.damage,
+        shields: sys.shields,
+        scale: sys.scale,
+        sensors: (sys as unknown as { sensors: unknown }).sensors,
+        armor: sys.armor,
+        dodge: sys.dodge,
+        ranged: sys.ranged,
+        ranged_damage: sys.ranged_damage,
+        ram: sys.ram,
+        ram_damage: sys.ram_damage,
+        vehicle_weapons: buildVehicleWeaponSnapshots(actor.items.contents),
+    };
 
     if (shouldDispatchVehicleDataAsGM(game.user.isGM)) {
         await OD6S.socket.executeAsGM("sendVehicleData", game.user.id, data);
         return;
     }
-    const crew = selectCrewmembersForBroadcast(data.crewmembers, uuid);
+    const crew = selectCrewmembersForBroadcast(
+        data.crewmembers as Array<{ uuid: string }>, uuid);
     // Batch world-actor updates through Actor.updateDocuments to cut socket
     // chatter and avoid partial-failure half-states. Token-actor (synthetic)
     // updates fall back to the per-doc path because they live on a scene's
@@ -145,7 +144,7 @@ export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void
     }
 }
 
-export async function modifyShields(actor: Actor, update: any): Promise<void> {
+export async function modifyShields(actor: Actor, update: Record<string, unknown>): Promise<void> {
     await OD6S.socket.executeAsGM("modifyShields", game.user.id, update);
 }
 
@@ -166,7 +165,10 @@ export async function vehicleCollision(actor: Actor): Promise<void> {
     await rollVehicleCollision(actor, result);
 }
 
-async function rollVehicleCollision(actor: any, result: any): Promise<void> {
+async function rollVehicleCollision(
+    actor: Actor,
+    result: { vehiclespeed: string; vehiclecollisiontype: string; vehiclecollisionmod?: string | number },
+): Promise<void> {
     const speed = result.vehiclespeed;
     const speedValue = OD6S.vehicle_speeds[speed].damage;
     const type = result.vehiclecollisiontype;
@@ -193,7 +195,12 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
         + game.i18n.localize(OD6S.damageTypes["p"]) + ") "
         + game.i18n.localize("OD6S.FROM") + " " + game.i18n.localize("OD6S.COLLISION");
 
-    const flags: any = {
+    const flags: {
+        type: string; source: string; damageType: string;
+        targetName: string | null; targetId: string | null;
+        isOpposable: boolean; wild: boolean; wildHandled: boolean;
+        wildResult: unknown; total: number; isVehicleCollision: boolean;
+    } = {
         type: "damage",
         source: game.i18n.localize("OD6S.COLLISION"),
         damageType: "p",
@@ -209,26 +216,32 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
 
     if (game.settings.get("od6s", "use_wild_die")) {
         const wildFlavor = game.i18n.localize("OD6S.WILD_DIE_FLAVOR").replace(/[[\]]/g, "");
-        const wildTerm = (roll.terms as any[]).find((d: any) => d.flavor === wildFlavor);
+        const wildTerm = (roll.terms as Array<{ flavor: string; total: number }>)
+            .find((d) => d.flavor === wildFlavor);
         if (wildTerm?.total === 1) {
             flags.wild = true;
             if (OD6S.wildDieOneDefault > 0 && OD6S.wildDieOneAuto === 0) flags.wildHandled = true;
         }
     }
 
-    let rollMode: any = CONST.DICE_ROLL_MODES.PUBLIC;
+    let rollMode: string = CONST.DICE_ROLL_MODES.PUBLIC;
     if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
         rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
 
     const rollMessage = await roll.toMessage({
-        speaker: ChatMessage.getSpeaker({actor: game.actors.find((a: any) => a.id === actor.id)}),
+        speaker: ChatMessage.getSpeaker({actor: game.actors.find((a: Actor) => a.id === actor.id)}),
         flavor: label,
         flags: {od6s: flags},
     }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
-        const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON()));
+        type DieResult = { result: number; discarded?: boolean; active?: boolean };
+        type RollSnapshot = {
+            total: number;
+            terms: Array<{ results: DieResult[] }>;
+        };
+        const replacementRoll = JSON.parse(JSON.stringify(rollMessage.rolls[0].toJSON())) as RollSnapshot;
         let highest = 0;
         for (let i = 0; i < replacementRoll.terms[0].results.length; i++) {
             if (replacementRoll.terms[0].results[i].result > replacementRoll.terms[0].results[highest].result) {
@@ -238,11 +251,11 @@ async function rollVehicleCollision(actor: any, result: any): Promise<void> {
         replacementRoll.terms[0].results[highest].discarded = true;
         replacementRoll.terms[0].results[highest].active = false;
         replacementRoll.total -= (+replacementRoll.terms[0].results[highest].result) + 1;
-        flags.total = replacementRoll.total;
+        (flags as { total: number }).total = replacementRoll.total;
 
         if (rollMessage.getFlag("od6s", "difficulty") && rollMessage.getFlag("od6s", "success")) {
             await rollMessage.setFlag("od6s", "success",
-                replacementRoll.total >= rollMessage.getFlag("od6s", "difficulty"));
+                replacementRoll.total >= (rollMessage.getFlag("od6s", "difficulty") as number));
         }
 
         await rollMessage.setFlag("od6s", "originalroll", rollMessage.rolls?.[0]);
@@ -261,7 +274,7 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
 
     const documentName = 'Item';
     let types = game.documentTypes[documentName].filter(t => t !== CONST.BASE_DOCUMENT_TYPE);
-    const data: any = {};
+    const data: Record<string, unknown> = {};
     const foldersCollection = game.folders.filter(f => (f.type === documentName) && f.displayed);
     const folders = foldersCollection.map(f => ({id: f.id, name: f.name}));
     const label = game.i18n.localize('OD6S.ITEM');
@@ -294,9 +307,9 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
         folders: folders,
         hasFolders: folders.length > 0,
         type: data.type || types[0],
-        types: types.reduce((obj, t) => {
+        types: types.reduce<Record<string, string>>((obj, t) => {
             const label = CONFIG[documentName]?.typeLabels?.[t] ?? t;
-            (obj as any)[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
+            obj[t] = game.i18n.has(label) ? game.i18n.localize(label) : t;
             return obj;
         }, {}),
         hasTypes: types.length > 1
@@ -314,6 +327,7 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
     foundry.utils.mergeObject(data, result);
     if (!data.folder) delete data["folder"];
     if (types.length === 1) data.type = types[0];
-    data.name = data.name || game.i18n.localize('OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type]);
+    data.name = data.name
+        || game.i18n.localize('OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type as string]);
     return actor.createEmbeddedDocuments('Item', [data]);
 }

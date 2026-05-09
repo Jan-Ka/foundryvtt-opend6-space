@@ -1,59 +1,80 @@
+/** Minimal sheet handle the explosive preview minimises/restores. */
+interface MinimisableSheet {
+    minimize(): unknown;
+    maximize(): unknown;
+}
+
+/** Bound mouse handlers for the placement preview. */
+interface PreviewEventHandlers {
+    cancel: (event: MouseEvent) => unknown;
+    confirm: (event: PIXI.FederatedEvent) => unknown;
+    move: (event: PIXI.FederatedEvent) => unknown;
+    resolve: (regions: unknown[]) => void;
+    reject: () => void;
+}
+
+/** Payload passed to `setExplosiveData` — only the actor reference is read here. */
+interface ExplosiveData {
+    actor: { sheet?: MinimisableSheet | null };
+    [key: string]: unknown;
+}
+
 /**
  * Handles the preview and placement of explosive blast regions on the canvas.
  * Replaces the old MeasuredTemplate-based system with Scene Regions (Foundry v14).
  */
 export default class ExplosivesTemplate {
 
-    /** @type {number} Throttle timestamp for mouse movement */
+    /** Throttle timestamp for mouse movement */
     #moveTime = 0;
 
-    /** @type {CanvasLayer} The initially active layer to restore */
-    #initialLayer: any;
+    /** The initially active layer to restore */
+    #initialLayer: CanvasLayer | undefined;
 
-    /** @type {object} Bound event handlers */
-    #events: any;
+    /** Bound event handlers */
+    #events!: PreviewEventHandlers;
 
-    /** @type {PIXI.Graphics} Preview circle */
-    #circle: any;
+    /** Preview circle */
+    #circle!: PIXI.Graphics;
 
-    /** @type {PIXI.Graphics} Range line from origin to target */
-    #rangeLine: any;
+    /** Range line from origin to target */
+    #rangeLine!: PIXI.Graphics;
 
-    /** @type {PIXI.Text} Distance measurement display */
-    #rangeMeasure: any;
+    /** Distance measurement display */
+    #rangeMeasure!: PIXI.Text;
 
-    /** @type {PIXI.Container} Container for all preview graphics */
-    #container: any;
+    /** Container for all preview graphics */
+    #container!: PIXI.Container;
 
-    /** @type {object} Explosive data from the dialog */
-    exData: any;
+    /** Explosive data from the dialog */
+    exData!: ExplosiveData;
 
-    /** @type {object} Actor sheet reference */
-    actorSheet: any;
+    /** Actor sheet reference */
+    actorSheet: MinimisableSheet | null | undefined;
 
-    /** @type {number} Origin X position */
-    originX: any;
+    /** Origin X position */
+    originX = 0;
 
-    /** @type {number} Origin Y position */
-    originY: any;
+    /** Origin Y position */
+    originY = 0;
 
-    /** @type {number} Blast radius in grid units */
-    radius;
+    /** Blast radius in grid units */
+    radius: number;
 
-    /** @type {number} Current preview X position */
-    previewX: any;
+    /** Current preview X position */
+    previewX = 0;
 
-    /** @type {number} Current preview Y position */
-    previewY: any;
+    /** Current preview Y position */
+    previewY = 0;
 
-    /** @type {boolean} Whether the preview position has a wall collision */
+    /** Whether the preview position has a wall collision */
     _preview = false;
 
-    constructor(radius: any) {
+    constructor(radius: number) {
         this.radius = radius;
     }
 
-    async setExplosiveData(data: any, x: any, y: any) {
+    async setExplosiveData(data: ExplosiveData, x: number, y: number) {
         this.exData = data;
         this.actorSheet = this.exData.actor.sheet;
         this.originX = x;
@@ -93,7 +114,7 @@ export default class ExplosivesTemplate {
     /**
      * Draw the blast radius circle at the given position.
      */
-    #drawCircle(x: any, y: any) {
+    #drawCircle(x: number, y: number) {
         const radiusPixels = this.radius * canvas.dimensions.distancePixels;
         this.#circle.clear();
         this.#circle.lineStyle(2, 0xFFFF00, 0.8);
@@ -107,7 +128,7 @@ export default class ExplosivesTemplate {
      * @returns {Promise<RegionDocument[]>}
      */
     #activatePreviewListeners() {
-        return new Promise((resolve, reject) => {
+        return new Promise<unknown[]>((resolve, reject) => {
             this.#events = {
                 cancel: this.#onCancelPlacement.bind(this),
                 confirm: this.#onConfirmPlacement.bind(this),
@@ -116,9 +137,9 @@ export default class ExplosivesTemplate {
                 reject,
             };
 
-            (canvas.stage as any).on("mousemove", this.#events.move);
-            (canvas.stage as any).on("mousedown", this.#events.confirm);
-            canvas.app.view.oncontextmenu = this.#events.cancel;
+            canvas.stage.on("mousemove", this.#events.move);
+            canvas.stage.on("mousedown", this.#events.confirm);
+            canvas.app.view.oncontextmenu = this.#events.cancel as (e: MouseEvent) => unknown;
         });
     }
 
@@ -128,8 +149,8 @@ export default class ExplosivesTemplate {
     async #finishPlacement() {
         canvas.stage.removeChild(this.#container);
         this.#container.destroy({ children: true });
-        (canvas.stage as any).off("mousemove", this.#events.move);
-        (canvas.stage as any).off("mousedown", this.#events.confirm);
+        canvas.stage.off("mousemove", this.#events.move);
+        canvas.stage.off("mousedown", this.#events.confirm);
         canvas.app.view.oncontextmenu = null;
         this.#initialLayer?.activate();
         await this.actorSheet?.maximize();
@@ -138,7 +159,7 @@ export default class ExplosivesTemplate {
     /**
      * Handle mouse movement during placement.
      */
-    #onMovePlacement(event: any) {
+    #onMovePlacement(event: PIXI.FederatedEvent) {
         event.stopPropagation();
         const now = Date.now();
         if (now - this.#moveTime <= 20) return;
@@ -183,7 +204,7 @@ export default class ExplosivesTemplate {
     /**
      * Confirm placement and create a Region document.
      */
-    async #onConfirmPlacement(_event: any) {
+    async #onConfirmPlacement(_event: PIXI.FederatedEvent) {
         // Block placement through walls
         const origin = { x: this.originX, y: this.originY };
         const target = { x: this.previewX, y: this.previewY };
@@ -225,7 +246,7 @@ export default class ExplosivesTemplate {
     /**
      * Cancel placement on right-click.
      */
-    async #onCancelPlacement(_event: any) {
+    async #onCancelPlacement(_event: MouseEvent) {
         await this.#finishPlacement();
         this.#events.reject();
     }

@@ -13,6 +13,7 @@ import {registerDragListeners} from "./sheet-listeners/drag";
 
 // Helper modules
 import {bindPrimaryTabs} from "../system/utilities/bind-tabs";
+import {isCharacterActor} from "../system/type-guards";
 import {deleteItem, addItem, onItemCreate} from "./sheet-helpers/item-crud";
 import {
     onDropCharacterTemplate, onDropSpeciesTemplate, onDropItemGroup,
@@ -136,7 +137,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         const root = this.element as HTMLElement;
 
-        bindPrimaryTabs(this as any, root);
+        bindPrimaryTabs(this, root);
 
         // Roll triggers must be bound for any owner regardless of edit mode —
         // V2 sheets render in PLAY mode by default (isEditable === false), but
@@ -163,6 +164,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
         root.querySelectorAll(".create-character").forEach((elem) =>
             elem.addEventListener("click", async () => {
+                if (!isCharacterActor(this.document)) return;
                 const newChar = new OD6SCreateCharacter(this.document,
                     od6sutilities.getAllItemsByType("character-template"));
                 newChar.render({force: true});
@@ -241,13 +243,14 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         await this.render();
     }
 
-    async _onAvailableActionAdd(event: any) {
+    async _onAvailableActionAdd(event: Event) {
+        const target = event.currentTarget as HTMLElement;
         await this._createAction({
-            name: event.currentTarget.dataset.name,
+            name: target.dataset.name!,
             type: "availableaction",
-            subtype: event.currentTarget.dataset.type,
-            itemId: event.currentTarget.dataset.id,
-            rollable: event.currentTarget.dataset.rollable,
+            subtype: target.dataset.type!,
+            itemId: target.dataset.id,
+            rollable: target.dataset.rollable,
         });
     }
 
@@ -255,35 +258,35 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Drop Handling (delegates)                    */
     /* -------------------------------------------- */
 
-    async _onDropItemGroup(event: any, item: any, data: any) {
+    async _onDropItemGroup(event: Event, item: OD6SItemGroupItem, data: Record<string, unknown>) {
         return onDropItemGroup(this, event, item, data);
     }
 
-    async _onDropSpeciesTemplate(event: any, item: any, data: any) {
+    async _onDropSpeciesTemplate(event: Event, item: OD6SSpeciesTemplateItem, data: Record<string, unknown>) {
         return onDropSpeciesTemplate(this, event, item, data);
     }
 
-    async _onDropCharacterTemplate(event: any, item: any, data: any) {
+    async _onDropCharacterTemplate(event: Event, item: OD6SCharacterTemplateItem, data: Record<string, unknown>) {
         return onDropCharacterTemplate(this, event, item, data);
     }
 
-    async _addCharacterTemplate(item: any) {
+    async _addCharacterTemplate(item: OD6SCharacterTemplateItem) {
         return addCharacterTemplate(this, item);
     }
 
-    async _templateItems(itemList: any) {
+    async _templateItems(itemList: OD6STemplateItemEntry[]) {
         return templateItems(this, itemList);
     }
 
-    async _onDrop(event: any) {
+    async _onDrop(event: DragEvent) {
         return onDrop(this, event);
     }
 
-    async _onDropItem(event: any, data: any) {
+    async _onDropItem(event: DragEvent, data: Record<string, unknown>) {
         return onDropItem(this, event, data);
     }
 
-    async _onDropActor(event: any, data: any) {
+    async _onDropActor(event: Event, data: Record<string, unknown>) {
         return onDropActor(this, event, data);
     }
 
@@ -291,19 +294,19 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Sorting Methods (delegates)                  */
     /* -------------------------------------------- */
 
-    _onSortItem(event: any, itemData: any) {
+    _onSortItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortItem(this, event, itemData);
     }
 
-    async _onSortCrew(event: any, data: any) {
+    async _onSortCrew(event: DragEvent, data: { crewUuid: string }) {
         return onSortCrew(this, event, data);
     }
 
-    async _onSortContainerItem(event: any, itemData: any) {
+    async _onSortContainerItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortContainerItem(this, event, itemData);
     }
 
-    async _onSortCargoItem(event: any, itemData: any) {
+    async _onSortCargoItem(event: DragEvent, itemData: { _id: string; [key: string]: unknown }) {
         return onSortCargoItem(this, event, itemData);
     }
 
@@ -311,7 +314,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Utility Methods                              */
     /* -------------------------------------------- */
 
-    _isEquippable(itemType: any) {
+    _isEquippable(itemType: string) {
         return OD6S.equippable.includes(itemType);
     }
 
@@ -361,9 +364,11 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         return rollAvailableAction(this, ev);
     }
 
-    async _editEffect(ev: any) {
-        const effect = this.document.effects.find((e: any) => e.id === ev.currentTarget.dataset.effectId);
-        new (foundry.applications.sheets as any).ActiveEffectConfig({document: effect}).render({force: true});
+    async _editEffect(ev: Event) {
+        const target = ev.currentTarget as HTMLElement;
+        const effect = this.document.effects.find((e: ActiveEffect) => e.id === target.dataset.effectId);
+        if (!effect) return;
+        new foundry.applications.sheets.ActiveEffectConfig({document: effect}).render({force: true});
     }
 
     /* -------------------------------------------- */
