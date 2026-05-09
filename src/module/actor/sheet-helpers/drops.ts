@@ -10,15 +10,45 @@ import {
 } from "../../system/type-guards";
 
 /**
+ * Minimal sheet shape consumed by the drop helpers. Avoiding `OD6SActorSheet`
+ * here breaks the actor-sheet ↔ helpers import cycle.
+ */
+interface DropSheetLike {
+    document: Actor;
+    render: () => unknown;
+    linkCrew: (uuid: string) => Promise<unknown>;
+    _isEquippable: (type: string) => boolean;
+    _createAction: (data: {
+        name: string; type?: string; subtype: string; rollable?: boolean | string; itemId?: string
+    }) => Promise<unknown>;
+    _onSortItem: (event: DragEvent, data: { _id: string; [key: string]: unknown }) => unknown;
+    _onSortCrew: (event: DragEvent, data: { crewUuid: string }) => unknown;
+    _onSortCargoItem: (event: DragEvent, data: { _id: string; [key: string]: unknown }) => unknown;
+    _onSortContainerItem: (event: DragEvent, data: { _id: string; [key: string]: unknown }) => unknown;
+}
+
+/** Drop payload returned by the drag-drop layer; type/uuid plus arbitrary extras. */
+type DropData = Record<string, unknown> & {
+    type?: string;
+    uuid?: string;
+    actorId?: string;
+    sceneId?: string;
+    tokenId?: string;
+    actor?: string;
+    itemId?: string;
+    _id?: string;
+};
+
+/**
  * Override for the _onDrop handler.
  */
-export async function onDrop(sheet: any, event: any) {
+export async function onDrop(sheet: DropSheetLike, event: DragEvent | { preventDefault: () => unknown; dataTransfer: { getData: (k: string) => string }; target?: unknown; currentTarget?: unknown }) {
     event.preventDefault();
     // Try to extract the data
 
-    let data;
+    let data: DropData;
     try {
-        data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        data = JSON.parse(event.dataTransfer!.getData('text/plain')) as DropData;
     } catch {
         return false;
     }
@@ -31,20 +61,20 @@ export async function onDrop(sheet: any, event: any) {
     // Handle different data types
     switch (data.type) {
         case "ActiveEffect":
-            return onDropActiveEffect(sheet, event, data);
+            return onDropActiveEffect(sheet, event as Event, data);
         case "Actor":
-            return onDropActor(sheet, event, data);
+            return onDropActor(sheet, event as Event, data);
         case "Item": {
             const item = await Item.fromDropData(data);
             switch (item.type) {
                 case "character-template":
-                    if (isCharacterTemplateItem(item)) return onDropCharacterTemplate(sheet, event, item, data);
+                    if (isCharacterTemplateItem(item)) return onDropCharacterTemplate(sheet, event as Event, item, data);
                     return;
                 case "item-group":
-                    if (isItemGroupItem(item)) return onDropItemGroup(sheet, event, item, data);
+                    if (isItemGroupItem(item)) return onDropItemGroup(sheet, event as Event, item, data);
                     return;
                 case "species-template":
-                    if (isSpeciesTemplateItem(item)) return onDropSpeciesTemplate(sheet, event, item, data);
+                    if (isSpeciesTemplateItem(item)) return onDropSpeciesTemplate(sheet, event as Event, item, data);
                     return;
                 case "skill": {
                     if (!isSkillItem(item)) return;
@@ -53,7 +83,7 @@ export async function onDrop(sheet: any, event: any) {
                         ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
                         return;
                     } else {
-                        return onDropItem(sheet, event, data);
+                        return onDropItem(sheet, event as DragEvent, data);
                     }
                 }
                 case "specialization": {
@@ -69,31 +99,32 @@ export async function onDrop(sheet: any, event: any) {
                         ui.notifications.warn(game.i18n.localize('OD6S.DOES_NOT_POSSESS_SKILL'));
                         return;
                     } else {
-                        return onDropItem(sheet, event, data);
+                        return onDropItem(sheet, event as DragEvent, data);
                     }
                 }
                 default:
-                    return onDropItem(sheet, event, data);
+                    return onDropItem(sheet, event as DragEvent, data);
             }
         }
         case "Folder":
-            return onDropFolder(sheet, event, data);
+            return onDropFolder(sheet, event as DragEvent, data);
         case "availableaction":
-            return await sheet._createAction(data);
+            return await sheet._createAction(data as unknown as Parameters<typeof sheet._createAction>[0]);
         case "assignedaction":
             data.type = "action";
             data._id = data.itemId;
-            return await sheet._onSortItem(event, data);
+            return await sheet._onSortItem(event as DragEvent, data as { _id: string; [k: string]: unknown });
         case "crewmember":
-            return await sheet._onSortCrew(event, data);
+            return await sheet._onSortCrew(event as DragEvent, data as { crewUuid: string });
     }
     sheet.render();
+    return undefined;
 }
 
 /**
  * Override for the _onDropItem handler.
  */
-export async function onDropItem(sheet: any, event: any, data: any) {
+export async function onDropItem(sheet: DropSheetLike, event: DragEvent, data: DropData) {
     if (!sheet.document.isOwner) return false;
     const item = await Item.implementation.fromDropData(data);
     const itemData = item.toObject();
@@ -111,7 +142,7 @@ export async function onDropItem(sheet: any, event: any, data: any) {
             itemData.type !== 'advantage' &&
             itemData.type !== 'disadvantage' &&
             itemData.type !== 'specialability') {
-            itemData.effects.forEach((i: any) => {
+            (itemData.effects as Array<{ disabled?: boolean; transfer?: boolean }>).forEach((i) => {
                 i.disabled = true;
             })
         }
@@ -129,7 +160,7 @@ export async function onDropItem(sheet: any, event: any, data: any) {
             if (sheet._isEquippable(itemData.type)) {
                 itemData.system.equipped.value = false;
             }
-            itemData.effects.forEach((i: any) => {
+            (itemData.effects as Array<{ disabled?: boolean; transfer?: boolean }>).forEach((i) => {
                 i.disabled = true;
                 i.transfer = false;
             })
@@ -137,7 +168,7 @@ export async function onDropItem(sheet: any, event: any, data: any) {
     }
 
     // Handle item sorting within the same Actor
-    if (item.parent !== null && data.uuid.startsWith(item.parent.uuid)) {
+    if (item.parent !== null && data.uuid!.startsWith(item.parent.uuid)) {
         if (sheet.document.type === 'starship' || sheet.document.type === 'vehicle' &&
             !OD6S.allowedItemTypes[sheet.document.type].includes(itemData.type)) {
             await sheet._onSortItem(event, itemData);
@@ -152,8 +183,8 @@ export async function onDropItem(sheet: any, event: any, data: any) {
         let sourceActor;
         if (typeof (data.actorId) !== 'undefined' && data.actorId !== null && data.actor !== '') {
             if (typeof (data.tokenId) !== 'undefined' && data.tokenId !== null && data.tokenId !== '') {
-                const scene = game.scenes.get(data.sceneId);
-                // @ts-expect-error
+                const scene = game.scenes.get(data.sceneId!);
+                // @ts-expect-error - synthetic .object on TokenDocument set by canvas
                 sourceActor = scene!.tokens.get(data.tokenId).object.actor;
             } else {
                 sourceActor = game.actors.get(data.actorId);
@@ -179,25 +210,26 @@ export async function onDropItem(sheet: any, event: any, data: any) {
 /**
  * Override for the _onDropActor handler.
  */
-export async function onDropActor(sheet: any, event: any, data: any) {
+export async function onDropActor(sheet: DropSheetLike, _event: Event, data: DropData) {
     if (!sheet.document.isOwner) return false;
 
     if (sheet.document.type === "vehicle" || sheet.document.type === "starship") {
-        if (sheet.document.system.embedded_pilot.value) {
+        if ((sheet.document.system as { embedded_pilot: { value: boolean } }).embedded_pilot.value) {
             let pilotActor: Actor | undefined;
-            if (data.uuid.startsWith('Compendium')) {
-                pilotActor = await fromUuid(data.uuid);
+            if (data.uuid!.startsWith('Compendium')) {
+                pilotActor = await fromUuid(data.uuid!);
             } else {
-                pilotActor = await od6sutilities.getActorFromUuid(data.uuid);
+                pilotActor = await od6sutilities.getActorFromUuid(data.uuid!);
             }
             if (typeof (pilotActor) === 'undefined') {
                 ui.notifications.warn(game.i18n.localize('OD6S.ACTOR_NOT_FOUND'));
                 return false;
             }
 
-            await sheet.document.addEmbeddedPilot(pilotActor);
+            await (sheet.document as Actor & { addEmbeddedPilot: (a: Actor) => Promise<unknown> })
+                .addEmbeddedPilot(pilotActor);
         } else {
-            await sheet.linkCrew(data.uuid);
+            await sheet.linkCrew(data.uuid!);
         }
     }
     return undefined;
@@ -208,11 +240,9 @@ export async function onDropActor(sheet: any, event: any, data: any) {
  * `_onDropActiveEffect`; ActorSheetV2 does not, so the prior call site
  * threw TypeError and the drop silently failed (#71).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function onDropActiveEffect(sheet: any, _event: any, data: any) {
+export async function onDropActiveEffect(sheet: DropSheetLike, _event: Event, data: DropData) {
     if (!sheet.document.isOwner) return false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const effect = await (ActiveEffect as any).implementation.fromDropData(data);
+    const effect = await ActiveEffect.implementation.fromDropData(data);
     if (!effect) return false;
     // Don't re-create an effect that's already on this actor.
     if (effect.target === sheet.document) return false;
@@ -229,21 +259,20 @@ export async function onDropActiveEffect(sheet: any, _event: any, data: any) {
  * flags, effect transfer disabling, container repacks) all apply
  * exactly as they would for an individual drop.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function onDropFolder(sheet: any, event: any, data: any) {
+export async function onDropFolder(sheet: DropSheetLike, event: DragEvent, data: DropData) {
     if (!sheet.document.isOwner) return false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const folder = await (Folder as any).implementation.fromDropData(data);
+    const folder = await Folder.implementation.fromDropData(data);
     if (!folder || folder.type !== "Item") return false;
 
     // Folder.children is an array of {folder, depth, root} wrappers in
     // v14 client side; .contents is the immediate documents.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const collected: any[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const walk = (f: any) => {
+    const collected: FoundryDocument[] = [];
+    const walk = (f: Folder) => {
         for (const doc of f.contents ?? []) collected.push(doc);
-        for (const child of f.children ?? []) walk(child.folder ?? child);
+        for (const child of f.children ?? []) {
+            const sub = (child as { folder?: Folder }).folder ?? (child as Folder);
+            walk(sub);
+        }
     };
     walk(folder);
 

@@ -258,35 +258,35 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Drop Handling (delegates)                    */
     /* -------------------------------------------- */
 
-    async _onDropItemGroup(event: any, item: any, data: any) {
+    async _onDropItemGroup(event: Event, item: OD6SItemGroupItem, data: Record<string, unknown>) {
         return onDropItemGroup(this, event, item, data);
     }
 
-    async _onDropSpeciesTemplate(event: any, item: any, data: any) {
+    async _onDropSpeciesTemplate(event: Event, item: OD6SSpeciesTemplateItem, data: Record<string, unknown>) {
         return onDropSpeciesTemplate(this, event, item, data);
     }
 
-    async _onDropCharacterTemplate(event: any, item: any, data: any) {
+    async _onDropCharacterTemplate(event: Event, item: OD6SCharacterTemplateItem, data: Record<string, unknown>) {
         return onDropCharacterTemplate(this, event, item, data);
     }
 
-    async _addCharacterTemplate(item: any) {
+    async _addCharacterTemplate(item: OD6SCharacterTemplateItem) {
         return addCharacterTemplate(this, item);
     }
 
-    async _templateItems(itemList: any) {
+    async _templateItems(itemList: OD6STemplateItemEntry[]) {
         return templateItems(this, itemList);
     }
 
-    async _onDrop(event: any) {
+    async _onDrop(event: DragEvent) {
         return onDrop(this, event);
     }
 
-    async _onDropItem(event: any, data: any) {
+    async _onDropItem(event: DragEvent, data: Record<string, unknown>) {
         return onDropItem(this, event, data);
     }
 
-    async _onDropActor(event: any, data: any) {
+    async _onDropActor(event: Event, data: Record<string, unknown>) {
         return onDropActor(this, event, data);
     }
 

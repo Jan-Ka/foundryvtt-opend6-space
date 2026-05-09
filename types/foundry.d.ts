@@ -532,6 +532,9 @@ declare class ActiveEffect extends FoundryDocument {
     icon: string;
     duration: any;
     toDragData(): any;
+    toObject(): Record<string, unknown>;
+    static implementation: typeof ActiveEffect;
+    static fromDropData(data: unknown): Promise<ActiveEffect | undefined>;
 }
 
 interface ActiveEffectChange {
@@ -643,7 +646,10 @@ interface CompendiumPack {
 declare class Folder extends FoundryDocument {
     type: string;
     displayed: boolean;
-    children: Folder[];
+    children: Array<Folder | { folder: Folder; depth?: number; root?: boolean }>;
+    contents?: FoundryDocument[];
+    static implementation: typeof Folder;
+    static fromDropData(data: unknown): Promise<Folder | undefined>;
 }
 
 // ---- Region (v14 - replaces MeasuredTemplate) ----
