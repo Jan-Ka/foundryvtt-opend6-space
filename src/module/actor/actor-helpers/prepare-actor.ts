@@ -1,22 +1,23 @@
 import {od6sutilities} from "../../system/utilities";
 import OD6S from "../../config/config-od6s";
 import {computeSkillDisplayScore} from "./skill-score";
+import {isCharacterActor, isVehicleActor, isContainerActor} from "../../system/type-guards";
 
-export function prepareBaseActorData(actor: any): void {
+export function prepareBaseActorData(actor: Actor): void {
     // Set all mod values to zero
-    if(actor.type.match(/^(character|npc|creature)/)) {
+    if (isCharacterActor(actor)) {
         for (const a in actor.system.attributes) {
             actor.system.attributes[a].mod = 0;
             actor.system.attributes[a].label = OD6S.attributes[a].name;
         }
 
-        const mList = {...OD6S.data_tab.offense, ...OD6S.data_tab.defense}
+        const mList = {...OD6S.data_tab.offense, ...OD6S.data_tab.defense};
         for (const m in mList) {
-            actor.system[m].mod = 0;
+            (actor.system as unknown as Record<string, OD6SModScoreField>)[m].mod = 0;
         }
     }
 
-    if (['starship', 'vehicle'].includes(actor.type)) {
+    if (isVehicleActor(actor)) {
         actor.system.sensors.mod = 0;
         for (const a in actor.system.attributes) {
             actor.system.attributes[a].mod = 0;
@@ -24,20 +25,27 @@ export function prepareBaseActorData(actor: any): void {
         }
     }
 
-    if (typeof(actor.system.use_wild_die) === 'undefined') {
-        if (actor.type !== 'vehicle' && actor.type !== 'starship' && actor.type !== 'container' && actor.type !== 'base') {
+    if (!isVehicleActor(actor) && !isContainerActor(actor) && isCharacterActor(actor)) {
+        if (typeof actor.system.use_wild_die === 'undefined') {
             actor.system.use_wild_die = true;
         }
     }
 }
 
-export async function prepareDerivedActorData(actor: any): Promise<void> {
-    const actorData = actor.system;
-
-    if(actor.type.match(/^(character|npc|creature)/)) {
+export async function prepareDerivedActorData(actor: Actor): Promise<void> {
+    if (isCharacterActor(actor)) {
+        const actorData = actor.system;
         if (OD6S.woundConfig === 1) {
-            actorData.wounds.value =
-                Object.keys(Object.fromEntries(Object.entries(OD6S.deadliness[3]).filter(([_k, v]: any) => v!.description === actor.getWoundLevelFromBodyPoints())))[0];
+            actorData.wounds.value = Number(
+                Object.keys(
+                    Object.fromEntries(
+                        Object.entries(OD6S.deadliness[3]).filter(
+                            ([_k, v]: [string, { description: string }]) =>
+                                v.description === actor.getWoundLevelFromBodyPoints(),
+                        ),
+                    ),
+                )[0],
+            );
         } else if (OD6S.woundConfig === 2) {
             actorData.wounds.value = 0;
         }
@@ -45,116 +53,121 @@ export async function prepareDerivedActorData(actor: any): Promise<void> {
         // Remove mortally wounded flag if actor is not mortally wounded
         if (actor.getFlag('od6s', 'mortally_wounded')) {
             if (OD6S.woundsId[od6sutilities.getWoundLevel(actor.system.wounds.value, actor)] !== 'mortally_wounded') {
-                await actor.unsetFlag('od6s','mortally_wounded');
+                await actor.unsetFlag('od6s', 'mortally_wounded');
             }
         }
-    }
 
-    if (['character','npc'].includes(actor.type)) {
-        actor.system.species.label = OD6S.speciesLabelName;
-    }
+        if (actor.type === 'character' || actor.type === 'npc') {
+            actor.system.species.label = OD6S.speciesLabelName;
+        }
 
-    if (actor.type === 'character') {
-        actor.system.chartype.label = OD6S.typeLabel;
+        if (actor.type === 'character') {
+            actor.system.chartype.label = OD6S.typeLabel;
+        }
     }
 
     actor.applyMods();
 
-    if (actor.type !== 'container') actor.setInitiative(actorData);
+    if (!isContainerActor(actor)) actor.setInitiative();
 
     // Iterate over custom active effects and handle them
-    const changes = [];
+    const changes: ActiveEffectChange[] = [];
     const itemRegex = new RegExp(`^(system)?.?(items)?.?(skill|specialization|weapon|vehicle-weapon|starship-weapon)s?`);
 
-    for ( const effect of actor.allApplicableEffects() ) {
+    for (const effect of actor.allApplicableEffects()) {
         if (!effect.active) continue;
-        changes.push(...effect.changes.filter((c: any) => c.type === "custom" &&
-            !c.key.match(itemRegex)));
+        changes.push(...effect.changes.filter((c) => c.type === "custom" && !c.key.match(itemRegex)));
     }
 
-    for (const change in changes) {
-        if(changes[change].key.match(itemRegex)) continue;
-        const changeValue = od6sutilities.evaluateChange(changes[change], actor)
-        const origValue = foundry.utils.getProperty(actor, changes[change].key);
-        if (typeof(origValue) === 'undefined' || origValue === null) continue;
-        foundry.utils.setProperty(actor, changes[change].key, changeValue + origValue)
+    for (const change of changes) {
+        if (change.key.match(itemRegex)) continue;
+        const changeValue = od6sutilities.evaluateChange(change, actor);
+        const origValue = foundry.utils.getProperty(actor, change.key);
+        if (typeof origValue === 'undefined' || origValue === null) continue;
+        foundry.utils.setProperty(actor, change.key, changeValue + origValue);
         actor.applyMods();
     }
 
     // Iterate over owned items and apply custom active effects
-    for (const item in actor.items.contents) {
-        const i = actor.items.contents[item];
+    for (const i of actor.items.contents) {
         i.findActiveEffects();
         i.applyMods();
 
         if (i.type === 'skill' || i.type === 'specialization') {
+            const skillSystem = i.system as OD6SSkillItemSystem | OD6SSpecializationItemSystem;
             // `system.score` is the canonical own-progression value (base + mod),
             // already reset by `i.applyMods()` above. `system.total` is the display
             // value that includes the linked attribute (and respects flatSkills /
             // advanced-skill rules). Templates and roll-dialog data-score reads
             // should consume `system.total`; roll-formula consumers add the
             // attribute themselves and therefore stay on `system.score`.
-            const attrKey = typeof i.system.attribute === 'string' ? i.system.attribute : undefined;
-            const attribute = attrKey ? actor.system.attributes?.[attrKey] : undefined;
-            i.system.total = computeSkillDisplayScore({
-                base: i.system.base,
-                mod: i.system.mod,
-                isAdvancedSkill: i.type === 'skill' && i.system.isAdvancedSkill,
+            const attrKey = typeof skillSystem.attribute === 'string' ? skillSystem.attribute : undefined;
+            const attribute = attrKey && !isContainerActor(actor)
+                ? actor.system.attributes?.[attrKey]
+                : undefined;
+            skillSystem.total = computeSkillDisplayScore({
+                base: skillSystem.base,
+                mod: skillSystem.mod,
+                isAdvancedSkill: i.type === 'skill' && (skillSystem as OD6SSkillItemSystem).isAdvancedSkill,
                 attributeScore: attribute?.score,
                 flatSkills: OD6S.flatSkills,
             });
-            i.system.totalText = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(i.system.total));
+            skillSystem.totalText = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(skillSystem.total));
         }
     }
 
-    if (actor.type !== 'container') {
+    if (!isContainerActor(actor)) {
         for (const a in actor.system.attributes) {
             const dice = od6sutilities.getDiceFromScore(actor.system.attributes[a].score);
             actor.system.attributes[a].text = `${od6sutilities.getTextFromDice(dice)}`;
         }
     }
 
-    if (['starship', 'vehicle'].includes(actor.type)) {
+    if (isVehicleActor(actor)) {
         if (actor.system.crew.value > 0) {
             await actor.sendVehicleData();
         }
     }
 }
 
-export function applyMods(actor: any): void {
+export function applyMods(actor: Actor): void {
+    if (isContainerActor(actor)) return;
     const actorData = actor.system;
 
     for (const a in actorData.attributes) {
         actorData.attributes[a].score = actorData.attributes[a].base + actorData.attributes[a].mod;
-        if(actor.type.match(/^(character|npc|creature)/)) {
-            actorData.strengthdamage.score = setStrengthDamageBonus(actor);
-        }
     }
 
-    if(actor.type.match(/^(character|npc|creature)/)) {
-        actor.system.pr.score = setResistance(actor, 'pr')
+    if (isCharacterActor(actor)) {
+        // Compute after the attribute loop so str.score reflects base+mod.
+        actor.system.strengthdamage.score = setStrengthDamageBonus(actor);
+        actor.system.pr.score = setResistance(actor, 'pr');
         actor.system.pr.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(actor.system.pr.score));
-        actor.system.er.score = setResistance(actor, 'er')
+        actor.system.er.score = setResistance(actor, 'er');
         actor.system.er.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(actor.system.er.score));
-        actor.system.noArmor = {};
-        actor.system.noArmor.mod = 0;
-        actor.system.noArmor.score = setResistance(actor, 'noArmor');
+        actor.system.noArmor = {
+            label: game.i18n.localize("OD6S.RESISTANCE_NO_ARMOR"),
+            mod: 0,
+            score: setResistance(actor, 'noArmor'),
+        };
         actor.system.noArmor.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(actor.system.noArmor.score));
-        actor.system.noArmor.label = game.i18n.localize("OD6S.RESISTANCE_NO_ARMOR")
     }
 }
 
-export function setStrengthDamageBonus(actor: any): any {
+export function setStrengthDamageBonus(actor: Actor): number {
+    if (!isCharacterActor(actor)) return 0;
     let damage;
-    if(!actor.type.match(/^(character|npc|creature)/)) return 0;
 
     // If game setting is true, use straight strength score plus modifier
     if (game.settings.get('od6s', 'strength_damage')) {
         return actor.system.attributes?.str.score + actor.system.strengthdamage?.mod;
     }
 
-    const liftSkill = actor.items.find((skill: any) => skill.name === OD6S.strDamSkill);
-    const base = liftSkill ? liftSkill.system.score + actor.system.attributes.str.score : actor.system.attributes.str.score;
+    const liftSkill = actor.items.find((skill) => skill.name === OD6S.strDamSkill);
+    const liftScore = liftSkill && (liftSkill.type === 'skill' || liftSkill.type === 'specialization')
+        ? (liftSkill.system as OD6SSkillItemSystem | OD6SSpecializationItemSystem).score
+        : 0;
+    const base = liftSkill ? liftScore + actor.system.attributes.str.score : actor.system.attributes.str.score;
 
     if (game.settings.get('od6s', 'od6_bonus')) {
         // Use base directly multiplied by the multiplier
@@ -164,18 +177,16 @@ export function setStrengthDamageBonus(actor: any): any {
         // Calculate based on dice conversion and then apply half dice logic
         const dice = Math.ceil(base / OD6S.pipsPerDice);
         const halfDice = OD6S.strDamRound ? Math.floor(dice / 2) : Math.ceil(dice / 2);
-        damage = (halfDice * OD6S.pipsPerDice) + actor.system.strengthdamage.mod;
+        damage = halfDice * OD6S.pipsPerDice;
     }
 
     damage += actor.system.strengthdamage.mod; // Always add modifier to the damage
     return damage;
 }
 
-export function setInitiative(actor: any): any {
-    if (actor.type === 'container' || actor.type === 'base') return
-    if (actor.type === 'vehicle' || actor.type === 'starship') {
-        if (!actor.system.embedded_pilot) return;
-    }
+export function setInitiative(actor: Actor): OD6SCharacterSystem | OD6SVehicleSystem | undefined {
+    if (isContainerActor(actor)) return;
+    if (isVehicleActor(actor) && !actor.system.embedded_pilot.value) return;
     // Base init is the character's perception score.  Special abilities and optional rules may add to it.
     // Using perception can be overridden in system config options
     // 0.7.3 add an option to change the base attribute
@@ -189,17 +200,20 @@ export function setInitiative(actor: any): any {
     return actor.system;
 }
 
-export function setResistance(actor: any, type: any): any {
+export type ResistanceKey = 'pr' | 'er' | 'noArmor';
+
+export function setResistance(actor: Actor, type: ResistanceKey): number {
+    if (!isCharacterActor(actor)) return 0;
     let dr = 0;
-    if (['vehicle', 'starship', 'container', 'base'].includes(actor.type)) return 0;
 
     // Accumulate DR from equipped and undamaged armor
     if (actor.itemTypes.armor && type !== 'noArmor') {
-        actor.itemTypes.armor.forEach((armor: any) => {
-            if (armor.system.equipped.value) {
-                dr += armor.system[type];
-                if (armor.system.damaged > 0) {
-                    dr -= OD6S.armorDamage[armor.system.damaged].penalty;
+        actor.itemTypes.armor.forEach((armor) => {
+            const armorSystem = armor.system as OD6SArmorItemSystem;
+            if (armorSystem.equipped.value) {
+                dr += (armorSystem as unknown as Record<string, number>)[type];
+                if (armorSystem.damaged !== undefined && armorSystem.damaged > 0) {
+                    dr -= OD6S.armorDamage[armorSystem.damaged].penalty;
                     dr = Math.max(0, dr);
                 }
             }
@@ -207,10 +221,13 @@ export function setResistance(actor: any, type: any): any {
     }
 
     if (OD6S.resistanceOption) {
-        const staminaItem = actor.items.find((skill: any) => skill.name === OD6S.resistanceSkill);
-        const staminaScore = staminaItem ? parseInt(staminaItem.system.score, 10) : 0;
-        const staminaAttr= staminaItem ? staminaItem.system.attribute : 'str';
-        const strScore = parseInt(actor.system.attributes[staminaAttr].score, 10);
+        const staminaItem = actor.items.find((skill) => skill.name === OD6S.resistanceSkill);
+        const staminaSystem = staminaItem && (staminaItem.type === 'skill' || staminaItem.type === 'specialization')
+            ? (staminaItem.system as OD6SSkillItemSystem | OD6SSpecializationItemSystem)
+            : undefined;
+        const staminaScore = staminaSystem ? Number(staminaSystem.score) : 0;
+        const staminaAttr = staminaSystem ? staminaSystem.attribute : 'str';
+        const strScore = Number(actor.system.attributes[staminaAttr].score);
 
         // Default the resistance multiplier if not set or zero
         if (!OD6S.resistanceMultiplier || OD6S.resistanceMultiplier === 0) {
@@ -221,9 +238,11 @@ export function setResistance(actor: any, type: any): any {
             Math.floor((staminaScore + strScore) * OD6S.resistanceMultiplier) :
             Math.ceil((staminaScore + strScore) * OD6S.resistanceMultiplier);
 
-        dr += damageResistance + actor.system[type].mod;
+        const modField = (actor.system as unknown as Record<string, OD6SModScoreField | undefined>)[type];
+        dr += damageResistance + (modField?.mod ?? 0);
     } else {
-        dr += actor.system.attributes.str.score + actor.system[type].mod;
+        const modField = (actor.system as unknown as Record<string, OD6SModScoreField | undefined>)[type];
+        dr += actor.system.attributes.str.score + (modField?.mod ?? 0);
     }
     return dr;
 }
