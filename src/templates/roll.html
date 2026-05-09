@@ -11,11 +11,11 @@
     {{#if (isDefense subtype)}}
     {{else}}
         {{#if targets.length }}
-            <div class="flexrow flex-group-left target" data-target="{{target}}">
+            <div class="flexrow flex-group-left target" data-target="{{target.id}}">
                 <label for="target">{{localize 'OD6S.TARGET'}}</label>
                 <select name="target" id="target">
                     {{#each targets as |t|}}
-                        <option value="{{t}}" {{#if (eq t ../target)}}selected{{/if}}>{{t.name}}</option>
+                        <option value="{{t.id}}" {{#if (eq t.id ../target.id)}}selected{{/if}}>{{t.name}}</option>
                     {{/each}}
                 </select>
             </div>

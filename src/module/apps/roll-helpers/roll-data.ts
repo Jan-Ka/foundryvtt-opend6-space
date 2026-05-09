@@ -82,6 +82,12 @@ export interface RollData {
     source: string;
     range: string;
     template: string;
+    /**
+     * Per-skill difficulty selection used by metaphysics rolls. Keyed by skill
+     * id; populated by metaphysics roll setup and mutated by the dialog's
+     * `.difficultylevel select` change handler. Absent for non-metaphysics rolls.
+     */
+    skills?: Record<string, { difficulty: string }>;
     only_stun: boolean;
     can_stun: boolean;
     stun: boolean;

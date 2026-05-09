@@ -2,32 +2,31 @@
 import {od6sutilities} from "../system/utilities";
 import OD6S, {type CharacterPointLimits} from "../config/config-od6s";
 import {od6sroll} from "./roll";
+import {isCharacterActor} from "../system/type-guards";
+import type {RollData} from "./roll-helpers/roll-data";
 
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
 /** Minimal sheet handle the dialog reads `rollData` from. */
 interface RollDialogActorSheet {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rollData: any;
+    rollData: RollData | undefined;
 }
 
 export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     actorSheet: RollDialogActorSheet;
-    // The roll dialog's runtime rollData is a wider blob than the typed
-    // `RollData` interface (it carries metaphysics `skills`, mutated
-    // `target = string`, etc); narrowing here would cascade through
-    // ~30 access chains. Keep `any` until rollData is unified.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rollData: any;
+    rollData: RollData;
     cpLimit: CharacterPointLimits;
     onSubmit: () => void | Promise<void>;
 
     constructor(actorSheet: RollDialogActorSheet, onSubmit: () => void | Promise<void>, options: object = {}) {
         super(options);
+        if (!actorSheet.rollData) {
+            throw new Error("RollDialog requires actorSheet.rollData to be populated");
+        }
         this.actorSheet = actorSheet;
-        this.rollData = this.actorSheet.rollData;
+        this.rollData = actorSheet.rollData;
         this.cpLimit = OD6S.characterPointLimits;
         this.onSubmit = onSubmit;
     }
@@ -68,9 +67,10 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     async _prepareContext(_options?: object): Promise<object> {
-        if (this.rollData.actor.type === "character") {
+        const actor = this.rollData.actor;
+        if (isCharacterActor(actor)) {
             this.rollData.cpcostcolor =
-                this.rollData.characterpoints > this.rollData.actor.system.characterpoints.value ? "red" : "black";
+                this.rollData.characterpoints > actor.system.characterpoints.value ? "red" : "black";
         }
         if (typeof this.rollData.rollmode !== "string") {
             this.rollData.rollmode = (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls"))
@@ -97,11 +97,12 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             let rollType = this.rollData.type;
             const actor = this.rollData.actor;
             if (rollType === "weapon") {
-                const item = actor.items.find((i: any) => i.id === this.rollData.itemid);
-                const spec = item.system.specialization;
-                if (actor.items.find((i: any) => i.type === "specialization" && i.name === spec)) {
+                const item = actor.items.find((i: Item) => i.id === this.rollData.itemid);
+                const spec = (item?.system as { specialization?: string } | undefined)?.specialization;
+                const skill = (item?.system as { skill?: string } | undefined)?.skill;
+                if (actor.items.find((i: Item) => i.type === "specialization" && i.name === spec)) {
                     rollType = "specialization";
-                } else if (actor.items.find((i: any) => i.type === "skill" && i.name === item.skill)) {
+                } else if (actor.items.find((i: Item) => i.type === "skill" && i.name === skill)) {
                     rollType = "skill";
                 } else {
                     rollType = "attribute";
@@ -116,6 +117,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             if (this.rollData.subtype === "vehicledodge") rollType = "dodge";
             if (this.rollData.subtype === "parry") rollType = "parry";
 
+            if (!isCharacterActor(actor)) return;
             if ((+this.rollData.characterpoints) >= this.cpLimit[rollType as keyof CharacterPointLimits]) {
                 ui.notifications.warn(game.i18n.localize("OD6S.MAX_CP"));
             } else if ((+this.rollData.characterpoints) >= actor.system.characterpoints.value) {
@@ -134,9 +136,11 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         find("#useattribute")?.addEventListener("change", async (ev) => {
             const value = (ev.target as HTMLSelectElement).value;
             this.rollData.attribute = value;
-            const attributeScore = this.rollData.actor.system.attributes[value].score;
-            const skillScore = this.rollData.actor.items
-                .filter((i: any) => i.name === this.rollData.label)[0].system.score;
+            const actor = this.rollData.actor;
+            if (!isCharacterActor(actor)) return;
+            const attributeScore = actor.system.attributes[value as keyof typeof actor.system.attributes].score;
+            const skillItem = actor.items.find((i: Item) => i.name === this.rollData.label);
+            const skillScore = (skillItem?.system as { score?: number } | undefined)?.score ?? 0;
             const newScore = (+attributeScore) + (+skillScore);
             const newDice = od6sutilities.getDiceFromScore(newScore);
             this.rollData.dice = newDice.dice;
@@ -157,7 +161,8 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
 
         find(".timer input")?.addEventListener("change", async (ev) => {
-            const item = this.rollData.actor.items.find((i: any) => i.id === this.rollData.itemid);
+            const item = this.rollData.actor.items.find((i: Item) => i.id === this.rollData.itemid);
+            if (!item) return;
             const value = (ev.target as HTMLInputElement).valueAsNumber;
             await item.setFlag("od6s", "explosiveTimer", value);
             this.rollData.timer = value;
@@ -165,16 +170,19 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
 
         find(".contact input")?.addEventListener("change", async () => {
-            const item = this.rollData.actor.items.find((i: any) => i.id === this.rollData.itemid);
+            const item = this.rollData.actor.items.find((i: Item) => i.id === this.rollData.itemid);
+            if (!item) return;
             await item.setFlag("od6s", "explosiveTimer", 0);
             this.rollData.contact = !this.rollData.contact;
-            this.rollData.timer = "";
+            this.rollData.timer = 0;
             await this.render();
         });
 
         find("#fatepoint")?.addEventListener("click", async () => {
+            const actor = this.rollData.actor;
+            if (!isCharacterActor(actor)) return;
             this.rollData.fatepoint = !this.rollData.fatepoint;
-            if (this.rollData.fatepoint && this.rollData.actor.system.fatepoints.value <= 0) {
+            if (this.rollData.fatepoint && actor.system.fatepoints.value <= 0) {
                 ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_FP_ROLL"));
                 this.rollData.fatepoint = !this.rollData.fatepoint;
             }
@@ -195,9 +203,11 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         find("#fulldefense")?.addEventListener("click", async () => {
             this.rollData.fulldefense = !this.rollData.fulldefense;
-            if (this.rollData.actor.system.stuns.current && this.rollData.actor.system.stuns.rounds > 0) {
+            const actor = this.rollData.actor;
+            if (isCharacterActor(actor)
+                && actor.system.stuns.current && actor.system.stuns.rounds > 0) {
                 this.rollData.stunnedpenalty = this.rollData.fulldefense
-                    ? 0 : this.rollData.actor.system.stuns.current;
+                    ? 0 : actor.system.stuns.current;
             }
             await this.render();
         });
@@ -237,7 +247,8 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
 
         find("#target")?.addEventListener("change", async (ev) => {
-            this.rollData.target = (ev.target as HTMLSelectElement).value;
+            const tokenId = (ev.target as HTMLSelectElement).value;
+            this.rollData.target = this.rollData.targets.find((t) => t.id === tokenId);
             await this.render();
         });
 
@@ -246,7 +257,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
                 const target = ev.target as HTMLSelectElement;
                 const wrapper = target.closest(".difficultylevel") as HTMLElement | null;
                 const skillKey = wrapper?.dataset.skill;
-                if (typeof skillKey !== "undefined") {
+                if (typeof skillKey !== "undefined" && this.rollData.skills) {
                     this.rollData.skills[skillKey].difficulty = target.value;
                 } else {
                     this.rollData.difficultylevel = target.value;
@@ -288,7 +299,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         });
 
         find("#miscmod")?.addEventListener("change", async (ev) => {
-            this.rollData.modifiers.miscmod = (ev.target as HTMLInputElement).value;
+            this.rollData.modifiers.miscmod = (ev.target as HTMLInputElement).valueAsNumber;
             await this.render();
         });
 
@@ -313,7 +324,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         this: RollDialog,
         _event: Event,
         _form: HTMLFormElement,
-        _formData: any,
+        _formData: object,
     ): Promise<void> {
         this.#submitted = true;
         await this.onSubmit();
