@@ -20,6 +20,8 @@ interface OD6SAttributeField {
     score: number;
     max?: number;
     min?: number;
+    /** Derived "<n>D+<p>" display text, refreshed each `prepareDerivedData`. */
+    text?: string;
 }
 
 interface OD6SModScoreField {
@@ -27,6 +29,8 @@ interface OD6SModScoreField {
     short_label?: string;
     mod: number;
     score: number;
+    /** Derived "<n>D+<p>" display text, refreshed each `applyMods`. */
+    text?: string;
 }
 
 interface OD6SModField {
@@ -90,6 +94,8 @@ interface OD6SCharacterSystem {
     block: OD6SModScoreField;
     pr: OD6SModScoreField;
     er: OD6SModScoreField;
+    /** Derived "no armor" resistance, recomputed each `applyMods`. */
+    noArmor?: OD6SModScoreField;
     credits: { type: string; label: string; value: number };
     funds: { type: string; label: string; score: number };
     sheetmode: { value: string };
@@ -216,6 +222,8 @@ interface OD6SVehicleSystem {
     };
     roll_mod: number;
     use_wild_die: boolean;
+    /** Initiative state (mirrors `OD6SVehicleCommon.initiative`). */
+    initiative: { type: string; label: string; formula: string; mod: number; score: number };
 }
 
 // ---- Item system data shapes ----
@@ -256,6 +264,10 @@ interface OD6SSkillFields {
     time_taken: string;
     isAdvancedSkill: boolean;
     used: { value: boolean };
+    /** Derived display value (own score + linked attribute), recomputed each `prepareDerivedData`. */
+    total?: number;
+    /** Derived "<n>D+<p>" text for `total`. */
+    totalText?: string;
 }
 
 /** Mixed in by advantage/disadvantage/cybernetic — `advantageFieldsSchema`. */
@@ -345,6 +357,12 @@ interface OD6SSpecialAbilityItemSystem extends OD6SItemBase {}
 interface OD6SArmorItemSystem extends OD6SItemBase, OD6SEquipment, OD6SEquip {
     pr: number;
     er: number;
+    /**
+     * Armor damage level (0-N) used by `setResistance` to subtract a penalty
+     * from the equipped DR. Not in the type-data schema — populated from
+     * legacy world data / active effects only.
+     */
+    damaged?: number;
 }
 
 interface OD6SWeaponItemSystem extends OD6SItemBase, OD6SEquipment, OD6SEquip {
