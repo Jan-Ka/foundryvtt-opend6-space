@@ -2,6 +2,7 @@ import {od6sutilities} from "./system/utilities";
 import OD6S from "./config/config-od6s";
 import {isVehicleActor} from "./system/type-guards";
 import {error as logError} from "./system/logger";
+import {unlinkCrew as unlinkCrewFromVehicle} from "./actor/sheet-helpers/crew";
 
 // Trust model for socketlib handlers
 // ----------------------------------
@@ -58,11 +59,14 @@ export interface DeleteExplosiveRegionPayload {
 }
 
 // Wrap each handler so failures leave an `[od6s:socket]` breadcrumb instead of
-// surfacing as bare "Uncaught (in promise)" rejections through socketlib.
-function register(name: string, handler: (...args: any[]) => unknown): void {
+// surfacing as bare "Uncaught (in promise)" rejections through socketlib. The
+// `Args` tuple generic preserves the handler's own parameter types at call
+// sites; only the dispatch boundary into socketlib's untyped `register`
+// remains `unknown[]`.
+function register<Args extends unknown[]>(name: string, handler: (...args: Args) => unknown): void {
     OD6S.socket.register(name, async (...args: unknown[]) => {
         try {
-            return await handler(...args);
+            return await handler(...(args as Args));
         } catch (err) {
             logError('socket', `${name} handler failed`, err);
             throw err;
@@ -111,7 +115,12 @@ async function userMayMutateVehicle(user: User, vehicle: Actor): Promise<boolean
     return false;
 }
 
-async function updateRollMessage(userId: string, messageId: string, update: any) {
+interface RollMessageUpdate {
+    content: string | number;
+    [key: string]: unknown;
+}
+
+async function updateRollMessage(userId: string, messageId: string, update: RollMessageUpdate) {
     const user = game.users.get(userId);
     if (!user) return denied('updateRollMessage', userId, 'unknown user');
     const message = game.messages.get(messageId);
@@ -286,7 +295,10 @@ async function unlinkCrew(userId: string, crewId: string, vehicleId: string) {
     if (!user.isGM && !vehicle.testUserPermission(user, 'OWNER') && !ownsCrew) {
         return denied('unlinkCrew', userId, `not authorized for crew=${crewId} on vehicle=${vehicleId}`);
     }
-    await (vehicle as any).sheet.unlinkCrew(crewId);
+    // Run the unlink directly on the document instead of going through the
+    // vehicle's sheet — the helper only ever needed the document, and the
+    // socket handler shouldn't depend on whatever sheet class is registered.
+    await unlinkCrewFromVehicle(vehicle, crewId);
 }
 
 async function addToVehicle(userId: string, vehicleId: string, crewId: string) {

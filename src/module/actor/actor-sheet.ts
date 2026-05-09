@@ -370,12 +370,12 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /*  Crew Management (delegates)                  */
     /* -------------------------------------------- */
 
-    async linkCrew(uuid: any) {
-        return linkCrew(this, uuid);
+    async linkCrew(uuid: string) {
+        return linkCrew(this.document, uuid);
     }
 
-    async unlinkCrew(crewID: any) {
-        return unlinkCrew(this, crewID);
+    async unlinkCrew(crewID: string) {
+        return unlinkCrew(this.document, crewID);
     }
 
     /* -------------------------------------------- */
