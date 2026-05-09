@@ -315,7 +315,7 @@ export function registerChatLogListeners() {
             let item = actor?.items.find((i: Item) => i.id === itemId);
             if (typeof (item) === "undefined") {
                 // See if the actor is a crewmember
-                if (isCharacterActor(actor!) && typeof actor.system.vehicle.name !== 'undefined') {
+                if (actor && isCharacterActor(actor) && typeof actor.system.vehicle.name !== 'undefined') {
                     const vehicleActor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
                     item = vehicleActor!.items.find((i: Item) => i.id === itemId);
                 }
@@ -335,6 +335,7 @@ export function registerChatLogListeners() {
             } else {
                 actor = game.actors.get(message!.speaker.actor)
             }
+            if (!actor) return;
             actor.sheet.render(true);
         })
 

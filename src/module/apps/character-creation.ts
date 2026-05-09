@@ -313,7 +313,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             elem.addEventListener("click", async (ev) => {
                 ev.preventDefault();
                 if (this.specScore === 0 && this.skillScore < OD6S.pipsPerDice) {
-                    (ui.notifications as any).warning("OD6S.NOT_ENOUGH_SKILL_DICE");
+                    ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SKILL_DICE"));
                     return;
                 }
                 const specData = (ev.currentTarget as HTMLElement).dataset as DOMStringMap;
@@ -358,7 +358,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             const before = {skill: this.skillScore, spec: this.specScore};
             const result = addSpecDiceBudget(this.skillScore, this.specScore, getAllocationConfig());
             if (!result.ok) {
-                ui.notifications.warn("OD6S.NOT_ENOUGH_SKILL_DICE");
+                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SKILL_DICE"));
             } else {
                 this.skillScore = result.skillScore;
                 this.specScore = result.specScore;
@@ -372,7 +372,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             const before = {skill: this.skillScore, spec: this.specScore};
             const result = removeSpecDiceBudget(this.skillScore, this.specScore, getAllocationConfig());
             if (!result.ok) {
-                ui.notifications.warn("OD6S.NOT_ENOUGH_SPECIALIZATION_DICE");
+                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SPECIALIZATION_DICE"));
             } else {
                 this.skillScore = result.skillScore;
                 this.specScore = result.specScore;

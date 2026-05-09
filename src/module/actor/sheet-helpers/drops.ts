@@ -34,7 +34,6 @@ type DropData = Record<string, unknown> & {
     actorId?: string;
     sceneId?: string;
     tokenId?: string;
-    actor?: string;
     itemId?: string;
     _id?: string;
 };
@@ -181,7 +180,7 @@ export async function onDropItem(sheet: DropSheetLike, event: DragEvent, data: D
     } else {
         // Could be dragging from sheet to sheet
         let sourceActor;
-        if (typeof (data.actorId) !== 'undefined' && data.actorId !== null && data.actor !== '') {
+        if (typeof (data.actorId) !== 'undefined' && data.actorId !== null && data.actorId !== '') {
             if (typeof (data.tokenId) !== 'undefined' && data.tokenId !== null && data.tokenId !== '') {
                 const scene = game.scenes.get(data.sceneId!);
                 // @ts-expect-error - synthetic .object on TokenDocument set by canvas
@@ -197,7 +196,7 @@ export async function onDropItem(sheet: DropSheetLike, event: DragEvent, data: D
                     await sourceActor!.deleteEmbeddedDocuments('Item', [item.id]);
                 }
             } else {
-                ui.notifications.warn('OD6S.WARN_NOT_DELETING_ITEM_OWNER');
+                ui.notifications.warn(game.i18n.localize('OD6S.WARN_NOT_DELETING_ITEM_OWNER'));
             }
         } else {
             await sheet.document.createEmbeddedDocuments("Item", [itemData]);
