@@ -1045,4 +1045,130 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.metaphysics, "metaphysics toggle not reset by DOM rename").toBe(true);
         expect(result.gender, "gender content not reset by DOM rename").toBe("seed-gender");
     });
+
+    test("rename while bio prose-mirror has unsaved draft does not blank stored bio (#159)", async ({page}) => {
+        // Probe for the leading hypothesis on #159: user types into the bio
+        // <prose-mirror> but has not clicked PM's own toolbar save when they
+        // change the name input; submitOnChange fires; what does the form
+        // submit harvest for the PM-bound fields?
+        //
+        // Acceptable outcomes:
+        //   (a) stored description equals the pre-edit seed — PM submitted
+        //       its committed value; the user's draft is dropped (a known
+        //       Foundry quirk, not data loss).
+        //   (b) stored description equals the typed draft — PM submitted
+        //       its live editor content.
+        //
+        // The bug case this test guards against:
+        //   (c) stored description is empty — PM submitted "" while there
+        //       was real content both in the document and in the editor.
+        //       That is the symptom owlsten reported as "the sheet was
+        //       reset".
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            const SEED_DESC = "<p>seed-description-body</p>";
+            const SEED_PERS = "<p>seed-personality-body</p>";
+            const SEED_BG = "<p>seed-background-body</p>";
+            await actor.update({
+                name: "smoke-persist",
+                system: {
+                    characterpoints: {value: 9},
+                    description: {content: SEED_DESC},
+                    personality: {content: SEED_PERS},
+                    background: {content: SEED_BG},
+                    gender: {content: "seed-gender"},
+                },
+            });
+
+            const sheet: any = actor.sheet;
+            // Land on biography tab so the PMs are mounted with non-zero rects.
+            (sheet.tabGroups ??= {}).primary = "description";
+            await sheet.render(true);
+            await new Promise((r) => setTimeout(r, 500));
+
+            const root = sheet.element as HTMLElement;
+            const descPM = root.querySelector(
+                'prose-mirror[name="system.description.content"]',
+            ) as HTMLElement | null;
+            const editor = descPM?.querySelector(".editor-content") as HTMLElement | null;
+            if (!descPM || !editor) {
+                await sheet.close();
+                return {found: false};
+            }
+
+            // Simulate "user is mid-edit in PM": focus the contenteditable,
+            // mutate its innerHTML, dispatch input. We do NOT click the PM's
+            // own save button. This mirrors typing into bio without leaving
+            // the editor.
+            editor.focus();
+            editor.innerHTML = "<p>typed-draft-but-not-saved</p>";
+            editor.dispatchEvent(new InputEvent("input", {bubbles: true, inputType: "insertText"}));
+            await new Promise((r) => setTimeout(r, 100));
+
+            // Snapshot what the PM's form-facing value attribute holds *before*
+            // the rename submit — useful for diagnosing which value the form
+            // serialization picks up.
+            const pmValueAttrBefore = (descPM as any).getAttribute?.("value") ?? null;
+
+            // Now drive the name change. submitOnChange fires; the whole form
+            // is harvested, including all three PMs.
+            const nameInput = root.querySelector('input[name="name"]') as HTMLInputElement;
+            nameInput.value = "rename-during-bio-draft";
+            nameInput.dispatchEvent(new Event("change", {bubbles: true}));
+            await new Promise((r) => setTimeout(r, 1200));
+
+            const after = window.game.actors.get(actor.id);
+            const snapshot = {
+                found: true,
+                pmValueAttrBefore,
+                name: after.name,
+                description: after.system.description.content,
+                personality: after.system.personality.content,
+                background: after.system.background.content,
+                characterpoints: after.system.characterpoints.value,
+                gender: after.system.gender.content,
+                seedDesc: SEED_DESC,
+                seedPers: SEED_PERS,
+                seedBg: SEED_BG,
+            };
+            await sheet.close();
+            return snapshot;
+        });
+
+        if (!result.found) {
+            test.skip(true, "description prose-mirror not present on the rendered sheet");
+            return;
+        }
+
+        // Hard assertions — the bug case (#159 hypothesis).
+        expect(result.name, "name change persisted").toBe("rename-during-bio-draft");
+        expect(result.description, "description must not be blanked by submit during bio draft")
+            .not.toBe("");
+        expect(result.description, "description must not collapse to an empty PM doc")
+            .not.toMatch(/^<p>(<br\s*\/?>)?<\/p>$/);
+        expect(result.personality, "personality (untouched PM) must survive the rename submit")
+            .toBe(result.seedPers);
+        expect(result.background, "background (untouched PM) must survive the rename submit")
+            .toBe(result.seedBg);
+        expect(result.characterpoints, "unrelated numeric field survives rename + bio-draft").toBe(9);
+        expect(result.gender, "unrelated text field survives rename + bio-draft").toBe("seed-gender");
+
+        // Soft characterization — log which of (a) committed seed vs.
+        // (b) live draft the form actually submitted, so a future failure
+        // here surfaces a behavior change in Foundry's PM form serialization.
+        const tookSeed = result.description === result.seedDesc;
+        const tookDraft = result.description?.includes("typed-draft-but-not-saved");
+        // eslint-disable-next-line no-console
+        console.log("[#159 PM-mid-edit probe]", {
+            tookSeed, tookDraft,
+            descriptionAfter: result.description,
+            pmValueAttrBefore: result.pmValueAttrBefore,
+        });
+        expect(tookSeed || tookDraft,
+            "description after rename is either committed seed or typed draft, not unrelated content")
+            .toBe(true);
+    });
 });
