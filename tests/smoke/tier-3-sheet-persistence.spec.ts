@@ -573,14 +573,21 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
             };
         });
 
-        // Footer's bottom edge should sit very close to the form's bottom edge
-        // (a few px slack for borders/padding). On the bug, footer.bottom was
-        // hundreds of px above form.bottom.
+        // Footer's bottom edge should sit close to the form's bottom edge.
+        // V14 ApplicationV2's `<section.window-content>` has ~16px of
+        // top/bottom padding (Foundry default), so the footer can only reach
+        // within `padding-bottom + 1-2px` of the form edge — anything beyond
+        // that means the flex chain isn't pinning. On the bug, footer.bottom
+        // was hundreds of px above form.bottom.
         const gap = result.formBottom - result.footerBottom;
-        expect(gap, "footer pinned within 16px of form bottom").toBeLessThan(16);
+        expect(gap, "footer pinned within ~24px of form bottom").toBeLessThan(24);
         // .sheet-body should occupy a meaningful share of the form (it has
-        // flex:1). Sanity-check it's at least 40% of the form height.
-        expect(result.bodyHeight / result.formHeight, ".sheet-body fills the available space").toBeGreaterThan(0.4);
+        // flex:1). The character header carries a large profile-img preview
+        // (~30% of the content area on a fresh actor) and there's
+        // `window-content` padding, so the body can't be 40% of the *form*
+        // — but it should still be > 25% as long as flex:1 is in effect.
+        // On the bug, body collapsed to its content (single-digit %).
+        expect(result.bodyHeight / result.formHeight, ".sheet-body fills the available space").toBeGreaterThan(0.25);
     });
 
     test("sheet-mode footer is present on all sheetmode-bearing actor types (#63)", async ({page}) => {
@@ -668,19 +675,31 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
             // because hidden tabs have zero-sized descendants.
             const activeTab = root.querySelector(".sheet-body > .tab.active") as HTMLElement | null;
             const activeTabName = activeTab?.dataset.tab ?? null;
+            // The biography tab stacks several prose-mirror editors in a
+            // scrollable .sheet-body. Hit-test only the editors whose center
+            // lies inside the visible scroll viewport — `elementFromPoint`
+            // returns null for points outside the viewport, which would
+            // false-positive a "clicks blocked" failure.
+            const sheetBody = root.querySelector("section.sheet-body") as HTMLElement | null;
+            const bodyRect = sheetBody?.getBoundingClientRect();
             const pms = [...root.querySelectorAll("prose-mirror")] as HTMLElement[];
             const out = pms.map((pm) => {
                 const ec = pm.querySelector(".editor-content") as HTMLElement | null;
-                if (!ec) return {hasEditor: false};
+                if (!ec) return {hasEditor: false, visible: false};
                 const r = ec.getBoundingClientRect();
                 if (r.width === 0 || r.height === 0) {
-                    return {hasEditor: true, height: r.height, hitInside: false, hitTag: "(zero-rect)"};
+                    return {hasEditor: true, visible: false, height: r.height, hitInside: false, hitTag: "(zero-rect)"};
                 }
                 const cx = r.left + r.width / 2;
                 const cy = r.top + r.height / 2;
+                const visible = !!bodyRect && cy >= bodyRect.top && cy <= bodyRect.bottom;
+                if (!visible) {
+                    return {hasEditor: true, visible: false, height: r.height, hitInside: false, hitTag: "(off-viewport)"};
+                }
                 const top = document.elementFromPoint(cx, cy);
                 return {
                     hasEditor: true,
+                    visible: true,
                     height: r.height,
                     hitInside: !!top && ec.contains(top),
                     hitTag: top?.tagName ?? "(none)",
@@ -695,10 +714,12 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         // the .height filter would silently drop).
         expect(result.activeTabName, "biography tab is the active pane").toBe("description");
 
-        // Description tab must render at least one prose-mirror with a
-        // sized editor-content whose center belongs to the editor.
-        const usable = result.editors.filter((r) => r.hasEditor && r.height && r.height > 0);
-        expect(usable.length, "at least one prose-mirror has a sized editor-content").toBeGreaterThan(0);
+        // Description tab must render at least one prose-mirror with a sized
+        // editor-content whose center belongs to the editor. Only test the
+        // editors visible in the current scroll viewport — off-screen ones
+        // would falsely fail because `elementFromPoint` is null outside it.
+        const usable = result.editors.filter((r) => r.hasEditor && r.visible && r.height && r.height > 0);
+        expect(usable.length, "at least one visible prose-mirror has a sized editor-content").toBeGreaterThan(0);
         for (const r of usable) {
             expect(r.height, "editor-content fills more than one line").toBeGreaterThan(60);
             expect(r.hitInside, `clicks land inside editor-content (got ${r.hitTag})`).toBe(true);
