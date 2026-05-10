@@ -928,4 +928,121 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         expect(result.hasEdit,
             "profile img must have data-edit=img to identify the path attribute").toBe(true);
     });
+
+    // Regression for #159: user reported that renaming a character AND
+    // editing the biography on the sheet "reset" the sheet. Hypothesis
+    // space includes upstream foundryvtt#13605 (PM in source mode drops
+    // edits on submit) and any partial submit on our side that overwrites
+    // unrelated system fields. These tests isolate the data layer (our
+    // TypeDataModel + actor update path) from the DOM/PM-submit layer
+    // (Foundry-controlled): if the data-layer test passes, the bug is in
+    // Foundry's PM/form pipeline, not in our system.
+    test("name + biography update via API preserves unrelated system fields (#159)", async ({page}) => {
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            // Seed unrelated system fields. If the name+bio update clobbers
+            // the parent system object instead of patching, these get reset.
+            await actor.update({
+                name: "smoke-persist",
+                system: {
+                    characterpoints: {value: 7},
+                    fatepoints: {value: 3},
+                    metaphysicsextranormal: {value: true},
+                    gender: {content: "seed-gender"},
+                    description: {content: ""},
+                    personality: {content: ""},
+                },
+            });
+
+            // Combined name + biography update — same shape Foundry's
+            // submitOnChange would produce when both inputs change in one
+            // submit cycle.
+            await actor.update({
+                name: "smoke-persist-bio-rename",
+                system: {
+                    description: {content: "<p>edited bio body</p>"},
+                    personality: {content: "<p>edited personality</p>"},
+                },
+            });
+
+            const after = window.game.actors.get(actor.id);
+            return {
+                name: after.name,
+                description: after.system.description.content,
+                personality: after.system.personality.content,
+                characterpoints: after.system.characterpoints.value,
+                fatepoints: after.system.fatepoints.value,
+                metaphysics: after.system.metaphysicsextranormal.value,
+                gender: after.system.gender.content,
+            };
+        });
+
+        expect(result.name, "name change persisted").toBe("smoke-persist-bio-rename");
+        expect(result.description, "description content persisted").toContain("edited bio");
+        expect(result.personality, "personality content persisted").toContain("edited personality");
+        expect(result.characterpoints, "characterpoints not reset by name+bio update").toBe(7);
+        expect(result.fatepoints, "fatepoints not reset by name+bio update").toBe(3);
+        expect(result.metaphysics, "metaphysics toggle not reset by name+bio update").toBe(true);
+        expect(result.gender, "gender content not reset by name+bio update").toBe("seed-gender");
+    });
+
+    test("DOM rename via submitOnChange preserves unrelated system fields (#159)", async ({page}) => {
+        // Drive the same path the user did for the name half: type in the
+        // name input, let submitOnChange fire. Verifies the sheet's submit
+        // pipeline doesn't blow away other system fields when only the
+        // name input changes.
+        await loginAndWaitReady(page);
+        await ensureCharacter(page);
+
+        const result = await evalInWorld(page, async () => {
+            const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
+            await actor.update({
+                name: "smoke-persist",
+                system: {
+                    characterpoints: {value: 11},
+                    fatepoints: {value: 4},
+                    metaphysicsextranormal: {value: true},
+                    description: {content: "<p>seed bio</p>"},
+                    personality: {content: "<p>seed personality</p>"},
+                    background: {content: "<p>seed background</p>"},
+                    gender: {content: "seed-gender"},
+                },
+            });
+
+            const sheet: any = actor.sheet;
+            await sheet.render(true);
+            await new Promise((r) => setTimeout(r, 400));
+
+            const nameInput = sheet.element.querySelector('input[name="name"]') as HTMLInputElement;
+            nameInput.value = "dom-renamed";
+            nameInput.dispatchEvent(new Event("change", {bubbles: true}));
+            await new Promise((r) => setTimeout(r, 800));
+
+            const after = window.game.actors.get(actor.id);
+            const snapshot = {
+                name: after.name,
+                description: after.system.description.content,
+                personality: after.system.personality.content,
+                background: after.system.background.content,
+                characterpoints: after.system.characterpoints.value,
+                fatepoints: after.system.fatepoints.value,
+                metaphysics: after.system.metaphysicsextranormal.value,
+                gender: after.system.gender.content,
+            };
+            await sheet.close();
+            return snapshot;
+        });
+
+        expect(result.name, "name change persisted").toBe("dom-renamed");
+        expect(result.description, "description not reset by DOM rename").toContain("seed bio");
+        expect(result.personality, "personality not reset by DOM rename").toContain("seed personality");
+        expect(result.background, "background not reset by DOM rename").toContain("seed background");
+        expect(result.characterpoints, "characterpoints not reset by DOM rename").toBe(11);
+        expect(result.fatepoints, "fatepoints not reset by DOM rename").toBe(4);
+        expect(result.metaphysics, "metaphysics toggle not reset by DOM rename").toBe(true);
+        expect(result.gender, "gender content not reset by DOM rename").toBe("seed-gender");
+    });
 });
