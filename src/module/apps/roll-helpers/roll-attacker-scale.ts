@@ -12,8 +12,9 @@ import {isCharacterActor, isVehicleActor} from "../../system/type-guards";
 import type {CanonicalRollType, RollTypeKey} from "./roll-data";
 
 /**
- * Roll-type keys that always count as attacks for scale derivation. Hoisted
- * to module scope so `isAttackRollKey` doesn't reallocate the set per call.
+ * Roll-type keys whose rolls get the `dice_for_scale` negative-scaleMod dice
+ * adjustment (Audit D enumeration). Hoisted to module scope so
+ * `isAttackRollKey` doesn't reallocate the set per call.
  */
 const ATTACK_KEYS: ReadonlySet<RollTypeKey> = new Set<RollTypeKey>([
     'weapon', 'starship-weapon', 'vehicle-weapon',
@@ -24,7 +25,6 @@ const ATTACK_KEYS: ReadonlySet<RollTypeKey> = new Set<RollTypeKey>([
 
 export interface AttackerScaleInput {
     actor: Actor;
-    classifiedKey: RollTypeKey;
     subtype: string;
     isAttackRoll: boolean;
     bucketAttackerScale: number | undefined;

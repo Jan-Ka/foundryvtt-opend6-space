@@ -267,7 +267,6 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     const isAttackRoll = isAttackRollKey(classified.key, classified.type, isRangedSubtype);
     const attackerScale = deriveAttackerScale({
         actor: data.actor,
-        classifiedKey: classified.key,
         subtype,
         isAttackRoll,
         bucketAttackerScale: bucketAny.attackerScale,

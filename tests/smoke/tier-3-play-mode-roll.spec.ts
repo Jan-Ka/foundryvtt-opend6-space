@@ -1,12 +1,18 @@
 /**
  * Tier 3 — Roll-from-sheet works in PLAY mode (regression for issue #76).
  *
- * V2 ActorSheets render in PLAY mode by default, where `isEditable` is
- * false. Previously, _onRender early-returned on !isEditable and never
- * bound the play-mode roll selectors — so non-GM players (whose sheets
- * default to PLAY mode) silently failed to roll. This spec opens the
- * sheet, forces PLAY mode, and verifies *each* selector that was moved
- * above the editability gate still fires its handler.
+ * Originally, V2 ActorSheets exposed PLAY/EDIT modes via DocumentSheetV2
+ * `_mode` + SHEET_MODES, with `isEditable` returning false in PLAY mode.
+ * In Foundry V14 that machinery is gone — `isEditable` is derived purely
+ * from the document's update permission. Non-GM owners viewing their
+ * own sheet still need the roll bindings to work, mirroring the original
+ * #76 scenario.
+ *
+ * To exercise the non-editable path under a Gamemaster login, this spec
+ * shadows `isEditable` to return false on the actor sheet instance before
+ * render. The render path then takes the same branch a non-GM player
+ * would hit, and we verify *each* selector that lives above the
+ * editability gate still fires its handler.
  *
  * Selectors covered: .rolldialog, .actionroll, .combat-action,
  * .vehicle-action. Each is verified by spying on the corresponding
@@ -26,6 +32,14 @@ test("all PLAY-mode roll selectors fire their handlers", async ({page}) => {
         if (!actor) {
             actor = await window.Actor.create({name: "smoke-character", type: "character"}, {render: false});
         }
+        // Ensure attributes are above the pipsPerDice (3) score gate, otherwise
+        // setupRollData warns "score too low" and never opens RollDialog.
+        if (actor.system.attributes.agi.base < 3) {
+            await actor.update({
+                "system.attributes.agi.base": 9,
+                "system.attributes.str.base": 9,
+            });
+        }
         if (!actor.items.find((i: any) => i.type === "skill" && i.name === "smoke-skill")) {
             await actor.createEmbeddedDocuments("Item", [{
                 name: "smoke-skill",
@@ -33,12 +47,15 @@ test("all PLAY-mode roll selectors fire their handlers", async ({page}) => {
                 system: {score: 3, attribute: "agi"},
             }]);
         }
-        // Add a weapon so .actionroll renders.
-        if (!actor.items.find((i: any) => i.type === "weapon" && i.name === "smoke-blaster")) {
+        // Add a rollable action so .actionroll renders. The class is gated on
+        // a truthy `action.system.rollable` (BooleanField) — see combat.html.
+        // Weapons live under the inventory tab and surface a different selector;
+        // .actionroll is specifically for actor.actions entries.
+        if (!actor.items.find((i: any) => i.type === "action" && i.name === "smoke-action")) {
             await actor.createEmbeddedDocuments("Item", [{
-                name: "smoke-blaster",
-                type: "weapon",
-                system: {damage: {score: 9, type: "p"}, subtype: "rangedattack"},
+                name: "smoke-action",
+                type: "action",
+                system: {rollable: true, subtype: "rangedattack"},
             }]);
         }
     });
@@ -52,9 +69,14 @@ test("all PLAY-mode roll selectors fire their handlers", async ({page}) => {
         try {
             const actor = window.game.actors.find((a: any) => a.name === "smoke-character");
 
-            const SHEET_MODES = (window.foundry as any).applications.sheets
-                ?.DocumentSheetV2?.SHEET_MODES ?? {PLAY: 1, EDIT: 2};
-            actor.sheet._mode = SHEET_MODES.PLAY;
+            // V14 dropped DocumentSheetV2.SHEET_MODES + `_mode`; isEditable
+            // is now permission-derived. Shadow the getter on this instance
+            // so the render path takes the !isEditable branch a non-GM owner
+            // would hit, without needing a second user session.
+            Object.defineProperty(actor.sheet, "isEditable", {
+                get: () => false,
+                configurable: true,
+            });
 
             // Stub the sheet methods that the moved selectors fan out to.
             // We swap them BEFORE render so the listener bindings capture

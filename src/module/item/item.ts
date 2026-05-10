@@ -438,7 +438,18 @@ export class OD6SItem extends Item {
             }
         }
 
-        let subtype = isActionItem(item) ? item.system.subtype : '';
+        // Weapons carry their localized weapon-type label (OD6S.MELEE / OD6S.RANGED
+        // / …) in `system.subtype`; classifyRoll normalizes that to canonical
+        // `meleeattack` / `rangedattack`, which the melee-range preflight gate
+        // and downstream bonus accumulators rely on. Pre-#57 this read
+        // `itemData.subtype` unconditionally; the discriminated-union narrowing
+        // dropped the weapon branch and silently passed `subtype: ''`, breaking
+        // the melee-range gate and personal melee/ranged mod application via
+        // `item.roll()`.
+        let subtype = '';
+        if (isActionItem(item) || isAnyWeaponItem(item)) {
+            subtype = item.system.subtype;
+        }
         if (parry) {
             subtype = "parry";
         }
