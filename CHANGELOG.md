@@ -10,6 +10,11 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+### Changed
+
+- Bump `compatibility.verified` to Foundry **14.361** (current
+  recommended build).
+
 ## [2.6.0] - 2026-05-09
 
 Internal-quality release: socket transport consolidated onto socketlib
