@@ -3,7 +3,10 @@ version: "3"
 dotenv: [".env"]
 
 vars:
-  FOUNDRY_VERSION: "14"
+  # Foundry image tag. Defaults to the floating `14` major; pin to a
+  # specific build (e.g. `14.361`) via .env when you want reproducible
+  # runs against the system.json `compatibility.verified` value.
+  FOUNDRY_VERSION: '{{.FOUNDRY_VERSION | default "14"}}'
   CONTAINER_NAME: od6s-foundry
   # Host port for the Foundry container. Override per-machine via .env
   # (FOUNDRY_PORT=30030) when 30000 is squatted by another process.
