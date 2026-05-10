@@ -1,84 +1,89 @@
 <!-- markdownlint-disable MD013 -->
-# Character data-loss recovery (issue #159)
+# Recovering a character with a blanked-out sheet
 
-If a character's biography fields appear blank after editing the name +
-biography in the same session, follow this runbook. Read it end to end
-before doing anything — the wrong order can overwrite recoverable data.
+If a player's character sheet suddenly looks empty after they edited the
+name and biography in the same sitting, this guide walks you through
+checking what was lost and getting their character back.
 
-## 1. Stop editing the affected actor immediately
+You'll need to be the GM. Read the whole page once before starting —
+doing the steps in the wrong order can make things worse.
 
-Every save on the actor's sheet may overwrite the last-good copy in
-Foundry's database. Close the sheet and don't reopen it until you've
-captured a backup.
+## 1. Stop editing the character
 
-## 2. Capture a snapshot from the live world
+Tell the player to close the sheet and not reopen it. Every save can
+overwrite what's still recoverable. If a token for the character is on
+the canvas, that's fine; just don't open the sheet.
 
-Open Foundry's developer console (F12) and paste the contents of
-[`scripts/check-character-data-loss.console.js`](../scripts/check-character-data-loss.console.js).
-You'll get a `window.od6sRecovery` namespace.
+## 2. Make a safety copy
+
+Before changing anything, take a snapshot of the world's characters so
+you can compare or restore later.
+
+1. In the Foundry browser tab, press **F12** to open the developer
+   tools, then click the **Console** tab.
+2. Open the script
+   [`scripts/check-character-data-loss.console.js`](https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/scripts/check-character-data-loss.console.js)
+   on GitHub, copy its full contents, paste into the Console, press
+   **Enter**.
+3. Type `od6sRecovery.audit()` and press **Enter**. You'll see a table
+   listing every character. The "suspect" column flags characters whose
+   biography is empty but who otherwise look like they've been played
+   (have items, character points, etc).
+4. Type `copy(od6sRecovery.dumpAll())` and press **Enter**. This puts a
+   full backup of every character on your clipboard. Paste it into a
+   text file and save it somewhere safe (e.g. `od6s-backup.json`).
+
+The script doesn't change anything by itself — it just reads.
+
+## 3. Restore from a Foundry world backup (best path)
+
+If you have a backup of the world from before the problem happened, use
+it. Foundry's built-in backups are the easiest:
+
+1. Quit out of the world (top-right menu → **Return to Setup**).
+2. From the Setup screen, click your world → **Manage Backups**.
+3. Pick a backup taken before the loss and restore it.
+4. Re-launch the world and check the affected character.
+
+If you keep your own backups (Time Machine, a daily folder copy, your
+hosting provider's snapshots), restoring the whole world folder works
+the same way — make sure Foundry isn't running while you copy files
+back, then restart it.
+
+## 4. Restore just one character (only if you have an old snapshot)
+
+If you previously saved a character's data using `od6sRecovery.dump(...)`
+or `dumpAll()`, you can put that single character back without rolling
+the whole world back. As GM, in the Console:
 
 ```js
-od6sRecovery.audit()              // identify suspect actors (read-only)
-copy(od6sRecovery.dumpAll())      // copy a full JSON backup to clipboard
-od6sRecovery.dump("Actor Name")   // single-actor JSON
+od6sRecovery.restore("ACTOR_ID", "PASTE_THE_JSON_STRING_HERE")
 ```
 
-Save the clipboard contents to a file before going further. The audit
-flags actors as suspect when **all three** biography HTMLFields
-(`description`, `personality`, `background`) are empty AND the character
-shows signs of use (character points, fate points, items, or any
-attribute base above 0). It also reports `_stats.modifiedTime` and
-`lastModifiedBy` so you can correlate against when the report came in.
+Replace `ACTOR_ID` with the character's id (the audit table shows it).
+Confirm the prompt that appears. The character keeps the same id, so
+their token, journal links, and chat history stay connected.
 
-False positives: a brand-new untouched character with an empty bio will
-look "suspect" if it has a single item attached. Treat the audit as a
-shortlist, not a verdict.
+If you don't have an earlier snapshot, you can't recover from the
+console — only a world backup will help.
 
-## 3. Recover from a Foundry world backup
+## 5. Until the bug is fixed, work around it
 
-Foundry's world data lives at `Data/worlds/<world-id>/`. The actor
-collection is the LevelDB pack at `Data/worlds/<world-id>/data/actors/`.
-If you have:
+- Make name changes and biography edits **separately**. Change the
+  name, click somewhere else on the sheet, wait a moment, then open the
+  biography section.
+- Don't have the same character open in multiple windows.
+- Before any session where you'll be doing a lot of sheet edits, run
+  `copy(od6sRecovery.dumpAll())` and save the result. Five seconds of
+  prep buys you a one-step recovery if anything goes wrong.
 
-- **A Foundry-managed backup** (Setup → Backup Manager): restore the
-  world from the snapshot taken before the data loss.
-- **A filesystem snapshot** (your own backup, Time Machine, container
-  volume snapshot, etc.): stop Foundry, replace the `actors/` pack, then
-  restart.
+## 6. Help us fix it
 
-After restoring, re-run `od6sRecovery.audit()` to confirm the suspect
-list is empty (or limited to genuinely new characters).
+Please add to [issue #159](https://github.com/Jan-Ka/foundryvtt-opend6-space/issues/159):
 
-## 4. Targeted single-actor restore
-
-If you only want to restore one actor and you have a previous JSON dump
-(from `od6sRecovery.dump(...)` or an earlier `dumpAll`):
-
-```js
-od6sRecovery.restore("ACTOR_ID", "{ ...json... }")
-```
-
-GM-only. Prompts for confirmation. Replaces name, image, system data,
-and embedded items in place — keeps the actor id stable so token
-references survive.
-
-## 5. Prevent further losses
-
-Until the underlying bug (issue #159) is resolved:
-
-- Make name changes and biography edits in **separate save cycles**.
-  Change the name → click outside → wait for the save to complete →
-  then edit the biography. Don't have multiple bio editors open at once.
-- Take a `dumpAll()` snapshot before any session where you'll be making
-  bulk edits to character sheets.
-
-## 6. Reporting
-
-If you hit this, please add to issue #159:
-
-- Foundry version (Settings → About).
-- System version.
-- The order of operations that triggered it (name first then bio, or
-  bio first then name).
-- Whether numeric fields (CP, FP, attributes) were also reset, or only
-  biography text.
+- Your Foundry version (Setup screen, top-right "About").
+- The OpenD6 Space system version (same place).
+- What you were doing right before the sheet blanked out — did you
+  change the name first or the biography first?
+- Did anything else look wrong (character points, attributes, items),
+  or only the biography text?
