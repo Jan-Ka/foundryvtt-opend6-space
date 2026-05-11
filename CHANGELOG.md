@@ -10,6 +10,24 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+### Fixed
+
+- Armor `system.damaged` is now declared on `ArmorData.defineSchema()`
+  (#67 follow-up): the field was referenced by the armor sheet
+  template, by the wound helper's `auto_armor_damage` path, and by the
+  manual `<select>` on the armor sheet, but never declared on the
+  DataModel. V14's strict `TypeDataModel` silently dropped the field
+  on every update, so manual *and* automatic armor damage tracking
+  were no-ops. Surfaced by the hermetic #67 regression spec after it
+  was refactored to flip `weapon_armor_damage` on for the probe.
+- `<select>` `selected` comparison in the armor / weapon /
+  starship-weapon / vehicle-weapon item-sheet templates coerces the
+  iterated key to a number before comparing against the stored
+  `system.damaged` value. The keys arrive as strings (`for…in` over
+  the levels record) while `damaged` is a `NumberField`, so the strict
+  `eq` helper never matched and the browser silently fell back to the
+  first `<option>` on every re-render.
+
 ### Changed
 
 - Bump `compatibility.verified` to Foundry **14.361** (current

@@ -37,7 +37,7 @@
                             <select name="system.damaged" id="item.system.damaged">
                                 
                                     {{#each (getWeaponDamageLevels) as |level key|}}
-                                        <option value="{{ key }}" {{#if (eq key @root.item.system.damaged)}}selected{{/if}}>
+                                        <option value="{{ key }}" {{#if (eq (add 0 key) @root.item.system.damaged)}}selected{{/if}}>
                                             {{localize level}}
                                         </option>
                                     {{/each}}
