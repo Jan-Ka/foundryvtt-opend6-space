@@ -1,19 +1,31 @@
 version: "3"
 
+dotenv: [".env"]
+
 vars:
-  FOUNDRY_VERSION: "14"
+  # Foundry image tag. Defaults to the floating `14` major; pin to a
+  # specific build (e.g. `14.361`) via .env when you want reproducible
+  # runs against the system.json `compatibility.verified` value.
+  FOUNDRY_VERSION: '{{.FOUNDRY_VERSION | default "14"}}'
   CONTAINER_NAME: od6s-foundry
-  FOUNDRY_PORT: "30000"
+  # Host port for the Foundry container. Override per-machine via .env
+  # (FOUNDRY_PORT=30030) when 30000 is squatted by another process.
+  FOUNDRY_PORT: '{{.FOUNDRY_PORT | default "30000"}}'
   FOUNDRY_DATA: "{{.ROOT_DIR}}/.foundry-data"
-  # Auto-detect container runtime: prefer docker, fall back to nerdctl (Rancher Desktop containerd)
+  # Containerd namespace for nerdctl. Rancher Desktop ships with `default`
+  # for plain containers and `k8s.io` for the k8s integration; pin it
+  # explicitly so commands aren't sensitive to ambient state. Override via
+  # .env (NERDCTL_NAMESPACE=k8s.io) if your container lives elsewhere.
+  NERDCTL_NAMESPACE: '{{.NERDCTL_NAMESPACE | default "default"}}'
+  # Resolve the container runtime once. Prefer docker; fall back to
+  # `nerdctl --namespace=<ns>` so every downstream invocation targets the
+  # same namespace without each task remembering to pass the flag.
   CONTAINER_RT:
     sh: |
       if docker info >/dev/null 2>&1; then echo docker
-      elif nerdctl info >/dev/null 2>&1; then echo nerdctl
+      elif nerdctl info >/dev/null 2>&1; then echo "nerdctl --namespace={{.NERDCTL_NAMESPACE}}"
       else echo none
       fi
-
-dotenv: [".env"]
 
 tasks:
   default:
