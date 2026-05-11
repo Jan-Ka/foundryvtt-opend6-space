@@ -1169,18 +1169,23 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
             .not.toBe("");
         expect(result.description, "description must not collapse to an empty PM doc")
             .not.toMatch(/^<p>(<br\s*\/?>)?<\/p>$/);
+        // Match the payload, not the exact serialization — PM may normalize
+        // whitespace / empty-doc shapes on submit even when the data is
+        // preserved, so strict toBe(seedPers/seedBg) is brittle without
+        // adding signal.
         expect(result.personality, "personality (untouched PM) must survive the rename submit")
-            .toBe(result.seedPers);
+            .toContain("seed-personality-body");
         expect(result.background, "background (untouched PM) must survive the rename submit")
-            .toBe(result.seedBg);
+            .toContain("seed-background-body");
         expect(result.characterpoints, "unrelated numeric field survives rename + bio-draft").toBe(9);
         expect(result.gender, "unrelated text field survives rename + bio-draft").toBe("seed-gender");
 
         // Soft characterization — log which of (a) committed seed vs.
         // (b) live draft the form actually submitted, so a future failure
         // here surfaces a behavior change in Foundry's PM form serialization.
-        const tookSeed = result.description === result.seedDesc;
-        const tookDraft = result.description?.includes("typed-draft-but-not-saved");
+        // Match on payload substrings for the same PM-normalization reason.
+        const tookSeed = !!result.description?.includes("seed-description-body");
+        const tookDraft = !!result.description?.includes("typed-draft-but-not-saved");
         // eslint-disable-next-line no-console
         console.log("[#159 PM-mid-edit probe]", {
             tookSeed, tookDraft,
