@@ -10,6 +10,8 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-05-11
+
 ### Fixed
 
 - Armor `system.damaged` is now declared on `ArmorData.defineSchema()`
