@@ -22,6 +22,15 @@ export function registerEffectListeners(
             await sheet.document.deleteEmbeddedDocuments('ActiveEffect', [ct.dataset.effectId]);
         }));
 
+    // Toggle Effect disabled state (enable / disable in place)
+    root.querySelectorAll<HTMLElement>('.effect-toggle').forEach((elem) =>
+        elem.addEventListener('click', async (ev: Event) => {
+            const ct = ev.currentTarget as HTMLElement;
+            const effect = sheet.document.effects.get(ct.dataset.effectId);
+            if (!effect) return;
+            await effect.update({disabled: !effect.disabled});
+        }));
+
     // Activate a manifestation
     root.querySelectorAll<HTMLElement>('.active-checkbox').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {

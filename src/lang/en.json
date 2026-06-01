@@ -1075,6 +1075,7 @@
   "OD6S.TOOLTIP_VEHICLE_WEAPON_ARC": "Comma-delimited list of firing arcs (front,rear,left,right)",
   "OD6S.TOOLTIP_VEHICLE_WEAPON_CREW": "Number of crew required to fire the weapon",
   "OD6S.TOOLTIP_VEHICLE_WEAPON_SCALE": "Scale value of the weapon; if 0 then the scale of the vehicle will be used",
+  "OD6S.TOGGLE_EFFECT": "Enable / Disable Effect",
   "OD6S.TOTAL": "Total",
   "OD6S.TO": "To",
   "OD6S.TOUGHNESS": "Toughness",

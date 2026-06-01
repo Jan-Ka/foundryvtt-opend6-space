@@ -219,6 +219,25 @@ export function registerActorHooks() {
         }
     })
 
+    // When an item embedded on an actor is deleted, also remove any
+    // ActiveEffects on the actor that originated from that item. Foundry
+    // v11+ no longer auto-copies item effects to the parent actor, but
+    // OD6S still has paths (drops.onDropActiveEffect, legacy worlds) that
+    // produce actor-embedded effects whose `origin` points at the source
+    // item. Without this cleanup, deleting the weapon/armor leaves the
+    // effect orphaned on the actor (#165).
+    Hooks.on('preDeleteItem', async (item, _options, _userId) => {
+        const actor = item.parent;
+        if (!actor || !('effects' in actor)) return;
+        const orphanIds: string[] = [];
+        for (const effect of actor.effects) {
+            if (effect.origin === item.uuid) orphanIds.push(effect.id);
+        }
+        if (orphanIds.length) {
+            await actor.deleteEmbeddedDocuments('ActiveEffect', orphanIds);
+        }
+    })
+
     Hooks.on('updateActiveEffect', async (effect) => {
         await od6sutilities.handleEffectChange(effect);
     })
