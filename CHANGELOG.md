@@ -10,6 +10,91 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-06-01
+
+User-facing bug-fix batch focused on the character sheet (Active
+Effects, Metaphysics) and the legacy settings dialogs, plus an opt-in
+mitigation for the Pings module interaction.
+
+### Added
+
+- Manifestation `+` button on the character sheet's Metaphysics tab
+  (#163): the Manifestations column previously rendered only its
+  heading, and the shipped compendia have no manifestations to drag in,
+  so users had no UI path to create one. The new `.item-add` button
+  routes through the existing inventory-tab listener into the
+  `OD6SAddItem` dialog filtered to the `manifestation` type.
+- Active Effects toggle on the actor sheet (#165): the Special
+  Abilities / Data tabs now expose an enable/disable control next to
+  edit and delete, wired to a `.effect-toggle` listener that flips
+  `effect.disabled` and re-renders the sheet so the icon and disabled
+  styling refresh immediately. `OD6S.TOGGLE_EFFECT` added to
+  `en.json`.
+- Opt-in `block_sheet_pointer_bleed` client setting (#166): when
+  enabled, a `document.body` mousedown listener calls
+  `stopPropagation` for events that originate inside `.application` or
+  `<dialog>`, so the unmaintained Pings module's window-level
+  long-press listener no longer fires from clicks on character sheets.
+  Canvas clicks still bubble through. Default off so behavior is
+  unchanged for users who aren't affected.
+
+### Fixed
+
+- Active Effect creation rejected with `validation errors: name: may
+  not be undefined` (#164). Foundry v11 renamed `ActiveEffect.label`
+  to `name`; the `addEffect` helper still passed `{label: name}` so
+  the schema's required `name` field was always undefined. Pass
+  `name` directly.
+- Delete affordance on the Special Abilities tab (#165): the template
+  rendered effects with only an edit button, so existing effects
+  could not be removed from the sheet.
+- Orphan ActiveEffects left behind when their source item was
+  deleted (#165): `drops.ts` and legacy worlds create actor-embedded
+  effects whose `origin` points at the source item, but no cleanup
+  ran on item deletion. A new `preDeleteItem` hook walks
+  `actor.effects` and removes any whose `origin` matches the deleted
+  item's uuid; the sweep runs exactly once on the initiating user's
+  client (who already had owner permission to delete the item),
+  avoiding permission errors for other connected users and not
+  requiring an active GM session.
+- Effect-management listeners moved above the `isEditable` gate in
+  `actor-sheet.ts` (#165): toggle/edit/delete are play-mode actions
+  (like rolling), so the gate was hiding the wiring but not the
+  buttons — the trash icon on the data tab silently no-op'd in PLAY
+  mode for owners.
+- Pre-existing `data-effect-id="effect.id"` typo on the data-tab
+  `<li>` (#165): missing Handlebars braces meant every list item
+  shared the literal string `effect.id`, so per-row actions targeted
+  the wrong document.
+- Five legacy settings dialogs silently failed to save (#161,
+  #162): `custom-fields.html`, `wild-die.html`, `active-attributes.html`,
+  `attributes-sorting.html`, and `initiative-settings.html` each
+  wrapped their body in a nested `<form>` inside the ApplicationV2
+  root (which is already a form). Browsers ignored the inner open
+  tag but treated the inner `</form>` as closing the outer, leaving
+  inputs detached from the form the submit handler read. Same root
+  cause as the 2.6.x `settings-v2.html` fix (82888b6); the five
+  legacy templates were missed by that pass. Swapped outer `<form>`
+  for `<div>` to match the documented V2 pattern.
+
+### Changed
+
+- Dev-dependency refresh: `@commitlint/cli` and
+  `@commitlint/config-conventional` 20 → 21, `lint-staged` 16 → 17,
+  plus minor/patch bumps for `vitest`, `@playwright/test`, `eslint`,
+  `typescript-eslint`, `sass`, `js-yaml`, and `@cyclonedx/cdxgen`.
+  Lint warnings 213 → 209 (all remaining are `no-explicit-any`
+  typing debt).
+
+### Smoke coverage
+
+- `tests/smoke/tier-3-active-effects.spec.ts` regressions for the
+  #164 `name`-vs-`label` fix, the #165 actor-effect toggle and delete
+  wiring, and the #165 orphan cleanup on item delete. Tests drive
+  through the actual DOM (`.effect-add`, `.effect-toggle`,
+  `.effect-delete`) rather than the document API so listener wiring
+  is exercised end-to-end.
+
 ## [2.6.1] - 2026-05-11
 
 ### Fixed
