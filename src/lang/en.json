@@ -534,6 +534,8 @@
   "OD6S.CONFIG_HIDE_SKILL_ROLLS": "Hide skill rolls until resolved",
   "OD6S.CONFIG_HIGHLIGHT_EFFECTS_DESCRIPTION": "Provide a green or red highlight to Attribute, Skill or Specialization scores that have been modified by an active effect.",
   "OD6S.CONFIG_HIGHLIGHT_EFFECTS": "Highlight Active Effects",
+  "OD6S.CONFIG_BLOCK_SHEET_POINTER_BLEED": "Block sheet clicks from reaching the canvas",
+  "OD6S.CONFIG_BLOCK_SHEET_POINTER_BLEED_DESCRIPTION": "Stops mousedown events that originate on a sheet or dialog from bubbling up to window-level listeners. Workaround for the `Pings` module (and similar) firing a canvas ping when you long-click on a character sheet under Foundry v14, where sheets mount to document.body and aren't seen as 'over the UI' by those modules. Enable only if you have a misbehaving module of this shape.",
   "OD6S.CONFIG_INITIAL_ATTRIBUTES_DESCRIPTION": "The total number of attribute pips available on character creation",
   "OD6S.CONFIG_INITIAL_ATTRIBUTES": "Initial Attribute Score",
   "OD6S.CONFIG_INITIAL_CHARACTER_POINTS_DESCRIPTION": "Starting Character Points for new characters",

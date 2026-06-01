@@ -1,4 +1,5 @@
 import OD6S from "../config-od6s";
+import {applySheetPointerBleedSetting} from "../../system/sheet-pointer-bleed";
 
 export function applySheetBackgroundOpacity(value: number): void {
     const clamped = Number.isFinite(value) ? Math.max(0, Math.min(2, value)) : 1;
@@ -107,6 +108,18 @@ export function registerDisplaySettings() {
     });
 
     applySheetBackgroundOpacity(game.settings.get('od6s', 'sheet_background_opacity') as number);
+
+    game.settings.register("od6s", "block_sheet_pointer_bleed", {
+        name: game.i18n.localize('OD6S.CONFIG_BLOCK_SHEET_POINTER_BLEED'),
+        hint: game.i18n.localize('OD6S.CONFIG_BLOCK_SHEET_POINTER_BLEED_DESCRIPTION'),
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean,
+        onChange: (value: boolean) => applySheetPointerBleedSetting(value),
+    });
+
+    applySheetPointerBleedSetting(game.settings.get('od6s', 'block_sheet_pointer_bleed') as boolean);
 
     game.settings.register("od6s", "show_metaphysics_attributes", {
         name: game.i18n.localize('OD6S.CONFIG_SHOW_METAPHYSICS_ATTRIBUTES'),
