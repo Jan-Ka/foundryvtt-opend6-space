@@ -5,7 +5,7 @@
 
 export async function addEffect(item: Item): Promise<void> {
     const name = game.i18n.localize("OD6S.NEW_ACTIVE_EFFECT");
-    const effect = await item.createEmbeddedDocuments("ActiveEffect", [{label: name}]);
+    const effect = await item.createEmbeddedDocuments("ActiveEffect", [{name}]);
     new foundry.applications.sheets.ActiveEffectConfig({document: effect[0]}).render({force: true});
 }
 
