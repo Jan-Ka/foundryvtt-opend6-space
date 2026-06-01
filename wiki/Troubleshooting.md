@@ -48,6 +48,28 @@ inert, file an issue with:
 - Foundry version,
 - whether socketlib is active.
 
+## Clicking a sheet drops a canvas ping
+
+Symptom: long-clicking, double-clicking, or holding the mouse on a character
+sheet drops a ping on the canvas behind it — as if the click went straight
+through the sheet.
+
+Cause: under Foundry v14, sheets mount to `document.body` rather than the
+old `#ui-middle` container. The
+[Pings](https://foundryvtt.com/packages/pings) module (and others with
+similar long-click handlers) decides whether a click is "over the UI" by
+walking up from the event target; with sheets mounted to `body`, that check
+misses and the click is treated as a canvas click.
+
+Workaround: enable **Block sheet clicks from reaching the canvas** under
+**Game Settings → Configure Settings → System Settings**. It stops
+`mousedown` events that originate inside a sheet or dialog from bubbling to
+the window-level listeners those modules attach to. The setting is
+client-scoped, so each user can opt in independently.
+
+Leave it off if you do not use a module of this shape — it is a targeted
+workaround rather than a general hardening.
+
 ## Reporting bugs
 
 Issues live at
