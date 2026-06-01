@@ -17,7 +17,7 @@
 import {test, expect} from "@playwright/test";
 import {loginAndWaitReady, evalInWorld} from "./helpers/foundry-page.js";
 
-test("addEffect helper creates an ActiveEffect with name field (#164)", async ({page}) => {
+test("item-sheet `+` button creates an ActiveEffect via addEffect helper (#164)", async ({page}) => {
     await loginAndWaitReady(page);
 
     const result = await evalInWorld(page, async () => {
@@ -31,34 +31,49 @@ test("addEffect helper creates an ActiveEffect with name field (#164)", async ({
         );
 
         const errs: string[] = [];
-        try {
-            await weapon.createEmbeddedDocuments("ActiveEffect", [{
-                name: window.game.i18n.localize("OD6S.NEW_ACTIVE_EFFECT"),
-            }]);
-        } catch (e) {
-            errs.push((e as Error).message);
-        }
+        const onRej = (e: PromiseRejectionEvent) =>
+            errs.push("rej: " + (e.reason?.message ?? String(e.reason)));
+        window.addEventListener("unhandledrejection", onRej);
+
+        await weapon.sheet.render(true);
+        await new Promise((r) => setTimeout(r, 250));
+
+        // Switch to effects tab if necessary, then click `.effect-add` —
+        // this is the click path exercising item-sheet-helpers/effects.ts
+        const root = weapon.sheet.element as HTMLElement;
+        const effectsTab = root.querySelector('a[data-tab="effects"]') as HTMLElement | null;
+        effectsTab?.click();
+        await new Promise((r) => setTimeout(r, 100));
+
+        const addBtn = root.querySelector('.effect-add') as HTMLElement | null;
+        const hadButton = !!addBtn;
+        addBtn?.click();
+        await new Promise((r) => setTimeout(r, 400));
+
+        window.removeEventListener("unhandledrejection", onRej);
 
         const effects = [...weapon.effects.contents];
         const out = {
             errs,
+            hadButton,
             count: effects.length,
             firstName: effects[0]?.name ?? null,
         };
+        await weapon.sheet.close();
         await weapon.delete();
         return out;
     });
 
-    expect(result.errs, "AE create errors").toEqual([]);
+    expect(result.hadButton, ".effect-add button rendered").toBe(true);
+    expect(result.errs, "no validation rejections").toEqual([]);
     expect(result.count).toBe(1);
     expect(result.firstName).toBeTruthy();
 });
 
-test("actor effect can be toggled and deleted from the sheet (#165)", async ({page}) => {
+test("actor sheet `.effect-toggle` and `.effect-delete` controls round-trip via the DOM (#165)", async ({page}) => {
     await loginAndWaitReady(page);
 
     const result = await evalInWorld(page, async () => {
-        // fresh actor
         const stale = window.game.actors.filter((a: any) => a.name === "smoke-effect-actor")
             .map((a: any) => a.id);
         if (stale.length) await window.Actor.deleteDocuments(stale);
@@ -67,30 +82,53 @@ test("actor effect can be toggled and deleted from the sheet (#165)", async ({pa
             {render: false},
         );
 
-        // seed an actor-embedded effect (the same shape a legacy world would
-        // have produced by copying a transferred item effect onto the actor)
         const [effect] = await actor.createEmbeddedDocuments("ActiveEffect", [{
             name: "smoke-effect",
             disabled: false,
         }]);
-        const initialDisabled = effect.disabled;
+        const effectId = effect.id;
 
-        // exercise the toggle handler the way the .effect-toggle click would
-        await effect.update({disabled: !effect.disabled});
-        const afterToggle = actor.effects.get(effect.id).disabled;
+        // Render the sheet and exercise the toggle/delete via DOM clicks
+        // — the regression was these controls being missing on the
+        // special-abilities tab and silently no-op on the data tab.
+        await actor.sheet.render(true);
+        await new Promise((r) => setTimeout(r, 300));
+        const root = actor.sheet.element as HTMLElement;
 
-        // exercise the delete handler the way the .effect-delete click would
-        await actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
-        const afterDelete = actor.effects.get(effect.id);
+        const toggleBtn = root.querySelector(
+            `.effect-toggle[data-effect-id="${effectId}"]`,
+        ) as HTMLElement | null;
+        const hadToggle = !!toggleBtn;
+        toggleBtn?.click();
+        // Poll until disabled flips (or timeout) to avoid CI flake.
+        const start = Date.now();
+        while (actor.effects.get(effectId)?.disabled !== true && Date.now() - start < 2000) {
+            await new Promise((r) => setTimeout(r, 50));
+        }
+        const afterToggle = actor.effects.get(effectId)?.disabled;
 
+        // Re-find the delete button after the toggle re-render
+        const deleteBtn = (actor.sheet.element as HTMLElement).querySelector(
+            `.effect-delete[data-effect-id="${effectId}"]`,
+        ) as HTMLElement | null;
+        const hadDelete = !!deleteBtn;
+        deleteBtn?.click();
+        const start2 = Date.now();
+        while (actor.effects.get(effectId) && Date.now() - start2 < 2000) {
+            await new Promise((r) => setTimeout(r, 50));
+        }
+        const afterDelete = actor.effects.get(effectId) ?? null;
+
+        await actor.sheet.close();
         await actor.delete();
 
-        return {initialDisabled, afterToggle, afterDelete: afterDelete ?? null};
+        return {hadToggle, hadDelete, afterToggle, afterDelete};
     });
 
-    expect(result.initialDisabled).toBe(false);
-    expect(result.afterToggle).toBe(true);
-    expect(result.afterDelete).toBeNull();
+    expect(result.hadToggle, ".effect-toggle rendered").toBe(true);
+    expect(result.hadDelete, ".effect-delete rendered").toBe(true);
+    expect(result.afterToggle, "toggle flipped disabled").toBe(true);
+    expect(result.afterDelete, "delete removed the effect").toBeNull();
 });
 
 test("deleting an item also removes orphan actor effects whose origin is the item (#165)", async ({page}) => {
@@ -105,24 +143,26 @@ test("deleting an item also removes orphan actor effects whose origin is the ite
             {render: false},
         );
 
-        // create an item embedded on the actor
         const [item] = await actor.createEmbeddedDocuments("Item", [
             {name: "smoke-orphan-weapon", type: "weapon"},
         ]);
 
-        // simulate the legacy / drops.ts code-path that copies an effect onto
-        // the actor with origin pointing at the source item
+        // Simulate the legacy / drops.ts code-path that copies an effect onto
+        // the actor with origin pointing at the source item.
         await actor.createEmbeddedDocuments("ActiveEffect", [{
             name: "smoke-orphan-effect",
             origin: item.uuid,
         }]);
         const beforeDelete = actor.effects.size;
 
-        // deleting the item must trigger preDeleteItem orphan cleanup
         await item.delete();
 
-        // hook fires async; give it a tick
-        await new Promise((r) => setTimeout(r, 100));
+        // Poll for the orphan-cleanup hook to settle instead of a fixed sleep
+        // so the test stays deterministic under CI load.
+        const start = Date.now();
+        while (actor.effects.size > 0 && Date.now() - start < 2000) {
+            await new Promise((r) => setTimeout(r, 50));
+        }
         const afterDelete = actor.effects.size;
 
         await actor.delete();

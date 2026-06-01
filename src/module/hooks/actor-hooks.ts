@@ -227,6 +227,10 @@ export function registerActorHooks() {
     // item. Without this cleanup, deleting the weapon/armor leaves the
     // effect orphaned on the actor (#165).
     Hooks.on('preDeleteItem', async (item, _options, _userId) => {
+        // Hooks fire on every connected client; only one client must run
+        // the cleanup or non-owners spam permission errors. The acting GM
+        // owns the canonical delete and runs the sweep.
+        if (game.users.activeGM !== game.user) return;
         const actor = item.parent;
         if (!actor || !('effects' in actor)) return;
         const orphanIds: string[] = [];
