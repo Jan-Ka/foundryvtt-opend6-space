@@ -142,9 +142,13 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         // Roll triggers must be bound for any owner regardless of edit mode —
         // V2 sheets render in PLAY mode by default (isEditable === false), but
         // rolling a skill/attack is a play-mode action. See issue #76.
+        // Effect management (edit/delete/toggle) is similarly a play-mode
+        // action; gating it behind edit mode hid the trash icon's behavior
+        // (#165) since the template still rendered it.
         if (this.actor.isOwner) {
             registerRollListeners(root, this);
             registerCombatRollListeners(root, this);
+            registerEffectListeners(root, this);
         }
 
         if (!this.isEditable) return;
@@ -193,7 +197,6 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         registerCombatActionListeners(root, this);
         registerVehicleListeners(root, this);
         registerScoreListeners(root, this);
-        registerEffectListeners(root, this);
         registerDragListeners(root, this);
     }
 

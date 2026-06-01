@@ -134,14 +134,24 @@
                     <div class="grid grid-2col">
                         {{#each actor.effects as |effect key|}}
                             <li class="effect flexrow">
-                                <div class="flexrow flex-group-left edit-effect
-                                    {{#if effect.disabled}}disabled{{/if}}"
-                                     data-effect-id="{{effect.id}}"
-                                     {{#if effect.name}}
-                                        title="{{effect.name}}">{{effect.name}}
-                                     {{ else }}
-                                         title="{{effect.label}}">{{effect.label}}
-                                     {{/if}}
+                                <div class="flexrow flex-group-left {{#if effect.disabled}}disabled{{/if}}"
+                                     title="{{effect.name}}">{{effect.name}}</div>
+                                <div class="item-controls flexrow flex-group-right">
+                                    <a class="item-control effect-toggle small-font"
+                                       data-effect-id="{{effect.id}}"
+                                       title="{{localize 'OD6S.TOGGLE_EFFECT'}}">
+                                        <i class="fas {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i>
+                                    </a>
+                                    <a class="item-control effect-edit small-font"
+                                       data-effect-id="{{effect.id}}"
+                                       title="{{localize 'OD6S.EDIT_EFFECT'}}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a class="item-control effect-delete small-font"
+                                       data-effect-id="{{effect.id}}"
+                                       title="{{localize 'OD6S.DELETE_EFFECT'}}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 </div>
                             </li>
                         {{/each}}
