@@ -103,8 +103,14 @@
             </div>
         </div>
         <div class="column">
-            <div>
+            <div class="grid title-add-grid">
                 <div class="flexrow flex-group-center"><b>{{getManifestationsName}}</b></div>
+                <div class="flexrow flex-group-center item-controls"
+                     title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.MANIFESTATION'}}">
+                    <a class="item-add"
+                       data-type="manifestation">
+                        <i class="fas fa-plus"></i></a>
+                </div>
             </div>
             <div class="manifestations">
                 <ul class="manifestations-list">
