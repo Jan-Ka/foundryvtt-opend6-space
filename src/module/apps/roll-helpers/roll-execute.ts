@@ -29,7 +29,6 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     let targetType;
     let damageScore = rollData.stun ? rollData.stundamagescore : rollData.damagescore;
     let damageType = rollData.stun ? rollData.stundamagetype : rollData.damagetype;
-    let baseDamage;
     let strModDice;
     let doUpdate = false;
 
@@ -168,7 +167,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         vehicleRamCollisionScore: isVehicleRam ? +OD6S.collision_types[rollData.vehiclecollisiontype].score : 0,
         pipsPerDice: OD6S.pipsPerDice,
     });
-    baseDamage = damageAssembly.baseDamage;
+    const baseDamage = damageAssembly.baseDamage;
     damageScore = damageAssembly.damageScore;
     const damageDice = damageAssembly.damageDice;
     strModDice = damageAssembly.strModDice ?? strModDice;

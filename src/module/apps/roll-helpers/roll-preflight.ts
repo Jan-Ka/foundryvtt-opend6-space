@@ -90,4 +90,4 @@ function passesMeleeRangeGate(data: IncomingRollData): boolean {
 
 // Local type aliases — kept narrow to avoid leaking Foundry-typed surface
 // out of this file.
-type IncomingRollData = import('./roll-data').IncomingRollData;
+import type { IncomingRollData } from './roll-data';

@@ -153,7 +153,7 @@ export class OD6SItem extends Item {
      */
     static async createDialog(
         data: { name?: string; folder?: string; type?: string; [key: string]: unknown } = {},
-        {parent=null, pack=null, ...options}: { parent?: Actor | null; pack?: string | null; [key: string]: unknown } = {},
+        {parent=null, pack=null, ..._options}: { parent?: Actor | null; pack?: string | null; [key: string]: unknown } = {},
     ) {
 
         // Collect data

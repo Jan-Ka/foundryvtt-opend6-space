@@ -36,7 +36,7 @@ function delegateEvent(
 }
 
 export function registerChatLogListeners() {
-    Hooks.on('renderChatLog', (log, html, data) => {
+    Hooks.on('renderChatLog', (log, html, _data) => {
         // In v14, html is an HTMLElement, not jQuery
 
         delegateEvent(html, 'input', ".explosive-damage", async (ev: Event) => {
