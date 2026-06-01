@@ -226,11 +226,13 @@ export function registerActorHooks() {
     // produce actor-embedded effects whose `origin` points at the source
     // item. Without this cleanup, deleting the weapon/armor leaves the
     // effect orphaned on the actor (#165).
-    Hooks.on('preDeleteItem', async (item, _options, _userId) => {
+    Hooks.on('preDeleteItem', async (item, _options, userId) => {
         // Hooks fire on every connected client; only one client must run
-        // the cleanup or non-owners spam permission errors. The acting GM
-        // owns the canonical delete and runs the sweep.
-        if (game.users.activeGM !== game.user) return;
+        // the cleanup or non-initiators spam permission errors. Gate on
+        // the user who initiated the delete (they had owner permission to
+        // delete the item, so they own the actor's effects too). Works
+        // in GM-less sessions, unlike a `game.users.activeGM` check.
+        if (game.user.id !== userId) return;
         const actor = item.parent;
         if (!actor || !('effects' in actor)) return;
         const orphanIds: string[] = [];
