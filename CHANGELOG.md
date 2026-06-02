@@ -10,6 +10,25 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-06-02
+
+Repository moved to the `nonex-ist` GitHub organization. No functional
+changes — this release ships the new canonical manifest URL so future
+auto-updates resolve directly instead of via GitHub's redirect, and
+validates that cosign keyless release signing works under the new
+workflow identity.
+
+### Changed
+
+- Manifest, download, and homepage URLs in `system.json` and
+  `package.json` rewritten from `Jan-Ka/foundryvtt-opend6-space` to
+  `nonex-ist/foundryvtt-opend6-space`. Existing installs continue to
+  receive updates via GitHub's repo-transfer redirect; this release
+  bakes in the new URL so subsequent updates skip the redirect.
+- Cosign verification identity in `CONTRIBUTING.md` updated to the new
+  workflow path. Tags prior to v2.7.1 remain signed under the previous
+  identity — verifying older releases requires the old regex.
+
 ## [2.7.0] - 2026-06-01
 
 User-facing bug-fix batch focused on the character sheet (Active
