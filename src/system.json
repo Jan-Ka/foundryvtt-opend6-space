@@ -183,6 +183,17 @@
     ]
   },
   "socket": true,
+  "media": [
+    {
+      "type": "cover",
+      "url": "assets/od6s_cover.webp",
+      "thumbnail": "assets/od6s_thumbnail.webp"
+    },
+    {
+      "type": "icon",
+      "url": "assets/od6s_icon.webp"
+    }
+  ],
   "url": "https://github.com/nonex-ist/foundryvtt-opend6-space",
   "manifest": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json",
   "download": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/od6s.zip",
