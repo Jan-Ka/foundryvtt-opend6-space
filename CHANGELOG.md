@@ -10,6 +10,21 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.7.4] - 2026-06-02
+
+Second hotfix for the 2.7.2 manifest art: the package tile and thumbnail
+returned 404 because relative `assets/...` paths in `media.url` and
+`media.thumbnail` are resolved by the browser against the current setup
+page URL, not against the system root. Foundry returns these strings
+verbatim from `BasePackage.getCover`, so the manifest has to spell out
+the full `systems/<id>/` prefix — same convention used by dnd5e and pf2e.
+
+### Fixed
+
+- `media[].url`, `media[].thumbnail`, and the icon entry's `url` in
+  `system.json` now use absolute `systems/od6s/assets/...` paths instead
+  of relative ones, so Foundry's setup screen actually loads the artwork.
+
 ## [2.7.3] - 2026-06-02
 
 Hotfix for the 2.7.2 manifest art: the setup screen never picked up the

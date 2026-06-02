@@ -2,7 +2,7 @@
   "id": "od6s",
   "title": "OpenD6 Space",
   "description": "OpenD6 Space System for FoundryVTT",
-  "version": "2.7.3",
+  "version": "2.7.4",
   "compatibility": {
     "minimum": "14",
     "verified": "14.363",
@@ -186,12 +186,12 @@
   "media": [
     {
       "type": "setup",
-      "url": "assets/od6s_cover.webp",
-      "thumbnail": "assets/od6s_thumbnail.webp"
+      "url": "systems/od6s/assets/od6s_cover.webp",
+      "thumbnail": "systems/od6s/assets/od6s_thumbnail.webp"
     },
     {
       "type": "icon",
-      "url": "assets/od6s_icon.webp"
+      "url": "systems/od6s/assets/od6s_icon.webp"
     }
   ],
   "url": "https://github.com/nonex-ist/foundryvtt-opend6-space",
