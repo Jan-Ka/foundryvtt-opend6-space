@@ -10,6 +10,20 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.7.3] - 2026-06-02
+
+Hotfix for the 2.7.2 manifest art: the setup screen never picked up the
+cover or thumbnail because Foundry's `BasePackage.getCover` only inspects
+`media` entries whose `type` is `"setup"` — `"cover"` is schema-valid but
+silently ignored by the setup UI.
+
+### Fixed
+
+- `media[].type` in `system.json` changed from `"cover"` to `"setup"` so
+  Foundry's setup screen actually resolves the package tile and its
+  thumbnail. No asset changes; the existing WebPs under `assets/` are
+  reused as-is.
+
 ## [2.7.2] - 2026-06-02
 
 Cosmetic release: declare cover, thumbnail, and icon artwork so the
