@@ -10,6 +10,18 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+## [2.7.2] - 2026-06-02
+
+Cosmetic release: declare cover, thumbnail, and icon artwork so the
+system surfaces its branding on Foundry's setup screen and in package
+listings instead of falling back to a generic placeholder.
+
+### Added
+
+- `media` array in `system.json` pointing at new WebP assets shipped
+  under `assets/`: a 1920×1080 cover with a 300×300 thumbnail, plus a
+  256×256 package icon.
+
 ## [2.7.1] - 2026-06-02
 
 Repository moved to the `nonex-ist` GitHub organization. No functional
