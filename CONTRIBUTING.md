@@ -5,7 +5,7 @@ project; bug reports, translations, and pull requests are all welcome.
 
 ## Quick links
 
-- Bugs and feature requests: <https://github.com/Jan-Ka/foundryvtt-opend6-space/issues>
+- Bugs and feature requests: <https://github.com/nonex-ist/foundryvtt-opend6-space/issues>
 - Discussion: [Discord](https://discord.gg/nh925pW2rU)
 - Security issues: see [SECURITY.md](SECURITY.md) — please **do not**
   file public issues for those.
@@ -150,7 +150,7 @@ keyless signing via GitHub Actions OIDC. To verify a downloaded
 cosign verify-blob \
   --certificate od6s.zip.pem \
   --signature   od6s.zip.sig \
-  --certificate-identity-regexp 'https://github\.com/Jan-Ka/foundryvtt-opend6-space/\.github/workflows/release\.yml@refs/tags/.+' \
+  --certificate-identity-regexp 'https://github\.com/nonex-ist/foundryvtt-opend6-space/\.github/workflows/release\.yml@refs/tags/.+' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   od6s.zip
 ```

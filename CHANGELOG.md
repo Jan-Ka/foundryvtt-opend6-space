@@ -655,7 +655,7 @@ everything under the hood is new.
 - Foundry global namespace references updated to v14 (`foundry.utils.*`,
   `foundry.applications.api.*`, etc.)
 - Project moved from GitLab (`gitlab.com/vtt2/opend6-space`) to GitHub
-  (`github.com/Jan-Ka/foundryvtt-opend6-space`)
+  (`github.com/nonex-ist/foundryvtt-opend6-space`)
 
 ### Removed
 

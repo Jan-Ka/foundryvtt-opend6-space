@@ -1,6 +1,6 @@
 # OpenD6 Space
 
-[![CI](https://github.com/Jan-Ka/foundryvtt-opend6-space/actions/workflows/ci.yml/badge.svg)](https://github.com/Jan-Ka/foundryvtt-opend6-space/actions/workflows/ci.yml)
+[![CI](https://github.com/nonex-ist/foundryvtt-opend6-space/actions/workflows/ci.yml/badge.svg)](https://github.com/nonex-ist/foundryvtt-opend6-space/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Foundry v14](https://img.shields.io/badge/Foundry-v14-orange.svg)](https://foundryvtt.com/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
@@ -33,14 +33,14 @@ Built so my brother can keep having awesome adventures in space.
 In Foundry VTT, use this manifest URL under **Game Systems → Install System**:
 
 ```text
-https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/system.json
+https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json
 ```
 
 That URL always resolves to the latest stable release. To pin a
 specific version, use the tagged form:
 
 ```text
-https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/download/v<version>/system.json
+https://github.com/nonex-ist/foundryvtt-opend6-space/releases/download/v<version>/system.json
 ```
 
 ### Verifying the download
@@ -53,7 +53,7 @@ for the verify command. Each release also ships a CycloneDX SBOM
 ## Configuration
 
 System rules can be tailored under **Game Settings → Configure Settings →
-System Settings**. See the [System Settings wiki page](https://github.com/Jan-Ka/foundryvtt-opend6-space/wiki/System-Settings)
+System Settings**. See the [System Settings wiki page](https://github.com/nonex-ist/foundryvtt-opend6-space/wiki/System-Settings)
 for a tour of the options.
 
 ## Localization
@@ -104,7 +104,7 @@ them.
 
 ## Contributing
 
-- Bugs and feature requests: [GitHub Issues](https://github.com/Jan-Ka/foundryvtt-opend6-space/issues)
+- Bugs and feature requests: [GitHub Issues](https://github.com/nonex-ist/foundryvtt-opend6-space/issues)
 - Discussion: [Discord](https://discord.gg/nh925pW2rU)
 
 ## Acknowledgements

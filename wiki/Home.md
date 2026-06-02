@@ -6,7 +6,7 @@ A [Foundry VTT](https://foundryvtt.com/) game system implementing the
 
 This wiki covers GM-facing topics: configuration, troubleshooting, and notes
 about how individual rules options change play. For source code, issues, and
-release notes, see the [main repository](https://github.com/Jan-Ka/foundryvtt-opend6-space).
+release notes, see the [main repository](https://github.com/nonex-ist/foundryvtt-opend6-space).
 
 ## Pages
 
@@ -19,14 +19,14 @@ release notes, see the [main repository](https://github.com/Jan-Ka/foundryvtt-op
 ## Quick links
 
 - [Latest stable release][release] — install via the manifest URL
-  `https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/system.json`
+  `https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json`
 - [Release notes (CHANGELOG)][changelog]
 - [Report a bug or request a feature][issues]
 - [Discord](https://discord.gg/nh925pW2rU)
 
-[release]: https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest
-[changelog]: https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/CHANGELOG.md
-[issues]: https://github.com/Jan-Ka/foundryvtt-opend6-space/issues
+[release]: https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest
+[changelog]: https://github.com/nonex-ist/foundryvtt-opend6-space/blob/main/CHANGELOG.md
+[issues]: https://github.com/nonex-ist/foundryvtt-opend6-space/issues
 
 ## Compatibility
 

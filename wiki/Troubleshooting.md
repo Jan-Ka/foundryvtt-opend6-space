@@ -21,14 +21,14 @@ logged-in GitHub download — so manual extraction is the only path.
 
 To roll back, delete `Data/systems/od6s/` and reinstall the stable manifest
 URL from
-<https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/system.json>.
+<https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json>.
 
 ## Verifying a stable release
 
 Tagged releases are signed with [cosign](https://docs.sigstore.dev/) keyless
 signing and ship a CycloneDX SBOM (`sbom.cdx.json`) and a SHA-256 checksum
 (`od6s.zip.sha256`). The verify command lives in
-[CONTRIBUTING.md](https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/CONTRIBUTING.md#verifying-a-release).
+[CONTRIBUTING.md](https://github.com/nonex-ist/foundryvtt-opend6-space/blob/main/CONTRIBUTING.md#verifying-a-release).
 
 ## "socketlib is not active"
 
@@ -73,6 +73,6 @@ workaround rather than a general hardening.
 ## Reporting bugs
 
 Issues live at
-<https://github.com/Jan-Ka/foundryvtt-opend6-space/issues>. Please include
+<https://github.com/nonex-ist/foundryvtt-opend6-space/issues>. Please include
 system + Foundry versions, a brief reproduction, and any errors from the
 browser console (F12).

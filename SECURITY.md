@@ -15,7 +15,7 @@ opening a public issue.
 **Preferred channels (any of):**
 
 - GitHub: open a private security advisory at
-  <https://github.com/Jan-Ka/foundryvtt-opend6-space/security/advisories/new>.
+  <https://github.com/nonex-ist/foundryvtt-opend6-space/security/advisories/new>.
   This is the most reliable channel and the response stays threaded.
 Please include:
 

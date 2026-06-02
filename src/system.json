@@ -183,8 +183,8 @@
     ]
   },
   "socket": true,
-  "url": "https://github.com/Jan-Ka/foundryvtt-opend6-space",
-  "manifest": "https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/system.json",
-  "download": "https://github.com/Jan-Ka/foundryvtt-opend6-space/releases/latest/download/od6s.zip",
-  "license": "https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/LICENSE"
+  "url": "https://github.com/nonex-ist/foundryvtt-opend6-space",
+  "manifest": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json",
+  "download": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/od6s.zip",
+  "license": "https://github.com/nonex-ist/foundryvtt-opend6-space/blob/main/LICENSE"
 }

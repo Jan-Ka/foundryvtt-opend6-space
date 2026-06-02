@@ -22,7 +22,7 @@ you can compare or restore later.
 1. In the Foundry browser tab, press **F12** to open the developer
    tools, then click the **Console** tab.
 2. Open the script
-   [`scripts/check-character-data-loss.console.js`](https://github.com/Jan-Ka/foundryvtt-opend6-space/blob/main/scripts/check-character-data-loss.console.js)
+   [`scripts/check-character-data-loss.console.js`](https://github.com/nonex-ist/foundryvtt-opend6-space/blob/main/scripts/check-character-data-loss.console.js)
    on GitHub, copy its full contents, paste into the Console, press
    **Enter**.
 3. Type `od6sRecovery.audit()` and press **Enter**. You'll see a table
@@ -79,7 +79,7 @@ console — only a world backup will help.
 
 ## 6. Help us fix it
 
-Please add to [issue #159](https://github.com/Jan-Ka/foundryvtt-opend6-space/issues/159):
+Please add to [issue #159](https://github.com/nonex-ist/foundryvtt-opend6-space/issues/159):
 
 - Your Foundry version (Setup screen, top-right "About").
 - The OpenD6 Space system version (same place).
