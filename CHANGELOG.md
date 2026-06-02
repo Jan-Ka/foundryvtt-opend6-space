@@ -24,6 +24,11 @@ silently ignored by the setup UI.
   thumbnail. No asset changes; the existing WebPs under `assets/` are
   reused as-is.
 
+### Changed
+
+- `compatibility.verified` bumped from `14.361` to `14.363` to match the
+  current Foundry V14 build the system is being tested against.
+
 ## [2.7.2] - 2026-06-02
 
 Cosmetic release: declare cover, thumbnail, and icon artwork so the
