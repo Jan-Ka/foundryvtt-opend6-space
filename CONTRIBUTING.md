@@ -148,16 +148,21 @@ keyless signing via GitHub Actions OIDC. To verify a downloaded
 <!-- markdownlint-disable MD013 -->
 ```bash
 cosign verify-blob \
-  --certificate od6s.zip.pem \
-  --signature   od6s.zip.sig \
+  --bundle od6s.zip.bundle \
   --certificate-identity-regexp 'https://github\.com/nonex-ist/foundryvtt-opend6-space/\.github/workflows/release\.yml@refs/tags/.+' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   od6s.zip
 ```
 <!-- markdownlint-enable MD013 -->
 
-Each release also includes a CycloneDX SBOM (`sbom.cdx.json`) and a
-SHA-256 checksum file (`od6s.zip.sha256`).
+The same `--bundle <file>.bundle` form verifies `system.json` and
+`sbom.cdx.json`, which ship signed alongside the zip. Each release also
+includes a CycloneDX SBOM (`sbom.cdx.json`) and a SHA-256 checksum file
+(`od6s.zip.sha256`).
+
+Tags before `v2.7.1` were signed under the previous workflow identity
+at `github.com/Jan-Ka/foundryvtt-opend6-space`. To verify older
+releases, substitute that path into the `--certificate-identity-regexp`.
 
 ## Translations
 
