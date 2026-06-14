@@ -14,7 +14,7 @@
                        data-dtype="{{actor.system.chartype.type}}"/>
                 {{#if (eq actor.system.created.value false)}}
                     {{#if (displayCharacterTemplateClear actor)}}
-                        <button class="reset-template">{{localize 'OD6S.CLEAR'}}</button>
+                        <button type="button" class="reset-template">{{localize 'OD6S.CLEAR'}}</button>
                     {{/if}}
                 {{/if}}
                 </div>
@@ -34,7 +34,7 @@
                        data-dtype="{{actor.system.species.type}}"/>
                 {{#if (eq actor.system.sheetmode.value "freeedit")}}
                     {{#if (displaySpeciesTemplateClear actor)}}
-                        <button class="reset-species-template">{{localize 'OD6S.CLEAR'}}</button>
+                        <button type="button" class="reset-species-template">{{localize 'OD6S.CLEAR'}}</button>
                     {{/if}}
                 {{/if}}
                 </div>
@@ -179,7 +179,7 @@
         {{/if}}
         {{#if (eq actor.system.created.value false)}}
             <div class="flexrow flex-group-center creation">
-                <button class="create-character">{{localize 'OD6S.CREATE'}}</button>
+                <button type="button" class="create-character">{{localize 'OD6S.CREATE'}}</button>
             </div>
         {{/if}}
     </div>
