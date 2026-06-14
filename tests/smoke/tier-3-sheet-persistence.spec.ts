@@ -97,7 +97,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
         const result = await evalInWorld(page, async () => {
             const html = await window.foundry.applications.handlebars.renderTemplate(
-                "systems/od6s/templates/actor/common/attribute-edit.html",
+                "systems/nonex-ist-od6s/templates/actor/common/attribute-edit.html",
                 {score: 5},
             );
             const div = document.createElement("div");
@@ -123,7 +123,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
         const data = await evalInWorld(page, async () => {
             const html = await window.foundry.applications.handlebars.renderTemplate(
-                "systems/od6s/templates/actor/common/attribute-edit.html",
+                "systems/nonex-ist-od6s/templates/actor/common/attribute-edit.html",
                 {score: 5},
             );
             const content = document.createElement("div");
@@ -226,7 +226,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
 
         const result = await evalInWorld(page, async () => {
             const html = await window.foundry.applications.handlebars.renderTemplate(
-                "systems/od6s/templates/item/item-attribute-edit.html",
+                "systems/nonex-ist-od6s/templates/item/item-attribute-edit.html",
                 {score: 5},
             );
             const div = document.createElement("div");
@@ -336,7 +336,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
                 });
             };
 
-            const meleeLabel = window.game.i18n.localize("OD6S.MELEE");
+            const meleeLabel = window.game.i18n.localize("NONEX_IST_OD6S.MELEE");
 
             snapshot("after-create");
 
@@ -499,9 +499,9 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
         await ensureCharacter(page);
 
         const result = await evalInWorld(page, async () => {
-            const prevSetting = window.game.settings.get("od6s", "weapon_armor_damage");
+            const prevSetting = window.game.settings.get("nonex-ist-od6s", "weapon_armor_damage");
             if (!prevSetting) {
-                await window.game.settings.set("od6s", "weapon_armor_damage", true);
+                await window.game.settings.set("nonex-ist-od6s", "weapon_armor_damage", true);
             }
             try {
                 const actor = window.game.actors.find((a: any) => a.name === "smoke-persist");
@@ -544,7 +544,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
                 return {selectPresent: true, target, storedAfter, selAfter};
             } finally {
                 if (!prevSetting) {
-                    await window.game.settings.set("od6s", "weapon_armor_damage", false);
+                    await window.game.settings.set("nonex-ist-od6s", "weapon_armor_damage", false);
                 }
             }
         });
@@ -785,7 +785,7 @@ test.describe("Tier 3 — sheet field persistence (#27)", () => {
             await new Promise((r) => setTimeout(r, 400));
 
             const dlg = [...window.foundry.applications.instances.values()].find(
-                (a: any) => (a as any).id === "od6s-advance-dialog",
+                (a: any) => (a as any).id === "nonex-ist-od6s-advance-dialog",
             ) as any;
 
             let submitted = false;

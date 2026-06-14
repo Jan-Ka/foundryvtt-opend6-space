@@ -154,7 +154,7 @@ export async function rollBodyPoints(sheet: RollSheetLike): Promise<void> {
     const strDice = od6sutilities.getDiceFromScore(actorSystem.attributes.str.score
         + actorSystem.attributes.str.mod);
     let rollString;
-    if (game.settings.get("od6s", "use_wild_die")) {
+    if (game.settings.get("nonex-ist-od6s", "use_wild_die")) {
         if (strDice.dice < 2) rollString = "1dw";
         else rollString = (+strDice.dice - 1) + "d6+1dw";
     } else {
@@ -162,10 +162,10 @@ export async function rollBodyPoints(sheet: RollSheetLike): Promise<void> {
     }
     rollString += "+" + (+strDice.pips + 20);
 
-    const label = game.i18n.localize("OD6S.ROLLING") + " " + game.i18n.localize(OD6S.bodyPointsName);
+    const label = game.i18n.localize("NONEX_IST_OD6S.ROLLING") + " " + game.i18n.localize(OD6S.bodyPointsName);
 
     let rollMode: string = CONST.DICE_ROLL_MODES.PUBLIC;
-    if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
+    if (game.user.isGM && game.settings.get("nonex-ist-od6s", "hide-gm-rolls")) {
         rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
     const roll = await new Roll(rollString).evaluate();
@@ -181,13 +181,13 @@ export async function rollPurchase(sheet: RollSheetLike, ev: Event, buyerId: str
     const target = ev.currentTarget as HTMLElement;
     const item = sheet.document.items.get(target.dataset.itemId!);
     if (typeof item === "undefined") {
-        ui.notifications.warn(game.i18n.localize("OD6S.ITEM_NOT_FOUND"));
+        ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ITEM_NOT_FOUND"));
         return;
     }
     const buyer = game.actors.get(buyerId);
     const itemSystem = item.system as OD6SEquipment;
     const data: Partial<IncomingRollData> = {
-        name: game.i18n.localize("OD6S.PURCHASE") + " " + item.name,
+        name: game.i18n.localize("NONEX_IST_OD6S.PURCHASE") + " " + item.name,
         itemId: item.id ?? undefined,
         actor: buyer,
         seller: sheet.document.id ?? undefined,

@@ -10,7 +10,7 @@ export async function getDifficultyFromLevel(level: string): Promise<number> {
         if (OD6S.difficulty[level].max === 0) {
             difficulty = 0;
         } else {
-            if (game.settings.get('od6s', 'random_dice_difficulty')) {
+            if (game.settings.get('nonex-ist-od6s', 'random_dice_difficulty')) {
                 const dice = OD6S.difficulty[level].dice;
                 const terms = dice + "D6";
                 const roll = await new Roll(terms).evaluate();
@@ -19,32 +19,32 @@ export async function getDifficultyFromLevel(level: string): Promise<number> {
                 let min = 0;
                 const max = OD6S.difficulty[level].max;
                 switch (level) {
-                    case "OD6S.DIFFICULTY_VERY_EASY":
+                    case "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY":
                         min = 1;
                         break;
 
-                    case  "OD6S.DIFFICULTY_EASY":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_VERY_EASY'].max + 1;
+                    case  "NONEX_IST_OD6S.DIFFICULTY_EASY":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_VERY_EASY'].max + 1;
                         break;
 
-                    case "OD6S.DIFFICULTY_MODERATE":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_EASY'].max + 1;
+                    case "NONEX_IST_OD6S.DIFFICULTY_MODERATE":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_EASY'].max + 1;
                         break;
 
-                    case "OD6S.DIFFICULTY_DIFFICULT":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_MODERATE'].max + 1;
+                    case "NONEX_IST_OD6S.DIFFICULTY_DIFFICULT":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_MODERATE'].max + 1;
                         break;
 
-                    case "OD6S.DIFFICULTY_VERY_DIFFICULT":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_DIFFICULT'].max + 1;
+                    case "NONEX_IST_OD6S.DIFFICULTY_VERY_DIFFICULT":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_DIFFICULT'].max + 1;
                         break;
 
-                    case "OD6S.DIFFICULTY_HEROIC":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_VERY_DIFFICULT'].max + 1;
+                    case "NONEX_IST_OD6S.DIFFICULTY_HEROIC":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_VERY_DIFFICULT'].max + 1;
                         break;
 
-                    case "OD6S.DIFFICULTY_LEGENDARY":
-                        min = OD6S.difficulty['OD6S.DIFFICULTY_VERY_DIFFICULT'].max + 1;
+                    case "NONEX_IST_OD6S.DIFFICULTY_LEGENDARY":
+                        min = OD6S.difficulty['NONEX_IST_OD6S.DIFFICULTY_VERY_DIFFICULT'].max + 1;
                         break;
 
                     case 'default':

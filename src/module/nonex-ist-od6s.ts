@@ -59,7 +59,7 @@ od6sHandlebars();
 
 Hooks.once('init', async function () {
 
-    game.od6s = {
+    game["nonex-ist-od6s"] = {
         OD6SActor,
         OD6SItem,
         OD6SToken,
@@ -127,7 +127,7 @@ Hooks.once('init', async function () {
     CONFIG.Dice.terms["b"] = CharacterPointDie;
     CONFIG.Token.objectClass = OD6SToken;
 
-    CONFIG.ChatMessage.template = "systems/od6s/templates/chat/chat.html";
+    CONFIG.ChatMessage.template = "systems/nonex-ist-od6s/templates/chat/chat.html";
 
     // Define custom Entity classes
     CONFIG.Actor.documentClass = OD6SActor;
@@ -137,8 +137,8 @@ Hooks.once('init', async function () {
     registerMigrationSetting();
 
     // Register sheet application classes
-    foundry.documents.collections.Actors.registerSheet("od6s", OD6SActorSheet, {makeDefault: true});
-    foundry.documents.collections.Items.registerSheet("od6s", OD6SItemSheet, {makeDefault: true});
+    foundry.documents.collections.Actors.registerSheet("nonex-ist-od6s", OD6SActorSheet, {makeDefault: true});
+    foundry.documents.collections.Items.registerSheet("nonex-ist-od6s", OD6SItemSheet, {makeDefault: true});
 });
 
 // Run world migration on ready

@@ -3,7 +3,7 @@
  * directory. Mutable scalar fields (e.g. `fatePointsName`, `wildDieOneDefault`)
  * are written by `od6sSettings()` at module init from world settings; the
  * nested table objects are also mutated in place by some settings hooks
- * (see `settings/index.ts` adjusting `OD6S.difficulty[*]`).
+ * (see `settings/index.ts` adjusting `NONEX_IST_OD6S.difficulty[*]`).
  */
 
 import attributes, { type Attributes } from "./attributes";
@@ -83,7 +83,7 @@ export interface CharacterPointLimits {
 /**
  * Minimal structural type for the socketlib socket bound to OD6S.
  * The full socketlib API is untyped; we capture only the methods used
- * by this codebase so dynamic dispatch through `OD6S.socket` typechecks.
+ * by this codebase so dynamic dispatch through `NONEX_IST_OD6S.socket` typechecks.
  * `register` callbacks are not type-checked because socketlib forwards
  * arbitrary arguments at runtime — that contract lives at the call sites.
  */
@@ -267,7 +267,7 @@ export interface Od6sConfig {
     [key: string]: unknown;
 }
 
-const chatPath = "systems/od6s/templates/chat/";
+const chatPath = "systems/nonex-ist-od6s/templates/chat/";
 
 const OD6S: Od6sConfig = {
     startCombat: false,
@@ -275,7 +275,7 @@ const OD6S: Od6sConfig = {
     // any consumer accesses it; pre-init reads would be a programming error.
     socket: undefined as unknown as SocketLibSocket,
     baseHitDifficulty: 10,
-    default_sensor_skill: "OD6S.SENSORS",
+    default_sensor_skill: "NONEX_IST_OD6S.SENSORS",
     fatePointsName: "",
     fatePointsShortName: "",
     useAFatePointName: "",
@@ -301,11 +301,11 @@ const OD6S: Od6sConfig = {
     baseMeleeAttackDifficulty: 10,
     baseBrawlAttackDifficulty: 10,
     defenseLock: false,
-    currencyName: "OD6S.CHAR_CREDITS",
+    currencyName: "NONEX_IST_OD6S.CHAR_CREDITS",
     fatePointRound: false,
     fatePointClimactic: false,
     woundConfig: 0,
-    bodyPointsName: "OD6S.BODY_POINTS",
+    bodyPointsName: "NONEX_IST_OD6S.BODY_POINTS",
     highHitDamage: false,
     weaponArmorDamage: false,
     autoOpposed: false,
@@ -322,20 +322,20 @@ const OD6S: Od6sConfig = {
     showSkillSpecialization: true,
     specializationDice: false,
     specStartingPipsPerDie: 3,
-    channelSkillName: "OD6S.METAPHYSICS_SKILL_CHANNEL",
-    senseSkillName: "OD6S.METAPHYSICS_SKILL_SENSE",
-    transformSkillName: "OD6S.METAPHYSICS_SKILL_TRANSFORM",
+    channelSkillName: "NONEX_IST_OD6S.METAPHYSICS_SKILL_CHANNEL",
+    senseSkillName: "NONEX_IST_OD6S.METAPHYSICS_SKILL_SENSE",
+    transformSkillName: "NONEX_IST_OD6S.METAPHYSICS_SKILL_TRANSFORM",
     trackStuns: false,
     stunDamageIncrement: true,
     randomDifficlty: false,
     hideExplosiveTemplates: true,
     meleeRange: false,
-    baseBrawlAttackDifficultyLevel: "OD6S.DIFFICULTY_VERY_EASY",
-    baseMeleeAttackDifficultyLevel: "OD6S.DIFFICULTY_VERY_EASY",
+    baseBrawlAttackDifficultyLevel: "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY",
+    baseMeleeAttackDifficultyLevel: "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY",
     stunScaling: false,
     woundScaling: false,
-    speciesLabelName: "OD6S.CHAR_SPECIES",
-    typeLabel: "OD6S.CHAR_TYPE",
+    speciesLabelName: "NONEX_IST_OD6S.CHAR_SPECIES",
+    typeLabel: "NONEX_IST_OD6S.CHAR_TYPE",
     highHitDamageMultiplier: 5,
     highHitDamagePipsOrDice: false,
     highHitDamageRound: false,
@@ -371,9 +371,9 @@ const OD6S: Od6sConfig = {
         initiative: 5,
     },
     explosives: [
-        "OD6S.EXPLOSIVE_THROWN",
-        // TODO: "OD6S.EXPLOSIVE_TIMER",
-        // TODO: "OD6S.EXPLOSIVE_TRIGGER"
+        "NONEX_IST_OD6S.EXPLOSIVE_THROWN",
+        // TODO: "NONEX_IST_OD6S.EXPLOSIVE_TIMER",
+        // TODO: "NONEX_IST_OD6S.EXPLOSIVE_TRIGGER"
     ],
     deadlinessLevel: { character: 3, creature: 3, npc: 3 },
     wildDieResult,
@@ -422,12 +422,12 @@ const OD6S: Od6sConfig = {
     ranges,
     damageTypes,
     cyberneticsLocations: [
-        "OD6S.HEAD",
-        "OD6S.RIGHT_ARM",
-        "OD6S.LEFT_ARM",
-        "OD6S.BODY",
-        "OD6S.RIGHT_LEG",
-        "OD6S.LEFT_LEG",
+        "NONEX_IST_OD6S.HEAD",
+        "NONEX_IST_OD6S.RIGHT_ARM",
+        "NONEX_IST_OD6S.LEFT_ARM",
+        "NONEX_IST_OD6S.BODY",
+        "NONEX_IST_OD6S.RIGHT_LEG",
+        "NONEX_IST_OD6S.LEFT_LEG",
     ],
     allowedItemTypes,
     actorTypeLabels,
@@ -444,19 +444,19 @@ const OD6S: Od6sConfig = {
     },
     data_tab: {
         defense: {
-            dodge: "OD6S.DODGE",
-            parry: "OD6S.PARRY",
-            block: "OD6S.BLOCK",
+            dodge: "NONEX_IST_OD6S.DODGE",
+            parry: "NONEX_IST_OD6S.PARRY",
+            block: "NONEX_IST_OD6S.BLOCK",
         },
         offense: {
-            ranged: "OD6S.RANGED",
-            melee: "OD6S.MELEE",
-            brawl: "OD6S.BRAWL",
-            initiative: "OD6S.INITIATIVE",
-            strengthdamage: "OD6S.STRENGTH_DAMAGE",
-            pr: "OD6S.PHYSICAL_RESISTANCE",
-            er: "OD6S.ENERGY_RESISTANCE",
-            move: "OD6S.MOVE",
+            ranged: "NONEX_IST_OD6S.RANGED",
+            melee: "NONEX_IST_OD6S.MELEE",
+            brawl: "NONEX_IST_OD6S.BRAWL",
+            initiative: "NONEX_IST_OD6S.INITIATIVE",
+            strengthdamage: "NONEX_IST_OD6S.STRENGTH_DAMAGE",
+            pr: "NONEX_IST_OD6S.PHYSICAL_RESISTANCE",
+            er: "NONEX_IST_OD6S.ENERGY_RESISTANCE",
+            move: "NONEX_IST_OD6S.MOVE",
         },
     },
     hiddenStatusEffects,

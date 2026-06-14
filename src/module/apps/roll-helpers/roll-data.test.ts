@@ -68,14 +68,14 @@ describe('isScoreTooLow', () => {
 describe('classifyRoll', () => {
     // Fake i18n table that mirrors en.json shape for the keys the classifier touches.
     const I18N: Record<string, string> = {
-        'OD6S.RANGED': 'Ranged',
-        'OD6S.THROWN': 'Thrown',
-        'OD6S.MISSILE': 'Missile',
-        'OD6S.EXPLOSIVE': 'Explosive',
-        'OD6S.MELEE': 'Melee',
-        'OD6S.ENERGY_RESISTANCE': 'Energy Resistance',
-        'OD6S.PHYSICAL_RESISTANCE': 'Physical Resistance',
-        'OD6S.RESISTANCE_NO_ARMOR': 'Resistance (No Armor)',
+        'NONEX_IST_OD6S.RANGED': 'Ranged',
+        'NONEX_IST_OD6S.THROWN': 'Thrown',
+        'NONEX_IST_OD6S.MISSILE': 'Missile',
+        'NONEX_IST_OD6S.EXPLOSIVE': 'Explosive',
+        'NONEX_IST_OD6S.MELEE': 'Melee',
+        'NONEX_IST_OD6S.ENERGY_RESISTANCE': 'Energy Resistance',
+        'NONEX_IST_OD6S.PHYSICAL_RESISTANCE': 'Physical Resistance',
+        'NONEX_IST_OD6S.RESISTANCE_NO_ARMOR': 'Resistance (No Armor)',
     };
     const localize: Localize = (k) => I18N[k] ?? k;
 

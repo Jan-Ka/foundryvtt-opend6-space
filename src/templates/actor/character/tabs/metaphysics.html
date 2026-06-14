@@ -9,8 +9,7 @@
                 <div{{#if (eq actor.system.sheetmode.value "normal")}} class="attributes grid grid-2col-attributes"
                 {{else}} class="attributes grid grid-3col-attributes"
                 {{/if}}>
-                    <div class="attributedialog flexrow flex-group-center{{#if
-                            (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                    <div class="attributedialog flexrow flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                          data-type="attribute"
                          data-score="{{actor.system.attributes.met.score}}"
                          data-label="{{getMetaphysicsName}}">
@@ -51,16 +50,14 @@
                                 class="item skills grid-2col-attributes"
                                 {{else}} class="skills grid grid-3col-attributes"
                                 {{/if}}>
-                                    <div class="skilldialog flex-group-left{{#if
-                                            (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                    <div class="skilldialog flex-group-left{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                          data-item-id="{{skill._id}}"
                                          data-type="skill"
                                          data-score="{{skill.system.total}}"
                                          data-label="{{skill.name}}">
                                         {{skill.name}}:
                                     </div>
-                                    <div class="flex-group-center{{#if
-                                            (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                    <div class="flex-group-center{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                          data-item-id="{{skill._id}}"
                                          data-type="skill"
                                          data-score="{{skill.system.total}}"
@@ -72,7 +69,7 @@
                                         <div class="item item-controls flexrow flex-group-center"
                                              data-item-id="{{skill._id}}">
                                             <a class="advancedialog"
-                                               title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                               title="{{localize "NONEX_IST_OD6S.ADVANCE_SKILL"}}"
                                                data-item-id="{{skill._id}}"
                                                data-type="skill"
                                                data-score="{{skill.system.total}}"
@@ -106,7 +103,7 @@
             <div class="grid title-add-grid">
                 <div class="flexrow flex-group-center"><b>{{getManifestationsName}}</b></div>
                 <div class="flexrow flex-group-center item-controls"
-                     title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.MANIFESTATION'}}">
+                     title="{{localize 'NONEX_IST_OD6S.ADD'}} {{localize 'NONEX_IST_OD6S.MANIFESTATION'}}">
                     <a class="item-add"
                        data-type="manifestation">
                         <i class="fas fa-plus"></i></a>
@@ -118,9 +115,8 @@
                         <li class="item manifestations">
                             {{#if item.system.activate}}
 			    <div class="item-list manifestation grid grid-3col-manifestations" draggable="true">
-                                <div class="attributes flexrow flex-group-center active-checkbox
-                                            {{#if item.system.active}}manifestation-active{{/if}}"
-                                     title="{{localize 'OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
+                                <div class="attributes flexrow flex-group-center active-checkbox {{#if item.system.active}}manifestation-active{{/if}}"
+                                     title="{{localize 'NONEX_IST_OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
                                     <a data-item-id="{{item._id}}" class="item-control">
                                         {{#if item.system.active}}
                                             <i class="far fa-check-circle manifestation-active"></i>
@@ -132,8 +128,7 @@
                             {{else}}
                                 {{#if item.system.attack}}
                                     <div class="skills grid grid-3col-manifestations">
-                                        <div class="attributes flexrow flex-group-center active-checkbox
-                                             title="{{localize 'OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
+                                        <div class="attributes flexrow flex-group-center active-checkbox title="{{localize 'NONEX_IST_OD6S.ACTIVE'}}" data-item-id="{{item._id}}">
                                         <a data-item-id="{{item._id}}" class="item-control">
                                             <i class="fas fa-circle"></i>
                                         </a>
@@ -151,14 +146,14 @@
                             <div class="item item-controls flexrow flex-group-center"
                                  data-item-id="{{item._id}}"
                                  data-type="manifestation"
-                                 title="{{localize "OD6S.EDIT"}}"
+                                 title="{{localize "NONEX_IST_OD6S.EDIT"}}"
                                  data-label="{{item.name}}">
                                 <a class="item-control item-edit" title="{{localize OD6S.EDIT}}"><i
                                         class="fas fa-edit"></i></a>
                                 <a data-item-id="{{item._id}}"
                                    data-type="manifestation"
                                    class="item-control item-delete"
-                                   title="{{localize 'OD6S.DELETE'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.DELETE'}}">
                                     <i class="fas fa-trash"></i></a>
                             </div>
                         </div>

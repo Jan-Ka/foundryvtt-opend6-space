@@ -90,26 +90,26 @@ export function bucketRangeFromDistance(
 ): RangeBucket | null {
     if (distance < 3) {
         return {
-            range: "OD6S.RANGE_POINT_BLANK_SHORT",
-            difficultyLevel: mapRangeToDifficulty ? "OD6S.DIFFICULTY_VERY_EASY" : null,
+            range: "NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT",
+            difficultyLevel: mapRangeToDifficulty ? "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY" : null,
         };
     }
     if (distance <= range.short) {
         return {
-            range: "OD6S.RANGE_SHORT_SHORT",
-            difficultyLevel: mapRangeToDifficulty ? "OD6S.DIFFICULTY_EASY" : null,
+            range: "NONEX_IST_OD6S.RANGE_SHORT_SHORT",
+            difficultyLevel: mapRangeToDifficulty ? "NONEX_IST_OD6S.DIFFICULTY_EASY" : null,
         };
     }
     if (distance <= range.medium) {
         return {
-            range: "OD6S.RANGE_MEDIUM_SHORT",
-            difficultyLevel: mapRangeToDifficulty ? "OD6S.DIFFICULTY_MODERATE" : null,
+            range: "NONEX_IST_OD6S.RANGE_MEDIUM_SHORT",
+            difficultyLevel: mapRangeToDifficulty ? "NONEX_IST_OD6S.DIFFICULTY_MODERATE" : null,
         };
     }
     if (distance <= range.long) {
         return {
-            range: "OD6S.RANGE_LONG_SHORT",
-            difficultyLevel: mapRangeToDifficulty ? "OD6S.DIFFICULTY_DIFFICULT" : null,
+            range: "NONEX_IST_OD6S.RANGE_LONG_SHORT",
+            difficultyLevel: mapRangeToDifficulty ? "NONEX_IST_OD6S.DIFFICULTY_DIFFICULT" : null,
         };
     }
     return null;

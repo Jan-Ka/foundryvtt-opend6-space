@@ -40,6 +40,6 @@ export function registerDiceHelpers() {
     })
 
     Handlebars.registerHelper('diceForScale', function () {
-        return game.settings.get('od6s', 'dice_for_scale');
+        return game.settings.get('nonex-ist-od6s', 'dice_for_scale');
     })
 }

@@ -233,7 +233,7 @@ export default class ExplosivesTemplate {
                 radiusY: radiusPixels,
             }],
             flags: {
-                od6s: {
+                "nonex-ist-od6s": {
                     explosive: true,
                 },
             },

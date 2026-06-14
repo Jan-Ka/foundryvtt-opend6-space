@@ -32,13 +32,13 @@ function keyForCore(core: string): string {
     return key;
 }
 
-const HEALTHY           = keyForCore('OD6S.WOUNDS_HEALTHY');
-const STUNNED           = keyForCore('OD6S.WOUNDS_STUNNED');
-const WOUNDED           = keyForCore('OD6S.WOUNDS_WOUNDED');
-const SEVERELY_WOUNDED  = keyForCore('OD6S.WOUNDS_SEVERELY_WOUNDED');
-const INCAPACITATED     = keyForCore('OD6S.WOUNDS_INCAPACITATED');
-const MORTALLY_WOUNDED  = keyForCore('OD6S.WOUNDS_MORTALLY_WOUNDED');
-const DEAD              = keyForCore('OD6S.WOUNDS_DEAD');
+const HEALTHY           = keyForCore('NONEX_IST_OD6S.WOUNDS_HEALTHY');
+const STUNNED           = keyForCore('NONEX_IST_OD6S.WOUNDS_STUNNED');
+const WOUNDED           = keyForCore('NONEX_IST_OD6S.WOUNDS_WOUNDED');
+const SEVERELY_WOUNDED  = keyForCore('NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED');
+const INCAPACITATED     = keyForCore('NONEX_IST_OD6S.WOUNDS_INCAPACITATED');
+const MORTALLY_WOUNDED  = keyForCore('NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED');
+const DEAD              = keyForCore('NONEX_IST_OD6S.WOUNDS_DEAD');
 
 const STUN_INCREMENT = false; // book default: stun does not use the increment rule
 
@@ -67,13 +67,13 @@ describe('fixture sanity', () => {
 describe('findWoundLevelByCore', () => {
     it('finds each core level in the default table', () => {
         const cores = [
-            'OD6S.WOUNDS_HEALTHY',
-            'OD6S.WOUNDS_STUNNED',
-            'OD6S.WOUNDS_WOUNDED',
-            'OD6S.WOUNDS_SEVERELY_WOUNDED',
-            'OD6S.WOUNDS_INCAPACITATED',
-            'OD6S.WOUNDS_MORTALLY_WOUNDED',
-            'OD6S.WOUNDS_DEAD',
+            'NONEX_IST_OD6S.WOUNDS_HEALTHY',
+            'NONEX_IST_OD6S.WOUNDS_STUNNED',
+            'NONEX_IST_OD6S.WOUNDS_WOUNDED',
+            'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED',
+            'NONEX_IST_OD6S.WOUNDS_INCAPACITATED',
+            'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED',
+            'NONEX_IST_OD6S.WOUNDS_DEAD',
         ];
         for (const core of cores) {
             expect(findWoundLevelByCore(TABLE, core)).toBeDefined();
@@ -87,27 +87,27 @@ describe('findWoundLevelByCore', () => {
 
 describe('computeNewWoundLevel — from Healthy', () => {
     it('Stunned hit → Stunned', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_STUNNED')).toBe(STUNNED);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_STUNNED')).toBe(STUNNED);
     });
 
     it('Wounded hit → Wounded', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_WOUNDED')).toBe(WOUNDED);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_WOUNDED')).toBe(WOUNDED);
     });
 
     it('Severely Wounded hit → Severely Wounded', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_SEVERELY_WOUNDED')).toBe(SEVERELY_WOUNDED);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED')).toBe(SEVERELY_WOUNDED);
     });
 
     it('Incapacitated hit → Incapacitated', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_INCAPACITATED')).toBe(INCAPACITATED);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED')).toBe(INCAPACITATED);
     });
 
     it('Mortally Wounded hit → Mortally Wounded', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_MORTALLY_WOUNDED')).toBe(MORTALLY_WOUNDED);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED')).toBe(MORTALLY_WOUNDED);
     });
 
     it('Dead hit → Dead', () => {
-        expect(transition(HEALTHY, 'OD6S.WOUNDS_DEAD')).toBe(DEAD);
+        expect(transition(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_DEAD')).toBe(DEAD);
     });
 });
 
@@ -118,29 +118,29 @@ describe('computeNewWoundLevel — from Healthy', () => {
 
 describe('computeNewWoundLevel — accumulation from Wounded', () => {
     it('Stunned hit while Wounded → stays Wounded (no increment, stun < current)', () => {
-        expect(transition(WOUNDED, 'OD6S.WOUNDS_STUNNED')).toBe(WOUNDED);
+        expect(transition(WOUNDED, 'NONEX_IST_OD6S.WOUNDS_STUNNED')).toBe(WOUNDED);
     });
 
     it('Wounded hit while Wounded → escalates by one', () => {
-        const result = transition(WOUNDED, 'OD6S.WOUNDS_WOUNDED');
+        const result = transition(WOUNDED, 'NONEX_IST_OD6S.WOUNDS_WOUNDED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(WOUNDED) + 1);
     });
 
     it('Severely Wounded hit while Wounded → Severely Wounded', () => {
-        expect(transition(WOUNDED, 'OD6S.WOUNDS_SEVERELY_WOUNDED')).toBe(SEVERELY_WOUNDED);
+        expect(transition(WOUNDED, 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED')).toBe(SEVERELY_WOUNDED);
     });
 });
 
 describe('computeNewWoundLevel — accumulation from Severely Wounded', () => {
     it('Wounded hit → escalates by one', () => {
-        const result = transition(SEVERELY_WOUNDED, 'OD6S.WOUNDS_WOUNDED');
+        const result = transition(SEVERELY_WOUNDED, 'NONEX_IST_OD6S.WOUNDS_WOUNDED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(SEVERELY_WOUNDED) + 1);
     });
 
     it('Incapacitated hit → Incapacitated', () => {
-        expect(transition(SEVERELY_WOUNDED, 'OD6S.WOUNDS_INCAPACITATED')).toBe(INCAPACITATED);
+        expect(transition(SEVERELY_WOUNDED, 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED')).toBe(INCAPACITATED);
     });
 });
 
@@ -150,7 +150,7 @@ describe('computeNewWoundLevel — accumulation from Severely Wounded', () => {
 
 describe('computeNewWoundLevel — Dead is terminal', () => {
     it('any hit while Dead → Dead', () => {
-        expect(transition(DEAD, 'OD6S.WOUNDS_DEAD')).toBe(DEAD);
+        expect(transition(DEAD, 'NONEX_IST_OD6S.WOUNDS_DEAD')).toBe(DEAD);
     });
 });
 
@@ -160,29 +160,29 @@ describe('computeNewWoundLevel — Dead is terminal', () => {
 
 describe('computeNewDamageLevel', () => {
     it('No damage → incoming level applied directly', () => {
-        expect(computeNewDamageLevel('OD6S.NO_DAMAGE', 'OD6S.DAMAGE_LIGHT')).toBe('OD6S.DAMAGE_LIGHT');
+        expect(computeNewDamageLevel('NONEX_IST_OD6S.NO_DAMAGE', 'NONEX_IST_OD6S.DAMAGE_LIGHT')).toBe('NONEX_IST_OD6S.DAMAGE_LIGHT');
     });
 
     it('Destroyed always wins', () => {
-        expect(computeNewDamageLevel('OD6S.DAMAGE_SEVERE', 'OD6S.DAMAGE_DESTROYED')).toBe('OD6S.DAMAGE_DESTROYED');
+        expect(computeNewDamageLevel('NONEX_IST_OD6S.DAMAGE_SEVERE', 'NONEX_IST_OD6S.DAMAGE_DESTROYED')).toBe('NONEX_IST_OD6S.DAMAGE_DESTROYED');
     });
 
     it('Heavy + Light → Severe', () => {
-        expect(computeNewDamageLevel('OD6S.DAMAGE_HEAVY', 'OD6S.DAMAGE_LIGHT')).toBe('OD6S.DAMAGE_SEVERE');
+        expect(computeNewDamageLevel('NONEX_IST_OD6S.DAMAGE_HEAVY', 'NONEX_IST_OD6S.DAMAGE_LIGHT')).toBe('NONEX_IST_OD6S.DAMAGE_SEVERE');
     });
 
     it('Severe + Light → Destroyed', () => {
-        expect(computeNewDamageLevel('OD6S.DAMAGE_SEVERE', 'OD6S.DAMAGE_LIGHT')).toBe('OD6S.DAMAGE_DESTROYED');
+        expect(computeNewDamageLevel('NONEX_IST_OD6S.DAMAGE_SEVERE', 'NONEX_IST_OD6S.DAMAGE_LIGHT')).toBe('NONEX_IST_OD6S.DAMAGE_DESTROYED');
     });
 
     it('Heavy + Very Light → stays Heavy (lesser damage ignored)', () => {
-        expect(computeNewDamageLevel('OD6S.DAMAGE_HEAVY', 'OD6S.DAMAGE_VERY_LIGHT')).toBe('OD6S.DAMAGE_HEAVY');
+        expect(computeNewDamageLevel('NONEX_IST_OD6S.DAMAGE_HEAVY', 'NONEX_IST_OD6S.DAMAGE_VERY_LIGHT')).toBe('NONEX_IST_OD6S.DAMAGE_HEAVY');
     });
 
     it('empty string (fresh actor) + any damage → undefined (schema bug guard)', () => {
         // Vehicles fresh from the DB had damage.value="" before the schema fix.
         // computeNewDamageLevel returns undefined for unrecognised current state.
-        expect(computeNewDamageLevel('', 'OD6S.DAMAGE_LIGHT')).toBeUndefined();
+        expect(computeNewDamageLevel('', 'NONEX_IST_OD6S.DAMAGE_LIGHT')).toBeUndefined();
     });
 });
 
@@ -199,29 +199,29 @@ function transitionIncrement(from: string, incoming: string): string | number | 
 
 describe('computeNewWoundLevel — stunDamageIncrement = true', () => {
     it('Stunned hit while Healthy → Stunned (same as default)', () => {
-        expect(transitionIncrement(HEALTHY, 'OD6S.WOUNDS_STUNNED')).toBe(STUNNED);
+        expect(transitionIncrement(HEALTHY, 'NONEX_IST_OD6S.WOUNDS_STUNNED')).toBe(STUNNED);
     });
 
     it('Stunned hit while Stunned → increments by one (stun accumulates)', () => {
-        const result = transitionIncrement(STUNNED, 'OD6S.WOUNDS_STUNNED');
+        const result = transitionIncrement(STUNNED, 'NONEX_IST_OD6S.WOUNDS_STUNNED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(STUNNED) + 1);
     });
 
     it('Stunned hit while Wounded → increments by one (stun accumulates)', () => {
-        const result = transitionIncrement(WOUNDED, 'OD6S.WOUNDS_STUNNED');
+        const result = transitionIncrement(WOUNDED, 'NONEX_IST_OD6S.WOUNDS_STUNNED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(WOUNDED) + 1);
     });
 
     it('Wounded hit while Wounded → increments by one (same as default)', () => {
-        const result = transitionIncrement(WOUNDED, 'OD6S.WOUNDS_WOUNDED');
+        const result = transitionIncrement(WOUNDED, 'NONEX_IST_OD6S.WOUNDS_WOUNDED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(WOUNDED) + 1);
     });
 
     it('Severely Wounded hit while Severely Wounded → increments by one', () => {
-        const result = transitionIncrement(SEVERELY_WOUNDED, 'OD6S.WOUNDS_SEVERELY_WOUNDED');
+        const result = transitionIncrement(SEVERELY_WOUNDED, 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED');
         expect(typeof result === 'number' ? result : parseInt(String(result)))
             .toBe(parseInt(SEVERELY_WOUNDED) + 1);
     });

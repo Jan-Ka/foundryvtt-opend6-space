@@ -8,7 +8,7 @@ export class OD6SCombat extends Combat {
      */
     async nextRound() {
         // Handle auto-explosive rolls if end-of-round is set
-        if (game.settings.get('od6s', 'auto_explosive') && game.settings.get('od6s', 'explosive_end_of_round')) {
+        if (game.settings.get('nonex-ist-od6s', 'auto_explosive') && game.settings.get('nonex-ist-od6s', 'explosive_end_of_round')) {
             await od6sutilities.detonateExplosives(this);
         }
 

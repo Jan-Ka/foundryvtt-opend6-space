@@ -154,8 +154,8 @@ describe('action-rangedattack handler', () => {
             makeCtx({ actor: characterWithAttrs({ scale: { score: 3 } }) }),
         );
         expect(out.score).toBe(12); // agi
-        expect(out.range).toBe('OD6S.RANGE_SHORT_SHORT');
-        expect(out.difficultylevel).toBe('OD6S.DIFFICULTY_EASY');
+        expect(out.range).toBe('NONEX_IST_OD6S.RANGE_SHORT_SHORT');
+        expect(out.difficultylevel).toBe('NONEX_IST_OD6S.DIFFICULTY_EASY');
         expect(out.attackerScale).toBe(3);
     });
 
@@ -167,7 +167,7 @@ describe('action-rangedattack handler', () => {
                 settings: makeSettings({ defaultUnknownDifficulty: true }),
             }),
         );
-        expect(out.difficultylevel).toBe('OD6S.DIFFICULTY_UNKNOWN');
+        expect(out.difficultylevel).toBe('NONEX_IST_OD6S.DIFFICULTY_UNKNOWN');
     });
 });
 
@@ -209,7 +209,7 @@ describe('action-meleeattack handler', () => {
     it('reads pre-resolved score from ctx.actionSkillResolved and sets damagescore to actor strength damage (no +5 — see RFC #100)', () => {
         const resolved: ActionResolution = { score: 15 }; // 6 (skill) + 9 (str)
         const out = HANDLERS['action-meleeattack'](
-            makeInput('meleeattack', { name: 'OD6S.ACTION_MELEE_ATTACK' }),
+            makeInput('meleeattack', { name: 'NONEX_IST_OD6S.ACTION_MELEE_ATTACK' }),
             makeCtx({ actor: characterWithAttrs(), actionSkillResolved: resolved }),
         );
         expect(out.score).toBe(15);
@@ -253,12 +253,12 @@ describe('action-vehicleramattack handler', () => {
                 },
             }),
         );
-        expect(out.source).toBe('OD6S.COLLISION');
+        expect(out.source).toBe('NONEX_IST_OD6S.COLLISION');
         expect(out.damagetype).toBe('p');
         expect(out.attackerScale).toBe(6);
         expect(out.vehicle).toBe('Actor.vehicle-1');
         expect(out.damagemodifiers).toContainEqual(
-            expect.objectContaining({ name: 'OD6S.ACTIVE_EFFECTS', value: 12 }),
+            expect.objectContaining({ name: 'NONEX_IST_OD6S.ACTIVE_EFFECTS', value: 12 }),
         );
     });
 
@@ -274,7 +274,7 @@ describe('action-vehicleramattack handler', () => {
         expect(out.vehicle).toBe('Actor.embedded');
         expect(out.attackerScale).toBe(9);
         expect(out.damagemodifiers).toContainEqual(
-            expect.objectContaining({ name: 'OD6S.ACTIVE_EFFECTS', value: 6 }),
+            expect.objectContaining({ name: 'NONEX_IST_OD6S.ACTIVE_EFFECTS', value: 6 }),
         );
     });
 });

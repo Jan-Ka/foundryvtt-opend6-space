@@ -79,7 +79,7 @@ export async function onDrop(sheet: DropSheetLike, event: DragEvent | { preventD
                     if (!isSkillItem(item)) return;
                     const sys = item.system;
                     if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
-                        ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
+                        ui.notifications.error(game.i18n.localize('NONEX_IST_OD6S.MISSING_ATTRIBUTE'))
                         return;
                     } else {
                         return onDropItem(sheet, event as DragEvent, data);
@@ -89,13 +89,13 @@ export async function onDrop(sheet: DropSheetLike, event: DragEvent | { preventD
                     if (!isSpecializationItem(item)) return;
                     const sys = item.system;
                     if (typeof (sys.attribute) === 'undefined' || sys.attribute === '') {
-                        ui.notifications.error(game.i18n.localize('OD6S.MISSING_ATTRIBUTE'))
+                        ui.notifications.error(game.i18n.localize('NONEX_IST_OD6S.MISSING_ATTRIBUTE'))
                         return;
                     } else if (typeof (sys.skill) === 'undefined' || sys.skill === '') {
-                        ui.notifications.error(game.i18n.localize('OD6S.MISSING_SKILL'))
+                        ui.notifications.error(game.i18n.localize('NONEX_IST_OD6S.MISSING_SKILL'))
                         return;
                     } else if (!(actor.items.find((i: Item) => i.type === 'skill' && i.name === sys.skill))) {
-                        ui.notifications.warn(game.i18n.localize('OD6S.DOES_NOT_POSSESS_SKILL'));
+                        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.DOES_NOT_POSSESS_SKILL'));
                         return;
                     } else {
                         return onDropItem(sheet, event as DragEvent, data);
@@ -196,7 +196,7 @@ export async function onDropItem(sheet: DropSheetLike, event: DragEvent, data: D
                     await sourceActor!.deleteEmbeddedDocuments('Item', [item.id]);
                 }
             } else {
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_NOT_DELETING_ITEM_OWNER'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NOT_DELETING_ITEM_OWNER'));
             }
         } else {
             await sheet.document.createEmbeddedDocuments("Item", [itemData]);
@@ -221,7 +221,7 @@ export async function onDropActor(sheet: DropSheetLike, _event: Event, data: Dro
                 pilotActor = await od6sutilities.getActorFromUuid(data.uuid!);
             }
             if (typeof (pilotActor) === 'undefined') {
-                ui.notifications.warn(game.i18n.localize('OD6S.ACTOR_NOT_FOUND'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.ACTOR_NOT_FOUND'));
                 return false;
             }
 

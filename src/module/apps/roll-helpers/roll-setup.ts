@@ -53,18 +53,18 @@ const RANGED_BUCKETING_SUBTYPES = new Set([
 
 function readSettings(): RollSettingsRaw {
     return {
-        defaultUnknownDifficulty: !!game.settings.get('od6s', 'default_unknown_difficulty'),
-        diceForScale: !!game.settings.get('od6s', 'dice_for_scale'),
+        defaultUnknownDifficulty: !!game.settings.get('nonex-ist-od6s', 'default_unknown_difficulty'),
+        diceForScale: !!game.settings.get('nonex-ist-od6s', 'dice_for_scale'),
         fundsFate: !!OD6S.fundsFate,
-        hideCombatCards: !!game.settings.get('od6s', 'hide-combat-cards'),
-        hideSkillCards: !!game.settings.get('od6s', 'hide-skill-cards'),
+        hideCombatCards: !!game.settings.get('nonex-ist-od6s', 'hide-combat-cards'),
+        hideSkillCards: !!game.settings.get('nonex-ist-od6s', 'hide-skill-cards'),
         showSkillSpecialization: !!OD6S.showSkillSpecialization,
         pipsPerDice: OD6S.pipsPerDice,
         meleeDifficulty: !!OD6S.meleeDifficulty,
-        explosiveZones: !!game.settings.get('od6s', 'explosive_zones'),
+        explosiveZones: !!game.settings.get('nonex-ist-od6s', 'explosive_zones'),
         weaponDamageTable: OD6S.weaponDamage,
         flatSkills: !!OD6S.flatSkills,
-        brawlAttribute: game.settings.get('od6s', 'brawl_attribute') as string,
+        brawlAttribute: game.settings.get('nonex-ist-od6s', 'brawl_attribute') as string,
     };
 }
 
@@ -119,11 +119,11 @@ function preResolveActionSkill(
     if (!isCharacterActor(data.actor)) return { score: 0 };
 
     const skillName = classified.key === 'action-meleeattack'
-        ? game.i18n.localize('OD6S.MELEE_COMBAT')
-        : game.i18n.localize('OD6S.BRAWL');
+        ? game.i18n.localize('NONEX_IST_OD6S.MELEE_COMBAT')
+        : game.i18n.localize('NONEX_IST_OD6S.BRAWL');
     const fallback = classified.key === 'action-meleeattack'
         ? 'agi'
-        : (game.settings.get('od6s', 'brawl_attribute') as string);
+        : (game.settings.get('nonex-ist-od6s', 'brawl_attribute') as string);
 
     const skillItem = data.actor.items.find(
         (i: Item) => i.type === 'skill' && i.name === skillName,
@@ -244,7 +244,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     const flatSkillsBypass = settings.flatSkills
         && (classified.type === 'skill' || classified.type === 'specialization');
     if (workingScore < settings.pipsPerDice && !flatSkillsBypass) {
-        ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+        ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.SCORE_TOO_LOW"));
         if (isExplosive) {
             await cancelAction({ ...data, isExplosive, itemid: data.itemId, regionId: data.regionId } as unknown as RollData);
         }
@@ -280,15 +280,15 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
 
     // ---- Range bucketing (orchestrator-side) ----
     let rangeLabel: string = (typeof bucketAny.range === 'string' ? bucketAny.range : undefined)
-        ?? 'OD6S.RANGE_POINT_BLANK_SHORT';
+        ?? 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT';
     let difficultyLevel: string = bucketAny.difficultylevel
         ?? data.difficultyLevel
-        ?? (settings.defaultUnknownDifficulty ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY');
+        ?? (settings.defaultUnknownDifficulty ? 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN' : 'NONEX_IST_OD6S.DIFFICULTY_EASY');
 
     if (RANGED_BUCKETING_SUBTYPES.has(subtype)) {
-        rangeLabel = 'OD6S.RANGE_SHORT_SHORT';
-        const rangeDifficulty = !!game.settings.get('od6s', 'map_range_to_difficulty');
-        const autoExplosive = !!game.settings.get('od6s', 'auto_explosive');
+        rangeLabel = 'NONEX_IST_OD6S.RANGE_SHORT_SHORT';
+        const rangeDifficulty = !!game.settings.get('nonex-ist-od6s', 'map_range_to_difficulty');
+        const autoExplosive = !!game.settings.get('nonex-ist-od6s', 'auto_explosive');
         const wantsBucket = (targets.length === 1 || (isExplosive && autoExplosive))
             && !!data.itemId
             && typeof data.token !== 'undefined' && data.token !== ''
@@ -311,7 +311,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
                         }
                         await clearExplosivePending(item, data.regionId);
                     }
-                    ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_RANGE'));
+                    ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.OUT_OF_RANGE'));
                     return false;
                 }
                 rangeLabel = bucketRange.range;
@@ -358,7 +358,7 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
             .attributes?.[attrKey]?.score ?? 0);
         const attrValues = od6sutilities.getDiceFromScore(attrScore);
         if (attrValues.dice === 0) {
-            ui.notifications.warn(game.i18n.localize("OD6S.SCORE_TOO_LOW"));
+            ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.SCORE_TOO_LOW"));
             return false;
         }
         // Score for finalize becomes attribute score (+ roll_mod once).
@@ -392,21 +392,21 @@ export async function setupRollData(data: IncomingRollData): Promise<RollData | 
     // ---- Visibility / FP-CP gating / wild die ----
     const isVisible = deriveVisibility(classified.key, settings, penalties.isBypass);
     const { canUseFp, canUseCp } = deriveCanUseFpCp(classified.key, settings);
-    const fatepointEffect = !!data.actor.getFlag('od6s', 'fatepointeffect') && canUseFp;
+    const fatepointEffect = !!data.actor.getFlag('nonex-ist-od6s', 'fatepointeffect') && canUseFp;
     const diceMultiplier = fatepointEffect ? 2 : 1;
 
     // ---- Misc COMMON inputs ----
     let name = data.name;
     if (subtype === 'parry' && classified.type === 'weapon') {
-        name = `${data.name} ${game.i18n.localize('OD6S.PARRY')}`;
+        name = `${data.name} ${game.i18n.localize('NONEX_IST_OD6S.PARRY')}`;
     }
     const vehicleTerrainDifficulty = OD6S.vehicleDifficulty
-        ? 'OD6S.TERRAIN_EASY'
-        : 'OD6S.DIFFICULTY_EASY';
+        ? 'NONEX_IST_OD6S.TERRAIN_EASY'
+        : 'NONEX_IST_OD6S.DIFFICULTY_EASY';
 
-    const wildDie = !!game.settings.get('od6s', 'use_wild_die')
+    const wildDie = !!game.settings.get('nonex-ist-od6s', 'use_wild_die')
         && !!(data.actor.system as { use_wild_die?: boolean }).use_wild_die;
-    const showWildDie = !!game.settings.get('od6s', 'use_wild_die');
+    const showWildDie = !!game.settings.get('nonex-ist-od6s', 'use_wild_die');
 
     // ---- Final bucket overrides for orchestrator-derived fields ----
     const bucketWithOverrides: typeof bucket = { ...bucket };

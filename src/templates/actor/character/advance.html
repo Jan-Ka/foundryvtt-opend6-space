@@ -1,14 +1,14 @@
-<div class="od6s advance-dialog">
+<div class="nonex-ist-od6s advance-dialog">
     <div class="flex-group-center">
-        <p>{{ localize 'OD6S.ADVANCE'}} {{localize label}}</p>
+        <p>{{ localize 'NONEX_IST_OD6S.ADVANCE'}} {{localize label}}</p>
     </div>
     {{#unless (flatSkills)}}
         <div class="grid grid-2col">
             <div class="flex-group-center">
-                <b>{{localize "OD6S.DICE"}}</b>
+                <b>{{localize "NONEX_IST_OD6S.DICE"}}</b>
             </div>
             <div class="flex-group-center">
-                <b>{{localize "OD6S.PIPS"}}</b>
+                <b>{{localize "NONEX_IST_OD6S.PIPS"}}</b>
             </div>
             {{#if freeadvance }}
                 <div class="flex-group-center advancedice" data-dice="{{diceFromScore score}}">
@@ -41,7 +41,7 @@
     {{else}}
         <div class="grid grid-3col">
             <div class="flex-group-center">
-                <b>{{localize "OD6S.SCORE"}}: </b>
+                <b>{{localize "NONEX_IST_OD6S.SCORE"}}: </b>
             </div>
             <div class="flex-group-center">
                 <div class="flex-group-center advancebase" data-base="{{base}}">
@@ -64,7 +64,7 @@
     {{#if metaPhysicsSkill}}
         <div class="grid grid-2col">
             <div class="flexrow flex-group-center metaphysicsteachercheckbox" data-metaphysicsteacher="{{metaphysicsteacher}}">
-                <label for="metaphysicsteacher">{{localize 'OD6S.METAPHYSICS_TEACHER'}}</label>
+                <label for="metaphysicsteacher">{{localize 'NONEX_IST_OD6S.METAPHYSICS_TEACHER'}}</label>
                 <input type="checkbox" id="metaphysicsteacher" name="metaphysicsteacher"
                        data-dtype="Boolean"
                        {{#if metaphysicsteacher}}checked{{/if}}>
@@ -76,7 +76,7 @@
     {{/if}}
     <div class="grid grid-2col">
         <div class="flexrow flex-group-center freeadvancecheckbox" data-freeadvance="{{freeadvance}}">
-            <label for="freeadvance">{{localize 'OD6S.FREE_ADVANCE'}}?</label>
+            <label for="freeadvance">{{localize 'NONEX_IST_OD6S.FREE_ADVANCE'}}?</label>
             <input type="checkbox" id="freeadvance" name="freeadvance"
                    data-dtype="Boolean"
                    {{#if freeadvance}}checked{{/if}}>
@@ -86,6 +86,6 @@
         </div>
     </div>
     <footer class="form-footer">
-        <button type="submit" data-action="submit">{{localize "OD6S.ADVANCE"}}</button>
+        <button type="submit" data-action="submit">{{localize "NONEX_IST_OD6S.ADVANCE"}}</button>
     </footer>
 </div>

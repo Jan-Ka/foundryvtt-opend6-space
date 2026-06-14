@@ -6,7 +6,7 @@
     {{/each}}
     {{#unless actor.system.merchant}}
         {{#unless (isGM)}}
-            <a class="item" data-tab="items-transfer">{{localize 'OD6S.TRANSFER_ITEM'}}</a>
+            <a class="item" data-tab="items-transfer">{{localize 'NONEX_IST_OD6S.TRANSFER_ITEM'}}</a>
         {{/unless}}
     {{/unless}}
 </nav>
@@ -15,10 +15,10 @@
         <div class="tab {{key}}" data-group="primary" data-tab="items-{{key}}">
             <div class="flexrow flex-group-center">
                 <div class="align-center-header">
-                    {{localize 'OD6S.ITEMS'}}
+                    {{localize 'NONEX_IST_OD6S.ITEMS'}}
                     {{#if (isGM)}}
                         <a class="item-controls-right item-add" data-type="{{key}}"
-                           title="{{localize 'OD6S.ADD'}} {{localize tab}}">
+                           title="{{localize 'NONEX_IST_OD6S.ADD'}} {{localize tab}}">
                             <i class="fas fa-plus"></i>
                         </a>
                     {{/if}}
@@ -53,7 +53,7 @@
                                             
                                         </select>
                                     {{ else }}
-                                        <label for="item.system.cost">{{localize 'OD6S.PRICE'}}:</label>
+                                        <label for="item.system.cost">{{localize 'NONEX_IST_OD6S.PRICE'}}:</label>
                                         <input class="merchant-cost-owner" type="number" name="system.cost"
                                                id="item.system.cost"
                                                data-item-id="{{item._id}}" data-actor-uuid="{{../../actor.uuid}}"
@@ -64,13 +64,13 @@
                                      data-item-id="{{item._id}}"
                                      data-type="{{item.type}}">
                                     <a class="item-control item-edit small-font" data-item-id="{{item._id}}"
-                                       title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                       title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a data-item-id="{{item._id}}"
                                        data-type="{{item.type}}"
                                        class="item-control item-delete small-font"
-                                       title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                       title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -79,7 +79,7 @@
                             {{#if ../../actor.system.merchant}}
                                 {{#if (gt item.system.quantity 0)}}
                                     <li class="item grid merchant-grid" data-item-id="{{item._id}}">
-                                        <div class="flexrow flex-group-center" title="{{localize 'OD6S.QUANTITY'}}">
+                                        <div class="flexrow flex-group-center" title="{{localize 'NONEX_IST_OD6S.QUANTITY'}}">
                                             {{item.system.quantity}}
                                         </div>
                                         <div class="flexrow flex-group-left show-item-details"
@@ -88,7 +88,7 @@
                                              data-item-id="{{item._id}}">{{item.name}}
                                         </div>
                                         <div class="item flexrow flex-group-left"
-                                             title="{{localize 'OD6S.PRICE'}}">
+                                             title="{{localize 'NONEX_IST_OD6S.PRICE'}}">
                                             {{#if (eq (getCost) "0")}}
                                                 {{localize (getConfig 'difficultyShort' item.system.price)}}
                                             {{ else }}
@@ -99,7 +99,7 @@
                                             <a data-item-id="{{item._id}}"
                                                data-type="{{item.type}}"
                                                class="item-control item-purchase"
-                                               title="{{localize 'OD6S.PURCHASE_ITEM'}}">
+                                               title="{{localize 'NONEX_IST_OD6S.PURCHASE_ITEM'}}">
                                                 <i class="fas fa-coins"></i>
                                             </a>
                                         </div>
@@ -108,7 +108,7 @@
                             {{else}}
                                 {{#if (gt item.system.quantity 0)}}
                                     <li class="item grid container-grid" data-item-id="{{item._id}}">
-                                        <div class="flexrow flex-group-center" title="{{localize 'OD6S.QUANTITY'}}">
+                                        <div class="flexrow flex-group-center" title="{{localize 'NONEX_IST_OD6S.QUANTITY'}}">
                                             {{item.system.quantity}}
                                         </div>
                                         <div class="flexrow flex-group-left show-item-details"
@@ -122,7 +122,7 @@
                                                data-rec-id="{{getCharacterActorId}}"
                                                data-type="{{item.type}}"
                                                class="item-control item-transfer"
-                                               title="{{localize 'OD6S.TRANSFER_ITEM'}}">
+                                               title="{{localize 'NONEX_IST_OD6S.TRANSFER_ITEM'}}">
                                                 <i class="fas fa-exchange-alt"></i>
                                             </a>
                                         </div>
@@ -140,13 +140,13 @@
             <div class="tab items-transfer" data-group="primary" data-tab="items-transfer">
                 <div class="flexrow flex-group-center">
                     <div class="align-center-header">
-                        {{localize 'OD6S.TAB_INVENTORY'}}
+                        {{localize 'NONEX_IST_OD6S.TAB_INVENTORY'}}
                     </div>
                 </div>
                 <ul class="player-inventory-list">
                     {{#each (getCharacterInventoryForContainer) as |item key|}}
                         <li class="item grid container-grid" data-item-id="{{item.id}}">
-                            <div class="flexrow flex-group-center" title="{{localize 'OD6S.QUANTITY'}}">
+                            <div class="flexrow flex-group-center" title="{{localize 'NONEX_IST_OD6S.QUANTITY'}}">
                                 {{item.system.system.quantity}}
                             </div>
                             <div class="flexrow flex-group-left show-item-details"
@@ -160,7 +160,7 @@
                                    data-sender-id="{{getCharacterActorId}}"
                                    data-rec-id="{{../actor.id}}"
                                    class="item-control item-transfer"
-                                   title="{{localize 'OD6S.TRANSFER_ITEM'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.TRANSFER_ITEM'}}">
                                     <i class="fas fa-exchange-alt"></i>
                                 </a>
                             </div>

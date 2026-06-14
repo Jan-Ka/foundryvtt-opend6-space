@@ -39,7 +39,7 @@ jobs:
           esac
           REL="https://github.com/${GITHUB_REPOSITORY}/releases"
           MANIFEST="${REL}/latest/download/system.json"
-          DOWNLOAD="${REL}/download/${TAG}/od6s.zip"
+          DOWNLOAD="${REL}/download/${TAG}/nonex-ist-od6s.zip"
           {
             echo "tag=$TAG"
             echo "version=$VERSION"
@@ -63,9 +63,9 @@ jobs:
         run: |
           set -eu
           mkdir -p build/artifacts
-          cp -r src build/od6s
-          (cd build && zip -r artifacts/od6s.zip od6s/)
-          (cd build/artifacts && sha256sum od6s.zip > od6s.zip.sha256)
+          cp -r src build/nonex-ist-od6s
+          (cd build && zip -r artifacts/nonex-ist-od6s.zip nonex-ist-od6s/)
+          (cd build/artifacts && sha256sum nonex-ist-od6s.zip > nonex-ist-od6s.zip.sha256)
 
       - name: Generate CycloneDX SBOM
         run: >
@@ -128,7 +128,7 @@ jobs:
         run: |
           set -eu
           cd build/artifacts
-          cosign sign-blob --bundle od6s.zip.bundle           od6s.zip
+          cosign sign-blob --bundle nonex-ist-od6s.zip.bundle           nonex-ist-od6s.zip
           cosign sign-blob --bundle sbom.cdx.json.bundle      sbom.cdx.json
           cd "$GITHUB_WORKSPACE"
           cosign sign-blob --bundle src/system.json.bundle    src/system.json
@@ -143,9 +143,9 @@ jobs:
           body_path: ${{ steps.changelog.outputs.body_path }}
           generate_release_notes: true
           files: |
-            build/artifacts/od6s.zip
-            build/artifacts/od6s.zip.sha256
-            build/artifacts/od6s.zip.bundle
+            build/artifacts/nonex-ist-od6s.zip
+            build/artifacts/nonex-ist-od6s.zip.sha256
+            build/artifacts/nonex-ist-od6s.zip.bundle
             build/artifacts/sbom.cdx.json
             build/artifacts/sbom.cdx.json.bundle
             src/system.json

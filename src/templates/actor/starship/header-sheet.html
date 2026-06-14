@@ -24,7 +24,7 @@
             <div class="flex-left">
                 <label for="actor.system.move.value">{{localize actor.system.move.label}}:</label>
                 <div class="grid grid-3col">
-                    <input title="{{localize 'OD6S.SPACE_MOVE'}}" name="system.move.value" type="number" min="0"
+                    <input title="{{localize 'NONEX_IST_OD6S.SPACE_MOVE'}}" name="system.move.value" type="number" min="0"
                            max="99"
                            value="{{actor.system.move.value}}" placeholder="10"
                            data-dtype="{{actor.system.move.type}}"/>
@@ -133,7 +133,7 @@
             {{/if}}
         {{/if}}
         <div class="flexrow flex-group-left">
-            <label for="actor.system.damage.value">{{localize 'OD6S.DAMAGE'}}:</label>
+            <label for="actor.system.damage.value">{{localize 'NONEX_IST_OD6S.DAMAGE'}}:</label>
             <select name="system.damage.value" id="actor.system.damage.value" style="width: 70px;">
                 
                     {{#each (getVehicleDamageLevels) as |level key|}}
@@ -145,16 +145,16 @@
             </select>
         </div>
         <div class="flexrow flex-group-left"
-             title="{{localize 'OD6S.ATMOSPHERIC_CAPABILITY'}}">
-            <label for="actor.system.atmospheric.value">{{localize 'OD6S.ATMOSPHERIC_CAPABILITY'}}</label>
+             title="{{localize 'NONEX_IST_OD6S.ATMOSPHERIC_CAPABILITY'}}">
+            <label for="actor.system.atmospheric.value">{{localize 'NONEX_IST_OD6S.ATMOSPHERIC_CAPABILITY'}}</label>
             <input id="actor.system.atmospheric.value" name="system.atmospheric.value" type="checkbox"
                    data-dtype="Boolean" {{#if actor.system.atmospheric.value}}checked{{/if}}/>
         </div>
         {{#if (isGM)}}
             <div class="flexrow flex-group-left">
-                <label title="{{localize 'OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
+                <label title="{{localize 'NONEX_IST_OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
                        for="actor.system.embedded_pilot.value">{{localize actor.system.embedded_pilot.label}}:</label>
-                <input title="{{localize 'OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
+                <input title="{{localize 'NONEX_IST_OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
                        id="actor.system.embedded_pilot.value" name="system.embedded_pilot.value" type="checkbox"
                        data-dtype="Boolean" {{#if actor.system.embedded_pilot.value}}checked{{/if}}/>
             </div>

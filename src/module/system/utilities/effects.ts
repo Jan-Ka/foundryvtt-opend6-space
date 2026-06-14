@@ -35,7 +35,7 @@ export function evaluateChange(change: ActiveEffectChange, caller: Actor | Item)
         }
     }
     if (typeof(newValue) === 'undefined' || newValue.includes('undefined') && game.user.isGM) {
-        ui.notifications.warn(game.i18n.localize('OD6S.WARN_EFFECT_PARSE') + ' ' + change.value);
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_EFFECT_PARSE') + ' ' + change.value);
         return 0;
     }
     const result = new Roll(newValue).evaluateSync().total;

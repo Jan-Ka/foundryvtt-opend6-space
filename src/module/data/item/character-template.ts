@@ -23,7 +23,7 @@ export default class CharacterTemplateData extends foundry.abstract.TypeDataMode
       move: new fields.NumberField({ initial: 10 }),
       me: new fields.BooleanField({ initial: false }),
       items: new fields.ArrayField(new fields.ObjectField()),
-      label: new fields.StringField({ initial: "OD6S.CHARACTER_TEMPLATES" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHARACTER_TEMPLATES" }),
     };
   }
 }

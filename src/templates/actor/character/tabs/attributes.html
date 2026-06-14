@@ -5,7 +5,7 @@
                 {{#each attrs as |attr|}}
                     {{#if (isAttributeActive attr.id) }}
                         {{#if (isEvenAttribute attr.sort) }}
-                            {{> systems/od6s/templates/actor/common/tabs/attribute-column.html
+                            {{> systems/nonex-ist-od6s/templates/actor/common/tabs/attribute-column.html
                                     actor=../actor key=attr.id attribute=attr system=../system}}
                         {{/if}}
                     {{/if}}
@@ -60,8 +60,7 @@
                                     class="item skills grid-2col-attributes"
                                     {{else}} class="skills grid grid-3col-attributes"
                                     {{/if}}>
-                                        <div class="skilldialog flex-group-left{{#if
-                                                (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                        <div class="skilldialog flex-group-left{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                              data-item-id="{{skill._id}}"
                                              data-type="skill"
                                              data-score="{{skill.system.total}}"
@@ -69,8 +68,7 @@
                                              data-label="{{skill.name}}">
                                             {{skill.name}}
                                         </div>
-                                        <div class="flex-group-center{{#if
-                                                (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                                        <div class="flex-group-center{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
                                             {{getModColor skill.system.mod}}"
                                              data-item-id="{{skill._id}}"
                                              data-type="skill"
@@ -87,7 +85,7 @@
                                             <div class="item item-controls flexrow flex-group-center"
                                                  data-item-id="{{skill._id}}">
                                                 <a class="advancedialog"
-                                                   title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                                   title="{{localize "NONEX_IST_OD6S.ADVANCE_SKILL"}}"
                                                    data-item-id="{{skill._id}}"
                                                    data-type="skill"
                                                    data-score="{{skill.system.total}}"
@@ -109,7 +107,7 @@
                                                 <a data-item-id="{{skill._id}}"
                                                    data-type="skill"
                                                    class="item-control item-delete"
-                                                   title={{localize 'OD6S.DELETE_SKILL'}}>
+                                                   title={{localize 'NONEX_IST_OD6S.DELETE_SKILL'}}>
                                                     <i class="fas fa-trash"></i></a>
                                             </div>{{/if}}
                                     </div>
@@ -125,7 +123,7 @@
                 {{#each attrs as |attr|}}
                     {{#if (isAttributeActive attr.id) }}
                         {{#unless (isEvenAttribute attr.sort) }}
-                            {{> systems/od6s/templates/actor/common/tabs/attribute-column.html
+                            {{> systems/nonex-ist-od6s/templates/actor/common/tabs/attribute-column.html
                                     actor=../actor attribute=attr key=attr.id system=../system}}
                         {{/unless}}
                     {{/if}}

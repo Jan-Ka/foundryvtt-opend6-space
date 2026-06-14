@@ -14,11 +14,11 @@ export class OD6SAddCrew extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-add-crew",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-add-crew",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.ADD_CREW",
+            title: "NONEX_IST_OD6S.ADD_CREW",
             resizable: false,
             minimizable: true,
         },
@@ -38,7 +38,7 @@ export class OD6SAddCrew extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/actor/common/add-crew.html",
+            template: "systems/nonex-ist-od6s/templates/actor/common/add-crew.html",
         },
     };
 

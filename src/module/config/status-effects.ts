@@ -1,6 +1,6 @@
 /**
  * Status effects displayed in the token HUD and applied via wound/stun automation.
- * Mounted onto `OD6S.statusEffects` by `config-od6s.ts`.
+ * Mounted onto `NONEX_IST_OD6S.statusEffects` by `config-od6s.ts`.
  */
 export interface StatusEffectDef {
     id: string;
@@ -34,25 +34,25 @@ const statusEffects: StatusEffectDef[] = [
     {
         id: "wounded",
         name: "EFFECT.StatusWounded",
-        img: "systems/od6s/icons/wounded.svg",
+        img: "systems/nonex-ist-od6s/icons/wounded.svg",
         hud: false
     },
     {
         id: "severely_wounded",
         name: "EFFECT.StatusSeverelyWounded",
-        img: "systems/od6s/icons/severely-wounded.svg",
+        img: "systems/nonex-ist-od6s/icons/severely-wounded.svg",
         hud: false
     },
     {
         id: "incapacitated",
         name: "EFFECT.StatusIncapacitated",
-        img: "systems/od6s/icons/incapacitated.svg",
+        img: "systems/nonex-ist-od6s/icons/incapacitated.svg",
         hud: false
     },
     {
         id: "mortally_wounded",
         name: "EFFECT.StatusMortallyWounded",
-        img: "systems/od6s/icons/mortally-wounded.svg",
+        img: "systems/nonex-ist-od6s/icons/mortally-wounded.svg",
         hud: false
     },
     {

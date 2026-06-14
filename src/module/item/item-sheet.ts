@@ -22,7 +22,7 @@ const ItemSheetV2 = foundry.applications.sheets.ItemSheetV2;
 export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     static DEFAULT_OPTIONS = {
-        classes: ["od6s", "sheet", "item"],
+        classes: ["nonex-ist-od6s", "sheet", "item"],
         position: {width: 520, height: 480},
         window: {resizable: true, minimizable: true},
         form: {submitOnChange: true, closeOnSubmit: false},
@@ -30,11 +30,11 @@ export class OD6SItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
     };
 
     static PARTS = {
-        body: {template: "systems/od6s/templates/item/item-weapon-sheet.html"},
+        body: {template: "systems/nonex-ist-od6s/templates/item/item-weapon-sheet.html"},
     };
 
     get template(): string {
-        return `systems/od6s/templates/item/item-${this.item.type}-sheet.html`;
+        return `systems/nonex-ist-od6s/templates/item/item-${this.item.type}-sheet.html`;
     }
 
     async _prepareContext(_options?: object): Promise<object> {

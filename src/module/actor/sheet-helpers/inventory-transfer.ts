@@ -4,11 +4,11 @@
  *   - `onPurchase` — finalize a purchase. Two entry paths:
  *     1. After a purchase roll resolves: chat-card / wild-die / difficulty-
  *        edit handlers call `seller.sheet._onPurchase(...)` to commit the
- *        sale (this is the path used when `OD6S.cost === '0'`, i.e. the
+ *        sale (this is the path used when `NONEX_IST_OD6S.cost === '0'`, i.e. the
  *        funds-based purchase-by-roll system).
  *     2. Direct purchase without a roll: the inventory listener calls
- *        `_onPurchase` immediately when `OD6S.cost !== '0'` (credit-based
- *        system; `OD6S.cost === '1'` additionally deducts buyer credits).
+ *        `_onPurchase` immediately when `NONEX_IST_OD6S.cost !== '0'` (credit-based
+ *        system; `NONEX_IST_OD6S.cost === '1'` additionally deducts buyer credits).
  *     Either way, the helper copies the item from seller to buyer
  *     (stacking same-name gear) and decrements the seller's quantity.
  *
@@ -39,7 +39,7 @@ export async function onPurchase(sheet: InventorySheetLike, itemId: string, buye
     // the stock between roll and resolve. Fail with the same not-found
     // warning `rollPurchase` uses rather than crashing on the next deref.
     if (typeof item === "undefined") {
-        ui.notifications.warn(game.i18n.localize("OD6S.ITEM_NOT_FOUND"));
+        ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ITEM_NOT_FOUND"));
         return;
     }
 
@@ -49,7 +49,7 @@ export async function onPurchase(sheet: InventorySheetLike, itemId: string, buye
     const itemSystem = item.system as OD6SEquipment;
     if (OD6S.cost === "1") {
         if ((+buyerSystem.credits.value) < (+itemSystem.cost)) {
-            ui.notifications.warn(game.i18n.localize("OD6S.WARN_NOT_ENOUGH_CURRENCY"));
+            ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.WARN_NOT_ENOUGH_CURRENCY"));
             return;
         }
         await buyer!.update({"system.credits.value": (+buyerSystem.credits.value) - (+itemSystem.cost)});

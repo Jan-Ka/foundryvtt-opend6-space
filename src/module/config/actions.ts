@@ -14,7 +14,7 @@ export interface ActionDef {
 
 export const actions: Record<string, ActionDef> = {
     "ranged_attack": {
-        "name": "OD6S.ACTION_RANGED_ATTACK",
+        "name": "NONEX_IST_OD6S.ACTION_RANGED_ATTACK",
         "type": "rangedattack",
         "rollable": true,
         "base": "agi",
@@ -22,7 +22,7 @@ export const actions: Record<string, ActionDef> = {
         "subtype": "rangedattack",
     },
     "melee_attack": {
-        "name": "OD6S.ACTION_MELEE_ATTACK",
+        "name": "NONEX_IST_OD6S.ACTION_MELEE_ATTACK",
         "type": "meleeattack",
         "rollable": true,
         "base": "agi",
@@ -30,7 +30,7 @@ export const actions: Record<string, ActionDef> = {
         "subtype": "meleeattack",
     },
     "brawl_attack": {
-        "name": "OD6S.ACTION_BRAWL_ATTACK",
+        "name": "NONEX_IST_OD6S.ACTION_BRAWL_ATTACK",
         "type": "brawlattack",
         "rollable": true,
         "base": "agi",
@@ -38,7 +38,7 @@ export const actions: Record<string, ActionDef> = {
         "subtype": "brawlattack",
     },
     "dodge": {
-        "name": "OD6S.ACTION_DODGE",
+        "name": "NONEX_IST_OD6S.ACTION_DODGE",
         "type": "dodge",
         "rollable": true,
         "base": "agi",
@@ -46,23 +46,23 @@ export const actions: Record<string, ActionDef> = {
         "subtype": "dodge",
     },
     "parry": {
-        "name": "OD6S.ACTION_PARRY",
+        "name": "NONEX_IST_OD6S.ACTION_PARRY",
         "type": "parry",
         "rollable": true,
         "base": "agi",
-        "skill": "OD6S.ACTION_MELEE_PARRY",
+        "skill": "NONEX_IST_OD6S.ACTION_MELEE_PARRY",
         "subtype": "parry",
     },
     "block": {
-        "name": "OD6S.ACTION_BLOCK",
+        "name": "NONEX_IST_OD6S.ACTION_BLOCK",
         "type": "block",
         "rollable": true,
         "base": "agi",
-        "skill": "OD6S.ACTION_BRAWL_BLOCK",
+        "skill": "NONEX_IST_OD6S.ACTION_BRAWL_BLOCK",
         "subtype": "block",
     },
     "other": {
-        "name": "OD6S.ACTION_OTHER",
+        "name": "NONEX_IST_OD6S.ACTION_OTHER",
         "type": "action",
         "rollable": false,
         "base": "",
@@ -73,7 +73,7 @@ export const actions: Record<string, ActionDef> = {
 
 export const vehicleActions: Record<string, ActionDef> = {
     "ranged_attack": {
-        "name": "OD6S.ACTION_VEHICLE_RANGED_ATTACK",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_RANGED_ATTACK",
         "type": "vehiclerangedattack",
         "rollable": true,
         "base": "mec",
@@ -81,7 +81,7 @@ export const vehicleActions: Record<string, ActionDef> = {
         "subtype": "",
     },
     "ram": {
-        "name": "OD6S.ACTION_VEHICLE_RAM",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_RAM",
         "type": "vehicleramattack",
         "rollable": true,
         "base": "mec",
@@ -89,7 +89,7 @@ export const vehicleActions: Record<string, ActionDef> = {
         "subtype": "",
     },
     "dodge": {
-        "name": "OD6S.ACTION_VEHICLE_DODGE",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_DODGE",
         "type": "vehicledodge",
         "rollable": true,
         "base": "mec",
@@ -97,7 +97,7 @@ export const vehicleActions: Record<string, ActionDef> = {
         "subtype": "",
     },
     "maneuver": {
-        "name": "OD6S.ACTION_VEHICLE_MANEUVER",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_MANEUVER",
         "type": "vehiclemaneuver",
         "rollable": true,
         "base": "mec",
@@ -105,15 +105,15 @@ export const vehicleActions: Record<string, ActionDef> = {
         "subtype": "",
     },
     "sensors": {
-        "name": "OD6S.ACTION_VEHICLE_SENSORS",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_SENSORS",
         "type": "vehiclesensors",
         "base": "mec",
-        "skill": "OD6S.SENSORS",
+        "skill": "NONEX_IST_OD6S.SENSORS",
         "rollable": true,
         "subtype": "",
     },
     "other": {
-        "name": "OD6S.ACTION_VEHICLE_OTHER",
+        "name": "NONEX_IST_OD6S.ACTION_VEHICLE_OTHER",
         "type": "action",
         "rollable": false,
         "base": "",

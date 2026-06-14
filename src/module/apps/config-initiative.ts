@@ -7,11 +7,11 @@ export default class od6sInitiativeConfiguration extends HandlebarsApplicationMi
     requiresWorldReload = false;
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-initiative-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-initiative-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_INITIATIVE_MENU",
+            title: "NONEX_IST_OD6S.CONFIG_INITIATIVE_MENU",
             resizable: true,
             minimizable: true,
         },
@@ -31,7 +31,7 @@ export default class od6sInitiativeConfiguration extends HandlebarsApplicationMi
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/initiative-settings.html",
+            template: "systems/nonex-ist-od6s/templates/settings/initiative-settings.html",
         },
     };
 
@@ -67,14 +67,14 @@ export default class od6sInitiativeConfiguration extends HandlebarsApplicationMi
     ): Promise<void> {
         const data = formData.object;
         for (const setting in data) {
-            await game.settings.set("od6s", setting, data[setting]);
-            const s = game.settings.settings.get("od6s." + setting);
+            await game.settings.set("nonex-ist-od6s", setting, data[setting]);
+            const s = game.settings.settings.get("nonex-ist-od6s." + setting);
             if (s?.requiresReload) this.requiresWorldReload = true;
         }
 
         if (data.reroll_initiative === false) {
-            await game.settings.set("od6s", "auto_reroll_character", false);
-            await game.settings.set("od6s", "auto_reroll_npc", false);
+            await game.settings.set("nonex-ist-od6s", "auto_reroll_character", false);
+            await game.settings.set("nonex-ist-od6s", "auto_reroll_npc", false);
         }
 
         await this.render();

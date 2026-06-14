@@ -9,7 +9,7 @@ import {OD6SHandleWildDieForm} from "../apps/handle-wild-die";
 import {error as logError} from "../system/logger";
 
 // Delegated event helper: attaches a listener on a parent that fires when a child matching selector is the target.
-// Wraps the handler so async failures leave a `[od6s:chat-log]` breadcrumb instead of unhandled rejections.
+// Wraps the handler so async failures leave a `[nonex-ist-od6s:chat-log]` breadcrumb instead of unhandled rejections.
 function delegateEvent(
     parent: HTMLElement,
     eventType: string,
@@ -43,9 +43,9 @@ export function registerChatLogListeners() {
             const target = ev.currentTarget as HTMLElement;
             const input = ev.target as HTMLInputElement;
             const message = await game.messages.get(target.dataset.messageId!);
-            const targets = message!.getFlag('od6s', 'targets') as Record<string, { damage: string }>;
+            const targets = message!.getFlag('nonex-ist-od6s', 'targets') as Record<string, { damage: string }>;
             targets[target.dataset.target!].damage = input.value;
-            await message!.setFlag('od6s', 'targets', targets);
+            await message!.setFlag('nonex-ist-od6s', 'targets', targets);
         })
 
         // Keyboard activation for chat-card controls that aren't native <button>s
@@ -100,7 +100,7 @@ export function registerChatLogListeners() {
             const messageId = target.dataset.messageId!;
             const stun = target.dataset.stun;
             const msg = game.messages.get(messageId);
-            const stunEffect = msg!.getFlag('od6s', 'stunEffect');
+            const stunEffect = msg!.getFlag('nonex-ist-od6s', 'stunEffect');
 
             if (isCharacterActor(actor) && isVehicleData) {
                 actor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
@@ -109,7 +109,7 @@ export function registerChatLogListeners() {
 
             if (od6sutilities.boolCheck(stun)) {
                 if (stunEffect === 'unconscious') {
-                    if (game.settings.get('od6s', 'auto_status')) {
+                    if (game.settings.get('nonex-ist-od6s', 'auto_status')) {
                         await actor.toggleStatusEffect('unconscious', {overlay: false, active: true});
                     }
                 } else {
@@ -127,7 +127,7 @@ export function registerChatLogListeners() {
                     }
                 }
             } else {
-                const usesDamageLevels = game.settings.get('od6s', 'bodypoints') === 0
+                const usesDamageLevels = game.settings.get('nonex-ist-od6s', 'bodypoints') === 0
                     || isVehicleData
                     || actor.type === 'starship' || actor.type === 'vehicle';
                 if (usesDamageLevels) {
@@ -140,10 +140,10 @@ export function registerChatLogListeners() {
                     let bp = actor.system.wounds.body_points.current - Number(result);
                     if (bp < 0) bp = 0;
                     await actor.update({ 'system.wounds.body_points.current': bp });
-                    if (game.settings.get('od6s', 'bodypoints') === 1) await actor.setWoundLevelFromBodyPoints(bp);
+                    if (game.settings.get('nonex-ist-od6s', 'bodypoints') === 1) await actor.setWoundLevelFromBodyPoints(bp);
                 }
             }
-            await msg!.setFlag('od6s', 'applied', true);
+            await msg!.setFlag('nonex-ist-od6s', 'applied', true);
         })
 
         delegateEvent(html, "click", ".explosive-damage-button", async (ev: Event) => {
@@ -160,18 +160,18 @@ export function registerChatLogListeners() {
             const actor = message!.speaker.token === null
                 ? game.actors.get(message!.speaker.actor)
                 : game!.scenes.active.tokens.get(message!.speaker.token)?.actor;
-            const item = actor!.items.get(message!.getFlag('od6s', 'itemId') as string);
-            const regionId = message!.getFlag('od6s', 'template') as string | undefined;
+            const item = actor!.items.get(message!.getFlag('nonex-ist-od6s', 'itemId') as string);
+            const regionId = message!.getFlag('nonex-ist-od6s', 'template') as string | undefined;
             const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
             if (item && regionId) {
                 await item.update({
-                    [`flags.od6s.explosivePending.-=${regionId}`]: null,
+                    [`flags.nonex-ist-od6s.explosivePending.-=${regionId}`]: null,
                 });
             }
-            if (region) await region.setFlag('od6s', 'handled', true);
-            await message!.setFlag('od6s', 'handled', true);
+            if (region) await region.setFlag('nonex-ist-od6s', 'handled', true);
+            await message!.setFlag('nonex-ist-od6s', 'handled', true);
             if (region) await canvas.scene.deleteEmbeddedDocuments('Region', [region.id]);
-            await message!.setFlag('od6s', 'applied', true);
+            await message!.setFlag('nonex-ist-od6s', 'applied', true);
         })
 
         delegateEvent(html, "click", ".damage-button", async (ev: Event) => {
@@ -189,19 +189,19 @@ export function registerChatLogListeners() {
                 itemId = data.itemId;
             }
 
-            if (game.settings.get('od6s', 'use_wild_die')) {
+            if (game.settings.get('nonex-ist-od6s', 'use_wild_die')) {
                 dice.dice = dice.dice - 1;
                 if (dice.dice < 1) {
-                    rollString = "+1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+                    rollString = "+1dw" + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
                 } else {
-                    rollString = dice.dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR') + "+1dw" +
-                        game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+                    rollString = dice.dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR') + "+1dw" +
+                        game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
                 }
             } else {
-                rollString = dice.dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR');
+                rollString = dice.dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR');
             }
             dice.pips ? rollString += "+" + dice.pips : null;
-            if (!game.settings.get('od6s', 'dice_for_scale')) {
+            if (!game.settings.get('nonex-ist-od6s', 'dice_for_scale')) {
                 const scaleBonus = Number(data.damagescalebonus ?? 0);
                 if (scaleBonus > 0) rollString += "+" + Math.abs(scaleBonus);
                 if (scaleBonus < 0) rollString += "-" + Math.abs(scaleBonus);
@@ -209,21 +209,21 @@ export function registerChatLogListeners() {
 
             const roll = await new Roll(rollString).evaluate();
 
-            let label = game.i18n.localize('OD6S.DAMAGE') + " (" +
+            let label = game.i18n.localize('NONEX_IST_OD6S.DAMAGE') + " (" +
                 game.i18n.localize(OD6S.damageTypes[data.damagetype ?? ""]) + ")";
 
             if (typeof (data.source) !== 'undefined' && data.source !== '') {
-                label = label + " " + game.i18n.localize('OD6S.FROM') + " " +
+                label = label + " " + game.i18n.localize('NONEX_IST_OD6S.FROM') + " " +
                     game.i18n.localize(data.source);
             }
 
             if (typeof (data.vehicle) !== 'undefined' && data.vehicle !== '') {
                 const vehicle = await od6sutilities.getActorFromUuid(data.vehicle);
-                label = label + " " + game.i18n.localize('OD6S.BY') + " " + vehicle!.name;
+                label = label + " " + game.i18n.localize('NONEX_IST_OD6S.BY') + " " + vehicle!.name;
             }
 
             if (typeof (data.targetname) !== 'undefined' && data.targetname !== '') {
-                label = label + " " + game.i18n.localize('OD6S.TO') + " " + data.targetname;
+                label = label + " " + game.i18n.localize('NONEX_IST_OD6S.TO') + " " + data.targetname;
             }
 
             const collisionFlag = data.collision === 'true';
@@ -245,8 +245,8 @@ export function registerChatLogListeners() {
                 "itemId": itemId
             }
 
-            if (game.settings.get('od6s', 'use_wild_die')) {
-                const WildDie = roll.terms.find(d => game.i18n.localize("OD6S.WILD_DIE_FLAVOR").includes(d.flavor))
+            if (game.settings.get('nonex-ist-od6s', 'use_wild_die')) {
+                const WildDie = roll.terms.find(d => game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR").includes(d.flavor))
                 if (WildDie!.total === 1) {
                     flags.wild = true;
                     if (OD6S.wildDieOneDefault > 0 && OD6S.wildDieOneAuto === 0) {
@@ -258,13 +258,13 @@ export function registerChatLogListeners() {
             }
 
             let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
-            if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
+            if (game.user.isGM && game.settings.get('nonex-ist-od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
 
             const rollMessage = await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({actor: game.actors.find(a => a.id === data.actor)}),
                 flavor: label,
                 flags: {
-                    od6s: flags
+                    "nonex-ist-od6s": flags
                 },
             }, {rollMode, create: true});
 
@@ -287,11 +287,11 @@ export function registerChatLogListeners() {
                 };
 
                 if (game.user.isGM) {
-                    if (rollMessage.getFlag('od6s', 'difficulty') && rollMessage.getFlag('od6s', 'success')) {
-                        replacementRoll.total < rollMessage.getFlag('od6s', 'difficulty') ? await rollMessage.setFlag('od6s', 'success', false) :
-                            await rollMessage.setFlag('od6s', 'success', true);
+                    if (rollMessage.getFlag('nonex-ist-od6s', 'difficulty') && rollMessage.getFlag('nonex-ist-od6s', 'success')) {
+                        replacementRoll.total < rollMessage.getFlag('nonex-ist-od6s', 'difficulty') ? await rollMessage.setFlag('nonex-ist-od6s', 'success', false) :
+                            await rollMessage.setFlag('nonex-ist-od6s', 'success', true);
                     }
-                    await rollMessage.setFlag('od6s', 'originalroll', rollMessage.rolls[0])
+                    await rollMessage.setFlag('nonex-ist-od6s', 'originalroll', rollMessage.rolls[0])
                     await rollMessage.update(rollMessageUpdate, {"diff": true});
                 } else {
                     await OD6S.socket.executeAsGM('updateRollMessage', game.user.id, rollMessage.id, rollMessageUpdate);
@@ -313,7 +313,7 @@ export function registerChatLogListeners() {
                 actor = game.actors.get(message!.speaker.actor)
             }
             // Find the item
-            const itemId = message!.getFlag('od6s', 'itemId') as string;
+            const itemId = message!.getFlag('nonex-ist-od6s', 'itemId') as string;
             let item = actor?.items.find((i: Item) => i.id === itemId);
             if (typeof (item) === "undefined") {
                 // See if the actor is a crewmember
@@ -347,8 +347,8 @@ export function registerChatLogListeners() {
             const message = game.messages.get(dataSet.messageId!);
             const data = {
                 messageId: dataSet.messageId,
-                baseDifficulty: message!.getFlag('od6s', 'baseDifficulty'),
-                modifiers: message!.getFlag('od6s', 'modifiers'),
+                baseDifficulty: message!.getFlag('nonex-ist-od6s', 'baseDifficulty'),
+                modifiers: message!.getFlag('nonex-ist-od6s', 'modifiers'),
             };
             new OD6SEditDifficulty(data).render(true);
         })
@@ -363,8 +363,8 @@ export function registerChatLogListeners() {
             const message = game.messages.get(dataSet.messageId!);
             const data = {
                 messageId: dataSet.messageId,
-                damage: message!.getFlag('od6s', 'damageScore'),
-                damageDice: message!.getFlag('od6s', 'damageDice'),
+                damage: message!.getFlag('nonex-ist-od6s', 'damageScore'),
+                damageDice: message!.getFlag('nonex-ist-od6s', 'damageDice'),
             };
             new OD6SEditDamage(data).render(true);
         })
@@ -383,7 +383,7 @@ export function registerChatLogListeners() {
             const message = game.messages.get(data.messageId);
 
             if (game.user.isGM) {
-                data.isExplosive = message!.getFlag('od6s', 'isExplosive');
+                data.isExplosive = message!.getFlag('nonex-ist-od6s', 'isExplosive');
                 // If in combat, only load tokens in combat.  Otherwise, load all tokens in scene
                 if (game.combat) {
                     const targets: Array<{ id: string; name: string }> = [];
@@ -404,13 +404,13 @@ export function registerChatLogListeners() {
             const target = ev.currentTarget as HTMLElement;
             const input = ev.target as HTMLInputElement;
             const message = game.messages.get(target.dataset.messageId!);
-            const targets = Array.from(message!.getFlag('od6s', 'targets') as ArrayLike<{ id: string; zone?: number }>);
+            const targets = Array.from(message!.getFlag('nonex-ist-od6s', 'targets') as ArrayLike<{ id: string; zone?: number }>);
             for (const t in targets) {
                 if (target.dataset.targetId === targets[t].id) {
                     targets[t].zone = parseInt(input.value);
                 }
             }
-            await message!.setFlag('od6s', 'targets', targets);
+            await message!.setFlag('nonex-ist-od6s', 'targets', targets);
         })
 
         delegateEvent(html, "click", ".message-sender", async (ev: Event) => {
@@ -437,9 +437,9 @@ export function registerChatLogListeners() {
         delegateEvent(html, "click", ".message-reveal", async (ev: Event) => {
             const target = ev.currentTarget as HTMLElement;
             const message = game.messages.get(target.dataset.messageId!);
-            await message!.setFlag('od6s', 'isVisible', true);
-            await message!.setFlag('od6s', 'isKnown', true);
-            if (message!.getFlag('od6s', 'isExplosive') && game.settings.get('od6s', 'auto_explosive')) {
+            await message!.setFlag('nonex-ist-od6s', 'isVisible', true);
+            await message!.setFlag('nonex-ist-od6s', 'isKnown', true);
+            if (message!.getFlag('nonex-ist-od6s', 'isExplosive') && game.settings.get('nonex-ist-od6s', 'auto_explosive')) {
                 // Reveal the explosive region
                 const region = od6sutilities.getTemplateFromMessage(message!).template;
                 if (region) {
@@ -480,19 +480,19 @@ export function registerChatLogListeners() {
             };
 
             const update = {
-                flags: { od6s: flags },
+                flags: { "nonex-ist-od6s": flags },
                 id: message!.id,
                 _id: message!.id,
             };
 
-            const total = message!.getFlag('od6s', 'total') as number | undefined;
+            const total = message!.getFlag('nonex-ist-od6s', 'total') as number | undefined;
             flags.success = !(typeof total === 'number' && total < flags.difficulty);
 
-            if (message!.getFlag('od6s', 'subtype') === 'purchase' && message!.getFlag('od6s', 'success')) {
-                const seller = game.actors.get(message!.getFlag('od6s', 'seller') as string);
+            if (message!.getFlag('nonex-ist-od6s', 'subtype') === 'purchase' && message!.getFlag('nonex-ist-od6s', 'success')) {
+                const seller = game.actors.get(message!.getFlag('nonex-ist-od6s', 'seller') as string);
                 await (seller!.sheet as unknown as {
                     _onPurchase: (item: unknown, actor: unknown) => Promise<void>
-                })._onPurchase(message!.getFlag('od6s', 'purchasedItem'), message!.speaker.actor);
+                })._onPurchase(message!.getFlag('nonex-ist-od6s', 'purchasedItem'), message!.speaker.actor);
             }
 
             await message!.update(update, {"diff": true});

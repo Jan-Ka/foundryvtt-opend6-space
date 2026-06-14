@@ -47,7 +47,7 @@ export function registerVehicleListeners(
     root.querySelectorAll<HTMLElement>('.vehicle-exit').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             ev.preventDefault();
-            await sheet.document.setFlag('od6s', 'crew', '');
+            await sheet.document.setFlag('nonex-ist-od6s', 'crew', '');
         }));
 
     // Open a crewmember's character sheet
@@ -70,7 +70,7 @@ export function registerVehicleListeners(
             );
 
             if (tokens.length === 0) {
-                ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.NO_TOKENS'));
                 return;
             }
 
@@ -96,7 +96,7 @@ export function registerVehicleListeners(
             }
 
             if (tokens.length === 0) {
-                ui.notifications.warn(game.i18n.localize('OD6S.NO_TOKENS'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.NO_TOKENS'));
                 return;
             }
 
@@ -140,7 +140,7 @@ export function registerVehicleListeners(
             } else {
                 if (sheet.document.system.shields.arcs[arc].value > 0) {
                     newValue--;
-                    allocated > 0 ? allocated-- : ui.notifications.error(game.i18n.localize('OD6S.ALLOCATION_ERROR'));
+                    allocated > 0 ? allocated-- : ui.notifications.error(game.i18n.localize('NONEX_IST_OD6S.ALLOCATION_ERROR'));
                     doUpdate = true;
                 }
             }
@@ -182,7 +182,7 @@ export function registerVehicleListeners(
             } else {
                 if (sheet.document.system.vehicle.shields.arcs[arc].value > 0) {
                     newValue--;
-                    allocated > 0 ? allocated-- : ui.notifications.error(game.i18n.localize('OD6S.ALLOCATION_ERROR'));
+                    allocated > 0 ? allocated-- : ui.notifications.error(game.i18n.localize('NONEX_IST_OD6S.ALLOCATION_ERROR'));
                     doUpdate = true;
                 }
             }

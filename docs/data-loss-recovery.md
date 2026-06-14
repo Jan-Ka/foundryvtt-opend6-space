@@ -31,7 +31,7 @@ you can compare or restore later.
    (have items, character points, etc).
 4. Type `copy(od6sRecovery.dumpAll())` and press **Enter**. This puts a
    full backup of every character on your clipboard. Paste it into a
-   text file and save it somewhere safe (e.g. `od6s-backup.json`).
+   text file and save it somewhere safe (e.g. `nonex-ist-od6s-backup.json`).
 
 The script doesn't change anything by itself — it just reads.
 

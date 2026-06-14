@@ -50,8 +50,8 @@ function makeSettings(overrides: Partial<RollSettingsView> = {}): RollSettingsVi
         meleeDifficulty: false,
         explosiveZones: false,
         weaponDamageTable: {
-            1: { penalty: 3, label: 'OD6S.WEAPON_DAMAGED_LIGHT' },
-            2: { penalty: 6, label: 'OD6S.WEAPON_DAMAGED_HEAVY' },
+            1: { penalty: 3, label: 'NONEX_IST_OD6S.WEAPON_DAMAGED_LIGHT' },
+            2: { penalty: 6, label: 'NONEX_IST_OD6S.WEAPON_DAMAGED_HEAVY' },
         },
         ...overrides,
     };
@@ -102,7 +102,7 @@ describe('weapon handler — happy path', () => {
         expect(out.damagetype).toBe('e');
         expect(out.damagescore).toBe(12);
         expect(out.source).toBe('Test Blaster');
-        expect(out.range).toBe('OD6S.RANGE_SHORT_SHORT');
+        expect(out.range).toBe('NONEX_IST_OD6S.RANGE_SHORT_SHORT');
     });
 
     it('emits the point-blank range label for melee subtype', () => {
@@ -111,7 +111,7 @@ describe('weapon handler — happy path', () => {
             makeInput('weapon', 'X', 'meleeattack'),
             makeCtx(melee),
         );
-        expect(out.range).toBe('OD6S.RANGE_POINT_BLANK_SHORT');
+        expect(out.range).toBe('NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT');
     });
 
     it('uses weapon scale when truthy, falling back to actor scale when 0/undefined', () => {
@@ -209,7 +209,7 @@ describe('weapon handler — damage modifiers from weapon state', () => {
         const damaged = basicRangedWeapon({ damaged: 1 });
         const out = HANDLERS['weapon'](makeInput('weapon', 'X'), makeCtx(damaged));
         expect(out.damagemodifiers).toContainEqual(
-            expect.objectContaining({ name: 'OD6S.WEAPON_DAMAGED', value: -3 }),
+            expect.objectContaining({ name: 'NONEX_IST_OD6S.WEAPON_DAMAGED', value: -3 }),
         );
     });
 
@@ -223,7 +223,7 @@ describe('weapon handler — damage modifiers from weapon state', () => {
             makeCtx(muscle, actor),
         );
         expect(out.damagemodifiers).toContainEqual(
-            expect.objectContaining({ name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 6 }),
+            expect.objectContaining({ name: 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS', value: 6 }),
         );
     });
 
@@ -235,12 +235,12 @@ describe('weapon handler — damage modifiers from weapon state', () => {
 
 describe('weapon handler — difficulty', () => {
     it('uses weapon-authored difficulty when meleeDifficulty setting is on', () => {
-        const item = basicRangedWeapon({ difficulty: 'OD6S.DIFFICULTY_MODERATE' });
+        const item = basicRangedWeapon({ difficulty: 'NONEX_IST_OD6S.DIFFICULTY_MODERATE' });
         const out = HANDLERS['weapon'](
             makeInput('weapon', 'X'),
             makeCtx(item, { type: 'character', uuid: 'Actor.x' }, { meleeDifficulty: true }),
         );
-        expect(out.difficultylevel).toBe('OD6S.DIFFICULTY_MODERATE');
+        expect(out.difficultylevel).toBe('NONEX_IST_OD6S.DIFFICULTY_MODERATE');
     });
 
     it('falls back to easy when weapon has no authored difficulty (and meleeDifficulty on)', () => {
@@ -248,7 +248,7 @@ describe('weapon handler — difficulty', () => {
             makeInput('weapon', 'X'),
             makeCtx(basicRangedWeapon(), { type: 'character', uuid: 'Actor.x' }, { meleeDifficulty: true }),
         );
-        expect(out.difficultylevel).toBe('OD6S.DIFFICULTY_EASY');
+        expect(out.difficultylevel).toBe('NONEX_IST_OD6S.DIFFICULTY_EASY');
     });
 });
 

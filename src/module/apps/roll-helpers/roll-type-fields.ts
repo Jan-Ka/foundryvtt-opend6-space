@@ -180,7 +180,7 @@ export const ROLL_TYPE_FIELDS = {
 //    (execute doubles originaldice/pips, setup doubles dice/pips).
 //
 // 3. roll-setup.ts:150–160 — melee/brawl out-of-range check (gated on
-//    `OD6S.meleeRange`). Token-width "fudge" is grid-geometry correction
+//    `NONEX_IST_OD6S.meleeRange`). Token-width "fudge" is grid-geometry correction
 //    so size-disparate tokens aren't false-positives. RECLASSIFIED: not a
 //    rules concern at all — Foundry-VTT UX validation. Phase 3 should
 //    relocate this to a pre-roll sheet/action listener so the rules

@@ -10,7 +10,7 @@
                 {{#each attrs as |attr|}}
                     {{#if attr.active }}
                         {{#if (isEvenAttribute attr.sort) }}
-                        {{> systems/od6s/templates/actor/character/create-skill-column.html
+                        {{> systems/nonex-ist-od6s/templates/actor/character/create-skill-column.html
                                 key=attr.id value=attr actor=../actor templateData=../templateData}}
                         {{/if}}
                     {{/if}}
@@ -31,7 +31,7 @@
                                 </div>
                             {{/if}}
                             <div class="item-add flex flex-group-center"
-                                 data-tooltip="{{localize 'OD6S.ADD_SKILL'}}"
+                                 data-tooltip="{{localize 'NONEX_IST_OD6S.ADD_SKILL'}}"
                                  data-type="skill"
                                  data-attrname="met">
                                 <a><i class="fas fa-plus"></i></a>
@@ -61,7 +61,7 @@
                                                 <div class="item item-controls flexrow flex-group-center"
                                                      data-item-id="{{skill._id}}">
                                                     <div class="increase-dialog"
-                                                         title="{{localize "OD6S.INCREASE_SKILL"}}"
+                                                         title="{{localize "NONEX_IST_OD6S.INCREASE_SKILL"}}"
                                                          data-item-id="{{skill._id}}"
                                                          data-type="skill"
                                                          data-score="{{skill.system.total}}"
@@ -69,7 +69,7 @@
                                                          data-label="{{skill.name}}">
                                                         <a><i class="fas fa-plus-square"></i></a></div>
                                                     <div class="decrease-dialog"
-                                                         title="{{localize "OD6S.DECREASE_SKILL"}}"
+                                                         title="{{localize "NONEX_IST_OD6S.DECREASE_SKILL"}}"
                                                          data-item-id="{{skill._id}}"
                                                          data-type="skill"
                                                          data-score="{{skill.system.total}}"
@@ -77,7 +77,7 @@
                                                          data-label="{{skill.name}}">
                                                         <a><i class="fas fa-minus-square"></i></a></div>
                                                     <div class="specialize-dialog"
-                                                         title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                                         title="{{localize "NONEX_IST_OD6S.CREATE_SPECIALIZATION"}}"
                                                          data-item-id="{{skill._id}}"
                                                          data-type="skill">
                                                         <a><i class="fas fa-chevron-circle-left"></i></a>
@@ -86,7 +86,7 @@
                                                         <div data-item-id="{{skill._id}}"
                                                              data-type="skill"
                                                              class="item-control item-delete"
-                                                             title={{localize 'OD6S.DELETE_SKILL'}}>
+                                                             title={{localize 'NONEX_IST_OD6S.DELETE_SKILL'}}>
                                                             <a><i class="fas fa-trash"></i></a>
                                                         </div>
                                                     {{else}}
@@ -106,7 +106,7 @@
                 {{#each attrs as |attr|}}
                     {{#if attr.active }}
                         {{#unless (isEvenAttribute attr.sort) }}
-                            {{> systems/od6s/templates/actor/character/create-skill-column.html
+                            {{> systems/nonex-ist-od6s/templates/actor/character/create-skill-column.html
                                     key=attr.id value=attr actor=../actor templateData=../templateData}}
                         {{/unless}}
                     {{/if}}

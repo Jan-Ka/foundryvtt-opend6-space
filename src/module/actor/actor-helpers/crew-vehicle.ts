@@ -23,7 +23,7 @@ export async function addEmbeddedPilot(actor: Actor, pilotActor: Actor): Promise
 
 export async function addToCrew(actor: Actor, vehicleId: string): Promise<unknown> {
     if (actor.isCrewMember()) {
-        const currentVehicle = await fromUuid(await actor.getFlag('od6s', 'crew'));
+        const currentVehicle = await fromUuid(await actor.getFlag('nonex-ist-od6s', 'crew'));
         const newVehicle = await fromUuid(vehicleId);
 
         const data = {
@@ -32,19 +32,19 @@ export async function addToCrew(actor: Actor, vehicleId: string): Promise<unknow
             "newVehicleName": newVehicle.name
         };
 
-        const addTemplate = "systems/od6s/templates/actor/common/verify-new-crew.html";
+        const addTemplate = "systems/nonex-ist-od6s/templates/actor/common/verify-new-crew.html";
         const html = await foundry.applications.handlebars.renderTemplate(addTemplate, data);
-        const label = game.i18n.localize("OD6S.TRANSFER_VEHICLE");
+        const label = game.i18n.localize("NONEX_IST_OD6S.TRANSFER_VEHICLE");
 
         const confirmed = await foundry.applications.api.DialogV2.confirm({
             window: { title: label },
             content: html,
-            yes: { label: game.i18n.localize("OD6S.OK") },
+            yes: { label: game.i18n.localize("NONEX_IST_OD6S.OK") },
         });
         if (confirmed) await actor._verifyAddToCrew(currentVehicle.uuid, vehicleId);
         return undefined;
     } else {
-        return await actor.setFlag('od6s', 'crew', vehicleId);
+        return await actor.setFlag('nonex-ist-od6s', 'crew', vehicleId);
     }
 }
 
@@ -70,12 +70,12 @@ export async function _verifyAddToCrew(actor: Actor, currentVehicleId: string, n
 }
 
 export async function removeFromCrew(actor: Actor, vehicleID: string): Promise<void> {
-    if (!canRemoveFromCrew(actor.getFlag('od6s', 'crew') as string | null | undefined, vehicleID)) {
-        ui.notifications.warn(game.i18n.localize('OD6S.NOT_CREW_MEMBER'))
+    if (!canRemoveFromCrew(actor.getFlag('nonex-ist-od6s', 'crew') as string | null | undefined, vehicleID)) {
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.NOT_CREW_MEMBER'))
         return;
     }
     try {
-        await actor.unsetFlag('od6s', 'crew');
+        await actor.unsetFlag('nonex-ist-od6s', 'crew');
     } catch (error) {
         console.error(error)
     }
@@ -88,7 +88,7 @@ export async function forceRemoveCrewmember(actor: Actor, crewID: string): Promi
 }
 
 export function isCrewMember(actor: Actor): boolean {
-    return isCrewMemberByFlag(actor.getFlag('od6s', 'crew') as string | null | undefined);
+    return isCrewMemberByFlag(actor.getFlag('nonex-ist-od6s', 'crew') as string | null | undefined);
 }
 
 export async function sendVehicleData(actor: Actor, uuid?: string): Promise<void> {
@@ -150,15 +150,15 @@ export async function modifyShields(actor: Actor, update: Record<string, unknown
 
 export async function vehicleCollision(actor: Actor): Promise<void> {
     if (actor.type !== 'vehicle' && actor.type !== 'starship') {
-        ui.notifications.warn(game.i18n.localize('OD6S.WARN_ACTOR_NOT_VEHICLE'));
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_ACTOR_NOT_VEHICLE'));
         return;
     }
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/actor/vehicle/collision.html");
+        "systems/nonex-ist-od6s/templates/actor/vehicle/collision.html");
     const result = await foundry.applications.api.DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.ROLL_COLLISION_DAMAGE")},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.ROLL_COLLISION_DAMAGE")},
         content,
-        ok: {label: game.i18n.localize("OD6S.ROLL")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.ROLL")},
     });
     if (!result) return;
 
@@ -177,23 +177,23 @@ async function rollVehicleCollision(
     const score = (+speedValue) + (+typeValue) + (+mod * OD6S.pipsPerDice);
     const dice = od6sutilities.getDiceFromScore(score);
     let rollString;
-    if (game.settings.get("od6s", "use_wild_die")) {
+    if (game.settings.get("nonex-ist-od6s", "use_wild_die")) {
         dice.dice = dice.dice - 1;
         if (dice.dice < 1) {
-            rollString = "+1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+            rollString = "+1dw" + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
         } else {
-            rollString = dice.dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR") + "+1dw"
-                + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+            rollString = dice.dice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR") + "+1dw"
+                + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
         }
     } else {
-        rollString = dice.dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR");
+        rollString = dice.dice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR");
     }
     if (dice.pips) rollString += "+" + dice.pips;
 
     const roll = await new Roll(rollString).evaluate();
-    const label = game.i18n.localize("OD6S.DAMAGE") + " ("
+    const label = game.i18n.localize("NONEX_IST_OD6S.DAMAGE") + " ("
         + game.i18n.localize(OD6S.damageTypes["p"]) + ") "
-        + game.i18n.localize("OD6S.FROM") + " " + game.i18n.localize("OD6S.COLLISION");
+        + game.i18n.localize("NONEX_IST_OD6S.FROM") + " " + game.i18n.localize("NONEX_IST_OD6S.COLLISION");
 
     const flags: {
         type: string; source: string; damageType: string;
@@ -202,7 +202,7 @@ async function rollVehicleCollision(
         wildResult: unknown; total: number; isVehicleCollision: boolean;
     } = {
         type: "damage",
-        source: game.i18n.localize("OD6S.COLLISION"),
+        source: game.i18n.localize("NONEX_IST_OD6S.COLLISION"),
         damageType: "p",
         targetName: null,
         targetId: null,
@@ -214,8 +214,8 @@ async function rollVehicleCollision(
         isVehicleCollision: true,
     };
 
-    if (game.settings.get("od6s", "use_wild_die")) {
-        const wildFlavor = game.i18n.localize("OD6S.WILD_DIE_FLAVOR").replace(/[[\]]/g, "");
+    if (game.settings.get("nonex-ist-od6s", "use_wild_die")) {
+        const wildFlavor = game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR").replace(/[[\]]/g, "");
         const wildTerm = (roll.terms as Array<{ flavor: string; total: number }>)
             .find((d) => d.flavor === wildFlavor);
         if (wildTerm?.total === 1) {
@@ -225,14 +225,14 @@ async function rollVehicleCollision(
     }
 
     let rollMode: string = CONST.DICE_ROLL_MODES.PUBLIC;
-    if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
+    if (game.user.isGM && game.settings.get("nonex-ist-od6s", "hide-gm-rolls")) {
         rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
 
     const rollMessage = await roll.toMessage({
         speaker: ChatMessage.getSpeaker({actor: game.actors.find((a: Actor) => a.id === actor.id)}),
         flavor: label,
-        flags: {od6s: flags},
+        flags: {"nonex-ist-od6s": flags},
     }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
@@ -253,12 +253,12 @@ async function rollVehicleCollision(
         replacementRoll.total -= (+replacementRoll.terms[0].results[highest].result) + 1;
         (flags as { total: number }).total = replacementRoll.total;
 
-        if (rollMessage.getFlag("od6s", "difficulty") && rollMessage.getFlag("od6s", "success")) {
-            await rollMessage.setFlag("od6s", "success",
-                replacementRoll.total >= (rollMessage.getFlag("od6s", "difficulty") as number));
+        if (rollMessage.getFlag("nonex-ist-od6s", "difficulty") && rollMessage.getFlag("nonex-ist-od6s", "success")) {
+            await rollMessage.setFlag("nonex-ist-od6s", "success",
+                replacementRoll.total >= (rollMessage.getFlag("nonex-ist-od6s", "difficulty") as number));
         }
 
-        await rollMessage.setFlag("od6s", "originalroll", rollMessage.rolls?.[0]);
+        await rollMessage.setFlag("nonex-ist-od6s", "originalroll", rollMessage.rolls?.[0]);
         await rollMessage.update({
             id: rollMessage.id,
             _id: rollMessage._id,
@@ -277,11 +277,11 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
     const data: Record<string, unknown> = {};
     const foldersCollection = game.folders.filter(f => (f.type === documentName) && f.displayed);
     const folders = foldersCollection.map(f => ({id: f.id, name: f.name}));
-    const label = game.i18n.localize('OD6S.ITEM');
-    const title = game.i18n.format("OD6S.CREATE_ITEM", {entity: label});
+    const label = game.i18n.localize('NONEX_IST_OD6S.ITEM');
+    const title = game.i18n.format("NONEX_IST_OD6S.CREATE_ITEM", {entity: label});
     const template = 'templates/sidebar/document-create.html';
 
-    if (game.settings.get('od6s', 'hide_advantages_disadvantages')) {
+    if (game.settings.get('nonex-ist-od6s', 'hide_advantages_disadvantages')) {
         types = types.filter(function (value, _index, _arr) {
             return value !== 'advantage';
         })
@@ -302,7 +302,7 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
     // unstyled grey/white-text dialog reported in #64; route through
     // the V2 namespaces instead.
     const html = await foundry.applications.handlebars.renderTemplate(template, {
-        name: data.name || game.i18n.format("OD6S.NEW_ITEM", {entity: label}),
+        name: data.name || game.i18n.format("NONEX_IST_OD6S.NEW_ITEM", {entity: label}),
         folder: data.folder,
         folders: folders,
         hasFolders: folders.length > 0,
@@ -328,6 +328,6 @@ export async function onCargoHoldItemCreate(actor: Actor, event: Event): Promise
     if (!data.folder) delete data["folder"];
     if (types.length === 1) data.type = types[0];
     data.name = data.name
-        || game.i18n.localize('OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type as string]);
+        || game.i18n.localize('NONEX_IST_OD6S.NEW') + " " + game.i18n.localize(OD6S.itemLabels[data.type as string]);
     return actor.createEmbeddedDocuments('Item', [data]);
 }

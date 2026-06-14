@@ -28,7 +28,7 @@ function baseInput<K extends RollTypeKey>(
         name: '',
         itemId: '',
         difficulty: 0,
-        difficultyLevel: 'OD6S.DIFFICULTY_EASY',
+        difficultyLevel: 'NONEX_IST_OD6S.DIFFICULTY_EASY',
         isExplosive: false,
         isVisible: false,
         fatepointEffect: false,
@@ -42,8 +42,8 @@ function baseInput<K extends RollTypeKey>(
         bonusPips: 0,
         miscMod: 0,
         scaleMod: 0,
-        range: 'OD6S.RANGE_POINT_BLANK_SHORT',
-        vehicleTerrainDifficulty: 'OD6S.DIFFICULTY_EASY',
+        range: 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT',
+        vehicleTerrainDifficulty: 'NONEX_IST_OD6S.DIFFICULTY_EASY',
         pipsPerDice: 3,
         actorRef: { id: 'actor-x' },
         tokenRef: undefined,
@@ -113,8 +113,8 @@ describe('runFinalize — bucket fields override defaults', () => {
                 stundamagescore: 0,
                 damagemodifiers: [],
                 source: 'Test Blaster',
-                range: 'OD6S.RANGE_SHORT_SHORT',
-                difficultylevel: 'OD6S.DIFFICULTY_EASY',
+                range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
+                difficultylevel: 'NONEX_IST_OD6S.DIFFICULTY_EASY',
                 only_stun: false,
                 can_stun: false,
                 stun: false,
@@ -125,7 +125,7 @@ describe('runFinalize — bucket fields override defaults', () => {
         expect(out.damagetype).toBe('e');
         expect(out.damagescore).toBe(18);
         expect(out.source).toBe('Test Blaster');
-        expect(out.range).toBe('OD6S.RANGE_SHORT_SHORT');
+        expect(out.range).toBe('NONEX_IST_OD6S.RANGE_SHORT_SHORT');
     });
 
     it('skill bucket sets attribute (no other bucket fields touched)', () => {
@@ -182,11 +182,11 @@ describe('runFinalize — modifiers sub-object', () => {
             bucket: { attribute: 'agi' },
             miscMod: 3,
             scaleMod: -2,
-            range: 'OD6S.RANGE_LONG',
+            range: 'NONEX_IST_OD6S.RANGE_LONG',
         }));
         expect(out.modifiers).toEqual({
-            range: 'OD6S.RANGE_LONG',
-            attackoption: 'OD6S.ATTACK_STANDARD',
+            range: 'NONEX_IST_OD6S.RANGE_LONG',
+            attackoption: 'NONEX_IST_OD6S.ATTACK_STANDARD',
             calledshot: '',
             cover: '',
             coverlight: '',
@@ -227,7 +227,7 @@ describe('runFinalize — stable defaults', () => {
         expect(out.shots).toBe(1);
         expect(out.fulldefense).toBe(false);
         expect(out.timer).toBe(0);
-        expect(out.template).toBe('systems/od6s/templates/roll.html');
+        expect(out.template).toBe('systems/nonex-ist-od6s/templates/roll.html');
         expect(out.vehiclespeed).toBe('cruise');
         expect(out.vehiclecollisiontype).toBe('t_bone');
         expect(out.fatepoint).toBe(false);

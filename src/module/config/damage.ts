@@ -12,58 +12,58 @@ export interface DamageLevel {
 
 export const weaponDamage: Record<number, DamageLevel> = {
     0: {
-        label: "OD6S.NO_DAMAGE",
+        label: "NONEX_IST_OD6S.NO_DAMAGE",
         penalty: 0
     },
     1: {
-        label: "OD6S.DAMAGE_LIGHT",
+        label: "NONEX_IST_OD6S.DAMAGE_LIGHT",
         penalty: 3
     },
     2: {
-        label: 'OD6S.DAMAGE_HEAVY',
+        label: 'NONEX_IST_OD6S.DAMAGE_HEAVY',
         penalty: 6
     },
     3: {
-        label: 'OD6S.DAMAGE_SEVERE',
+        label: 'NONEX_IST_OD6S.DAMAGE_SEVERE',
         penalty: 999
     },
     4: {
-        label: 'OD6S.DAMAGE_DESTROYED',
+        label: 'NONEX_IST_OD6S.DAMAGE_DESTROYED',
         penalty: 999
     }
 };
 
 export const armorDamage: Record<number, DamageLevel> = {
     0: {
-        label: "OD6S.NO_DAMAGE",
+        label: "NONEX_IST_OD6S.NO_DAMAGE",
         woundLevel: "",
         penalty: 0
     },
     1: {
-        label: "OD6S.DAMAGE_LIGHT",
+        label: "NONEX_IST_OD6S.DAMAGE_LIGHT",
         woundLevel: "",
         penalty: 1
     },
     2: {
-        label: 'OD6S.DAMAGE_HEAVY',
+        label: 'NONEX_IST_OD6S.DAMAGE_HEAVY',
         penalty: 3
     },
     3: {
-        label: 'OD6S.DAMAGE_SEVERE',
+        label: 'NONEX_IST_OD6S.DAMAGE_SEVERE',
         penalty: 999
     },
     4: {
-        label: 'OD6S.DAMAGE_DESTROYED',
+        label: 'NONEX_IST_OD6S.DAMAGE_DESTROYED',
         penalty: 999
     }
 };
 
 export const damage: Record<string, number> = {
-    "OD6S.WOUNDS_STUNNED": 1,
-    "OD6S.WOUNDS_WOUNDED": 4,
-    "OD6S.WOUNDS_INCAPACITATED": 9,
-    "OD6S.WOUNDS_MORTALLY_WOUNDED": 13,
-    "OD6S.WOUNDS_DEAD": 16
+    "NONEX_IST_OD6S.WOUNDS_STUNNED": 1,
+    "NONEX_IST_OD6S.WOUNDS_WOUNDED": 4,
+    "NONEX_IST_OD6S.WOUNDS_INCAPACITATED": 9,
+    "NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED": 13,
+    "NONEX_IST_OD6S.WOUNDS_DEAD": 16
 };
 
 export interface VehicleDamageLevel {
@@ -73,39 +73,39 @@ export interface VehicleDamageLevel {
 }
 
 export const vehicleDamage: Record<string, VehicleDamageLevel> = {
-    "OD6S.NO_DAMAGE": {
+    "NONEX_IST_OD6S.NO_DAMAGE": {
         "damage": 0,
-        "passenger_damage": "OD6S.PASSENGER_NO_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_NO_DAMAGE",
         "passenger_damage_dice": 0
     },
-    "OD6S.DAMAGE_VERY_LIGHT": {
+    "NONEX_IST_OD6S.DAMAGE_VERY_LIGHT": {
         "damage": 1,
-        "passenger_damage": "OD6S.PASSENGER_NO_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_NO_DAMAGE",
         "passenger_damage_dice": 0
     },
-    "OD6S.DAMAGE_LIGHT": {
+    "NONEX_IST_OD6S.DAMAGE_LIGHT": {
         "damage": 4,
-        "passenger_damage": "OD6S.PASSENGER_QUARTER_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_QUARTER_DAMAGE",
         "passenger_damage_dice": 1
     },
-    "OD6S.DAMAGE_HEAVY": {
+    "NONEX_IST_OD6S.DAMAGE_HEAVY": {
         "damage": 9,
-        "passenger_damage": "OD6S.PASSENGER_HALF_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_HALF_DAMAGE",
         "passenger_damage_dice": 3
     },
-    "OD6S.DAMAGE_SEVERE": {
+    "NONEX_IST_OD6S.DAMAGE_SEVERE": {
         "damage": 13,
-        "passenger_damage": "OD6S.PASSENGER_THREE_QUARTERS_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_THREE_QUARTERS_DAMAGE",
         "passenger_damage_dice": 6
     },
-    "OD6S.DAMAGE_DESTROYED": {
+    "NONEX_IST_OD6S.DAMAGE_DESTROYED": {
         "damage": 16,
-        "passenger_damage": "OD6S.PASSENGER_FULL_DAMAGE",
+        "passenger_damage": "NONEX_IST_OD6S.PASSENGER_FULL_DAMAGE",
         "passenger_damage_dice": 12
     }
 };
 
 export const damageTypes: Record<string, string> = {
-    "p": "OD6S.PHYSICAL",
-    "e": "OD6S.ENERGY"
+    "p": "NONEX_IST_OD6S.PHYSICAL",
+    "e": "NONEX_IST_OD6S.ENERGY"
 };

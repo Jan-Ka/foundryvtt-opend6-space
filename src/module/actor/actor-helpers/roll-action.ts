@@ -12,16 +12,16 @@ export async function resolveRollAction(actor: any, actionId: any, msg?: any): P
     let scaleMod = 0;
 
     let scale = 0;
-    if (game.settings.get('od6s','dice_for_scale') && typeof(msg) !== 'undefined' &&
+    if (game.settings.get('nonex-ist-od6s','dice_for_scale') && typeof(msg) !== 'undefined' &&
         (actionId === 'vehicletoughness' || actionId === 'er' || actionId === 'pr') ) {
-        const attackMessage = game.messages.get(msg.getFlag('od6s','attackMessage'));
-        const attackerScale = attackMessage!.getFlag('od6s','attackerScale');
+        const attackMessage = game.messages.get(msg.getFlag('nonex-ist-od6s','attackMessage'));
+        const attackerScale = attackMessage!.getFlag('nonex-ist-od6s','attackerScale');
         if(actor.type === 'vehicle' || actor.type === 'starship') {
             scale = actor.system.scale.score;
         } else {
             if(actor.system?.vehicle?.uuid !== 'undefined' && actor.system?.vehicle?.uuid !== '') {
-                if(attackMessage!.getFlag('od6s','type') === 'vehicleweapon' ||
-                   attackMessage!.getFlag('od6s','type') === 'starshipweapon') {
+                if(attackMessage!.getFlag('nonex-ist-od6s','type') === 'vehicleweapon' ||
+                   attackMessage!.getFlag('nonex-ist-od6s','type') === 'starshipweapon') {
                     const vehicleActor = await od6sutilities.getActorFromUuid(actor.system.vehicle.uuid);
                     scale = vehicleActor!.system.scale.score;
                 }
@@ -67,8 +67,8 @@ export async function resolveRollAction(actor: any, actionId: any, msg?: any): P
         case 'vehiclerangedattack':
             // We know nothing about skills or fire control, just use the defaults
             type = actionId;
-            name = game.i18n.localize('OD6S.ACTION_VEHICLE_RANGED_ATTACK');
-            score = od6sutilities.getScoreFromSkill(actor, '', game.i18n.localize('OD6S.GUNNERY_SKILL'), 'mec');
+            name = game.i18n.localize('NONEX_IST_OD6S.ACTION_VEHICLE_RANGED_ATTACK');
+            score = od6sutilities.getScoreFromSkill(actor, '', game.i18n.localize('NONEX_IST_OD6S.GUNNERY_SKILL'), 'mec');
             break;
         case 'vehicleramattack':
         case 'vehicledodge':
@@ -108,25 +108,25 @@ export async function resolveRollAction(actor: any, actionId: any, msg?: any): P
             type = "vehicletoughness";
             score = vehicle.shields.arcs.front.value + vehicle.toughness.score;
             name = game.i18n.localize(vehicle.shields.arcs.front.label) + " " +
-                game.i18n.localize('OD6S.SHIELDS');
+                game.i18n.localize('NONEX_IST_OD6S.SHIELDS');
             break;
         case 'vehicleshieldsrear':
             type = "vehicletoughness";
             score = vehicle.shields.arcs.rear.value + vehicle.toughness.score;
             name = game.i18n.localize(vehicle.shields.arcs.rear.label) + " " +
-                game.i18n.localize('OD6S.SHIELDS');
+                game.i18n.localize('NONEX_IST_OD6S.SHIELDS');
             break;
         case 'vehicleshieldsleft':
             type = "vehicletoughness";
             score = vehicle.shields.arcs.left.value + vehicle.toughness.score;
             name = game.i18n.localize(vehicle.shields.arcs.left.label) + " " +
-                game.i18n.localize('OD6S.SHIELDS');
+                game.i18n.localize('NONEX_IST_OD6S.SHIELDS');
             break;
         case 'vehicleshieldsright':
             type = "vehicletoughness";
             score = vehicle.shields.arcs.right.value + vehicle.toughness.score;
             name = game.i18n.localize(vehicle.shields.arcs.right.label) + " " +
-                game.i18n.localize('OD6S.SHIELDS');
+                game.i18n.localize('NONEX_IST_OD6S.SHIELDS');
             break;
         case 'vehiclesensorspassive':
         case 'vehiclesensorsfocus':
@@ -134,7 +134,7 @@ export async function resolveRollAction(actor: any, actionId: any, msg?: any): P
         case 'vehiclesensorssearch': {
             const sensorType = actionId.replace('vehiclesensors', '');
             score = od6sutilities.getSensorTotal(actor, vehicle.sensors.types[sensorType].score);
-            name = game.i18n.localize('OD6S.SENSORS') + ": " +
+            name = game.i18n.localize('NONEX_IST_OD6S.SENSORS') + ": " +
                 game.i18n.localize(vehicle.sensors.types[sensorType].label);
             break;
         }

@@ -8,7 +8,7 @@ export default class SkillData extends foundry.abstract.TypeDataModel {
     return {
       ...baseSchema(),
       ...skillFieldsSchema(),
-      label: new fields.StringField({ initial: "OD6S.CHAR_SKILLS" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_SKILLS" }),
     };
   }
 }

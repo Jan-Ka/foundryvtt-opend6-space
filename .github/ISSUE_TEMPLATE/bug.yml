@@ -42,7 +42,7 @@ body:
       required: true
 
   - type: input
-    id: od6s-version
+    id: nonex-ist-od6s-version
     attributes:
       label: OpenD6 Space version
     validations:

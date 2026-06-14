@@ -57,11 +57,11 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-advance-dialog",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-advance-dialog",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.ADVANCE",
+            title: "NONEX_IST_OD6S.ADVANCE",
             resizable: false,
             minimizable: true,
         },
@@ -78,7 +78,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/actor/character/advance.html",
+            template: "systems/nonex-ist-od6s/templates/actor/character/advance.html",
         },
     };
 
@@ -151,7 +151,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         if (up) {
             if ((this.advanceData.type === "attribute")
-                && (this.advanceData.label === game.i18n.localize("OD6S.CHAR_METAPHYSICS"))
+                && (this.advanceData.label === game.i18n.localize("NONEX_IST_OD6S.CHAR_METAPHYSICS"))
                 && (this.advanceData.score === 0)) {
                 this.advanceData.cpcost = 20;
                 return;
@@ -177,7 +177,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             }
         } else {
             if ((this.advanceData.type === "attribute")
-                && (this.advanceData.label === game.i18n.localize("OD6S.CHAR_METAPHYSICS"))
+                && (this.advanceData.label === game.i18n.localize("NONEX_IST_OD6S.CHAR_METAPHYSICS"))
                 && (this.advanceData.score === OD6S.pipsPerDice)) {
                 this.advanceData.cpcost = 0;
                 return;
@@ -220,7 +220,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         if ((this.advanceData.type === "attribute")
-            && (this.advanceData.label === game.i18n.localize("OD6S.CHAR_METAPHYSICS"))
+            && (this.advanceData.label === game.i18n.localize("NONEX_IST_OD6S.CHAR_METAPHYSICS"))
             && (this.advanceData.score === 0)) {
 
             this.cpCost(true);
@@ -230,14 +230,14 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         if (OD6S.skillUsed && this.advanceData.type !== "attribute" && skillAttr !== "met") {
             if (!this.advanceData.used) {
-                ui.notifications.warn(game.i18n.localize("OD6S.SKILL_MUST_BE_USED"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.SKILL_MUST_BE_USED"));
                 return false;
             }
         }
 
         if ((this.advanceData.originalscore < this.advanceData.score)
                 && (!this.advanceData.freeadvance)) {
-            ui.notifications.warn(game.i18n.localize("OD6S.ALREADY_ADVANCED"));
+            ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ALREADY_ADVANCED"));
             return false;
         }
 
@@ -254,7 +254,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
                 const attrs = (this.actorSheet.actor.system as OD6SCharacterSystem).attributes;
                 const max = attrs[attr]!.max;
                 if (max !== undefined && (this.advanceData.score + 1) > max) {
-                    ui.notifications.warn(game.i18n.localize("OD6S.WARN_ADVANCE_GREATER_THAN_MAX"));
+                    ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.WARN_ADVANCE_GREATER_THAN_MAX"));
                     return false;
                 }
             }
@@ -268,7 +268,7 @@ export class AdvanceDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     pipDown() {
         if ((this.advanceData.type === "attribute")
-            && (this.advanceData.label === game.i18n.localize("OD6S.CHAR_METAPHYSICS"))
+            && (this.advanceData.label === game.i18n.localize("NONEX_IST_OD6S.CHAR_METAPHYSICS"))
             && (this.advanceData.score === OD6S.pipsPerDice)) {
 
             this.cpCost(false);

@@ -21,7 +21,7 @@ function buildTranslations() {
 
   for (const folder of folders) {
     const srcDir = path.join(PACK_SRC, folder);
-    const jsonPath = path.join(TRANSLATIONS_DEST, `od6s.${folder}.json`);
+    const jsonPath = path.join(TRANSLATIONS_DEST, `nonex-ist-od6s.${folder}.json`);
 
     let label = folder.replace(/-/g, " ");
     label = label.replace(/(^\w)|(\s+\w)/g, (letter) => letter.toUpperCase());

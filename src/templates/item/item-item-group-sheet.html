@@ -1,7 +1,7 @@
 <div class="{{cssClass}}">
     <header class="sheet-header">
         <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" title="{{item.name}}"
-             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+             alt="{{localize 'NONEX_IST_OD6S.ALT_ITEM_IMAGE'}}"/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
         </div>
@@ -9,9 +9,9 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
-        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
-        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+        <a class="item" data-tab="description">{{localize "NONEX_IST_OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "NONEX_IST_OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="labels">{{localize "NONEX_IST_OD6S.LABELS"}}</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -25,9 +25,9 @@
         {{!-- Attributes Tab --}}
         <div class="tab attributes" data-group="primary" data-tab="attributes">
             <div class="grid title-add-grid">
-                <div class="flexrow flex-group-center"><b>{{localize 'OD6S.ACTOR_TYPES'}}</b></div>
+                <div class="flexrow flex-group-center"><b>{{localize 'NONEX_IST_OD6S.ACTOR_TYPES'}}</b></div>
                 <div class="flexrow flex-group-center item-controls">
-                    <a class="item-control add-actor-type" title="{{localize 'OD6S.ADD_ACTOR_TYPE'}}"
+                    <a class="item-control add-actor-type" title="{{localize 'NONEX_IST_OD6S.ADD_ACTOR_TYPE'}}"
                        data-type="actor-type">
                         <i class="fas fa-plus"></i></a>
                 </div>
@@ -35,7 +35,7 @@
             <div class="grid grid-6col">
                 {{#each item.system.actor_types as |type|}}
                     <div class="flexrow flex-group-left delete-actor-type"
-                         title="{{localize 'OD6S.DELETE'}}" data-type="{{type}}">
+                         title="{{localize 'NONEX_IST_OD6S.DELETE'}}" data-type="{{type}}">
                         {{ localize (getActorTypeLabel type) }}
                     </div>
                 {{/each}}
@@ -49,7 +49,7 @@
                                 {{#if itemType.label}}
                                     <div class="item-controls">
                                         <a class="item-control template-item-add"
-                                           title="{{localize 'OD6S.ADD'}} {{localize itemType.label}}"
+                                           title="{{localize 'NONEX_IST_OD6S.ADD'}} {{localize itemType.label}}"
                                            data-type="{{typeKey}}">
                                             <i class="fas fa-plus"></i>
                                         </a>
@@ -69,12 +69,12 @@
                                                        data-name="{{templateItem.name}}"
                                                        data-type="{{templateItem.type}}"
                                                        data-desc="{{templateItem.description}}"
-                                                       title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                                       title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                                                         <i class="fas fa-edit"></i></a>
                                                     <a class="template-item-control template-item-delete"
                                                        data-name="{{templateItem.name}}"
                                                        data-type="{{templateItem.type}}"
-                                                       title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                                       title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                                                         <i class="fas fa-trash"></i></a>
                                                 </div>
                                             </div>
@@ -89,7 +89,7 @@
         </div>
 
         {{!--Labels Tab --}}
-        {{> systems/od6s/templates/item/item-labels-tags.html }}
+        {{> systems/nonex-ist-od6s/templates/item/item-labels-tags.html }}
 
     </section>
 </div>

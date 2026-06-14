@@ -46,13 +46,13 @@ test("block_sheet_pointer_bleed stops mousedown from reaching window listeners (
         );
 
         // 1) Setting OFF — bubble reaches window
-        await window.game.settings.set("od6s", "block_sheet_pointer_bleed", false);
+        await window.game.settings.set("nonex-ist-od6s", "block_sheet_pointer_bleed", false);
         windowHits = 0;
         dispatch();
         const offHits = windowHits;
 
         // 2) Setting ON — body-level listener stops propagation
-        await window.game.settings.set("od6s", "block_sheet_pointer_bleed", true);
+        await window.game.settings.set("nonex-ist-od6s", "block_sheet_pointer_bleed", true);
         windowHits = 0;
         dispatch();
         const onHits = windowHits;
@@ -66,7 +66,7 @@ test("block_sheet_pointer_bleed stops mousedown from reaching window listeners (
 
         // teardown
         window.removeEventListener("mousedown", windowListener, false);
-        await window.game.settings.set("od6s", "block_sheet_pointer_bleed", false);
+        await window.game.settings.set("nonex-ist-od6s", "block_sheet_pointer_bleed", false);
         await actor.sheet.close();
         await actor.delete();
 

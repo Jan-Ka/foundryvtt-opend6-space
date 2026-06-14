@@ -2,7 +2,7 @@
     {{#if (eq actor.system.description.label)}}
         <label for="actor.system.description.content" class="resource-label">{{localize actor.system.description.label}}:</label>
     {{else}}
-        <label for="actor.system.description.content" class="resource-label">{{localize 'OD6S.DESCRIPTION'}}:</label>
+        <label for="actor.system.description.content" class="resource-label">{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}:</label>
     {{/if}}
     <prose-mirror name="system.description.content" value="{{actor.system.description.content}}" {{#unless editable}}disabled{{/unless}}></prose-mirror>
 </div>

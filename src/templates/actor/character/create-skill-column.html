@@ -8,7 +8,7 @@
                 <b>{{diceFromScore value.score}}</b>D+<b>{{pipsFromScore value.score}}</b>
             </div>
             <div class="skill-add flex-group-center"
-                 data-tooltip="{{localize 'OD6S.ADD_SKILL'}}"
+                 data-tooltip="{{localize 'NONEX_IST_OD6S.ADD_SKILL'}}"
                  data-type="skill"
                  data-new="false"
                  data-attrname="{{ key }}">
@@ -39,7 +39,7 @@
                             <div class="item item-controls flexrow flex-group-center"
                                  data-item-id="{{skill._id}}">
                                 <div class="increase-dialog"
-                                     title="{{localize "OD6S.INCREASE_SKILL"}}"
+                                     title="{{localize "NONEX_IST_OD6S.INCREASE_SKILL"}}"
                                      data-item-id="{{skill._id}}"
                                      data-type="skill"
                                      data-score="{{skill.system.total}}"
@@ -47,7 +47,7 @@
                                      data-label="{{skill.name}}">
                                     <a><i class="fas fa-plus-square"></i></a></div>
                                 <div class="decrease-dialog"
-                                     title="{{localize "OD6S.DECREASE_SKILL"}}"
+                                     title="{{localize "NONEX_IST_OD6S.DECREASE_SKILL"}}"
                                      data-item-id="{{skill._id}}"
                                      data-type="skill"
                                      data-score="{{skill.system.total}}"
@@ -55,7 +55,7 @@
                                      data-label="{{skill.name}}">
                                     <a><i class="fas fa-minus-square"></i></a></div>
                                 <div class="specialize-dialog"
-                                     title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                     title="{{localize "NONEX_IST_OD6S.CREATE_SPECIALIZATION"}}"
                                      data-item-id="{{skill._id}}"
                                      data-type="skill">
                                     <a><i class="fas fa-chevron-circle-left"></i></a>
@@ -64,7 +64,7 @@
                                     <div class="skill-delete" data-item-id="{{skill._id}}"
                                          data-type="skill"
                                          class="item-control skill-delete"
-                                         title={{localize 'OD6S.DELETE_SKILL'}}>
+                                         title={{localize 'NONEX_IST_OD6S.DELETE_SKILL'}}>
                                         <a><i class="fas fa-trash"></i></a>
                                     </div>
                                 {{else}}
@@ -96,7 +96,7 @@
                                          data-item-id="{{spec._id}}">
                                         {{#unless (specializationDice)}}
                                         <div class="increase-spec-dialog"
-                                             title="{{localize "OD6S.INCREASE_SPECIALIZATION"}}"
+                                             title="{{localize "NONEX_IST_OD6S.INCREASE_SPECIALIZATION"}}"
                                              data-item-id="{{spec._id}}"
                                              data-type="spec"
                                              data-score="{{spec.system.total}}"
@@ -104,7 +104,7 @@
                                              data-label="{{spec.name}}">
                                             <a><i class="fas fa-plus-square"></i></a></div>
                                         <div class="decrease-spec-dialog"
-                                             title="{{localize "OD6S.DECREASE_SPECIALIZATION"}}"
+                                             title="{{localize "NONEX_IST_OD6S.DECREASE_SPECIALIZATION"}}"
                                              data-item-id="{{spec._id}}"
                                              data-type="spec"
                                              data-score="{{spec.system.total}}"
@@ -118,7 +118,7 @@
                                         <div data-item-id="{{spec._id}}"
                                              data-type="spec"
                                              class="item-control spec-delete"
-                                             title={{localize 'OD6S.DELETE_SPECIALIZATION'}}>
+                                             title={{localize 'NONEX_IST_OD6S.DELETE_SPECIALIZATION'}}>
                                             <a><i class="fas fa-trash"></i></a>
                                         </div>
                                     </div>

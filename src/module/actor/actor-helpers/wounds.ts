@@ -39,13 +39,13 @@ export async function applyWounds(actor: Actor, wound: string): Promise<void> {
         _id: actor.id,
     };
     const armorUpdates: Array<Record<string, unknown> & {_id: string}> = [];
-    if (wound === 'OD6S.WOUNDS_STUNNED') {
+    if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') {
         update[`system.stuns.current`] = 1;
         update[`system.stuns.rounds`] = 1;
         update[`system.stuns.value`] = actor.system.stuns.value + 1;
     }
 
-    if (game.settings.get('od6s', 'weapon_armor_damage') && game.settings.get('od6s', 'auto_armor_damage')) {
+    if (game.settings.get('nonex-ist-od6s', 'weapon_armor_damage') && game.settings.get('nonex-ist-od6s', 'auto_armor_damage')) {
         for (const value of actor.itemTypes.armor) {
             if (!isArmorItem(value)) continue;
             const damaged = value.system.damaged ?? 0;
@@ -53,19 +53,19 @@ export async function applyWounds(actor: Actor, wound: string): Promise<void> {
 
             let armorDamage = 0;
             switch (wound) {
-                case 'OD6S.WOUNDS_WOUNDED':
+                case 'NONEX_IST_OD6S.WOUNDS_WOUNDED':
                     if (damaged <= 1) armorDamage = 1;
                     break;
-                case 'OD6S.WOUNDS_SEVERELY_WOUNDED':
+                case 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED':
                     if (damaged <= 1) armorDamage = 1;
                     break;
-                case 'OD6S.WOUNDS_INCAPACITATED':
+                case 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED':
                     if (damaged <= 2) armorDamage = 2;
                     break;
-                case 'OD6S.WOUNDS_MORTALLY_WOUNDED':
+                case 'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED':
                     if (damaged <= 3) armorDamage = 3;
                     break;
-                case 'OD6S.WOUNDS_DEAD':
+                case 'NONEX_IST_OD6S.WOUNDS_DEAD':
                     if (damaged <= 4) armorDamage = 4;
                     break;
                 default:
@@ -106,27 +106,27 @@ export function calculateNewWoundLevel(actor: Actor, wound: string): string | nu
 
 export async function triggerMortallyWoundedCheck(actor: Actor): Promise<void> {
     if (!isCharacterActor(actor)) return;
-    const flag = actor.getFlag('od6s', 'mortally_wounded');
+    const flag = actor.getFlag('nonex-ist-od6s', 'mortally_wounded');
     if (flag === undefined) return;
     const rollData = {
-        name: game.i18n.localize('OD6S.RESIST_MORTALLY_WOUNDED'),
+        name: game.i18n.localize('NONEX_IST_OD6S.RESIST_MORTALLY_WOUNDED'),
         actor: actor,
         score: actor.system.attributes.str.score,
         type: 'mortally_wounded',
         difficulty: flag,
-        difficultyLevel: 'OD6S.DIFFICULTY_CUSTOM'
+        difficultyLevel: 'NONEX_IST_OD6S.DIFFICULTY_CUSTOM'
     };
     await od6sroll._onRollDialog(rollData);
 }
 
 export async function applyMortallyWoundedFailure(actor: Actor): Promise<void> {
     if (!isCharacterActor(actor)) return;
-    if (game.settings.get('od6s', 'auto_status')) {
+    if (game.settings.get('nonex-ist-od6s', 'auto_status')) {
         await actor.toggleStatusEffect('dead', {overlay: false, active: true});
     }
 
     const table = OD6S.deadliness[OD6S.deadlinessLevel[actor.type]];
-    const dead = Object.keys(table).find((key) => table[key].core === 'OD6S.WOUNDS_DEAD');
+    const dead = Object.keys(table).find((key) => table[key].core === 'NONEX_IST_OD6S.WOUNDS_DEAD');
     const update = {
         system: {
             wounds: {
@@ -136,13 +136,13 @@ export async function applyMortallyWoundedFailure(actor: Actor): Promise<void> {
     };
 
     await actor.update(update);
-    await actor.unsetFlag('od6s', 'mortally_wounded');
+    await actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
 }
 
 export async function applyIncapacitatedFailure(actor: Actor): Promise<void> {
     const roll = await new Roll("10d6").evaluate();
-    const flavor = actor.name + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
-        roll.total + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
+    const flavor = actor.name + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_01') +
+        roll.total + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_02');
     if (game.modules.get("dice-so-nice")?.active) game.dice3d.messageHookDisabled = true;
     await roll.toMessage({flavor: flavor});
     if (game.modules.get("dice-so-nice")?.active) game.dice3d.messageHookDisabled = false;
@@ -159,7 +159,7 @@ export function getWoundLevelFromBodyPoints(actor: Actor, bp?: number): string |
     const sys = actor.system;
     const bodyPointsCurrent = typeof bp !== 'undefined' ? bp : sys.wounds.body_points.current;
 
-    if (bodyPointsCurrent < 1) return 'OD6S.WOUNDS_DEAD';
+    if (bodyPointsCurrent < 1) return 'NONEX_IST_OD6S.WOUNDS_DEAD';
     const ratio = Math.ceil(bodyPointsCurrent / sys.wounds.body_points.max * 100);
     let level: string | undefined;
     for (const key in OD6S.bodyPointLevels) {
@@ -169,7 +169,7 @@ export function getWoundLevelFromBodyPoints(actor: Actor, bp?: number): string |
             break;
         }
     }
-    if (typeof level === 'undefined') level = 'OD6S.WOUNDS_HEALTHY';
+    if (typeof level === 'undefined') level = 'NONEX_IST_OD6S.WOUNDS_HEALTHY';
     return level;
 }
 

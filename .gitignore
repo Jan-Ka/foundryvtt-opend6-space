@@ -6,10 +6,10 @@ package-lock.json
 # Build output
 dist/
 build/
-src/css/od6s.css
+src/css/nonex-ist-od6s.css
 src/packs/
-src/module/od6s.js
-src/module/od6s.js.map
+src/module/nonex-ist-od6s.js
+src/module/nonex-ist-od6s.js.map
 
 # pnpm cache (CI cache target)
 .pnpm-store/

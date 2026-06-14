@@ -18,13 +18,13 @@ export class od6sattributeedit {
         const score = this.actor.system.attributes[attribute].base;
 
         const content = await foundry.applications.handlebars.renderTemplate(
-            "systems/od6s/templates/actor/common/attribute-edit.html",
+            "systems/nonex-ist-od6s/templates/actor/common/attribute-edit.html",
             {score});
 
         const result = await foundry.applications.api.DialogV2.input({
-            window: {title: game.i18n.localize("OD6S.EDIT") + " " + label + "!"},
+            window: {title: game.i18n.localize("NONEX_IST_OD6S.EDIT") + " " + label + "!"},
             content,
-            ok: {label: game.i18n.localize("OD6S.EDIT_ATTRIBUTE")},
+            ok: {label: game.i18n.localize("NONEX_IST_OD6S.EDIT_ATTRIBUTE")},
         });
         if (!result) return;
 

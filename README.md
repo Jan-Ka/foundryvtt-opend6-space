@@ -48,7 +48,7 @@ https://github.com/nonex-ist/foundryvtt-opend6-space/releases/download/v<version
 Releases are signed with [cosign](https://docs.sigstore.dev/) keyless
 signing — see [CONTRIBUTING.md](CONTRIBUTING.md#verifying-a-release)
 for the verify command. Each release also ships a CycloneDX SBOM
-(`sbom.cdx.json`) and a SHA-256 checksum (`od6s.zip.sha256`).
+(`sbom.cdx.json`) and a SHA-256 checksum (`nonex-ist-od6s.zip.sha256`).
 
 ## Configuration
 
@@ -76,8 +76,8 @@ pnpm run watch       # rebuild JS/SCSS on change
 pnpm run check       # lint + typecheck + tests
 ```
 
-The bundle is built with esbuild → `src/module/od6s.js`. SCSS compiles
-to `src/css/od6s.css`. Compendium packs are authored as YAML in
+The bundle is built with esbuild → `src/module/nonex-ist-od6s.js`. SCSS compiles
+to `src/css/nonex-ist-od6s.css`. Compendium packs are authored as YAML in
 `compendia/` and built to LevelDB packs in `src/packs/` via
 `@foundryvtt/foundryvtt-cli`.
 
@@ -89,7 +89,7 @@ pnpm run test:smoke                     # runs all smoke specs
 pnpm run test:smoke:ui                  # interactive Playwright UI
 ```
 
-Requires a Foundry world running with `od6s` selected. Defaults to
+Requires a Foundry world running with `nonex-ist-od6s` selected. Defaults to
 `http://localhost:30000` and user `Gamemaster` with no password;
 override via `FOUNDRY_URL`, `FOUNDRY_USER`, `FOUNDRY_PASSWORD`.
 

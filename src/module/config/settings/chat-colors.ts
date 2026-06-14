@@ -22,28 +22,28 @@ let colorPickerHookRegistered = false;
 
 function applyOne(key: ChatColorKey, value: unknown) {
     const raw = typeof value === 'string' && HEX.test(value) ? value : DEFAULTS[key];
-    document.documentElement.style.setProperty(`--od6s-chat-color-${key}`, raw);
+    document.documentElement.style.setProperty(`--nonex-ist-od6s-chat-color-${key}`, raw);
 }
 
 function applyOpacity(value: unknown) {
     const clamped = typeof value === 'number' && Number.isFinite(value)
         ? Math.max(0, Math.min(2, value))
         : 1;
-    document.documentElement.style.setProperty('--od6s-chat-opacity', String(clamped));
+    document.documentElement.style.setProperty('--nonex-ist-od6s-chat-opacity', String(clamped));
 }
 
 export function applyChatColors() {
     (Object.keys(SETTING_BY_KEY) as ChatColorKey[]).forEach(k => {
-        applyOne(k, game.settings.get('od6s', SETTING_BY_KEY[k]));
+        applyOne(k, game.settings.get('nonex-ist-od6s', SETTING_BY_KEY[k]));
     });
-    applyOpacity(game.settings.get('od6s', OPACITY_KEY));
+    applyOpacity(game.settings.get('nonex-ist-od6s', OPACITY_KEY));
 }
 
 export function registerChatColorSettings() {
     (Object.keys(SETTING_BY_KEY) as ChatColorKey[]).forEach(k => {
-        game.settings.register('od6s', SETTING_BY_KEY[k], {
-            name: game.i18n.localize(`OD6S.CONFIG_CHAT_COLOR_${k.toUpperCase()}`),
-            hint: game.i18n.localize(`OD6S.CONFIG_CHAT_COLOR_${k.toUpperCase()}_DESCRIPTION`),
+        game.settings.register('nonex-ist-od6s', SETTING_BY_KEY[k], {
+            name: game.i18n.localize(`NONEX_IST_OD6S.CONFIG_CHAT_COLOR_${k.toUpperCase()}`),
+            hint: game.i18n.localize(`NONEX_IST_OD6S.CONFIG_CHAT_COLOR_${k.toUpperCase()}_DESCRIPTION`),
             scope: 'client',
             config: true,
             type: String,
@@ -52,9 +52,9 @@ export function registerChatColorSettings() {
         });
     });
 
-    game.settings.register('od6s', OPACITY_KEY, {
-        name: game.i18n.localize('OD6S.CONFIG_CHAT_BACKGROUND_OPACITY'),
-        hint: game.i18n.localize('OD6S.CONFIG_CHAT_BACKGROUND_OPACITY_DESCRIPTION'),
+    game.settings.register('nonex-ist-od6s', OPACITY_KEY, {
+        name: game.i18n.localize('NONEX_IST_OD6S.CONFIG_CHAT_BACKGROUND_OPACITY'),
+        hint: game.i18n.localize('NONEX_IST_OD6S.CONFIG_CHAT_BACKGROUND_OPACITY_DESCRIPTION'),
         scope: 'client',
         config: true,
         type: Number,
@@ -71,7 +71,7 @@ export function registerChatColorSettings() {
         Hooks.on('renderSettingsConfig', (_app: any, html: any) => {
             const root: HTMLElement = html?.jquery ? html[0] : html;
             Object.values(SETTING_BY_KEY).forEach(key => {
-                const input = root.querySelector<HTMLInputElement>(`input[name="od6s.${key}"]`);
+                const input = root.querySelector<HTMLInputElement>(`input[name="nonex-ist-od6s.${key}"]`);
                 if (input && input.type !== 'color') input.type = 'color';
             });
         });

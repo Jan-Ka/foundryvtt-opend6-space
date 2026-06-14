@@ -7,7 +7,7 @@ vars:
   # specific build (e.g. `14.361`) via .env when you want reproducible
   # runs against the system.json `compatibility.verified` value.
   FOUNDRY_VERSION: '{{.FOUNDRY_VERSION | default "14"}}'
-  CONTAINER_NAME: od6s-foundry
+  CONTAINER_NAME: nonex-ist-od6s-foundry
   # Host port for the Foundry container. Override per-machine via .env
   # (FOUNDRY_PORT=30030) when 30000 is squatted by another process.
   FOUNDRY_PORT: '{{.FOUNDRY_PORT | default "30000"}}'
@@ -268,7 +268,7 @@ tasks:
         --env FOUNDRY_TELEMETRY=false
         --publish {{.FOUNDRY_PORT}}:30000/tcp
         --volume "{{.FOUNDRY_DATA}}:/data"
-        --volume "{{.ROOT_DIR}}/src:/data/Data/systems/od6s"
+        --volume "{{.ROOT_DIR}}/src:/data/Data/systems/nonex-ist-od6s"
         ghcr.io/felddy/foundryvtt:{{.FOUNDRY_VERSION}}
       - echo ""
       - echo "Foundry VTT starting at http://localhost:{{.FOUNDRY_PORT}}"

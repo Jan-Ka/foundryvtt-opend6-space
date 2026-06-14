@@ -18,7 +18,7 @@ export class OD6SItem extends Item {
      */
     static async create(data: any, options={}) {
         if (!data.img)
-            data.img = "systems/od6s/icons/blank.png";
+            data.img = "systems/nonex-ist-od6s/icons/blank.png";
         return await super.create(data, options);
     }
 
@@ -172,7 +172,7 @@ export class OD6SItem extends Item {
             return value !== 'action' && value !== 'vehicle' && value !== 'base';
         });
 
-        if (game.settings.get('od6s', 'hide_advantages_disadvantages')) {
+        if (game.settings.get('nonex-ist-od6s', 'hide_advantages_disadvantages')) {
             types = types.filter(function (value, _index, _arr) {
                 return value !== 'advantage';
             })
@@ -271,7 +271,7 @@ export class OD6SItem extends Item {
                 // Try a specialization first, then a skill, then an attribute
                 let found = false;
 
-                if (parry && game.settings.get('od6s','parry_skills')) {
+                if (parry && game.settings.get('nonex-ist-od6s','parry_skills')) {
                     let skill;
                     // parry_skill / parry_specialization only exist on regular
                     // hand/personal weapons; vehicle/starship weapons can't parry.
@@ -359,7 +359,7 @@ export class OD6SItem extends Item {
                     // Get the appropriate skill or attribute
                     switch (sys.subtype) {
                         case 'dodge':
-                            name = 'OD6S.DODGE';
+                            name = 'NONEX_IST_OD6S.DODGE';
                             break;
                         case 'parry':
                             if (actor.items.find((i: Item) => i.id === sys.itemId)) {

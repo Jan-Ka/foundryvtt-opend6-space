@@ -5,21 +5,21 @@ import {od6sutilities} from "../utilities";
 
 export function registerExplosiveHelpers() {
     Handlebars.registerHelper('isExplosivesAuto', function() {
-        return game.settings.get('od6s', 'auto_explosive');
+        return game.settings.get('nonex-ist-od6s', 'auto_explosive');
     })
 
     Handlebars.registerHelper('notExplosivesEndOfRound', function() {
-        return !game.settings.get('od6s', 'explosive_end_of_round');
+        return !game.settings.get('nonex-ist-od6s', 'explosive_end_of_round');
     })
 
     Handlebars.registerHelper('getExplosiveZones', function(key) {
-        const zones = game.settings.get('od6s', 'explosive_zones') ? 4 : 3;
+        const zones = game.settings.get('nonex-ist-od6s', 'explosive_zones') ? 4 : 3;
         return (key <= zones);
     })
 
     Handlebars.registerHelper('getExplosiveZonesCount', function() {
         const zones = [];
-        for (let i = 1; i <= (game.settings.get('od6s', 'explosive_zones') ? 4 : 3); i++) {
+        for (let i = 1; i <= (game.settings.get('nonex-ist-od6s', 'explosive_zones') ? 4 : 3); i++) {
             zones.push(i);
         }
         return zones;

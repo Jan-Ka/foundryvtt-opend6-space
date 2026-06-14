@@ -51,9 +51,9 @@ export async function prepareDerivedActorData(actor: Actor): Promise<void> {
         }
 
         // Remove mortally wounded flag if actor is not mortally wounded
-        if (actor.getFlag('od6s', 'mortally_wounded')) {
+        if (actor.getFlag('nonex-ist-od6s', 'mortally_wounded')) {
             if (OD6S.woundsId[od6sutilities.getWoundLevel(actor.system.wounds.value, actor)] !== 'mortally_wounded') {
-                await actor.unsetFlag('od6s', 'mortally_wounded');
+                await actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
             }
         }
 
@@ -146,7 +146,7 @@ export function applyMods(actor: Actor): void {
         actor.system.er.score = setResistance(actor, 'er');
         actor.system.er.text = od6sutilities.getTextFromDice(od6sutilities.getDiceFromScore(actor.system.er.score));
         actor.system.noArmor = {
-            label: game.i18n.localize("OD6S.RESISTANCE_NO_ARMOR"),
+            label: game.i18n.localize("NONEX_IST_OD6S.RESISTANCE_NO_ARMOR"),
             mod: 0,
             score: setResistance(actor, 'noArmor'),
         };
@@ -159,7 +159,7 @@ export function setStrengthDamageBonus(actor: Actor): number {
     let damage;
 
     // If game setting is true, use straight strength score plus modifier
-    if (game.settings.get('od6s', 'strength_damage')) {
+    if (game.settings.get('nonex-ist-od6s', 'strength_damage')) {
         return actor.system.attributes?.str.score + actor.system.strengthdamage?.mod;
     }
 
@@ -169,7 +169,7 @@ export function setStrengthDamageBonus(actor: Actor): number {
         : 0;
     const base = liftSkill ? liftScore + actor.system.attributes.str.score : actor.system.attributes.str.score;
 
-    if (game.settings.get('od6s', 'od6_bonus')) {
+    if (game.settings.get('nonex-ist-od6s', 'od6_bonus')) {
         // Use base directly multiplied by the multiplier
         const modifiedBase = base * OD6S.strDamMultiplier;
         damage = OD6S.strDamRound ? Math.floor(modifiedBase) : Math.ceil(modifiedBase);

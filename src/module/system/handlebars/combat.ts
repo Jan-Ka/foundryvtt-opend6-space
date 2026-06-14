@@ -63,22 +63,22 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('isRanged', function (type) {
-        return type !== game.i18n.localize("OD6S.MELEE");
+        return type !== game.i18n.localize("NONEX_IST_OD6S.MELEE");
     })
 
     Handlebars.registerHelper('isExplosive', function (type) {
-        return type === game.i18n.localize("OD6S.EXPLOSIVE");
+        return type === game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE");
     })
 
     Handlebars.registerHelper('isExplosiveDice', function (type) {
-        return type === game.i18n.localize("OD6S.EXPLOSIVE") &&
+        return type === game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE") &&
             OD6S.grenadeDamageDice;
     })
 
     Handlebars.registerHelper('isMuscle', function (type) {
         switch (type) {
-            case game.i18n.localize("OD6S.THROWN"):
-            case game.i18n.localize("OD6S.MISSILE"):
+            case game.i18n.localize("NONEX_IST_OD6S.THROWN"):
+            case game.i18n.localize("NONEX_IST_OD6S.MISSILE"):
                 return true;
             default:
                 return false;
@@ -103,7 +103,7 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('useParrySkill', function () {
-        return game.settings.get('od6s', 'parry_skills');
+        return game.settings.get('nonex-ist-od6s', 'parry_skills');
     })
 
     Handlebars.registerHelper('getCover', function (type) {
@@ -127,7 +127,7 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('hitsOrMisses', function (success) {
-        return success ? game.i18n.localize('OD6S.HITS') : game.i18n.localize('OD6S.MISSES');
+        return success ? game.i18n.localize('NONEX_IST_OD6S.HITS') : game.i18n.localize('NONEX_IST_OD6S.MISSES');
     })
 
     Handlebars.registerHelper('onSuccess', function (success, roll, target) {
@@ -137,7 +137,7 @@ export function registerCombatHelpers() {
             const difference = roll - target;
             if (difference < 0) {
                 // Actually a failure
-                return 'OD6S.FAILURE';
+                return 'NONEX_IST_OD6S.FAILURE';
             }
             for (const result in OD6S.result) {
                 if (difference >= OD6S.result[result].difference) {
@@ -147,7 +147,7 @@ export function registerCombatHelpers() {
                 }
             }
         } else {
-            resultMessage = 'OD6S.FAILURE'
+            resultMessage = 'NONEX_IST_OD6S.FAILURE'
         }
 
         return resultMessage;
@@ -158,7 +158,7 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('useWeaponArmorDamage', function () {
-        return game.settings.get('od6s','weapon_armor_damage');
+        return game.settings.get('nonex-ist-od6s','weapon_armor_damage');
     })
 
     Handlebars.registerHelper('getArmorDamageLevels', function () {
@@ -184,7 +184,7 @@ export function registerCombatHelpers() {
     Handlebars.registerHelper('getHitLocation', function (type, location) {
         if (OD6S.randomHitLocations && location !== '') {
             if (type !== 'vehicle' && type !== 'starship') {
-                return game.i18n.localize("OD6S.LOCATION") + ":" + " " + game.i18n.localize(location);
+                return game.i18n.localize("NONEX_IST_OD6S.LOCATION") + ":" + " " + game.i18n.localize(location);
             }
             return '';
         }
@@ -200,7 +200,7 @@ export function registerCombatHelpers() {
     })
 
     Handlebars.registerHelper('showBodyPointsDamage', function (isVehicle) {
-        return (game.settings.get('od6s', 'bodypoints') > 0
+        return (game.settings.get('nonex-ist-od6s', 'bodypoints') > 0
             && !isVehicle);
     })
 
@@ -249,7 +249,7 @@ export function registerCombatHelpers() {
 
     Handlebars.registerHelper('getStrRange', function (messageId, range, type) {
         const message = game.messages.get(messageId);
-        const ranges = message!.getFlag('od6s', type);
+        const ranges = message!.getFlag('nonex-ist-od6s', type);
         const rangeKey = Object.keys(OD6S.ranges).find(key => OD6S.ranges[key].name === range);
         // @ts-expect-error
         const itemKey = OD6S.ranges[rangeKey].item;

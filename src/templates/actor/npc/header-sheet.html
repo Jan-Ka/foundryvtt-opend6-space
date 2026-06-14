@@ -29,7 +29,7 @@
                        data-dtype="{{actor.system.species.type}}"/>
                 {{#if (eq actor.system.sheetmode.value "freeedit")}}
                     {{#if (displaySpeciesTemplateClear actor)}}
-                        <button class="reset-species-template">{{localize 'OD6S.CLEAR'}}</button>
+                        <button type="button" class="reset-species-template">{{localize 'NONEX_IST_OD6S.CLEAR'}}</button>
                     {{/if}}
                 {{/if}}
                 </div>
@@ -50,13 +50,13 @@
                    min="0" max="9999" value="{{actor.system.fatepoints.value}}" placeholder="0"
                    data-dtype="{{actor.system.fatepoints.type}}"/>
             <div class="flexrow flex-group-left fatepointeffect"
-                 title="{{localize 'OD6S.IN_EFFECT'}}">
+                 title="{{localize 'NONEX_IST_OD6S.IN_EFFECT'}}">
                 <label for="fpInEffect"></label>
                 <input id="fpInEffect" type="checkbox"
                     {{#unless (gt actor.system.fatepoints.value 0) }}
-                        {{#unless actor.flags.od6s.fatepointeffect}}disabled{{/unless}}
+                        {{#unless actor.flags.nonex-ist-od6s.fatepointeffect}}disabled{{/unless}}
                     {{/unless}}
-                       data-dtype="Boolean" {{#if actor.flags.od6s.fatepointeffect}}checked{{/if}}/>
+                       data-dtype="Boolean" {{#if actor.flags.nonex-ist-od6s.fatepointeffect}}checked{{/if}}/>
             </div>
         </div>
         <div class="flexrow flex-group-center">

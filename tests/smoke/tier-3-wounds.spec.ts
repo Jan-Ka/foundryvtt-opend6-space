@@ -42,14 +42,14 @@ test("wound transitions advance and status toggle works without schema errors", 
         const before = actor.system.wounds.value;
 
         try {
-            await actor.applyWounds("OD6S.WOUNDS_WOUNDED");
+            await actor.applyWounds("NONEX_IST_OD6S.WOUNDS_WOUNDED");
         } catch (e) {
             errs.push("wounded: " + (e as Error).message);
         }
         const afterWounded = actor.system.wounds.value;
 
         try {
-            await actor.applyWounds("OD6S.WOUNDS_SEVERELY_WOUNDED");
+            await actor.applyWounds("NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED");
         } catch (e) {
             errs.push("severe: " + (e as Error).message);
         }

@@ -10,7 +10,7 @@
  *   FOUNDRY_URL          (default http://localhost:30000)
  *   FOUNDRY_USER         (default "Gamemaster")
  *   FOUNDRY_GM_PASSWORD  (default "" — fresh smoke worlds have no GM password)
- *   FOUNDRY_SMOKE_WORLD  (default "od6s-smoke" — the world id this harness
+ *   FOUNDRY_SMOKE_WORLD  (default "nonex-ist-od6s-smoke" — the world id this harness
  *                        is allowed to interact with; identity-guarded to
  *                        avoid trampling a developer's personal campaign on
  *                        the same Foundry instance)
@@ -30,7 +30,7 @@ const USER = process.env.FOUNDRY_USER ?? "Gamemaster";
 // used to enter /setup). A fresh smoke world's GM has no password, so
 // the default of empty is correct.
 const PASSWORD = process.env.FOUNDRY_GM_PASSWORD ?? "";
-const SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "od6s-smoke";
+const SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "nonex-ist-od6s-smoke";
 
 declare global {
     interface Window {

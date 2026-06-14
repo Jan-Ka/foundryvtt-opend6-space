@@ -84,15 +84,15 @@ export function registerDisplayHelpers() {
     });
 
     Handlebars.registerHelper('getBodyTemplate', function (type) {
-        return "systems/od6s/templates/actor/" + type + "/body-sheet.html";
+        return "systems/nonex-ist-od6s/templates/actor/" + type + "/body-sheet.html";
     })
 
     Handlebars.registerHelper('getHeaderFormTemplate', function (type) {
-        return "systems/od6s/templates/actor/" + type + "/header-sheet.html";
+        return "systems/nonex-ist-od6s/templates/actor/" + type + "/header-sheet.html";
     })
 
     Handlebars.registerHelper('getWoundsTemplate', function () {
-        return "systems/od6s/templates/actor/common/wounds.html";
+        return "systems/nonex-ist-od6s/templates/actor/common/wounds.html";
     })
 
     Handlebars.registerHelper('displayCharacterTemplateClear', function (actor) {
@@ -131,7 +131,7 @@ export function registerDisplayHelpers() {
     })
 
     Handlebars.registerHelper('getFlag', function (message, flag) {
-        return message.getFlag('od6s', flag);
+        return message.getFlag('nonex-ist-od6s', flag);
     })
 
     Handlebars.registerHelper('isGmOrOwner', function (id) {

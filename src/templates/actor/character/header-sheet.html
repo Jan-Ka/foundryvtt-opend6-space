@@ -14,7 +14,7 @@
                        data-dtype="{{actor.system.chartype.type}}"/>
                 {{#if (eq actor.system.created.value false)}}
                     {{#if (displayCharacterTemplateClear actor)}}
-                        <button class="reset-template">{{localize 'OD6S.CLEAR'}}</button>
+                        <button type="button" class="reset-template">{{localize 'NONEX_IST_OD6S.CLEAR'}}</button>
                     {{/if}}
                 {{/if}}
                 </div>
@@ -34,7 +34,7 @@
                        data-dtype="{{actor.system.species.type}}"/>
                 {{#if (eq actor.system.sheetmode.value "freeedit")}}
                     {{#if (displaySpeciesTemplateClear actor)}}
-                        <button class="reset-species-template">{{localize 'OD6S.CLEAR'}}</button>
+                        <button type="button" class="reset-species-template">{{localize 'NONEX_IST_OD6S.CLEAR'}}</button>
                     {{/if}}
                 {{/if}}
                 </div>
@@ -56,13 +56,13 @@
                    min="0" max="9999" value="{{actor.system.fatepoints.value}}" placeholder="0"
                    data-dtype="{{actor.system.fatepoints.type}}"/>
             <div class="flexrow flex-group-left fatepointeffect"
-                 title="{{localize 'OD6S.IN_EFFECT'}}">
+                 title="{{localize 'NONEX_IST_OD6S.IN_EFFECT'}}">
                 <label for="fpInEffect"></label>
                 <input id="fpInEffect" type="checkbox"
                     {{#unless (gt actor.system.fatepoints.value 0) }}
-                        {{#unless actor.flags.od6s.fatepointeffect}}disabled{{/unless}}
+                        {{#unless actor.flags.nonex-ist-od6s.fatepointeffect}}disabled{{/unless}}
                     {{/unless}}
-                       data-dtype="Boolean" {{#if actor.flags.od6s.fatepointeffect}}checked{{/if}}/>
+                       data-dtype="Boolean" {{#if actor.flags.nonex-ist-od6s.fatepointeffect}}checked{{/if}}/>
             </div>
         </div>
         {{#if (ne (getCustomField1) "")}}
@@ -121,23 +121,23 @@
         </div>
         {{#if (eq (getCost) '0')}}
             <div class="funds flexrow flex-group-center">
-                <label for="actor.system.funds.score">{{localize 'OD6S.CHAR_FUNDS'}}:</label>
+                <label for="actor.system.funds.score">{{localize 'NONEX_IST_OD6S.CHAR_FUNDS'}}:</label>
                 {{#if (eq actor.system.sheetmode.value "normal")}}
                     <div class="funds flex-group-center rolldialog" data-score="{{actor.system.funds.score}}"
-                         data-type="funds" data-subtype="funds" data-label="{{localize 'OD6S.CHAR_FUNDS'}}">
+                         data-type="funds" data-subtype="funds" data-label="{{localize 'NONEX_IST_OD6S.CHAR_FUNDS'}}">
                         {{diceFromScore actor.system.funds.score}}D+{{pipsFromScore actor.system.funds.score}}
                     </div>
                 {{else}}
                     {{#if (eq actor.system.sheetmode.value "freeedit")}}
                         <div class="edit-funds">
-                            <input title="{{localize 'OD6S.CHAR_FUNDS'}}" name="funds-dice" type="number"
+                            <input title="{{localize 'NONEX_IST_OD6S.CHAR_FUNDS'}}" name="funds-dice" type="number"
                                    id="funds-dice"
                                    data-id="funds-dice" value="{{diceFromScore actor.system.funds.score}}" min="0"
                                    max="99"
                                    placeholder="{{diceFromScore actor.system.funds.score}}" data-type="Number"/></div>
                         D+
                         <div class="edit-funds">
-                            <input title="{{localize 'OD6S.CHAR_FUNDS'}}" name="funds-pips" type="number"
+                            <input title="{{localize 'NONEX_IST_OD6S.CHAR_FUNDS'}}" name="funds-pips" type="number"
                                    id="funds-pips"
                                    data-id="funds-pips" value="{{pipsFromScore actor.system.funds.score}}" min="0"
                                    max="99"
@@ -179,7 +179,7 @@
         {{/if}}
         {{#if (eq actor.system.created.value false)}}
             <div class="flexrow flex-group-center creation">
-                <button class="create-character">{{localize 'OD6S.CREATE'}}</button>
+                <button type="button" class="create-character">{{localize 'NONEX_IST_OD6S.CREATE'}}</button>
             </div>
         {{/if}}
     </div>

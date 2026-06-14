@@ -108,10 +108,10 @@
             {{/if}}
         {{/if}}
         <div class="flexrow flex-group-left">
-            <label for="actor.system.cover.value">{{localize "OD6S.COVER"}}</label>
+            <label for="actor.system.cover.value">{{localize "NONEX_IST_OD6S.COVER"}}</label>
             <select name="system.cover.value" id="actor.system.cover.value" style="width: 70px;">
                 
-                    {{#each (getCover "OD6S.COVER") as |cover key|}}
+                    {{#each (getCover "NONEX_IST_OD6S.COVER") as |cover key|}}
                         <option value="{{key}}" title="{{localize (concat key "_DESCRIPTION")}}"
                                 {{#if (eq key cover)}}selected{{/if}}>
                             {{localize key}}
@@ -121,7 +121,7 @@
             </select>
         </div>
         <div class="flexrow flex-group-left">
-            <label for="actor.system.damage.value">{{localize 'OD6S.DAMAGE'}}:</label>
+            <label for="actor.system.damage.value">{{localize 'NONEX_IST_OD6S.DAMAGE'}}:</label>
             <select name="system.damage.value" id="actor.system.damage.value" style="width: 70px;">
                 
                     {{#each (getVehicleDamageLevels) as |level key|}}
@@ -134,9 +134,9 @@
         </div>
     {{#if (isGM)}}
     <div class="flexrow flex-group-left">
-        <label title="{{localize 'OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
+        <label title="{{localize 'NONEX_IST_OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
                for="actor.system.embedded_pilot.value">{{localize actor.system.embedded_pilot.label}}:</label>
-        <input title="{{localize 'OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
+        <input title="{{localize 'NONEX_IST_OD6S.EMBEDDED_PILOT_DESCRIPTION'}}"
                id="actor.system.embedded_pilot.value" name="system.embedded_pilot.value" type="checkbox"
                data-dtype="Boolean" {{#if actor.system.embedded_pilot.value}}checked{{/if}}/>
     </div>

@@ -46,7 +46,7 @@ const TYPED_DEFAULT_ITEM_TYPES = new Set([
  */
 export function defaultImgForItemType(type: string): string {
     if (TYPED_DEFAULT_ITEM_TYPES.has(type)) {
-        return `systems/od6s/icons/${type}-default.svg`;
+        return `systems/nonex-ist-od6s/icons/${type}-default.svg`;
     }
     return DEFAULT_ITEM_IMG_FALLBACK;
 }
@@ -143,7 +143,7 @@ export function prepareCharacterItems(items: readonly SheetItem[]): CharacterIte
 
 /**
  * Vehicle and starship buckets share the cargo-hold catch-all: any item of
- * a type listed in `OD6S.cargo_hold` that isn't a native equipped slot
+ * a type listed in `NONEX_IST_OD6S.cargo_hold` that isn't a native equipped slot
  * (vehicle-weapon / vehicle-gear or starship-weapon / starship-gear)
  * falls into cargo. Without this, items added via the cargo-hold + dialog
  * across-scale are created but never displayed.

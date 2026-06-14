@@ -29,8 +29,8 @@ export async function getSkillsFromTemplate(items: Item[]): Promise<Item[]> {
  */
 export async function _getItemFromCompendiumId(id: string): Promise<Item | null> {
     let packs: CompendiumPack[];
-    if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
+    if (game.settings.get('nonex-ist-od6s', 'hide_compendia')) {
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'nonex-ist-od6s' && p.documentName === 'Item');
     } else {
         packs = game.packs.filter((p) => p.documentName === 'Item');
     }
@@ -49,8 +49,8 @@ export async function _getItemFromCompendiumId(id: string): Promise<Item | null>
  */
 export async function _getItemFromCompendium(itemName: string): Promise<Item | null> {
     let packs: CompendiumPack[];
-    if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
+    if (game.settings.get('nonex-ist-od6s', 'hide_compendia')) {
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'nonex-ist-od6s' && p.documentName === 'Item');
     } else {
         packs = game.packs.filter((p) => p.documentName === 'Item');
     }
@@ -88,8 +88,8 @@ export async function getItemByName(itemName: string): Promise<Item | undefined>
 export function getItemsFromCompendiumByType(itemType: OD6SItemType): Array<{_id: string; name: string; type: string}> {
     let searchResult: Array<{_id: string; name: string; type: string}> = [];
     let packs: CompendiumPack[];
-    if (game.settings.get('od6s', 'hide_compendia')) {
-        packs = game.packs.filter((p) => p.metadata.packageName !== 'od6s' && p.documentName === 'Item');
+    if (game.settings.get('nonex-ist-od6s', 'hide_compendia')) {
+        packs = game.packs.filter((p) => p.metadata.packageName !== 'nonex-ist-od6s' && p.documentName === 'Item');
     } else {
         packs = game.packs.filter((p) => p.documentName === 'Item');
     }

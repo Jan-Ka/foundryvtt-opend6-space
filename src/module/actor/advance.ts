@@ -121,7 +121,7 @@ export class od6sadvance {
         /* Character Point cost is too high. */
         if (!advanceData.freeadvance) {
             if (advanceData.cpcost > actorData.characterpoints.value) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_ADVANCE"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_CP_ADVANCE"));
                 return;
             }
         }

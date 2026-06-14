@@ -17,11 +17,11 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-explosive-dialog",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-explosive-dialog",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "div",
         window: {
-            title: "OD6S.SET_EXPLOSIVE",
+            title: "NONEX_IST_OD6S.SET_EXPLOSIVE",
             resizable: false,
             minimizable: true,
         },
@@ -36,7 +36,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/apps/explosive.html",
+            template: "systems/nonex-ist-od6s/templates/apps/explosive.html",
         },
     };
 
@@ -57,12 +57,12 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
     static async #onSubmit(this: ExplosiveDialog, event: Event): Promise<void> {
         event.preventDefault();
 
-        if (game.settings.get("od6s", "auto_explosive")) {
+        if (game.settings.get("nonex-ist-od6s", "auto_explosive")) {
             let radius;
-            if (game.settings.get("od6s", "explosive_zones")) {
+            if (game.settings.get("nonex-ist-od6s", "explosive_zones")) {
                 radius = this.data.item.system.blast_radius["4"].range;
                 if (radius < 1) {
-                    ui.notifications.warn(game.i18n.localize("OD6S.WARN_EXPLOSIVE_NOT_CONFIGURED_FOR_ZONES"));
+                    ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.WARN_EXPLOSIVE_NOT_CONFIGURED_FOR_ZONES"));
                     return;
                 }
             } else {
@@ -80,8 +80,8 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
             await this.close();
         } else {
             this.data.stage += 1;
-            if (this.data.type === "OD6S.EXPLOSIVE_THROWN") {
-                await this.data.item.setFlag("od6s", "explosiveSet", true);
+            if (this.data.type === "NONEX_IST_OD6S.EXPLOSIVE_THROWN") {
+                await this.data.item.setFlag("nonex-ist-od6s", "explosiveSet", true);
                 await this.data.item.roll(false);
             }
             await this.close();
@@ -100,7 +100,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
     async handleResult(regions: any) {
         this.data.stage += 1;
 
-        if (this.data.stage === 1 && this.data.type === "OD6S.EXPLOSIVE_THROWN") {
+        if (this.data.stage === 1 && this.data.type === "NONEX_IST_OD6S.EXPLOSIVE_THROWN") {
             const region = regions[0];
             const distance = Math.floor(canvas.grid.measurePath([
                 {x: this.token.center.x, y: this.token.center.y},
@@ -108,7 +108,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
             ]).distance);
 
             await this.data.item.update({
-                [`flags.od6s.explosivePending.${region.id}`]: {
+                [`flags.nonex-ist-od6s.explosivePending.${region.id}`]: {
                     origin: {x: this.token.center.x, y: this.token.center.y},
                     range: distance,
                 },
@@ -116,7 +116,7 @@ export default class ExplosiveDialog extends HandlebarsApplicationMixin(Applicat
 
             await region.update({
                 flags: {
-                    od6s: {
+                    "nonex-ist-od6s": {
                         explosive: true,
                         actor: this.data.actor.uuid,
                         item: this.data.item.id,

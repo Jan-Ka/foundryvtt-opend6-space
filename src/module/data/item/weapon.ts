@@ -30,7 +30,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       scale: new fields.SchemaField({
         score: new fields.NumberField({ initial: 0 }),
         type: new fields.StringField({ initial: "Number" }),
-        label: new fields.StringField({ initial: "OD6S.SCALE" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.SCALE" }),
       }),
       // Helpers (isRanged, isMuscle, isExplosive) and the weapon-sheet
       // <option value> all operate on the *localized* subtype, so the
@@ -39,7 +39,7 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
       // migrateData below normalizes any key-form value on later loads.
       subtype: new fields.StringField({
         initial: () => (game as { i18n?: { localize?: (k: string) => string } } | undefined)
-          ?.i18n?.localize?.("OD6S.RANGED") ?? "OD6S.RANGED",
+          ?.i18n?.localize?.("NONEX_IST_OD6S.RANGED") ?? "NONEX_IST_OD6S.RANGED",
       }),
       stats: new fields.SchemaField({
         attribute: new fields.StringField({ initial: "AGI" }),
@@ -75,13 +75,13 @@ export default class WeaponData extends foundry.abstract.TypeDataModel {
         score: new fields.NumberField({ initial: 0 }),
         type: new fields.StringField({ initial: "e" }),
       }),
-      difficulty: new fields.StringField({ initial: "OD6S.DIFFICULTY_EASY" }),
+      difficulty: new fields.StringField({ initial: "NONEX_IST_OD6S.DIFFICULTY_EASY" }),
       mods: new fields.SchemaField({
         difficulty: new fields.NumberField({ initial: 0 }),
         attack: new fields.NumberField({ initial: 0 }),
         damage: new fields.NumberField({ initial: 0 }),
       }),
-      label: new fields.StringField({ initial: "OD6S.CHAR_WEAPONS" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_WEAPONS" }),
     };
   }
 }

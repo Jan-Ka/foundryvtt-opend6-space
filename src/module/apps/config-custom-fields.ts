@@ -9,11 +9,11 @@ export default class od6sCustomFieldsConfiguration extends HandlebarsApplication
     requiresWorldReload = false;
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-custom-fields-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-custom-fields-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_CUSTOM_FIELDS",
+            title: "NONEX_IST_OD6S.CONFIG_CUSTOM_FIELDS",
             resizable: true,
             minimizable: true,
         },
@@ -33,7 +33,7 @@ export default class od6sCustomFieldsConfiguration extends HandlebarsApplication
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/custom-fields.html",
+            template: "systems/nonex-ist-od6s/templates/settings/custom-fields.html",
         },
     };
 
@@ -66,11 +66,11 @@ export default class od6sCustomFieldsConfiguration extends HandlebarsApplication
                         ? od6sCustomFieldsConfiguration.#updateActorTypes(value, type, true)
                         : od6sCustomFieldsConfiguration.#updateActorTypes(value, type, false);
                 }
-                await game.settings.set("od6s", setting, value);
+                await game.settings.set("nonex-ist-od6s", setting, value);
             } else {
-                await game.settings.set("od6s", setting, data[setting]);
+                await game.settings.set("nonex-ist-od6s", setting, data[setting]);
             }
-            const s = game.settings.settings.get("od6s." + setting);
+            const s = game.settings.settings.get("nonex-ist-od6s." + setting);
             if (s?.requiresReload) this.requiresWorldReload = true;
         }
     }

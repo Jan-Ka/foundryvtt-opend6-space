@@ -297,8 +297,8 @@ function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBuck
     }
 
     const difficultylevel = ctx.settings.meleeDifficulty
-        ? (item.difficulty ?? 'OD6S.DIFFICULTY_EASY')
-        : 'OD6S.DIFFICULTY_EASY';
+        ? (item.difficulty ?? 'NONEX_IST_OD6S.DIFFICULTY_EASY')
+        : 'NONEX_IST_OD6S.DIFFICULTY_EASY';
 
     const specSkill =
         ctx.settings.showSkillSpecialization && item.stats?.specialization === input.name
@@ -316,8 +316,8 @@ function buildWeaponBucket(input: HandlerInput, ctx: HandlerContext): WeaponBuck
         // distance-to-target resolution (via bucketRangeFromDistance) happens
         // downstream — handler emits the rules-default initial label.
         range: input.subtype === 'meleeattack'
-            ? 'OD6S.RANGE_POINT_BLANK_SHORT'
-            : 'OD6S.RANGE_SHORT_SHORT',
+            ? 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT'
+            : 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
         difficultylevel,
         only_stun: onlyStun,
         can_stun: canStun,
@@ -368,7 +368,7 @@ const vehicleRamForActor = (
         };
 
 const defaultDifficultyLabel = (settings: RollSettingsView): string =>
-    settings.defaultUnknownDifficulty ? 'OD6S.DIFFICULTY_UNKNOWN' : 'OD6S.DIFFICULTY_EASY';
+    settings.defaultUnknownDifficulty ? 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN' : 'NONEX_IST_OD6S.DIFFICULTY_EASY';
 
 // ---- Action handlers ----
 
@@ -380,14 +380,14 @@ const actionOtherHandler: Handler<'action-other'> = () => ({});
 
 const actionRangedAttackHandler: Handler<'action-rangedattack'> = (_input, ctx) => ({
     score: characterAttributeScore(ctx.actor, 'agi'),
-    range: 'OD6S.RANGE_SHORT_SHORT',
+    range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
     difficultylevel: defaultDifficultyLabel(ctx.settings),
     attackerScale: actorScale(ctx.actor),
 });
 
 const actionVehicleRangedAttackHandler: Handler<'action-vehiclerangedattack'> = (_input, ctx) => ({
     score: characterAttributeScore(ctx.actor, 'mec'),
-    range: 'OD6S.RANGE_SHORT_SHORT',
+    range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
     difficultylevel: defaultDifficultyLabel(ctx.settings),
     attackerScale: vehicleScaleForActor(ctx.actor, ctx),
     vehicle: vehicleUuidForActor(ctx.actor),
@@ -420,7 +420,7 @@ const actionVehicleRamAttackHandler: Handler<'action-vehicleramattack'> = (_inpu
     return {
         damagetype: 'p',
         damagemodifiers,
-        source: 'OD6S.COLLISION',
+        source: 'NONEX_IST_OD6S.COLLISION',
         attackerScale: vehicleScaleForActor(ctx.actor, ctx),
         vehicle: vehicleUuidForActor(ctx.actor),
     };
@@ -438,7 +438,7 @@ const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweapo
             damagetype: input.damage_type ?? '',
             damagescore: input.damage ?? 0,
             source: input.name ?? '',
-            range: 'OD6S.RANGE_SHORT_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
             difficultylevel: defaultDifficultyLabel(ctx.settings),
             attackerScale: vehicleScaleForActor(ctx.actor, ctx),
             vehicle: vehicleUuidForActor(ctx.actor),
@@ -458,7 +458,7 @@ const actionVehicleRangedWeaponAttackHandler: Handler<'action-vehiclerangedweapo
         damagetype: item.damage?.type ?? '',
         damagescore: modded.damageScore,
         source: item.name ?? '',
-        range: 'OD6S.RANGE_SHORT_SHORT',
+        range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
         difficultylevel: defaultDifficultyLabel(ctx.settings),
         // Truthy fallback to vehicle scale — matches the legacy guard.
         attackerScale: item.scale?.score || vehicleScaleForActor(ctx.actor, ctx),

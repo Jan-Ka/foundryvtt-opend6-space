@@ -14,11 +14,11 @@ export class OD6SEditDamage extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-edit-damage",
-        classes: ["od6s"],
+        id: "nonex-ist-od6s-edit-damage",
+        classes: ["nonex-ist-od6s"],
         tag: "form",
         window: {
-            title: "OD6S.EDIT_DAMAGE",
+            title: "NONEX_IST_OD6S.EDIT_DAMAGE",
             minimizable: true,
         },
         position: {
@@ -37,7 +37,7 @@ export class OD6SEditDamage extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/chat/edit-damage.html",
+            template: "systems/nonex-ist-od6s/templates/chat/edit-damage.html",
         },
     };
 
@@ -56,8 +56,8 @@ export class OD6SEditDamage extends HandlebarsApplicationMixin(ApplicationV2) {
         if (!message) return;
 
         const damageScore = od6sutilities.getScoreFromDice(data.damageDice, data.damagePips);
-        await message.setFlag("od6s", "damageScore", damageScore);
-        await message.setFlag("od6s", "damageDice", {
+        await message.setFlag("nonex-ist-od6s", "damageScore", damageScore);
+        await message.setFlag("nonex-ist-od6s", "damageDice", {
             dice: data.damageDice,
             pips: data.damagePips,
         });

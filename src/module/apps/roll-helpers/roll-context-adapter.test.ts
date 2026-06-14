@@ -26,7 +26,7 @@ const SETTINGS: RollSettingsRaw = {
     pipsPerDice: 3,
     meleeDifficulty: false,
     explosiveZones: false,
-    weaponDamageTable: { 1: { penalty: 3, label: 'OD6S.LIGHT' } },
+    weaponDamageTable: { 1: { penalty: 3, label: 'NONEX_IST_OD6S.LIGHT' } },
     flatSkills: false,
     brawlAttribute: 'str',
 };
@@ -122,7 +122,7 @@ describe('adaptItem', () => {
                 damaged: 1,
                 mods: { damage: 3, attack: 0, difficulty: 0 },
                 stats: { skill: 'Blaster', specialization: 'Test Blaster' },
-                difficulty: 'OD6S.DIFFICULTY_MODERATE',
+                difficulty: 'NONEX_IST_OD6S.DIFFICULTY_MODERATE',
             },
         });
         expect(view.damage).toEqual({ type: 'e', score: 12, str: false, muscle: false });
@@ -132,7 +132,7 @@ describe('adaptItem', () => {
         expect(view.damaged).toBe(1);
         expect(view.mods).toEqual({ damage: 3, attack: 0, difficulty: 0 });
         expect(view.stats).toEqual({ skill: 'Blaster', specialization: 'Test Blaster' });
-        expect(view.difficulty).toBe('OD6S.DIFFICULTY_MODERATE');
+        expect(view.difficulty).toBe('NONEX_IST_OD6S.DIFFICULTY_MODERATE');
         expect(view.isExplosive).toBe(false);
     });
 
@@ -185,7 +185,7 @@ describe('adaptSettings + adaptContext', () => {
         expect(ctx.item?.type).toBe('weapon');
         expect(ctx.targets.length).toBe(1);
         expect(ctx.settings.brawlAttribute).toBe('str');
-        expect(ctx.localize('OD6S.X')).toBe('OD6S.X');
+        expect(ctx.localize('NONEX_IST_OD6S.X')).toBe('NONEX_IST_OD6S.X');
     });
 
     it('adaptContext omits item when not provided', () => {

@@ -1,9 +1,9 @@
 <header class="message-header flexrow">
-    <h4>{{localize "OD6S.DAMAGE_RESULT"}}</h4>
+    <h4>{{localize "NONEX_IST_OD6S.DAMAGE_RESULT"}}</h4>
     <span class="message-metadata">
           <time class="message-timestamp">{{timeSince message.timestamp}}</time>
         {{#if user.isGM}}
-            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "NONEX_IST_OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
         {{/if}}
       </span>
     {{#if message.flavor}}
@@ -15,30 +15,30 @@
 </div>
 <br/>
     <div class="result">
-    {{localize 'OD6S.DAMAGE_RESULT'}}: {{#if (showBodyPointsDamage message.flags.od6s.loserIsVehicle)}}
-        {{message.flags.od6s.result}} {{localize 'OD6S.BODY_POINTS'}}
+    {{localize 'NONEX_IST_OD6S.DAMAGE_RESULT'}}: {{#if (showBodyPointsDamage message.flags.nonex-ist-od6s.loserIsVehicle)}}
+        {{message.flags.nonex-ist-od6s.result}} {{localize 'NONEX_IST_OD6S.BODY_POINTS'}}
     {{else}}
-        {{localize message.flags.od6s.result}}
+        {{localize message.flags.nonex-ist-od6s.result}}
     {{/if}}
-    {{#if user.isGM}}{{#if message.flags.od6s.apply}}{{#unless message.flags.od6s.applied}}
+    {{#if user.isGM}}{{#if message.flags.nonex-ist-od6s.apply}}{{#unless message.flags.nonex-ist-od6s.applied}}
             <br>
             <div class="apply-damage-button"
-                 data-result="{{message.flags.od6s.result}}"
-                 data-token-id="{{message.flags.od6s.loserId}}"
-                 data-is-vehicle="{{message.flags.od6s.loserIsVehicle}}"
+                 data-result="{{message.flags.nonex-ist-od6s.result}}"
+                 data-token-id="{{message.flags.nonex-ist-od6s.loserId}}"
+                 data-is-vehicle="{{message.flags.nonex-ist-od6s.loserIsVehicle}}"
                  data-message-id="{{message._id}}"
-                 data-stun="{{message.flags.od6s.stun}}"
+                 data-stun="{{message.flags.nonex-ist-od6s.stun}}"
 
-                 {{#if message.flags.od6s.stun}}
-                 title="{{localize 'OD6S.APPLY_STUN'}}">
-                     <button>{{localize 'OD6S.APPLY_STUN'}}</button>
+                 {{#if message.flags.nonex-ist-od6s.stun}}
+                 title="{{localize 'NONEX_IST_OD6S.APPLY_STUN'}}">
+                     <button>{{localize 'NONEX_IST_OD6S.APPLY_STUN'}}</button>
                  {{else}}
-                 title="{{localize 'OD6S.APPLY_DAMAGE'}}">
-                 <button>{{localize 'OD6S.APPLY_DAMAGE'}}</button>
+                 title="{{localize 'NONEX_IST_OD6S.APPLY_DAMAGE'}}">
+                 <button>{{localize 'NONEX_IST_OD6S.APPLY_DAMAGE'}}</button>
                  {{/if}}
             </div>
     {{/unless}}{{/if}}{{/if}}
-    {{#if message.flags.od6s.passengerDamage}}
-            <br>{{ localize 'OD6S.PASSENGER_DAMAGE' }}: {{ localize message.flags.od6s.passengerDamage }}
+    {{#if message.flags.nonex-ist-od6s.passengerDamage}}
+            <br>{{ localize 'NONEX_IST_OD6S.PASSENGER_DAMAGE' }}: {{ localize message.flags.nonex-ist-od6s.passengerDamage }}
     {{/if}}
     </div>

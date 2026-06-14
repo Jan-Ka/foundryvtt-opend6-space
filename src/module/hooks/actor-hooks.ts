@@ -29,7 +29,7 @@ export function registerActorHooks() {
 
     Hooks.on("preUpdateActor", async (document, change, _options, _userId) => {
         if (change.system?.wounds && change.system.wounds.value > document.system.wounds.value) {
-            if (game.settings.get('od6s', 'bodypoints') === 0) {
+            if (game.settings.get('nonex-ist-od6s', 'bodypoints') === 0) {
                 const status = OD6S.woundsId[od6sutilities.getWoundLevel(change.system.wounds.value, document)];
                 if (status === 'stunned') {
                     change.system.stuns = {};
@@ -60,15 +60,15 @@ export function registerActorHooks() {
         }
 
         if(change.system?.stuns?.value) {
-            if(game.settings.get('od6s','track_stuns')) {
+            if(game.settings.get('nonex-ist-od6s','track_stuns')) {
                 if (game.user.isGM) {
                     if (document.system.stuns.value >= od6sutilities.getDiceFromScore(document.system.attributes.str.score).dice) {
                         // Actor has become unconscious
                         const roll = await new Roll("2d6").evaluate();
                         const flavor = document.name +
-                            game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
+                            game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_01') +
                             roll.total +
-                            game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
+                            game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_02');
                         await roll.toMessage({flavor: flavor});
 
                         await document.toggleStatusEffect('unconscious', {overlay: false, active: true});
@@ -78,7 +78,7 @@ export function registerActorHooks() {
         }
 
         if (change.system?.wounds?.value) {
-            if(game.settings.get('od6s','auto_status')) {
+            if(game.settings.get('nonex-ist-od6s','auto_status')) {
                 const status = OD6S.woundsId[od6sutilities.getWoundLevel(change.system.wounds.value, document)];
                 if ((document.hasPlayerOwner && document.isOwner)) {
                     if (game.user.isGM) {
@@ -94,39 +94,39 @@ export function registerActorHooks() {
                     }
 
                     if (status === 'healthy') {
-                        await document.unsetFlag('od6s', 'mortally_wounded');
+                        await document.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                     } else if (status === 'stunned') {
                         // Apply stunned flag
-                        if (document.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                            await document.unsetFlag('od6s', 'mortally_wounded');
+                        if (document.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                            await document.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                         }
                     } else if (status === 'wounded') {
-                        if (document.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                            await document.unsetFlag('od6s', 'mortally_wounded');
+                        if (document.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                            await document.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                         }
                     } else if (status === 'severely_wounded') {
-                        if (document.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                            await document.unsetFlag('od6s', 'mortally_wounded');
+                        if (document.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                            await document.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                         }
                     } else if (status === 'incapacitated') {
-                        if (document.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                            await document.unsetFlag('od6s', 'mortally_wounded');
+                        if (document.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                            await document.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                         }
 
-                        if (game.settings.get('od6s', 'auto_incapacitated')) {
+                        if (game.settings.get('nonex-ist-od6s', 'auto_incapacitated')) {
                             const rollData = {
-                                name: game.i18n.localize('OD6S.RESIST_INCAPACITATED'),
+                                name: game.i18n.localize('NONEX_IST_OD6S.RESIST_INCAPACITATED'),
                                 actor: document,
                                 score: document.system.attributes.str.score,
                                 type: 'incapacitated',
-                                difficultylevel: 'OD6S.DIFFICULTY_MODERATE'
+                                difficultylevel: 'NONEX_IST_OD6S.DIFFICULTY_MODERATE'
                             }
                             await od6sroll._onRollDialog(rollData);
                         } else {
                             await document.applyIncapacitatedFailure();
                         }
                     } else if (status === 'mortally_wounded') {
-                        await document.setFlag('od6s', 'mortally_wounded', 0)
+                        await document.setFlag('nonex-ist-od6s', 'mortally_wounded', 0)
                     }
 
 
@@ -145,32 +145,32 @@ export function registerActorHooks() {
                     for (const token of tokens) {
                         if (status === 'stunned') {
                             // Apply stunned flag
-                            if (token.actor.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                                await token.actor.unsetFlag('od6s', 'mortally_wounded');
+                            if (token.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                                await token.actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                             }
                         } else if (status === 'wounded') {
-                            if (token.actor.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                                await token.actor.unsetFlag('od6s', 'mortally_wounded');
+                            if (token.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                                await token.actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                             }
                         } else if (status === 'severely_wounded') {
-                            if (token.actor.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                                await token.actor.unsetFlag('od6s', 'mortally_wounded');
+                            if (token.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                                await token.actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                             }
                         } else if (status === 'incapacitated') {
-                            if (token.actor.getFlag('od6s', 'mortally_wounded') !== 'undefined') {
-                                await token.actor.unsetFlag('od6s', 'mortally_wounded');
+                            if (token.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') !== 'undefined') {
+                                await token.actor.unsetFlag('nonex-ist-od6s', 'mortally_wounded');
                             }
 
                             const rollData = {
-                                name: game.i18n.localize('OD6S.RESIST_INCAPACITATED'),
+                                name: game.i18n.localize('NONEX_IST_OD6S.RESIST_INCAPACITATED'),
                                 actor: token.actor,
                                 score: token.actor.system.attributes.str.score,
                                 type: 'incapacitated',
-                                difficultylevel: 'OD6S.DIFFICULTY_MODERATE'
+                                difficultylevel: 'NONEX_IST_OD6S.DIFFICULTY_MODERATE'
                             }
                             await od6sroll._onRollDialog(rollData);
                         } else if (status === 'mortally_wounded') {
-                            await token.actor.setFlag('od6s', 'mortally_wounded', 1)
+                            await token.actor.setFlag('nonex-ist-od6s', 'mortally_wounded', 1)
                         }
                     }
                 }
@@ -200,8 +200,8 @@ export function registerActorHooks() {
                 }
             }
         } else {
-            if (document.actor.getFlag('od6s', 'crew') !== '') {
-                const vehicle = await od6sutilities.getActorFromUuid(document.actor.getFlag('od6s', 'crew'));
+            if (document.actor.getFlag('nonex-ist-od6s', 'crew') !== '') {
+                const vehicle = await od6sutilities.getActorFromUuid(document.actor.getFlag('nonex-ist-od6s', 'crew'));
                 if (vehicle) {
                     try {
                         await vehicle.forceRemoveCrewmember(document.actor.uuid);

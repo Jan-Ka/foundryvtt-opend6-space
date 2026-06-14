@@ -58,7 +58,7 @@ export interface DeleteExplosiveRegionPayload {
     regionId: string;
 }
 
-// Wrap each handler so failures leave an `[od6s:socket]` breadcrumb instead of
+// Wrap each handler so failures leave an `[nonex-ist-od6s:socket]` breadcrumb instead of
 // surfacing as bare "Uncaught (in promise)" rejections through socketlib. The
 // `Args` tuple generic preserves the handler's own parameter types at call
 // sites; only the dispatch boundary into socketlib's untyped `register`
@@ -76,7 +76,7 @@ function register<Args extends unknown[]>(name: string, handler: (...args: Args)
 
 export function registerSocketlib() {
     Hooks.once("socketlib.ready", () => {
-        OD6S.socket = socketlib.registerSystem("od6s");
+        OD6S.socket = socketlib.registerSystem("nonex-ist-od6s");
         register("checkCrewStatus", checkCrewStatus);
         register("sendVehicleData", sendVehicleData);
         register("modifyShields", modifyShields);
@@ -129,11 +129,11 @@ async function updateRollMessage(userId: string, messageId: string, update: Roll
         return denied('updateRollMessage', userId, `not author of message ${messageId}`);
     }
     await message.update(update, {diff: true});
-    await message.setFlag('od6s', 'total', update.content);
-    await message.setFlag('od6s', 'originalroll', message.rolls[0]);
-    const difficulty = message.getFlag('od6s', 'difficulty') as number | undefined;
+    await message.setFlag('nonex-ist-od6s', 'total', update.content);
+    await message.setFlag('nonex-ist-od6s', 'originalroll', message.rolls[0]);
+    const difficulty = message.getFlag('nonex-ist-od6s', 'difficulty') as number | undefined;
     if (typeof difficulty === 'number') {
-        await message.setFlag('od6s', 'success', (+update.content) >= difficulty);
+        await message.setFlag('nonex-ist-od6s', 'success', (+update.content) >= difficulty);
     }
 }
 
@@ -179,14 +179,14 @@ async function triggerRollAction(type: string, actorId: string) {
 }
 
 // A region mutation is authorized when the caller is GM, originally placed
-// the region (`flags.od6s.originalOwner === userId`), or owns the token
+// the region (`flags.nonex-ist-od6s.originalOwner === userId`), or owns the token
 // recorded on the region. The supplied `actorUuid` ties the call to a
 // specific detonator, but on its own it would let any actor-owner mutate
 // any region — so it must agree with one of the region-side bindings.
 async function userMayMutateRegion(user: User, region: RegionDocument, actorUuid: string): Promise<boolean> {
     if (user.isGM) return true;
-    if (region.getFlag('od6s', 'originalOwner') === user.id) return true;
-    const tokenId = region.getFlag('od6s', 'token') as string | undefined;
+    if (region.getFlag('nonex-ist-od6s', 'originalOwner') === user.id) return true;
+    const tokenId = region.getFlag('nonex-ist-od6s', 'token') as string | undefined;
     if (tokenId) {
         const token = canvas.scene?.tokens.get(tokenId);
         const tokenActor = token?.actor;
@@ -212,7 +212,7 @@ async function updateExplosiveRegion(userId: string, data: ExplosiveRegionPayloa
         return await region.update({ shapes: updatedShapes });
     } else if (data.operation === "setFlags") {
         for (const entry of data.flags) {
-            await region.setFlag('od6s', entry.flag, entry.value);
+            await region.setFlag('nonex-ist-od6s', entry.flag, entry.value);
         }
     }
 }
@@ -331,7 +331,7 @@ async function updateVehicle(userId: string, vehicleID: string, update: Record<s
 async function getVehicleFlag(vehicleID: string, flag: string) {
     const actor = await od6sutilities.getActorFromUuid(vehicleID);
     if (!actor) return;
-    return await actor.getFlag('od6s', flag);
+    return await actor.getFlag('nonex-ist-od6s', flag);
 }
 
 async function setVehicleFlag(userId: string, vehicleID: string, flag: string, value: unknown) {
@@ -342,7 +342,7 @@ async function setVehicleFlag(userId: string, vehicleID: string, flag: string, v
     if (!(await userMayMutateVehicle(user, actor))) {
         return denied('setVehicleFlag', userId, `not authorized for vehicle ${vehicleID}`);
     }
-    return await actor.setFlag('od6s', flag, value);
+    return await actor.setFlag('nonex-ist-od6s', flag, value);
 }
 
 async function unsetVehicleFlag(userId: string, vehicleID: string, flag: string) {
@@ -353,7 +353,7 @@ async function unsetVehicleFlag(userId: string, vehicleID: string, flag: string)
     if (!(await userMayMutateVehicle(user, actor))) {
         return denied('unsetVehicleFlag', userId, `not authorized for vehicle ${vehicleID}`);
     }
-    return await actor.unsetFlag('od6s', flag);
+    return await actor.unsetFlag('nonex-ist-od6s', flag);
 }
 
 export async function getActorFromUuid(uuid: any) {
@@ -362,10 +362,10 @@ export async function getActorFromUuid(uuid: any) {
 
 export async function promptResistanceRolls(msg: any) {
     if(game.user.isGM) return;
-    if (msg.getFlag('od6s','type') === 'damage' && OD6S.autoPromptPlayerResistance) {
-        const target = game.scenes.active.tokens.get(msg.getFlag('od6s', 'targetId'));
+    if (msg.getFlag('nonex-ist-od6s','type') === 'damage' && OD6S.autoPromptPlayerResistance) {
+        const target = game.scenes.active.tokens.get(msg.getFlag('nonex-ist-od6s', 'targetId'));
 
-        if (msg.getFlag('od6s', 'wild') && !msg.getFlag('od6s', 'wildHandled')) return;
+        if (msg.getFlag('nonex-ist-od6s', 'wild') && !msg.getFlag('nonex-ist-od6s', 'wildHandled')) return;
 
         if (typeof (target) !== 'undefined' && target) {
             if (isVehicleActor(target.actor)) {
@@ -379,7 +379,7 @@ export async function promptResistanceRolls(msg: any) {
 
 
             if (!game.user.isGM && target.actor.hasPlayerOwner && target.isOwner) {
-                const resistType = msg.getFlag('od6s', 'damageType') + 'r';
+                const resistType = msg.getFlag('nonex-ist-od6s', 'damageType') + 'r';
                 return target.actor.rollAction(resistType, msg);
             }
         }

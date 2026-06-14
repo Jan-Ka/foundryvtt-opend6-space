@@ -26,11 +26,11 @@ export function getTemplateFromMessage(message: ChatMessage): { actor: Actor | u
     } else {
         actor = game.actors.get(message.speaker.actor);
     }
-    const item = actor!.items.get(message.getFlag('od6s', 'itemId'));
+    const item = actor!.items.get(message.getFlag('nonex-ist-od6s', 'itemId'));
     // Region id stamped on the message at creation (roll-execute). Falls back
     // to the (deprecated) item flag for messages created before #40 landed.
-    const regionId = (message.getFlag('od6s', 'template') as string | undefined)
-        ?? (item?.getFlag('od6s', 'explosiveTemplate') as string | undefined);
+    const regionId = (message.getFlag('nonex-ist-od6s', 'template') as string | undefined)
+        ?? (item?.getFlag('nonex-ist-od6s', 'explosiveTemplate') as string | undefined);
     const template = regionId
         ? (canvas.scene.getEmbeddedDocument('Region', regionId) as RegionDocument | undefined) ?? null
         : null;
@@ -44,7 +44,7 @@ export function lookupAttributeKey(id: string): string | false {
     if (typeof(key) !== "undefined" && key !== null) {
         return key
     } else {
-        ui.notifications.warn(game.i18n.localize('OD6S.ATTRIBUTE_NOT_FOUND'));
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.ATTRIBUTE_NOT_FOUND'));
         return false;
     }
 }

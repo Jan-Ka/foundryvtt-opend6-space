@@ -13,106 +13,106 @@ import od6sMiscRulesConfiguration from "../../apps/config-miscrules";
 import od6sAttributesSortingConfiguration from "../../apps/config-attributes-sorting";
 
 export function registerMenuSettings() {
-    game.settings.registerMenu("od6s", "custom_labels_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_CUSTOM_LABELS"),
-        hint: game.i18n.localize("OD6S.CONFIG_CUSTOM_LABELS_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_CUSTOMIZE_LABELS"),
+    game.settings.registerMenu("nonex-ist-od6s", "custom_labels_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOM_LABELS"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOM_LABELS_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOMIZE_LABELS"),
         type: od6sCustomLabelsConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "custom_fields_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_CUSTOM_FIELDS"),
-        hint: game.i18n.localize("OD6S.CONFIG_CUSTOM_FIELDS_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_CUSTOM_FIELDS"),
+    game.settings.registerMenu("nonex-ist-od6s", "custom_fields_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOM_FIELDS"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOM_FIELDS_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOM_FIELDS"),
         type: od6sCustomFieldsConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "wild_die_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_WILD_DIE_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_WILD_DIE_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_WILD_DIE_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "wild_die_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_WILD_DIE_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_WILD_DIE_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_WILD_DIE_MENU_LABEL"),
         type: od6sWildDieConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "character_point_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_CHARACTER_POINT_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_CHARACTER_POINT_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_CHARACTER_POINT_MENU"),
+    game.settings.registerMenu("nonex-ist-od6s", "character_point_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CHARACTER_POINT_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CHARACTER_POINT_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CHARACTER_POINT_MENU"),
         type: od6sCharacterPointConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "deadliness_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_DEADLINESS_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_DEADLINESS_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_DEADLINESS_MENU"),
+    game.settings.registerMenu("nonex-ist-od6s", "deadliness_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_MENU"),
         type: od6sDeadlinessConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "reveal_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_REVEAL_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_REVEAL_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_REVEAL_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "reveal_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_REVEAL_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_REVEAL_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_REVEAL_MENU_LABEL"),
         type: od6sRevealConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "rules_options_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_RULES_OPTIONS_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_RULES_OPTIONS_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_RULES_OPTIONS_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "rules_options_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_RULES_OPTIONS_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_RULES_OPTIONS_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_RULES_OPTIONS_MENU_LABEL"),
         type: od6sRulesConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "initiative_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_INITIATIVE_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_INITIATIVE_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_INITIATIVE_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "initiative_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_INITIATIVE_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_INITIATIVE_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_INITIATIVE_MENU_LABEL"),
         type: od6sInitiativeConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "automation_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_AUTOMATION_OPTIONS_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_AUTOMATION_OPTIONS_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_AUTOMATION_OPTIONS_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "automation_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_AUTOMATION_OPTIONS_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_AUTOMATION_OPTIONS_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_AUTOMATION_OPTIONS_MENU_LABEL"),
         type: od6sAutomationConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "difficulty_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_DIFFICULTY_MENU"),
-        hint: game.i18n.localize("OD6S.CONFIG_DIFFICULTY_MENU_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_DIFFICULTY_MENU_LABEL"),
+    game.settings.registerMenu("nonex-ist-od6s", "difficulty_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DIFFICULTY_MENU"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DIFFICULTY_MENU_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_DIFFICULTY_MENU_LABEL"),
         type: od6sDifficultyConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu("od6s", "misc_menu", {
-        name: game.i18n.localize("OD6S.CONFIG_MISC_RULES"),
-        hint: game.i18n.localize("OD6S.CONFIG_MISC_RULES_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_CUSTOMIZE_MISC"),
+    game.settings.registerMenu("nonex-ist-od6s", "misc_menu", {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_MISC_RULES"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_MISC_RULES_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_CUSTOMIZE_MISC"),
         type: od6sMiscRulesConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu('od6s', 'active_attributes_menu', {
-        name: game.i18n.localize("OD6S.CONFIG_ACTIVE_ATTRIBUTES"),
-        hint: game.i18n.localize("OD6S.CONFIG_ACTIVE_ATTRIBUTES_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_ACTIVE_ATTRIBUTES_MENU"),
+    game.settings.registerMenu('nonex-ist-od6s', 'active_attributes_menu', {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ACTIVE_ATTRIBUTES"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ACTIVE_ATTRIBUTES_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ACTIVE_ATTRIBUTES_MENU"),
         type: od6sActiveAttributesConfiguration,
         restricted: true
     })
 
-    game.settings.registerMenu('od6s', 'attributes_sorting_menu', {
-        name: game.i18n.localize("OD6S.CONFIG_ATTRIBUTES_SORTING"),
-        hint: game.i18n.localize("OD6S.CONFIG_ATTRIBUTES_SORTING_DESCRIPTION"),
-        label: game.i18n.localize("OD6S.CONFIG_ATTRIBUTES_SORTING_MENU"),
+    game.settings.registerMenu('nonex-ist-od6s', 'attributes_sorting_menu', {
+        name: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ATTRIBUTES_SORTING"),
+        hint: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ATTRIBUTES_SORTING_DESCRIPTION"),
+        label: game.i18n.localize("NONEX_IST_OD6S.CONFIG_ATTRIBUTES_SORTING_MENU"),
         type: od6sAttributesSortingConfiguration,
         restricted: true
     })

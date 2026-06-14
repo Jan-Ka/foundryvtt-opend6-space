@@ -15,7 +15,7 @@ export class OD6SChat {
                         actor = game.actors.get(message!.speaker.actor);
                     }
 
-                    if (message!.getFlag('od6s', 'canUseCp') &&
+                    if (message!.getFlag('nonex-ist-od6s', 'canUseCp') &&
                         actor && (game.user.isGM || actor.isOwner) &&
                         isCharacterActor(actor) &&
                         (actor.type === "character" || actor.type === "npc") &&
@@ -29,7 +29,7 @@ export class OD6SChat {
 
         options.push(
             {
-                name: game.i18n.localize("OD6S.USE_A_CHARACTER_POINT"),
+                name: game.i18n.localize("NONEX_IST_OD6S.USE_A_CHARACTER_POINT"),
                 icon: '<i class="fas fa-user-plus"></i>',
                 condition: canApplyCharacterPoint,
                 callback: (li: any) => {

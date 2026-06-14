@@ -37,7 +37,7 @@ describe('deriveRollMode', () => {
             expect(deriveRollMode({
                 whisper: ['gm1'],
                 author: { id: 'gm1' },
-                flags: { od6s: { rollMode: 'gmroll' } },
+                flags: { "nonex-ist-od6s": { rollMode: 'gmroll' } },
             })).toBe('gm');
         });
 
@@ -45,7 +45,7 @@ describe('deriveRollMode', () => {
             expect(deriveRollMode({
                 whisper: ['gm1'],
                 author: { id: 'gm1' },
-                flags: { od6s: { rollMode: 'selfroll' } },
+                flags: { "nonex-ist-od6s": { rollMode: 'selfroll' } },
             })).toBe('self');
         });
 
@@ -53,7 +53,7 @@ describe('deriveRollMode', () => {
             expect(deriveRollMode({
                 whisper: ['gm1'],
                 author: { id: 'gm1' },
-                flags: { od6s: { rollMode: 'blindroll' } },
+                flags: { "nonex-ist-od6s": { rollMode: 'blindroll' } },
             })).toBe('blind');
         });
 
@@ -61,7 +61,7 @@ describe('deriveRollMode', () => {
             expect(deriveRollMode({
                 whisper: ['gm1'],
                 author: { id: 'u1' },
-                flags: { od6s: { rollMode: 'publicroll' } },
+                flags: { "nonex-ist-od6s": { rollMode: 'publicroll' } },
             })).toBe('public');
         });
 
@@ -69,7 +69,7 @@ describe('deriveRollMode', () => {
             expect(deriveRollMode({
                 whisper: [],
                 author: { id: 'u1' },
-                flags: { od6s: { rollMode: 'garbage' } },
+                flags: { "nonex-ist-od6s": { rollMode: 'garbage' } },
             })).toBe('public');
         });
     });

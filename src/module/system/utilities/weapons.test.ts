@@ -121,14 +121,14 @@ describe('getWeaponRange', () => {
         const actor = mockActor({ agi: { score: 9 }, str: { score: 12 } });
         const item = rangeItem('AGI', 'STR+2', 'AGI');
         await expect(getWeaponRange(actor, item)).resolves.toBe(false);
-        expect(warn).toHaveBeenCalledWith('OD6S.WARN_INVALID_RANGE_ATTRIBUTE');
+        expect(warn).toHaveBeenCalledWith('NONEX_IST_OD6S.WARN_INVALID_RANGE_ATTRIBUTE');
     });
 
     it('warns and returns false when range string contains no known attribute', async () => {
         const actor = mockActor({ agi: { score: 9 } });
         const item = rangeItem('XYZ+1', '10', '20');
         await expect(getWeaponRange(actor, item)).resolves.toBe(false);
-        expect(warn).toHaveBeenCalledWith('OD6S.WARN_INVALID_RANGE_ATTRIBUTE');
+        expect(warn).toHaveBeenCalledWith('NONEX_IST_OD6S.WARN_INVALID_RANGE_ATTRIBUTE');
     });
 
     it('uses Roll and posts a chat message when static_str_range is off', async () => {

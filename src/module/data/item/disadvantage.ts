@@ -8,7 +8,7 @@ export default class DisadvantageData extends foundry.abstract.TypeDataModel {
     return {
       ...baseSchema(),
       ...advantageFieldsSchema(),
-      label: new fields.StringField({ initial: "OD6S.CHAR_DISADVANTAGES" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_DISADVANTAGES" }),
     };
   }
 }

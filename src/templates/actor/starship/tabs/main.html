@@ -1,7 +1,7 @@
 <div class="tab main" data-group="primary" data-tab="main">
     <div class="row">
         <div class="column">
-            <h4 class="flex-group-center">{{localize 'OD6S.ATTRIBUTES'}}</h4>
+            <h4 class="flex-group-center">{{localize 'NONEX_IST_OD6S.ATTRIBUTES'}}</h4>
             <div class="grid grid-2col">
                 <div class="flexrow flex-group-left">
                     <div class="flexrow flex-group-left">
@@ -13,19 +13,18 @@
                     </div>
                 </div>
                 <div class="flexrow flex-group-left">
-                    <div class="flexrow flex-group-left edit-dodge{{#if actor.system.embedded_pilot.value}}
-                    attribute attributedialog rolldialog{{/if}}"
+                    <div class="flexrow flex-group-left edit-dodge{{#if actor.system.embedded_pilot.value}} attribute attributedialog rolldialog{{/if}}"
                         {{#if actor.system.embedded_pilot.value}}
                          data-subtype="vehicledodge"
                          data-type="dodge"
-                         data-label="{{localize 'OD6S.ACTION_VEHICLE_DODGE'}}"
+                         data-label="{{localize 'NONEX_IST_OD6S.ACTION_VEHICLE_DODGE'}}"
                          data-id="dodge"
                          data-token="{{actor.token.id}}"
                          data-score="{{getPilotManeuverTotal actor}}"
                         {{/if}}>
                         <label for="dodge"
                         >{{#if actor.system.embedded_pilot.value}}<b>{{/if}}
-                            {{ localize 'OD6S.DODGE' }}
+                            {{ localize 'NONEX_IST_OD6S.DODGE' }}
                             {{#if actor.system.embedded_pilot.value}}</b>{{/if}}
                             {{#if actor.system.embedded_pilot.value}}
                                 &nbsp(<b>{{diceFromScore (getPilotManeuverTotal actor)}}</b>D+<b>{{pipsFromScore
@@ -33,7 +32,7 @@
                             {{/if}}:</label>
                     </div>
                     <div>
-                        <input title="{{localize 'OD6S.DODGE'}}" name="system.dodge.score"
+                        <input title="{{localize 'NONEX_IST_OD6S.DODGE'}}" name="system.dodge.score"
                                value="{{actor.system.dodge.score}}"
                                placeholder="{{ actor.system.dodge.score }}"
                                id="actor.system.dodge.score"
@@ -46,7 +45,7 @@
                                for="actor.system.maneuverability.score"><b>{{localize
                                 actor.system.maneuverability.label}}</b>:</label>
                         <div class="edit-maneuverability">
-                            <input title="{{localize 'OD6S.CHAR_MANEUVERABILITY'}}"
+                            <input title="{{localize 'NONEX_IST_OD6S.CHAR_MANEUVERABILITY'}}"
                                    name="maneuverability-dice" type="number"
                                    id="maneuverability-dice"
                                    data-id="maneuverability-dice"
@@ -55,7 +54,7 @@
                                    data-type="Number"/></div>
                         D+
                         <div class="edit-maneuverability">
-                            <input title="{{localize 'OD6S.CHAR_MANEUVERABILITY'}}" name="maneuverability-pips"
+                            <input title="{{localize 'NONEX_IST_OD6S.CHAR_MANEUVERABILITY'}}" name="maneuverability-pips"
                                    type="number"
                                    id="maneuverability-pips"
                                    data-id="maneuverability-pips"
@@ -65,15 +64,13 @@
                         </div>
                     {{else}}
                         {{#if actor.system.embedded_pilot.value}}
-                            <div class="attribute attributedialog flex-group-center{{#if
-                                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div class="attribute attributedialog flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="maneuverability"
                                  data-score="{{getPilotManeuverTotal actor}}"
                                  data-label="{{localize actor.system.maneuverability.label}}">
                                 <b>{{ localize actor.system.maneuverability.label }}</b>
                             </div>
-                            <div class="flex-group-center{{#if
-                                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="maneuverability"
                                  data-score="{{getPilotManeuverTotal actor}}"
                                  data-label="{{localize actor.system.maneuverability.label}}">
@@ -81,15 +78,13 @@
                                     (getPilotManeuverTotal actor)}}</b>
                             </div>
                         {{else}}
-                            <div class="attribute attributedialog flex-group-center{{#if
-                                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div class="attribute attributedialog flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="maneuverability"
                                  data-score="{{actor.system.maneuverability.score}}"
                                  data-label="{{localize actor.system.maneuverability.label}}">
                                 <b>{{ localize actor.system.maneuverability.label }}</b>
                             </div>
-                            <div class="flex-group-center{{#if
-                                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="maneuverability"
                                  data-score="{{actor.system.maneuverability.score}}"
                                  data-label="{{localize actor.system.maneuverability.label}}">
@@ -100,8 +95,7 @@
                     {{/if}}
                 </div>
                 <div class="flexrow flex-group-left">
-                    <div class="attribute flexrow flex-group-left {{#if
-                            (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                    <div class="attribute flexrow flex-group-left {{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                          title="{{getToughnessName actor.type}}"
                          data-type="vehicletoughness"
                          data-score="{{add actor.system.toughness.score actor.system.armor.score}}"
@@ -119,12 +113,12 @@
                 </div>
             </div>
             {{#if (gt actor.system.shields.value 0)}}
-                <h4 class="flexrow flex-group-center">{{localize 'OD6S.SHIELDS'}}:
-                    <div class="flex-group-center">{{ localize 'OD6S.TOTAL' }}: <b>{{diceFromScore
+                <h4 class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.SHIELDS'}}:
+                    <div class="flex-group-center">{{ localize 'NONEX_IST_OD6S.TOTAL' }}: <b>{{diceFromScore
                             actor.system.shields.value}}</b>D+<b>{{pipsFromScore
                             actor.system.shields.value}}</b></div>
                     <div class="flex-group-center">
-                        {{ localize 'OD6S.ALLOCATED'}}:
+                        {{ localize 'NONEX_IST_OD6S.ALLOCATED'}}:
                         <b>{{diceFromScore actor.system.shields.allocated}}</b>D+<b>{{pipsFromScore
                             actor.system.shields.allocated}}</b></div>
                 </h4>
@@ -133,9 +127,8 @@
                         <div class="grid grid-shields">
                             <div class="flexrow flex-group-left">{{localize
                                     actor.system.shields.arcs.front.label}}</div>
-                            <div title="{{localize 'OD6S.ALLOCATED'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="shields"
                                  data-score="{{actor.system.shields.arcs.front.value}}"
                                  data-label="{{localize actor.system.shields.arcs.front.label}} {{localize
@@ -143,9 +136,8 @@
                                 <b>{{diceFromScore actor.system.shields.arcs.front.value}}
                                 </b>D+<b>{{pipsFromScore actor.system.shields.arcs.front.value}}</b>
                             </div>
-                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="vehicletoughness"
                                  data-score="{{add actor.system.shields.arcs.front.value actor.system.toughness.score
                                                    actor.system.armor.score}}"
@@ -166,9 +158,8 @@
                         </div>
                         <div class="grid grid-shields">
                             <div class="flexrow flex-group-left">{{localize actor.system.shields.arcs.left.label}}</div>
-                            <div title="{{localize 'OD6S.ALLOCATED'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="shields"
                                  data-score="{{actor.system.shields.arcs.left.value}}"
                                  data-label="{{localize actor.system.shields.arcs.left.label}} {{localize
@@ -176,9 +167,8 @@
                                 <b>{{diceFromScore actor.system.shields.arcs.left.value}}
                                 </b>D+<b>{{pipsFromScore actor.system.shields.arcs.left.value}}</b>
                             </div>
-                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="vehicletoughness"
                                  data-score="{{add actor.system.shields.arcs.left.value actor.system.toughness.score
                                                    actor.system.armor.score}}"
@@ -201,9 +191,8 @@
                     <div class="column">
                         <div class="grid grid-shields">
                             <div class="flexrow flex-group-left">{{localize actor.system.shields.arcs.rear.label}}</div>
-                            <div title="{{localize 'OD6S.ALLOCATED'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="shields"
                                  data-score="{{actor.system.shields.arcs.rear.value}}"
                                  data-label="{{localize actor.system.shields.arcs.rear.label}} {{localize
@@ -211,9 +200,8 @@
                                 <b>{{diceFromScore actor.system.shields.arcs.rear.value}}
                                 </b>D+<b>{{pipsFromScore actor.system.shields.arcs.rear.value}}</b>
                             </div>
-                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="vehicletoughness"
                                  data-score="{{add actor.system.shields.arcs.rear.value actor.system.toughness.score
                                                    actor.system.armor.score}}"
@@ -235,9 +223,8 @@
                         <div class="grid grid-shields">
                             <div class="flexrow flex-group-left">{{localize
                                     actor.system.shields.arcs.right.label}}</div>
-                            <div title="{{localize 'OD6S.ALLOCATED'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.ALLOCATED'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="shields"
                                  data-score="{{actor.system.shields.arcs.right.value}}"
                                  data-label="{{localize actor.system.shields.arcs.right.label}} {{localize
@@ -245,9 +232,8 @@
                                 <b>{{diceFromScore actor.system.shields.arcs.right.value}}
                                 </b>D+<b>{{pipsFromScore actor.system.shields.arcs.right.value}}</b>
                             </div>
-                            <div title="{{localize 'OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
-                                 class="flex-group-center{{#if
-                                         (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div title="{{localize 'NONEX_IST_OD6S.TOTAL'}} {{getToughnessName 'starship'}}"
+                                 class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-type="vehicletoughness"
                                  data-score="{{add actor.system.shields.arcs.right.value actor.system.toughness.score
                                                    actor.system.armor.score}}"
@@ -272,19 +258,18 @@
             {{#if (getSensorsConfig)}}
                 {{#if actor.system.sensors.value }}
                     <div class="flexrow flex-group-center">
-                        {{ localize 'OD6S.SENSORS' }}
+                        {{ localize 'NONEX_IST_OD6S.SENSORS' }}
                     </div>
                     <div class="grid grid-2col">
                         {{#each actor.system.sensors.types as |sensortype key|}}
                             <div class="flexrow flex-group-center">
                                 {{localize sensortype.label}}:
-                                <div title="{{localize 'OD6S.RANGE'}}">{{sensortype.range}}</div>
-                                <div title="{{localize 'OD6S.SCORE'}}"
-                                     class="flex-group-center{{#if
-                                             (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                <div title="{{localize 'NONEX_IST_OD6S.RANGE'}}">{{sensortype.range}}</div>
+                                <div title="{{localize 'NONEX_IST_OD6S.SCORE'}}"
+                                     class="flex-group-center{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                      data-type="sensors"
                                      data-score="{{getPilotSensorsTotal ../this.actor key}}"
-                                     data-label="{{localize 'OD6S.SENSORS'}} {{localize sensortype.label}}">
+                                     data-label="{{localize 'NONEX_IST_OD6S.SENSORS'}} {{localize sensortype.label}}">
                                     {{#if ../actor.system.embedded_pilot.value}}
                                         <b>{{diceFromScore (getPilotSensorsTotal ../this.actor key)}}</b>D+
                                         <b>{{pipsFromScore (getPilotSensorsTotal ../this.actor key)}}</b>
@@ -302,9 +287,9 @@
         <div class="column">
             {{#if actor.system.embedded_pilot.value}}
                 <div class="grid title-add-grid">
-                    <div class="flexrow flex-group-center">{{localize 'OD6S.EMBEDDED_PILOT'}}</div>
+                    <div class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.EMBEDDED_PILOT'}}</div>
                     <div class="flexrow flex-group-center item-controls">
-                        <a class="embedded-pilot-add" title="{{localize 'OD6S.ADD_EMBEDDED_PILOT'}}"
+                        <a class="embedded-pilot-add" title="{{localize 'NONEX_IST_OD6S.ADD_EMBEDDED_PILOT'}}"
                            data-type="embedded-pilot">
                             <i class="fas fa-plus"></i></a>
                     </div>
@@ -314,7 +299,7 @@
                         <div class="grid title-add-grid">
                             <div class="flexrow flex-group-center">{{actor.system.embedded_pilot.actor.name}}</div>
                             <div class="flexrow flex-group-center item-controls">
-                                <a class="embedded-pilot-remove" title="{{localize 'OD6S.REMOVE_EMBEDDED_PILOT'}}"
+                                <a class="embedded-pilot-remove" title="{{localize 'NONEX_IST_OD6S.REMOVE_EMBEDDED_PILOT'}}"
                                    data-type="embeddedpilotremove">
                                     <i class="fas fa-trash"></i></a>
                             </div>
@@ -322,7 +307,7 @@
                         <ul class="attribute-list">
                             {{#each actor.system.attributes as |attribute key|}}
                                 {{#if attribute.active }}
-                                    {{> systems/od6s/templates/actor/common/tabs/attribute-column.html
+                                    {{> systems/nonex-ist-od6s/templates/actor/common/tabs/attribute-column.html
                                            actor=../actor key=key attribute=attribute system=../system}}
                                 {{/if }}
                             {{/each}}
@@ -331,9 +316,9 @@
                 {{/if}}
             {{else}}
                 <div class="grid title-add-grid">
-                    <div class="flexrow flex-group-center">{{localize 'OD6S.CREW'}}</div>
+                    <div class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.CREW'}}</div>
                     <div class="flexrow flex-group-center item-controls">
-                        <a class="crew-add" title="{{localize 'OD6S.ADD_CREW'}}" data-type="crewmember">
+                        <a class="crew-add" title="{{localize 'NONEX_IST_OD6S.ADD_CREW'}}" data-type="crewmember">
                             <i class="fas fa-plus"></i></a>
                     </div>
                 </div>
@@ -351,7 +336,7 @@
                                            data-vehicleId="{{../actor.uuid}}"
                                            data-type="weapon"
                                            class="item-control crew-delete small-font"
-                                           title="{{localize 'OD6S.REMOVE_CREW'}}">
+                                           title="{{localize 'NONEX_IST_OD6S.REMOVE_CREW'}}">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -364,9 +349,9 @@
         </div>
     </div>
     <div class="grid title-add-grid">
-        <div class="flexrow flex-group-center">{{localize 'OD6S.WEAPONS'}}</div>
+        <div class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.WEAPONS'}}</div>
         <div class="flexrow flex-group-center item-controls">
-            <a class="item-control item-create" title="{{localize 'OD6S.ADD_STARSHIP_WEAPON'}}"
+            <a class="item-control item-create" title="{{localize 'NONEX_IST_OD6S.ADD_STARSHIP_WEAPON'}}"
                data-type="starship-weapon">
                 <i class="fas fa-plus"></i></a>
         </div>
@@ -379,12 +364,10 @@
                         <div class="equip-checkbox" data-item-id="{{weapon ._id}}">
                             <input type="checkbox" name="weapon actor.system.equipped.value"
                                    id="weapon actor.system.equipped.value" data-dtype="Boolean"
-                                   title="{{localize 'OD6S.EQUIPPED'}}"
+                                   title="{{localize 'NONEX_IST_OD6S.EQUIPPED'}}"
                                 {{#if weapon.system.equipped.value}}checked{{/if}}>
                         </div>
-                        <div class="flexrow flex-group-left{{#if
-                                ../actor.system.embedded_pilot.value}} actionroll{{/if}}
-                            {{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
+                        <div class="flexrow flex-group-left{{#if ../actor.system.embedded_pilot.value}} actionroll{{/if}} {{#if (gt weapon.system.damaged 0)}} damaged{{/if}}"
                              title="{{weapon.description}}"
                             {{#if ../actor.system.embedded_pilot.value}}
                              data-type="rangedattack"
@@ -397,23 +380,23 @@
                             {{#if ../actor.system.embedded_pilot.value}}
                                 <b>&nbsp;{{getPilotWeaponTotal ../actor weapon}}</b>{{/if}}</div>
                         <div class="flexrow flex-group-left"
-                             title="{{localize 'OD6S.ARC'}}">
+                             title="{{localize 'NONEX_IST_OD6S.ARC'}}">
                             {{localize weapon.system.arc.value}}</div>
                         <div class="flexrow flex-group-center"
-                             title="{{localize 'OD6S.RANGE'}}">
+                             title="{{localize 'NONEX_IST_OD6S.RANGE'}}">
                             {{weapon.system.range.short}}/{{weapon.system.range.medium}}
                             /{{weapon.system.range.long}}</div>
                         <div class="flexrow flex-group-center rolldialog"
-                             title="{{localize 'OD6S.DAMAGE'}}"
+                             title="{{localize 'NONEX_IST_OD6S.DAMAGE'}}"
                              data-score="{{weapon.system.damage.score}}"
-                             data-label="{{weapon.name}}: {{localize 'OD6S.DAMAGE'}}"
+                             data-label="{{weapon.name}}: {{localize 'NONEX_IST_OD6S.DAMAGE'}}"
                              data-type="damage"
                              data-dtype="{{ weapon.system.damage.type }}"
                              data-item-id="{{weapon._id}}">
                             <b>{{diceFromScore weapon.system.damage.score}}D+{{pipsFromScore
                                     weapon.system.damage.score}}</b>
                         </div>
-                        <div class="flexrow flex-group-center" title="{{localize 'OD6S.FIRE_CONTROL'}}">
+                        <div class="flexrow flex-group-center" title="{{localize 'NONEX_IST_OD6S.FIRE_CONTROL'}}">
                             {{diceFromScore weapon.system.fire_control.score}}D+{{pipsFromScore
                                 weapon.system.fire_control.score}}</div>
                         <div class="item-controls flexrow flex-group-center"
@@ -437,9 +420,9 @@
     </div>
     <br>
     <div class="grid title-add-grid">
-        <div class="flexrow flex-group-center">{{localize 'OD6S.GEAR'}}</div>
+        <div class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.GEAR'}}</div>
         <div class="flexrow flex-group-center item-controls">
-            <a class="item-control item-create" title="{{localize 'OD6S.ADD_GEAR'}}"
+            <a class="item-control item-create" title="{{localize 'NONEX_IST_OD6S.ADD_GEAR'}}"
                data-type="starship-gear">
                 <i class="fas fa-plus"></i></a>
         </div>
@@ -453,10 +436,10 @@
                             <div class="equip-checkbox" data-item-id="{{item._id}}">
                                 <input type="checkbox" name="system.equipped.value"
                                        id="item.system.equipped.value" data-dtype="Boolean"
-                                       title="{{localize 'OD6S.EQUIPPED'}}"
+                                       title="{{localize 'NONEX_IST_OD6S.EQUIPPED'}}"
                                     {{#if item.system.equipped.value}}checked{{/if}}>
                             </div>
-                            <div class="edit-quantity" title="{{localize 'OD6S.QUANTITY'}}"
+                            <div class="edit-quantity" title="{{localize 'NONEX_IST_OD6S.QUANTITY'}}"
                                  data-item-id="{{item._id}}">
                                 <input type="number" name="system.quantity"
                                        id="actor.system.quantity" data-dtype="Number"
@@ -468,13 +451,13 @@
                                  data-item-id="{{item._id}}"
                                  data-type="item">
                                 <a class="item-control item-edit small-font" data-item-id="{{item._id}}"
-                                   title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a data-item-id="{{item._id}}"
                                    data-type="item"
                                    class="item-control item-delete small-font"
-                                   title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>

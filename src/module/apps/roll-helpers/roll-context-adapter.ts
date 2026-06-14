@@ -23,7 +23,7 @@ import type { Localize } from './roll-data';
 
 /**
  * Settings values the rules pipeline depends on. The orchestrator reads
- * these from `game.settings` / `OD6S.*` once and hands them in as a plain
+ * these from `game.settings` / `NONEX_IST_OD6S.*` once and hands them in as a plain
  * object so the adapter (and finalize) stay testable.
  */
 export interface RollSettingsRaw {

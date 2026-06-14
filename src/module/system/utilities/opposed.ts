@@ -33,25 +33,25 @@ export function getOpposedQueueEntry(index: number) { return opposedQueue[index]
 export function setOpposedQueueEntry(index: number, entry: {messageId: string}) { opposedQueue[index] = entry; }
 
 export async function autoOpposeRoll(msg: ChatMessage): Promise<void> {
-    if (msg.getFlag('od6s','opposedRollDone')) return;
-    if (game.settings.get('od6s', 'use_wild_die')
-        && msg.getFlag('od6s', 'wild') && !msg.getFlag('od6s', 'wildHandled')) return;
-    const token = game.scenes!.active!.tokens.get(msg.getFlag('od6s', 'targetId'))
+    if (msg.getFlag('nonex-ist-od6s','opposedRollDone')) return;
+    if (game.settings.get('nonex-ist-od6s', 'use_wild_die')
+        && msg.getFlag('nonex-ist-od6s', 'wild') && !msg.getFlag('nonex-ist-od6s', 'wildHandled')) return;
+    const token = game.scenes!.active!.tokens.get(msg.getFlag('nonex-ist-od6s', 'targetId'))
     if (typeof (token) !== 'undefined') {
-        await msg.setFlag('od6s','opposedRollDone', true)
+        await msg.setFlag('nonex-ist-od6s','opposedRollDone', true)
         await generateOpposedRoll(token, msg);
     }
     if (!isOpposedQueueEmpty()) {
-        if (msg.getFlag('od6s', 'type') === 'damage'||msg.getFlag('od6s', 'type') === 'explosive') {
+        if (msg.getFlag('nonex-ist-od6s', 'type') === 'damage'||msg.getFlag('nonex-ist-od6s', 'type') === 'explosive') {
             // Shouldn't be here, damage needs to come before resistance.
             clearOpposedQueue();
             pushOpposedQueue({ messageId: msg.id });
-        } else if (msg.getFlag('od6s', 'type') === 'resistance') {
+        } else if (msg.getFlag('nonex-ist-od6s', 'type') === 'resistance') {
             pushOpposedQueue({ messageId: msg.id });
             return await handleOpposedRoll();
         }
     } else {
-        if (msg.getFlag('od6s', 'type') === 'damage'||msg.getFlag('od6s', 'type') === 'explosive') {
+        if (msg.getFlag('nonex-ist-od6s', 'type') === 'damage'||msg.getFlag('nonex-ist-od6s', 'type') === 'explosive') {
             pushOpposedQueue({ messageId: msg.id });
         } else {
             clearOpposedQueue();
@@ -70,24 +70,24 @@ export async function handleOpposedRoll(): Promise<void> {
         content?: string;
         flavor?: string;
         stun?: unknown;
-        flags: { od6s?: Record<string, unknown> };
+        flags: { "nonex-ist-od6s"?: Record<string, unknown> };
     } = { flags: {} };
     let collision: boolean | string;
     let passengerDamage = '';
     const message1 = (await game.messages.get(getOpposedQueueEntry(0).messageId))!;
     const message2 = (await game.messages.get(getOpposedQueueEntry(1).messageId))!;
-    const messageType1 = message1.getFlag('od6s', 'type');
-    const messageType2 = message2.getFlag('od6s', 'type');
+    const messageType1 = message1.getFlag('nonex-ist-od6s', 'type');
+    const messageType2 = message2.getFlag('nonex-ist-od6s', 'type');
     clearOpposedQueue();
 
-    if (((messageType1 === 'damage' || messageType1 === 'explosive') && message2!.getFlag('od6s', 'type') === 'resistance') ||
+    if (((messageType1 === 'damage' || messageType1 === 'explosive') && message2!.getFlag('nonex-ist-od6s', 'type') === 'resistance') ||
         (messageType1) === 'resistance' && (messageType2 === 'damage' || messageType2 === 'explosive')) {
         type = "damageresult";
     } else {
         type = "opposedcheck";
     }
 
-    collision = (message1!.getFlag('od6s', 'isVehicleCollision') || message2!.getFlag('od6s', 'isVehicleCollision'))
+    collision = (message1!.getFlag('nonex-ist-od6s', 'isVehicleCollision') || message2!.getFlag('nonex-ist-od6s', 'isVehicleCollision'))
     collision = (collision === 'true');
 
     if (typeof (game.actors.get(message1!.speaker.actor)) !== "undefined") {
@@ -105,21 +105,21 @@ export async function handleOpposedRoll(): Promise<void> {
     message1!.flavorName = message1!.alias;
     message2!.flavorName = message2!.alias;
 
-    if (message1!.getFlag('od6s', 'vehicle')) {
+    if (message1!.getFlag('nonex-ist-od6s', 'vehicle')) {
         message1!.actorType = "vehicle";
-        const vehicleActor = await getActorFromUuid(message1!.getFlag('od6s', 'vehicle'));
+        const vehicleActor = await getActorFromUuid(message1!.getFlag('nonex-ist-od6s', 'vehicle'));
         message1!.flavorName = vehicleActor!.name;
     }
-    if (message2!.getFlag('od6s', 'vehicle')) {
+    if (message2!.getFlag('nonex-ist-od6s', 'vehicle')) {
         message2!.actorType = "vehicle";
-        const vehicleActor = await getActorFromUuid(message2!.getFlag('od6s', 'vehicle'));
+        const vehicleActor = await getActorFromUuid(message2!.getFlag('nonex-ist-od6s', 'vehicle'));
         message2!.flavorName = vehicleActor!.name;
     }
 
     if(messageType1 === 'explosive' || messageType2 === 'explosive') {
         if (messageType1 === 'explosive') {
             const targetId = message2!.speaker.token;
-            const damage = message1!.getFlag('od6s', 'targets').find((t: { id: string; damage: number }) => t.id === targetId).damage;
+            const damage = message1!.getFlag('nonex-ist-od6s', 'targets').find((t: { id: string; damage: number }) => t.id === targetId).damage;
             const resistance = message2!.rolls[0].total;
             if (damage > resistance) {
                 winner = message1;
@@ -130,7 +130,7 @@ export async function handleOpposedRoll(): Promise<void> {
             }
         } else {
             const targetId = message1!.speaker.token !== null ? message1!.speaker.token : message1!.speaker.actor;
-            const damage = message2!.getFlag('od6s', 'targets').find((t: { id: string; damage: number }) =>t.id === targetId).damage;
+            const damage = message2!.getFlag('nonex-ist-od6s', 'targets').find((t: { id: string; damage: number }) =>t.id === targetId).damage;
             const resistance = message1!.rolls[0].total;
             if (damage > resistance) {
                 winner = message2;
@@ -150,7 +150,7 @@ export async function handleOpposedRoll(): Promise<void> {
         }
     }
 
-    const stun = await message1!.getFlag('od6s', 'stun') || await message2!.getFlag('od6s', 'stun');
+    const stun = await message1!.getFlag('nonex-ist-od6s', 'stun') || await message2!.getFlag('nonex-ist-od6s', 'stun');
     let stunEffect = 'unconscious';
 
     const diff = (+winner.rolls[0].total) - (+loser.rolls[0].total);
@@ -158,16 +158,16 @@ export async function handleOpposedRoll(): Promise<void> {
     if (type === "damageresult") {
 
         if (loser.actorType === "vehicle" || loser.actorType === "starship") {
-            damageFlavor = game.i18n.localize('OD6S.DAMAGES');
+            damageFlavor = game.i18n.localize('NONEX_IST_OD6S.DAMAGES');
         } else {
             if (boolCheck(data.stun)) {
-                damageFlavor = game.i18n.localize('OD6S.STUNS');
+                damageFlavor = game.i18n.localize('NONEX_IST_OD6S.STUNS');
             } else {
-                damageFlavor = game.i18n.localize("OD6S.INJURES");
+                damageFlavor = game.i18n.localize("NONEX_IST_OD6S.INJURES");
             }
         }
 
-        if (winner.getFlag('od6s', 'type') === "damage" || winner.getFlag('od6s', 'type') === 'explosive') {
+        if (winner.getFlag('nonex-ist-od6s', 'type') === "damage" || winner.getFlag('nonex-ist-od6s', 'type') === 'explosive') {
             if (boolCheck(stun)) {
                 data.content = winner.alias + " " + damageFlavor + " " + loser.flavorName;
                 stunned = true;
@@ -184,17 +184,17 @@ export async function handleOpposedRoll(): Promise<void> {
                 if (stunEffect === 'unconscious') {
                     if (OD6S.stunDice) {
                         const roll = await new Roll("2d6").evaluate();
-                        result = loser.flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
-                            roll.total + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
+                        result = loser.flavorName + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_01') +
+                            roll.total + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_02');
                     } else {
-                        result = loser.flavorName + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_01') +
-                            diff + game.i18n.localize('OD6S.CHAT_UNCONSCIOUS_02');
+                        result = loser.flavorName + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_01') +
+                            diff + game.i18n.localize('NONEX_IST_OD6S.CHAT_UNCONSCIOUS_02');
                     }
                 } else {
                     if (stunEffect === '-2D') {
-                        result = game.i18n.localize('OD6S.WOUNDS_STUNNED') + " " + stunEffect;
+                        result = game.i18n.localize('NONEX_IST_OD6S.WOUNDS_STUNNED') + " " + stunEffect;
                     } else if (stunEffect === '-1D') {
-                        result = game.i18n.localize('OD6S.WOUNDS_STUNNED') + " " + stunEffect;
+                        result = game.i18n.localize('NONEX_IST_OD6S.WOUNDS_STUNNED') + " " + stunEffect;
                     }
                 }
             } else {
@@ -206,29 +206,29 @@ export async function handleOpposedRoll(): Promise<void> {
                 }
             }
         } else {
-            data.content = winner.alias + " " + game.i18n.localize("OD6S.RESISTS") + " " + loser.alias;
+            data.content = winner.alias + " " + game.i18n.localize("NONEX_IST_OD6S.RESISTS") + " " + loser.alias;
             if (winner.actorType === "vehicle" || winner.actorType === "starship") {
-                result = 'OD6S.NO_DAMAGE';
+                result = 'NONEX_IST_OD6S.NO_DAMAGE';
             } else {
                 if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
                     result = 0;
                 } else {
-                    result = 'OD6S.NO_INJURY';
+                    result = 'NONEX_IST_OD6S.NO_INJURY';
                 }
             }
         }
     } else {
-        data.flavor = message1!.alias + " " + game.i18n.localize("OD6S.VS") + " " + message2!.alias;
-        data.content = winner.alias + " " + game.i18n.localize("OD6S.WINS");
+        data.flavor = message1!.alias + " " + game.i18n.localize("NONEX_IST_OD6S.VS") + " " + message2!.alias;
+        data.content = winner.alias + " " + game.i18n.localize("NONEX_IST_OD6S.WINS");
     }
 
     let loserId: string | Actor | undefined = loser.speaker.token;
     if (loser.actorType === "vehicle" || loser.actorType === "starship") {
-        const token = await getTokenFromUuid(loser.getFlag('od6s','vehicle'));
+        const token = await getTokenFromUuid(loser.getFlag('nonex-ist-od6s','vehicle'));
         if (typeof (token) !== 'undefined') {
             loserId = token.id;
         } else {
-            loserId = await getActorFromUuid(loser.getFlag('od6s', 'vehicle'));
+            loserId = await getActorFromUuid(loser.getFlag('nonex-ist-od6s', 'vehicle'));
         }
         if (OD6S.passengerDamageDice) {
             passengerDamage = OD6S.vehicle_damage[result].passenger_damage_dice + "D";
@@ -240,11 +240,11 @@ export async function handleOpposedRoll(): Promise<void> {
     let apply = false;
     if (OD6S.woundConfig > 0 && loser.actorType !== 'vehicle' && loser.actorType !== 'starship') {
         if ((+result) > 0 || stunned) apply = true;
-    } else if (result !== 'OD6S.NO_INJURY' && result !== 'OD6S.NO_DAMAGE') {
+    } else if (result !== 'NONEX_IST_OD6S.NO_INJURY' && result !== 'NONEX_IST_OD6S.NO_DAMAGE') {
         apply = true;
     }
 
-    data.flags.od6s = {
+    data.flags["nonex-ist-od6s"] = {
         "isOpposed": true,
         "type": type,
         "isVisible": false,
@@ -263,8 +263,8 @@ export async function handleOpposedRoll(): Promise<void> {
 
 export async function generateOpposedRoll(token: TokenDocument, msg: ChatMessage): Promise<void> {
     if (!token.actor.hasPlayerOwner) {
-        if (msg.getFlag('od6s', 'type') === 'damage' || msg.getFlag('od6s','type') === 'explosive') {
-            const type = msg.getFlag('od6s', 'damageType');
+        if (msg.getFlag('nonex-ist-od6s', 'type') === 'damage' || msg.getFlag('nonex-ist-od6s','type') === 'explosive') {
+            const type = msg.getFlag('nonex-ist-od6s', 'damageType');
             if (isVehicleActor(token.actor)) {
                 const sys = token.actor.system;
                 if (sys.embedded_pilot.value || sys.crewmembers.length < 1) {

@@ -95,8 +95,8 @@ describe('computeStunFlags', () => {
 
 describe('buildDamagedWeaponModifier', () => {
     const table: Record<number, WeaponDamageEntry> = {
-        1: { penalty: 1, label: 'OD6S.WEAPON_DAMAGED_LIGHT' },
-        2: { penalty: 3, label: 'OD6S.WEAPON_DAMAGED_HEAVY' },
+        1: { penalty: 1, label: 'NONEX_IST_OD6S.WEAPON_DAMAGED_LIGHT' },
+        2: { penalty: 3, label: 'NONEX_IST_OD6S.WEAPON_DAMAGED_HEAVY' },
     };
 
     it('returns null when undamaged', () => {
@@ -109,10 +109,10 @@ describe('buildDamagedWeaponModifier', () => {
 
     it('returns negated penalty as the modifier value', () => {
         expect(buildDamagedWeaponModifier(1, table)).toEqual({
-            name: 'OD6S.WEAPON_DAMAGED', value: -1, level: 'OD6S.WEAPON_DAMAGED_LIGHT',
+            name: 'NONEX_IST_OD6S.WEAPON_DAMAGED', value: -1, level: 'NONEX_IST_OD6S.WEAPON_DAMAGED_LIGHT',
         });
         expect(buildDamagedWeaponModifier(2, table)).toEqual({
-            name: 'OD6S.WEAPON_DAMAGED', value: -3, level: 'OD6S.WEAPON_DAMAGED_HEAVY',
+            name: 'NONEX_IST_OD6S.WEAPON_DAMAGED', value: -3, level: 'NONEX_IST_OD6S.WEAPON_DAMAGED_HEAVY',
         });
     });
 });
@@ -120,7 +120,7 @@ describe('buildDamagedWeaponModifier', () => {
 describe('buildStrengthDamageModifier', () => {
     it('produces a modifier carrying the strength damage score', () => {
         expect(buildStrengthDamageModifier(5)).toEqual({
-            name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 5,
+            name: 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS', value: 5,
         });
     });
 });
@@ -136,7 +136,7 @@ describe('ramAttackContribution', () => {
     it('emits the ram-damage modifier when ram_damage > 0', () => {
         expect(ramAttackContribution(0, 4)).toEqual({
             bonusModIncrement: 0,
-            modifier: { name: 'OD6S.ACTIVE_EFFECTS', value: 4 },
+            modifier: { name: 'NONEX_IST_OD6S.ACTIVE_EFFECTS', value: 4 },
         });
     });
 
@@ -150,7 +150,7 @@ describe('ramAttackContribution', () => {
     it('emits both when both are > 0', () => {
         expect(ramAttackContribution(3, 4)).toEqual({
             bonusModIncrement: 3,
-            modifier: { name: 'OD6S.ACTIVE_EFFECTS', value: 4 },
+            modifier: { name: 'NONEX_IST_OD6S.ACTIVE_EFFECTS', value: 4 },
         });
     });
 });

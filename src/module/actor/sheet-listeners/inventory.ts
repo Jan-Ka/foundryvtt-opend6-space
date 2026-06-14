@@ -177,7 +177,7 @@ export function registerInventoryListeners(
     root.querySelectorAll<HTMLElement>('.item-purchase').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             if (typeof game.user.character === 'undefined') {
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NO_CHARACTER_ASSIGNED'));
                 return;
             }
             const ct = ev.currentTarget as HTMLElement;
@@ -192,7 +192,7 @@ export function registerInventoryListeners(
     root.querySelectorAll<HTMLElement>('.item-transfer').forEach((elem) =>
         elem.addEventListener('click', async (ev: Event) => {
             if (typeof game.user.character === 'undefined') {
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_CHARACTER_ASSIGNED'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NO_CHARACTER_ASSIGNED'));
                 return;
             }
             const ct = ev.currentTarget as HTMLElement;

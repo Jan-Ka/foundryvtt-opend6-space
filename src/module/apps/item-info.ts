@@ -12,11 +12,11 @@ export default class OD6SItemInfo extends HandlebarsApplicationMixin(Application
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-item-info",
-        classes: ["od6s", "bordered", "boxed", "item-info-ok-button", "align-form-header", "align-center-header"],
+        id: "nonex-ist-od6s-item-info",
+        classes: ["nonex-ist-od6s", "bordered", "boxed", "item-info-ok-button", "align-form-header", "align-center-header"],
         tag: "div",
         window: {
-            title: "OD6S.ITEM_INFO",
+            title: "NONEX_IST_OD6S.ITEM_INFO",
             resizable: true,
             minimizable: true,
         },
@@ -28,7 +28,7 @@ export default class OD6SItemInfo extends HandlebarsApplicationMixin(Application
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/item/item-info.html",
+            template: "systems/nonex-ist-od6s/templates/item/item-info.html",
         },
     };
 

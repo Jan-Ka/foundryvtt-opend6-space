@@ -54,7 +54,7 @@ const SELECTORS = {
 };
 
 export interface EnsureWorldOptions {
-    /** World id (folder name) we expect — defaults to FOUNDRY_SMOKE_WORLD or `od6s-smoke`. */
+    /** World id (folder name) we expect — defaults to FOUNDRY_SMOKE_WORLD or `nonex-ist-od6s-smoke`. */
     worldId: string;
     /** System id to use when creating the world from scratch. */
     system: string;
@@ -306,8 +306,8 @@ async function createWorld(page: Page, opts: EnsureWorldOptions): Promise<void> 
     await page.locator(SELECTORS.setup.worldTitleInput).first().fill(opts.worldId);
 
     const systemSelect = page.locator(SELECTORS.setup.worldSystemSelect).first();
-    // Two value formats Foundry has used: bare id ("od6s") or package id
-    // ("od6s.od6s"). Try the bare id first; fall back to label match.
+    // Two value formats Foundry has used: bare id ("nonex-ist-od6s") or package id
+    // ("nonex-ist-od6s.od6s"). Try the bare id first; fall back to label match.
     try {
         await systemSelect.selectOption({value: opts.system});
     } catch {

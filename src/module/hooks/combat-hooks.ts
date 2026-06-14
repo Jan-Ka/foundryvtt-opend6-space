@@ -44,7 +44,7 @@ export function registerCombatHooks() {
         if (Combat.combatant?.actor) {
             if (game.user.isGM) {
 
-                if (!game.settings.get('od6s', 'reaction_skills')) {
+                if (!game.settings.get('nonex-ist-od6s', 'reaction_skills')) {
                     const update: any = {};
                     update.id = Combat.combatant.actor.id;
                     update.system = {};
@@ -58,12 +58,12 @@ export function registerCombatHooks() {
 
                     if (Combat.combatant.actor.isCrewMember()) {
                         if (Combat.combatant.actor.system.vehicle.dodge.score > 0) {
-                            const vehicleId = Combat.combatant.actor.getFlag('od6s', 'crew');
+                            const vehicleId = Combat.combatant.actor.getFlag('nonex-ist-od6s', 'crew');
                             const dodgeActor = await OD6S.socket.executeAsGM('getVehicleFlag', vehicleId, 'dodge_actor');
                             if (dodgeActor === Combat.combatant.actor.uuid) {
                                 const vUpdate: any = {};
                                 vUpdate.flags = {};
-                                vUpdate.flags.od6s = {};
+                                vUpdate.flags["nonex-ist-od6s"] = {};
                                 vUpdate.system = {};
                                 vUpdate.system.dodge = {};
                                 vUpdate.system.dodge.score = 0;
@@ -74,7 +74,7 @@ export function registerCombatHooks() {
                     }
                 }
                 if (!OD6S.fatePointRound) {
-                    await Combat.combatant.actor.setFlag('od6s', 'fatepointeffect', false);
+                    await Combat.combatant.actor.setFlag('nonex-ist-od6s', 'fatepointeffect', false);
                 }
             }
         }
@@ -84,7 +84,7 @@ export function registerCombatHooks() {
         // End-of-round stuff here
         if (data.turn === 0) {
             // Initiative
-            if (game.user.isGM && game.settings.get('od6s', 'reroll_initiative')) {
+            if (game.user.isGM && game.settings.get('nonex-ist-od6s', 'reroll_initiative')) {
                 await OD6SInitiative._onPreUpdateCombat(Combat, data, options, userId);
             }
             if (game.user.isGM) {
@@ -118,7 +118,7 @@ export function registerCombatHooks() {
                             update.system.stuns.rounds = rounds - 1;
                         }
 
-                        if (game.settings.get('od6s', 'reaction_skills')) {
+                        if (game.settings.get('nonex-ist-od6s', 'reaction_skills')) {
                             update.system.parry = {};
                             update.system.parry.score = 0;
                             update.system.dodge = {};
@@ -131,7 +131,7 @@ export function registerCombatHooks() {
                                 vUpdate.system = {};
                                 vUpdate.system.dodge = {};
                                 vUpdate.system.dodge.score = 0;
-                                const vehicleId = combatant.actor.getFlag('od6s', 'crew');
+                                const vehicleId = combatant.actor.getFlag('nonex-ist-od6s', 'crew');
                                 const vehicle = await od6sutilities.getActorFromUuid(vehicleId);
                                 if (typeof vehicle !== 'undefined') {
                                     await vehicle.update(vUpdate);
@@ -140,13 +140,13 @@ export function registerCombatHooks() {
                         }
                         await combatant.actor.update(update, {'diff': true});
                         if (OD6S.fatePointRound) {
-                            await combatant.actor.setFlag('od6s', 'fatepointeffect', false);
+                            await combatant.actor.setFlag('nonex-ist-od6s', 'fatepointeffect', false);
                         }
 
-                        if (game.settings.get('od6s', 'auto_mortally_wounded')) {
-                            if (combatant.actor.getFlag('od6s', 'mortally_wounded') !== undefined) {
-                                await combatant.actor.setFlag('od6s', 'mortally_wounded',
-                                    combatant.actor.getFlag('od6s', 'mortally_wounded') + 1);
+                        if (game.settings.get('nonex-ist-od6s', 'auto_mortally_wounded')) {
+                            if (combatant.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') !== undefined) {
+                                await combatant.actor.setFlag('nonex-ist-od6s', 'mortally_wounded',
+                                    combatant.actor.getFlag('nonex-ist-od6s', 'mortally_wounded') + 1);
                                 if(combatant.hasPlayerOwner) {
                                     OD6S.socket.executeForOthers("triggerRoll", 'mortally_wounded', combatant.uuid);
                                 } else {
@@ -176,7 +176,7 @@ export function registerCombatHooks() {
                 update.system.block = {};
                 update.system.block.score = 0;
                 await combatant.update(update, {'diff': true});
-                await combatant.setFlag('od6s', 'fatepointeffect', false);
+                await combatant.setFlag('nonex-ist-od6s', 'fatepointeffect', false);
             }
         }
     })

@@ -22,7 +22,7 @@ describe('defaultImgForItemType', () => {
         'starship-weapon', 'starship-gear', 'character-template',
         'species-template', 'item-group',
     ])('returns the system-shipped default for %s', (type) => {
-        expect(defaultImgForItemType(type)).toBe(`systems/od6s/icons/${type}-default.svg`);
+        expect(defaultImgForItemType(type)).toBe(`systems/nonex-ist-od6s/icons/${type}-default.svg`);
     });
 
     it('falls back to mystery-man for unmapped types', () => {
@@ -97,8 +97,8 @@ describe('prepareCharacterItems', () => {
             {type: 'gear', img: 'icons/custom/sack.svg'},
         ];
         prepareCharacterItems(items);
-        expect(items[0].img).toBe('systems/od6s/icons/weapon-default.svg');
-        expect(items[1].img).toBe('systems/od6s/icons/armor-default.svg');
+        expect(items[0].img).toBe('systems/nonex-ist-od6s/icons/weapon-default.svg');
+        expect(items[1].img).toBe('systems/nonex-ist-od6s/icons/armor-default.svg');
         expect(items[2].img).toBe('icons/custom/sack.svg');
     });
 });
@@ -174,7 +174,7 @@ describe('prepareContainerItems', () => {
         ];
         const r = prepareContainerItems(items);
         expect(r.container).toHaveLength(2);
-        expect(items[0].img).toBe('systems/od6s/icons/gear-default.svg');
-        expect(items[1].img).toBe('systems/od6s/icons/weapon-default.svg');
+        expect(items[0].img).toBe('systems/nonex-ist-od6s/icons/gear-default.svg');
+        expect(items[1].img).toBe('systems/nonex-ist-od6s/icons/weapon-default.svg');
     });
 });

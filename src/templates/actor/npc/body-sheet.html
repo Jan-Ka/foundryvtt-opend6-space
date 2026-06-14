@@ -1,14 +1,14 @@
 {{!-- Sheet Tab Navigation --}}
 <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="main">{{localize 'OD6S.MAIN'}}</a>
-    <a class="item" data-tab="combat">{{localize 'OD6S.TAB_COMBAT'}}</a>
+    <a class="item" data-tab="main">{{localize 'NONEX_IST_OD6S.MAIN'}}</a>
+    <a class="item" data-tab="combat">{{localize 'NONEX_IST_OD6S.TAB_COMBAT'}}</a>
     {{#if (isCrewMember actor) }}
-        <a class="item" data-tab="vehicle">{{localize 'OD6S.TAB_VEHICLE'}}</a>
+        <a class="item" data-tab="vehicle">{{localize 'NONEX_IST_OD6S.TAB_VEHICLE'}}</a>
     {{/if}}
     {{#if (hasCybernetics actor) }}
-        <a class="item" data-tab="cybernetics">{{localize 'OD6S.TAB_CYBERNETICS'}}</a>
+        <a class="item" data-tab="cybernetics">{{localize 'NONEX_IST_OD6S.TAB_CYBERNETICS'}}</a>
     {{/if}}
-        <a class="item" data-tab="description">{{localize 'OD6S.DESCRIPTION'}}</a>
+        <a class="item" data-tab="description">{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}</a>
     {{#if (eq actor.system.sheetmode.value 'freeedit') }}
         <a class="item" data-tab="data"><i class="fas fa-cog"></i></a>
     {{/if}}
@@ -16,22 +16,22 @@
 {{!-- Sheet Body --}}
 <section class="sheet-body">
     {{!-- Attribues Tab --}}
-    {{> systems/od6s/templates/actor/npc/tabs/main.html}}
+    {{> systems/nonex-ist-od6s/templates/actor/npc/tabs/main.html}}
 
     {{!-- Combat Tab --}}
-    {{> systems/od6s/templates/actor/common/tabs/combat.html}}
+    {{> systems/nonex-ist-od6s/templates/actor/common/tabs/combat.html}}
 
     {{!-- Vehicle Tab --}}{{#if (isCrewMember actor) }}
-    {{> systems/od6s/templates/actor/common/tabs/vehicle.html}}{{/if}}
+    {{> systems/nonex-ist-od6s/templates/actor/common/tabs/vehicle.html}}{{/if}}
 
     {{!-- Owned Cybernetics Tab --}}
-    {{>systems/od6s/templates/actor/common/tabs/cybernetics.html}}
+    {{>systems/nonex-ist-od6s/templates/actor/common/tabs/cybernetics.html}}
 
     {{!-- Description tab --}}
-    {{>systems/od6s/templates/actor/common/tabs/description.html}}
+    {{>systems/nonex-ist-od6s/templates/actor/common/tabs/description.html}}
 
     {{#if (eq actor.system.sheetmode.value 'freeedit') }}
     {{!-- Data Tab --}}
-        {{> systems/od6s/templates/actor/common/tabs/data.html}}
+        {{> systems/nonex-ist-od6s/templates/actor/common/tabs/data.html}}
     {{/if}}
 </section>

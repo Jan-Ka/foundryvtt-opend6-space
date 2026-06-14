@@ -3,14 +3,14 @@
         {{#if (eq selectedTemplate "custom") }}
             <br>
             <div class="create-custom-template-name grid grid-2col-type">
-                <label for="custom.name"><b>{{localize 'OD6S.TEMPLATE_NAME'}}</b>:</label>
-                <input title="{{localize 'OD6S.TEMPLATE_NAME'}}" name="custom.templateName" type="text"
+                <label for="custom.name"><b>{{localize 'NONEX_IST_OD6S.TEMPLATE_NAME'}}</b>:</label>
+                <input title="{{localize 'NONEX_IST_OD6S.TEMPLATE_NAME'}}" name="custom.templateName" type="text"
                        value="{{custom.templateName}}" placeholder="{{custom.templateName}}">
             </div>
             <div class="create-custom-template grid grid-4col">
                 <div class="create-custom-template character-points flexrow flex-group-left">
-                    <label for="custom.characterPoints"><b>{{localize 'OD6S.CHARACTER_POINTS'}}</b>:</label>
-                    <input title="{{localize 'OD6S.CHARACTER_POINTS'}}" name="custom.characterPoints" type="number"
+                    <label for="custom.characterPoints"><b>{{localize 'NONEX_IST_OD6S.CHARACTER_POINTS'}}</b>:</label>
+                    <input title="{{localize 'NONEX_IST_OD6S.CHARACTER_POINTS'}}" name="custom.characterPoints" type="number"
                            value="{{custom.characterPoints}}" placeholder="{{custom.characterPoints}}">
                 </div>
                 <div class="create-custom-template fate-points flexrow flex-group-left">
@@ -19,8 +19,8 @@
                            value="{{custom.fatePoints}}" placeholder="{{custom.fatePoints}}">
                 </div>
                 <div class="create-custom-template move flexrow flex-group-left">
-                    <label for="custom.move"><b>{{localize 'OD6S.CHAR_MOVE'}}</b>:</label>
-                    <input title="{{localize 'OD6S.CHAR_MOVE'}}" name="custom.move" type="number"
+                    <label for="custom.move"><b>{{localize 'NONEX_IST_OD6S.CHAR_MOVE'}}</b>:</label>
+                    <input title="{{localize 'NONEX_IST_OD6S.CHAR_MOVE'}}" name="custom.move" type="number"
                            value="{{custom.move}}" placeholder="{{custom.move}}">
                 </div>
                 <div class="create-custom-template me flexrow flex-group-center">
@@ -34,7 +34,7 @@
                 <div class="row">
                     <div class="column">
                         <div class="attribute-dice-row grid grid-4col-attribute-dice">
-                            {{localize 'OD6S.REMAINING_ATTRIBUTE_DICE'}}
+                            {{localize 'NONEX_IST_OD6S.REMAINING_ATTRIBUTE_DICE'}}
                             <input type="number" name="attribute-dice"
                                    id="attributeDice" data-dtype="Boolean"
                                    value="{{diceFromScore custom.attributeDice}}">
@@ -48,14 +48,14 @@
                     <div class="column"></div>
                 </div>
             </div>
-            {{localize 'OD6S.ATTRIBUTE_DICE_ALLOCATION_INSTRUCTIONS'}}
+            {{localize 'NONEX_IST_OD6S.ATTRIBUTE_DICE_ALLOCATION_INSTRUCTIONS'}}
             <div class="attributes">
-                <br><b>{{localize 'OD6S.ATTRIBUTES'}}</b>
+                <br><b>{{localize 'NONEX_IST_OD6S.ATTRIBUTES'}}</b>
                 <div class="row">
                     <div class="column">
                         {{#each custom.attributes as |value key|}}
                             {{#if (eq (isEvenAttribute ../actor key) 0) }}
-                                {{> systems/od6s/templates/actor/character/create-attribute-column-custom.html
+                                {{> systems/nonex-ist-od6s/templates/actor/character/create-attribute-column-custom.html
                                         key=key value=value }}
                             {{/if}}
                         {{/each}}
@@ -85,7 +85,7 @@
                     <div class="column">
                         {{#each custom.attributes as |value key|}}
                             {{#if (eq (isEvenAttribute ../actor key) 0) }}
-                                {{> systems/od6s/templates/actor/character/create-attribute-column-custom.html
+                                {{> systems/nonex-ist-od6s/templates/actor/character/create-attribute-column-custom.html
                                         key=key value=value }}
                             {{/if}}
                         {{/each}}
@@ -112,7 +112,7 @@
                         {{#each attrs as |attr|}}
                             {{#if attr.active }}
                                 {{#if (isEvenAttribute attr.sort) }}
-                                {{> systems/od6s/templates/actor/character/create-attribute-column.html
+                                {{> systems/nonex-ist-od6s/templates/actor/character/create-attribute-column.html
                                         key=attr.id value=attr.score skills=../skills}}
                                 {{/if}}
                             {{/if}}
@@ -158,7 +158,7 @@
                         {{#each attrs as |attr key|}}
                             {{#if attr.active }}
                                 {{#unless (isEvenAttribute attr.sort) }}
-                                {{> systems/od6s/templates/actor/character/create-attribute-column.html
+                                {{> systems/nonex-ist-od6s/templates/actor/character/create-attribute-column.html
                                         key=attr.id value=attr.score skills=../skills}}
                                 {{/unless}}
                             {{/if}}
@@ -172,9 +172,9 @@
                                         height: auto;
                                         min-height: 80%;
                                         ">
-                <span>{{localize 'OD6S.MOVE'}}:&nbsp{{templateData.system.move}}</span>
+                <span>{{localize 'NONEX_IST_OD6S.MOVE'}}:&nbsp{{templateData.system.move}}</span>
                 <span>{{getFatePointsShortName}}:&nbsp{{templateData.system.fp}}</span>
-                <span>{{localize 'OD6S.CHARACTER_POINTS'}}:&nbsp{{templateData.system.cp}}</span>
+                <span>{{localize 'NONEX_IST_OD6S.CHARACTER_POINTS'}}:&nbsp{{templateData.system.cp}}</span>
                 {{#if templateData.system.me}}
                     <span>{{getMetaphysicsExtranormalName}}:<input type="checkbox" name="me" disabled
                                                                    data-dtype="boolean"

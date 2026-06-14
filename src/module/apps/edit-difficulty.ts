@@ -12,11 +12,11 @@ export default class OD6SEditDifficulty extends HandlebarsApplicationMixin(Appli
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-edit-difficulty",
-        classes: ["od6s"],
+        id: "nonex-ist-od6s-edit-difficulty",
+        classes: ["nonex-ist-od6s"],
         tag: "form",
         window: {
-            title: "OD6S.EDIT_DIFFICULTY",
+            title: "NONEX_IST_OD6S.EDIT_DIFFICULTY",
             minimizable: true,
         },
         position: {
@@ -35,7 +35,7 @@ export default class OD6SEditDifficulty extends HandlebarsApplicationMixin(Appli
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/chat/edit-difficulty.html",
+            template: "systems/nonex-ist-od6s/templates/chat/edit-difficulty.html",
         },
     };
 
@@ -53,14 +53,14 @@ export default class OD6SEditDifficulty extends HandlebarsApplicationMixin(Appli
         const message = game.messages.get(data.messageId);
         if (!message) return;
 
-        const diff = (+data.baseDifficulty) - (+message.getFlag("od6s", "baseDifficulty"));
-        const newDifficulty = (+message.getFlag("od6s", "difficulty")) + diff;
+        const diff = (+data.baseDifficulty) - (+message.getFlag("nonex-ist-od6s", "baseDifficulty"));
+        const newDifficulty = (+message.getFlag("nonex-ist-od6s", "difficulty")) + diff;
         const success = message.rolls[0].total >= newDifficulty;
 
         await message.update({
             id: message.id,
             flags: {
-                od6s: {
+                "nonex-ist-od6s": {
                     baseDifficulty: data.baseDifficulty,
                     difficulty: newDifficulty,
                     success,

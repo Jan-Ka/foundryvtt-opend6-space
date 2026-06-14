@@ -21,7 +21,7 @@ export async function getDifficulty(rollData: RollData): Promise<number> {
 }
 
 async function getDifficultyImpl(rollData: RollData): Promise<number> {
-    if (rollData.isExplosive && rollData.range === 'OD6S.RANGE_POINT_BLANK_SHORT' && !game.settings.get('od6s','map_range_to_difficulty')) {
+    if (rollData.isExplosive && rollData.range === 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT' && !game.settings.get('nonex-ist-od6s','map_range_to_difficulty')) {
         return 5;
     }
 
@@ -214,7 +214,7 @@ export function applyDifficultyEffects(rollData: RollData): Modifier[] {
         } else {
             if (OD6S.vehicle_speeds[rollData.vehiclespeed].mod) {
                 modifiers.push({
-                    "name": game.i18n.localize("OD6S.VEHICLE_SPEED") + "(" +
+                    "name": game.i18n.localize("NONEX_IST_OD6S.VEHICLE_SPEED") + "(" +
                         game.i18n.localize(OD6S.vehicle_speeds[rollData.vehiclespeed].name) + ")",
                     "value": OD6S.vehicle_speeds[rollData.vehiclespeed].mod
                 })
@@ -224,7 +224,7 @@ export function applyDifficultyEffects(rollData: RollData): Modifier[] {
 
     if (rollData.subtype === 'vehicleramattack') {
         modifiers.push({
-            "name": game.i18n.localize("OD6S.ACTION_VEHICLE_RAM"),
+            "name": game.i18n.localize("NONEX_IST_OD6S.ACTION_VEHICLE_RAM"),
             "value": 10
         })
     }
@@ -261,38 +261,38 @@ export function applyDifficultyEffects(rollData: RollData): Modifier[] {
         }
     }
 
-    if (mods.cover !== '' && OD6S.cover["OD6S.COVER"][mods.cover].modifier !== 0) {
+    if (mods.cover !== '' && OD6S.cover["NONEX_IST_OD6S.COVER"][mods.cover].modifier !== 0) {
         modifiers.push({
             "name": game.i18n.localize(mods.cover),
-            "value": OD6S.cover["OD6S.COVER"][mods.cover].modifier
+            "value": OD6S.cover["NONEX_IST_OD6S.COVER"][mods.cover].modifier
         })
     }
 
-    if (mods.coverlight !== '' && OD6S.cover["OD6S.COVER_LIGHT"][mods.coverlight].modifier !== 0) {
+    if (mods.coverlight !== '' && OD6S.cover["NONEX_IST_OD6S.COVER_LIGHT"][mods.coverlight].modifier !== 0) {
         modifiers.push({
             "name": game.i18n.localize(mods.coverlight),
-            "value": OD6S.cover["OD6S.COVER_LIGHT"][mods.coverlight].modifier
+            "value": OD6S.cover["NONEX_IST_OD6S.COVER_LIGHT"][mods.coverlight].modifier
         })
     }
 
-    if (mods.coversmoke !== '' && OD6S.cover["OD6S.COVER_SMOKE"][mods.coversmoke].modifier !== 0) {
+    if (mods.coversmoke !== '' && OD6S.cover["NONEX_IST_OD6S.COVER_SMOKE"][mods.coversmoke].modifier !== 0) {
         modifiers.push({
             "name": game.i18n.localize(mods.coversmoke),
-            "value": OD6S.cover["OD6S.COVER_SMOKE"][mods.coversmoke].modifier
+            "value": OD6S.cover["NONEX_IST_OD6S.COVER_SMOKE"][mods.coversmoke].modifier
         })
     }
 
     if (mods.calledshot !== '' && OD6S.calledShot[mods.calledshot].modifier !== 0) {
         modifiers.push({
-            "name": game.i18n.localize('OD6S.CALLED_SHOT') + "-" + game.i18n.localize(mods.calledshot),
+            "name": game.i18n.localize('NONEX_IST_OD6S.CALLED_SHOT') + "-" + game.i18n.localize(mods.calledshot),
             "value": OD6S.calledShot[mods.calledshot].modifier
         })
     }
 
     if (mods.scalemod !== 0) {
-        if (!game.settings.get('od6s', 'dice_for_scale')) {
+        if (!game.settings.get('nonex-ist-od6s', 'dice_for_scale')) {
             modifiers.push({
-                "name": game.i18n.localize("OD6S.SCALE"),
+                "name": game.i18n.localize("NONEX_IST_OD6S.SCALE"),
                 "value": mods.scalemod
             })
         }
@@ -300,7 +300,7 @@ export function applyDifficultyEffects(rollData: RollData): Modifier[] {
 
     if (mods.miscmod !== 0) {
         modifiers.push({
-            "name": game.i18n.localize("OD6S.MISC"),
+            "name": game.i18n.localize("NONEX_IST_OD6S.MISC"),
             "value": mods.miscmod
         })
     }
@@ -357,7 +357,7 @@ export function applyDamageEffects(rollData: RollData): Modifier[] {
 
     if (mods.calledshot !== '' && OD6S.calledShot[mods.calledshot].damage !== 0) {
         modifiers.push({
-            "name": game.i18n.localize('OD6S.CALLED_SHOT') + "-" + game.i18n.localize(mods.calledshot),
+            "name": game.i18n.localize('NONEX_IST_OD6S.CALLED_SHOT') + "-" + game.i18n.localize(mods.calledshot),
             "value": 0,
             "pips": OD6S.calledShot[mods.calledshot].damage,
         })
@@ -365,7 +365,7 @@ export function applyDamageEffects(rollData: RollData): Modifier[] {
 
     if (mods.scalemod !== 0) {
         modifiers.push({
-            "name": game.i18n.localize("OD6S.SCALE"),
+            "name": game.i18n.localize("NONEX_IST_OD6S.SCALE"),
             "value": mods.scalemod
         })
     }

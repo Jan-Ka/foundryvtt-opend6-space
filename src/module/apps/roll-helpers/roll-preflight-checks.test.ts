@@ -13,8 +13,8 @@ import { meleeRangeGateApplies } from './roll-preflight-checks';
 // the human-readable label "Melee" so we can build a roll request that
 // looks like one item.roll() would actually produce on a melee weapon.
 const fakeLocalize = (key: string): string => {
-    if (key === 'OD6S.MELEE') return 'Melee';
-    if (key === 'OD6S.RANGED') return 'Ranged';
+    if (key === 'NONEX_IST_OD6S.MELEE') return 'Melee';
+    if (key === 'NONEX_IST_OD6S.RANGED') return 'Ranged';
     return key;
 };
 

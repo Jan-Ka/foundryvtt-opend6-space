@@ -6,7 +6,7 @@ export default class SpecialAbilityData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       ...baseSchema(),
-      label: new fields.StringField({ initial: "OD6S.CHAR_SPECIAL_ABILITIES" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_SPECIAL_ABILITIES" }),
     };
   }
 }

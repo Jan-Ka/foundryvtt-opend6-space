@@ -29,7 +29,7 @@ const BLAST_QUARTER_DAMAGE_MULTIPLIER = 0.25;
 
 /**
  * Per-throw state for an in-flight explosive, keyed by the blast region's id
- * on `flags.od6s.explosivePending`. One entry per throw lets multiple
+ * on `flags.nonex-ist-od6s.explosivePending`. One entry per throw lets multiple
  * unresolved instances of the same explosive item co-exist (#40) — the
  * previous scalar flags clobbered each other on the second throw.
  */
@@ -41,14 +41,14 @@ export interface ExplosivePending {
 /** Read the per-throw pending entry for `regionId`, or undefined if absent. */
 export function getExplosivePending(item: Item, regionId: string | undefined): ExplosivePending | undefined {
     if (!regionId) return undefined;
-    const map = item.getFlag('od6s', 'explosivePending') as Record<string, ExplosivePending> | undefined;
+    const map = item.getFlag('nonex-ist-od6s', 'explosivePending') as Record<string, ExplosivePending> | undefined;
     return map?.[regionId];
 }
 
 /** Delete only the entry for `regionId` from the pending map (preserves other in-flight throws). */
 export async function clearExplosivePending(item: Item, regionId: string | undefined): Promise<void> {
     if (!regionId) return;
-    await item.update({ [`flags.od6s.explosivePending.-=${regionId}`]: null });
+    await item.update({ [`flags.nonex-ist-od6s.explosivePending.-=${regionId}`]: null });
 }
 
 export interface ExplosiveTarget {
@@ -74,23 +74,23 @@ export async function scatterExplosive(
     const sourceRay = new foundry.canvas.geometry.Ray(origin, target);
 
     // Save original position for un-scatter on hit
-    await region.setFlag('od6s', 'originalX', shape.x);
-    await region.setFlag('od6s', 'originalY', shape.y);
+    await region.setFlag('nonex-ist-od6s', 'originalX', shape.x);
+    await region.setFlag('nonex-ist-od6s', 'originalY', shape.y);
 
     const scatterRoll = await new Roll('1d6').evaluate();
     const scatter = scatterRoll.total;
 
     switch(range) {
-        case 'OD6S.RANGE_POINT_BLANK_SHORT':
+        case 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT':
             distanceTerms = '1d6';
             break;
-        case 'OD6S.RANGE_SHORT_SHORT':
+        case 'NONEX_IST_OD6S.RANGE_SHORT_SHORT':
             distanceTerms = '1d6';
             break;
-        case 'OD6S.RANGE_MEDIUM_SHORT':
+        case 'NONEX_IST_OD6S.RANGE_MEDIUM_SHORT':
             distanceTerms = '2d6';
             break;
-        case 'OD6S.RANGE_LONG_SHORT':
+        case 'NONEX_IST_OD6S.RANGE_LONG_SHORT':
             distanceTerms = '3d6';
             break;
         default:
@@ -191,33 +191,33 @@ export async function getExplosiveTargets(actor: Actor, itemId: string, regionId
 export async function detonateExplosives(combat: Combat): Promise<void> {
     // Find all active explosive regions on the scene and detonate
     const regions: RegionDocument[] = combat.scene?.regions?.filter(
-        (i: RegionDocument) => i.flags?.od6s?.explosive === true,
+        (i: RegionDocument) => i.flags?.["nonex-ist-od6s"]?.explosive === true,
     ) ?? [];
     for (const region of regions) {
         await region.update({ visibility: 2 }); // Make visible to all
         let actor;
-        if (typeof(region.getFlag('od6s','token')) === 'undefined' || region.getFlag('od6s','token') === '') {
-            actor = await getActorFromUuid(region.getFlag('od6s', 'actor'))
+        if (typeof(region.getFlag('nonex-ist-od6s','token')) === 'undefined' || region.getFlag('nonex-ist-od6s','token') === '') {
+            actor = await getActorFromUuid(region.getFlag('nonex-ist-od6s', 'actor'))
         } else {
-            actor = game!.scenes!.active!.tokens.get(region.getFlag('od6s', 'token'))!.actor;
+            actor = game!.scenes!.active!.tokens.get(region.getFlag('nonex-ist-od6s', 'token'))!.actor;
         }
 
-        const data: { flags: { od6s: Record<string, unknown> } } = { flags: { od6s: {} } };
-        data.flags.od6s = {
-            actorId: region.getFlag('od6s','actor'),
-            tokenId: region.getFlag('od6s', 'token'),
-            itemId: region.getFlag('od6s','item'),
+        const data: { flags: { "nonex-ist-od6s": Record<string, unknown> } } = { flags: { "nonex-ist-od6s": {} } };
+        data.flags["nonex-ist-od6s"] = {
+            actorId: region.getFlag('nonex-ist-od6s','actor'),
+            tokenId: region.getFlag('nonex-ist-od6s', 'token'),
+            itemId: region.getFlag('nonex-ist-od6s','item'),
             templateId: region.id,
-            targets: actor ? await getExplosiveTargets(actor, region.getFlag('od6s','item'), region.id) : [],
+            targets: actor ? await getExplosiveTargets(actor, region.getFlag('nonex-ist-od6s','item'), region.id) : [],
             triggered: true
         }
 
         // Regenerate the original message
-        if(region.getFlag('od6s','message')) {
-            const origMessage = game.messages.get(region.getFlag('od6s','message'));
+        if(region.getFlag('nonex-ist-od6s','message')) {
+            const origMessage = game.messages.get(region.getFlag('nonex-ist-od6s','message'));
             if(typeof(origMessage) !== 'undefined') {
                 const cloneMessage = origMessage.clone(data);
-                await origMessage.unsetFlag('od6s', 'isExplosive');
+                await origMessage.unsetFlag('nonex-ist-od6s', 'isExplosive');
                 // Blind rolls also populate `whisper`, so the blind check
                 // must come first or it would never be reached.
                 let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
@@ -227,7 +227,7 @@ export async function detonateExplosives(combat: Combat): Promise<void> {
                     rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
                 }
                 await ChatMessage.deleteDocuments([origMessage.id]);
-                cloneMessage.flags.od6s.canUseCp = false;
+                cloneMessage.flags["nonex-ist-od6s"].canUseCp = false;
                 cloneMessage.rolls[0].toMessage(cloneMessage, {rollMode});
             }
         }
@@ -256,11 +256,11 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
 
     // Region id stamped on the attack message at creation; falls back to the
     // dataset templateId for legacy / handler-driven callers.
-    const regionId = (message?.getFlag('od6s', 'template') as string | undefined) || data.templateId;
+    const regionId = (message?.getFlag('nonex-ist-od6s', 'template') as string | undefined) || data.templateId;
 
     let targets: ExplosiveTarget[];
     if (message) {
-        targets = message.getFlag('od6s', 'targets') as ExplosiveTarget[];
+        targets = message.getFlag('nonex-ist-od6s', 'targets') as ExplosiveTarget[];
     } else {
         targets = await getExplosiveTargets(actor, data.itemId, regionId);
     }
@@ -268,7 +268,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
     const item = actor!.items.get(data.itemId);
     const wsys = item && isWeaponItem(item) ? item.system : undefined;
 
-    if (game.settings.get('od6s', 'auto_explosive')) {
+    if (game.settings.get('nonex-ist-od6s', 'auto_explosive')) {
         const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
 
         if (region) {
@@ -284,13 +284,13 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
 
     // Create damage chat message
     interface ExplosiveMsgData {
-        flags: { od6s: Record<string, unknown> & { targets: ExplosiveTarget[] } };
+        flags: { "nonex-ist-od6s": Record<string, unknown> & { targets: ExplosiveTarget[] } };
         flavor?: string;
         speaker?: { alias?: string; actor?: string; token?: string; scene?: string };
     }
     const msgData: ExplosiveMsgData = {
         flags: {
-            od6s: {
+            "nonex-ist-od6s": {
                 targets: [],
                 item: item!.id,
                 isOpposable: true,
@@ -303,9 +303,9 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
     };
 
     if (boolCheck(data.stun)) {
-        msgData.flavor = game.i18n.localize("OD6S.EXPLOSIVE_STUN_DAMAGE");
+        msgData.flavor = game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE_STUN_DAMAGE");
     } else {
-        msgData.flavor = game.i18n.localize("OD6S.EXPLOSIVE_DAMAGE");
+        msgData.flavor = game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE_DAMAGE");
     }
     msgData.speaker = {
         alias: actor!.name,
@@ -316,7 +316,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
 
     let rollString;
 
-    if(game.settings.get('od6s','explosive_zones')) {
+    if(game.settings.get('nonex-ist-od6s','explosive_zones')) {
         if (!wsys) return false;
         // Separate rolls for each zone; damage score represents whole dice
         for (const i in wsys.blast_radius) {
@@ -324,21 +324,21 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
             const zoneTargets = targets.filter((target: ExplosiveTarget) => target.zone === (+i));
             if (zoneTargets.length < 1) continue;
             if (zone.damage < 1) {
-                ui.notifications.warn(game.i18n.localize("OD6S.WARN_NO_DICE_FOR_ZONE"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.WARN_NO_DICE_FOR_ZONE"));
                 return false;
             }
             let dice = zone.damage;
-            if (game.settings.get('od6s', 'use_wild_die')) {
+            if (game.settings.get('nonex-ist-od6s', 'use_wild_die')) {
                 dice = dice - 1;
                 if (dice < 1) {
-                    rollString = "1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR") + " ["
-                        + game.i18n.localize('OD6S.ZONE') + "]" ;
+                    rollString = "1dw" + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR") + " ["
+                        + game.i18n.localize('NONEX_IST_OD6S.ZONE') + "]" ;
                 } else {
-                    rollString = dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR') + "+1dw" +
-                        game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+                    rollString = dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR') + "+1dw" +
+                        game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
                 }
             } else {
-                rollString = dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR');
+                rollString = dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR');
             }
             const roll  = await new Roll(rollString).evaluate();
             for (let target = 0; target < zoneTargets.length; target++) {
@@ -349,56 +349,56 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
                 if(!message) {
                     // TODO: Figure out a better way to deal with this
                     damage = roll.total;
-                } else if (getDodgeScore(actor) > (message.getFlag('od6s', 'total') as number)) {
+                } else if (getDodgeScore(actor) > (message.getFlag('nonex-ist-od6s', 'total') as number)) {
                     damage = 0;
                 } else {
                     damage = roll.total;
                 }
-                if (game.settings.get('od6s', 'auto_explosive')) {
+                if (game.settings.get('nonex-ist-od6s', 'auto_explosive')) {
                     // noop
                 } else {
-                    msgData.flags.od6s.apply = true;
+                    msgData.flags["nonex-ist-od6s"].apply = true;
                 }
-                msgData.flags.od6s.targets[target] = zoneTargets[target];
-                msgData.flags.od6s.targets[target].damage = damage;
+                msgData.flags["nonex-ist-od6s"].targets[target] = zoneTargets[target];
+                msgData.flags["nonex-ist-od6s"].targets[target].damage = damage;
             }
             if (boolCheck(data.stun)) {
-                msgData.flavor = game.i18n.localize('OD6S.ZONE') + " " + i + " "
-                    + game.i18n.localize("OD6S.EXPLOSIVE_STUN_DAMAGE");
+                msgData.flavor = game.i18n.localize('NONEX_IST_OD6S.ZONE') + " " + i + " "
+                    + game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE_STUN_DAMAGE");
             } else {
-                msgData.flavor = game.i18n.localize('OD6S.ZONE') + " " + i + " "
-                    + game.i18n.localize("OD6S.EXPLOSIVE_DAMAGE");
+                msgData.flavor = game.i18n.localize('NONEX_IST_OD6S.ZONE') + " " + i + " "
+                    + game.i18n.localize("NONEX_IST_OD6S.EXPLOSIVE_DAMAGE");
             }
             await roll.toMessage(msgData);
-            msgData.flags.od6s.targets = [];
+            msgData.flags["nonex-ist-od6s"].targets = [];
         }
     } else {
-        msgData.flags.od6s.targets = targets;
+        msgData.flags["nonex-ist-od6s"].targets = targets;
         if (!wsys) return false;
         // One roll, with a fraction for zones > 1
         const dice = (boolCheck(data.stun)) ? getDiceFromScore(wsys.stun.score, OD6S.pipsPerDice)
             : getDiceFromScore(wsys.damage.score, OD6S.pipsPerDice);
         if (boolCheck(data.stun)) {
             if (wsys.stun.score === 0 || (wsys.stun.score as unknown) === '') {
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
                 return;
             }
         } else {
             if (wsys.damage.score === 0 || (wsys.damage.score as unknown) === '') {
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_EXPLOSIVE_CONFIGURED_FOR_ZONES'));
                 return;
             }
         }
-        if (game.settings.get('od6s', 'use_wild_die')) {
+        if (game.settings.get('nonex-ist-od6s', 'use_wild_die')) {
             dice.dice = (+dice.dice) - 1;
             if (dice.dice < 1) {
-                rollString = "1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+                rollString = "1dw" + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
             } else {
-                rollString = dice.dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR') + "+1dw" +
-                    game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+                rollString = dice.dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR') + "+1dw" +
+                    game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
             }
         } else {
-            rollString = dice.dice + "d6" + game.i18n.localize('OD6S.BASE_DIE_FLAVOR');
+            rollString = dice.dice + "d6" + game.i18n.localize('NONEX_IST_OD6S.BASE_DIE_FLAVOR');
         }
         const roll = await new Roll(rollString).evaluate();
         // Iterate over targets
@@ -408,7 +408,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
             let actor = await game.actors.get(target.id);
             if (typeof (actor) === 'undefined') actor = game!.scenes!.active!.tokens.get(target.id)!.actor;
             if(typeof(actor) === 'undefined') continue;
-            if(getDodgeScore(actor) > (message!.getFlag('od6s','total') as number)) {
+            if(getDodgeScore(actor) > (message!.getFlag('nonex-ist-od6s','total') as number)) {
                 // noop
             } else {
                 switch(target.zone) {
@@ -425,12 +425,12 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
                         damage = 0;
                 }
 
-                msgData.flags.od6s.targets[i].damage = damage;
+                msgData.flags["nonex-ist-od6s"].targets[i].damage = damage;
 
-                if (game.settings.get('od6s', 'auto_explosive')) {
+                if (game.settings.get('nonex-ist-od6s', 'auto_explosive')) {
                     // noop
                 } else {
-                    msgData.flags.od6s.apply = true;
+                    msgData.flags["nonex-ist-od6s"].apply = true;
                 }
             }
         }
@@ -447,7 +447,7 @@ export async function detonateExplosive(data: DetonateExplosiveData): Promise<un
 export function getBlastRadius(item: Item, range: number): number {
     let zone = 1;
     if (!isWeaponItem(item)) return zone;
-    const maxZone = game.settings.get('od6s', 'explosive_zones') ? 4 : 3;
+    const maxZone = game.settings.get('nonex-ist-od6s', 'explosive_zones') ? 4 : 3;
 
     for (let i=1; i < maxZone + 1; i++) {
         if (range > item.system.blast_radius[String(i) as "1" | "2" | "3" | "4"].range) {

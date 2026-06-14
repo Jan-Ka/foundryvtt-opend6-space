@@ -21,7 +21,7 @@ export interface ItemLike {
 }
 
 /**
- * Predicate matching the runtime behaviour of `actor.getFlag('od6s', 'crew')`
+ * Predicate matching the runtime behaviour of `actor.getFlag('nonex-ist-od6s', 'crew')`
  * — a crewmember is identified by holding a non-empty crew flag pointing at
  * a vehicle uuid.
  */
@@ -31,7 +31,7 @@ export function isCrewMemberByFlag(crewFlag: string | null | undefined): boolean
 
 /**
  * Decide whether `removeFromCrew` should proceed. The runtime emits a
- * `OD6S.NOT_CREW_MEMBER` warning when the caller's crew flag doesn't match
+ * `NONEX_IST_OD6S.NOT_CREW_MEMBER` warning when the caller's crew flag doesn't match
  * the target vehicle id; this predicate captures that gate without the
  * notification side effect.
  */

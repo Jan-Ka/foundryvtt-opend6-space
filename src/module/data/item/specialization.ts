@@ -9,7 +9,7 @@ export default class SpecializationData extends foundry.abstract.TypeDataModel {
       ...baseSchema(),
       ...skillFieldsSchema(),
       skill: new fields.StringField({ initial: "" }),
-      label: new fields.StringField({ initial: "OD6S.CHAR_SPECIALIZATIONS" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_SPECIALIZATIONS" }),
       used: new fields.SchemaField({
         value: new fields.BooleanField({ initial: false }),
       }),
