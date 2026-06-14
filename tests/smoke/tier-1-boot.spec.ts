@@ -55,7 +55,7 @@ test.describe("Tier 1 — Boot & registration", () => {
             version: window.game.system.version,
             foundry: window.game.version,
         }));
-        expect(r.id).toBe("od6s");
+        expect(r.id).toBe("nonex-ist-od6s");
         expect(r.foundry).toMatch(/^14\./);
     });
 
@@ -72,8 +72,8 @@ test.describe("Tier 1 — Boot & registration", () => {
     test("sheet classes registered", async ({page}) => {
         await loginAndWaitReady(page);
         const r = await evalInWorld(page, () => ({
-            actor: window.CONFIG.Actor.sheetClasses?.character?.["od6s.OD6SActorSheet"]?.cls?.name,
-            item: window.CONFIG.Item.sheetClasses?.skill?.["od6s.OD6SItemSheet"]?.cls?.name,
+            actor: window.CONFIG.Actor.sheetClasses?.character?.["nonex-ist-od6s.OD6SActorSheet"]?.cls?.name,
+            item: window.CONFIG.Item.sheetClasses?.skill?.["nonex-ist-od6s.OD6SItemSheet"]?.cls?.name,
         }));
         expect(r.actor).toBe("OD6SActorSheet");
         expect(r.item).toBe("OD6SItemSheet");
@@ -83,7 +83,7 @@ test.describe("Tier 1 — Boot & registration", () => {
         await loginAndWaitReady(page);
         const packs = await evalInWorld(page, () =>
             window.game.packs
-                .filter((p: any) => p.metadata.packageName === "od6s")
+                .filter((p: any) => p.metadata.packageName === "nonex-ist-od6s")
                 .map((p: any) => p.metadata.name)
                 .sort(),
         );

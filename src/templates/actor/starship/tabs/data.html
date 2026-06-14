@@ -1,5 +1,5 @@
 <div class="tab data" data-group="primary" data-tab="data">
-    <div class="flexrow flex-group-center">{{localize 'OD6S.ACTOR_ID'}}: {{actor.uuid}}</div>
+    <div class="flexrow flex-group-center">{{localize 'NONEX_IST_OD6S.ACTOR_ID'}}: {{actor.uuid}}</div>
 <div class="grid grid-2col">
     <div class="flexrow flex-group-left">
         <label for="actor.system.maneuverability.score">{{localize actor.system.maneuverability.label}}:</label>
@@ -23,8 +23,8 @@
     </div>
     {{#if (gt actor.system.shields.value 0)}}
         <div class="flexrow flex-group-left">
-            <label for="actor.system.shields.skill.value">{{localize 'OD6S.SHIELDS'}} {{localize 'OD6S.SKILL'}}:</label>
-            <input title="{{localize 'OD6S.SHIELDS'}} {{localize 'OD6S.SKILL'}}"
+            <label for="actor.system.shields.skill.value">{{localize 'NONEX_IST_OD6S.SHIELDS'}} {{localize 'NONEX_IST_OD6S.SKILL'}}:</label>
+            <input title="{{localize 'NONEX_IST_OD6S.SHIELDS'}} {{localize 'NONEX_IST_OD6S.SKILL'}}"
                    name="system.shields.skill.value" type="text"
                    value="{{actor.system.shields.skill.value}}" data-dtype="String"/>
         </div>
@@ -43,42 +43,42 @@
 <div class="row">
     <div class="column">
         {{#if actor.system.embedded_pilot}}
-            <h2>{{localize 'OD6S.ATTRIBUTES'}}</h2>
+            <h2>{{localize 'NONEX_IST_OD6S.ATTRIBUTES'}}</h2>
             <div class="grid data-attribute-grid">
                 {{#each actor.system.attributes as |attribute key|}}
                     <div class="flexrow flex-group-left">
                         {{localize attribute.label}}
                     </div>
                     <div class="flexrow flex-group-left">
-                        {{localize 'OD6S.BASE'}}:{{attribute.base}}
+                        {{localize 'NONEX_IST_OD6S.BASE'}}:{{attribute.base}}
                     </div>
                     <div class="flexrow flex-group-left">
                         <label for="actor.system.attributes.{{key}}.mod">
-                            {{localize 'OD6S.MOD'}}:
+                            {{localize 'NONEX_IST_OD6S.MOD'}}:
                         </label>
                         <input name="system.attributes.{{key}}.mod" id="actor.system.attributes.{{key}}.mod" type="number"
                                data-dtype="Number" value="{{attribute.mod}}"/>
                     </div>
                     <div class="flexrow flex-group-left">
-                        {{localize 'OD6S.TOTAL'}}:{{attribute.score}}
+                        {{localize 'NONEX_IST_OD6S.TOTAL'}}:{{attribute.score}}
                     </div>
                     <div class="flexrow flex-group-left">
                         <label for="actor.system.attributes.{{key}}.min">
-                            {{localize 'OD6S.MIN'}}:
+                            {{localize 'NONEX_IST_OD6S.MIN'}}:
                         </label>
                         <input name="system.attributes.{{key}}.min" id="actor.system.attributes.{{key}}.min" type="number"
                                data-dtype="Number" value="{{attribute.min}}"/>
                     </div>
                     <div class="flexrow flex-group-left">
                         <label for="actor.system.attributes.{{key}}.max">
-                            {{localize 'OD6S.MAX'}}:
+                            {{localize 'NONEX_IST_OD6S.MAX'}}:
                         </label>
                         <input name="system.attributes.{{key}}.max" id="actor.system.attributes.{{key}}.max" type="number"
                                data-dtype="Number" value="{{attribute.max}}"/>
                     </div>
                 {{/each}}
             </div>
-            <h2>{{localize 'OD6S.ITEMS'}}</h2>
+            <h2>{{localize 'NONEX_IST_OD6S.ITEMS'}}</h2>
             <ul class="items-list">
                 {{#each actor.items as |item key|}}
                     <li class="item-data" data-item-id="{{item.id}}">
@@ -88,13 +88,13 @@
                                  data-item-id="{{item.id}}"
                                  data-type="item">
                                 <a class="item-control item-edit small-font" data-item-id="{{item.id}}"
-                                   title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a data-item-id="{{item.id}}"
                                    data-type="item"
                                    class="item-control item-delete small-font"
-                                   title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                   title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
@@ -111,7 +111,7 @@
                        data-vehicleId="{{ ../actor.uuid}}"
                        data-type="crewmember"
                        class="item-control crew-delete small-font"
-                       title="{{localize 'OD6S.REMOVE_FROM_VEHICLE'}}">
+                       title="{{localize 'NONEX_IST_OD6S.REMOVE_FROM_VEHICLE'}}">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>
@@ -120,9 +120,9 @@
         {{/if}}
     </div>
     <div class="column">
-        <h2>{{localize 'OD6S.ACTOR_FLAGS'}}</h2>
+        <h2>{{localize 'NONEX_IST_OD6S.ACTOR_FLAGS'}}</h2>
         <ul class="flags-list">
-            {{#each actor.flags.od6s as |value key|}}
+            {{#each actor.flags.nonex-ist-od6s as |value key|}}
                 <li class="flag" data-flag="{{key}}" data-value="{{value}}">
                     <div class="grid grid-2col">
                         <div class="flexrow flex-group-left" title="{{key}}">
@@ -144,8 +144,8 @@
             </div>
             {{#if actor.system.sensors.value }}
                 <div class="flexrow flex-group-left">
-                    <label for="actor.system.sensors.skill">{{localize 'OD6S.SENSORS'}} {{localize 'OD6S.SKILL'}}:</label>
-                    <input title="{{localize 'OD6S.SENSORS'}} {{localize 'OD6S.SKILL'}}"
+                    <label for="actor.system.sensors.skill">{{localize 'NONEX_IST_OD6S.SENSORS'}} {{localize 'NONEX_IST_OD6S.SKILL'}}:</label>
+                    <input title="{{localize 'NONEX_IST_OD6S.SENSORS'}} {{localize 'NONEX_IST_OD6S.SKILL'}}"
                            name="system.sensors.skill" type="text"
                            value="{{actor.system.sensors.skill}}" data-dtype="String"/>
                 </div>
@@ -155,14 +155,14 @@
                             {{localize sensortype.label}}
                         </div>
                         <div class="flexrow flex-group-left">
-                            <label for="actor.system.sensors.types.{{key}}.range">{{localize 'OD6S.RANGE'}}:</label>
-                            <input title="{{localize 'OD6S.RANGE'}}" id="actor.system.sensors.types.{{key}}.range"
+                            <label for="actor.system.sensors.types.{{key}}.range">{{localize 'NONEX_IST_OD6S.RANGE'}}:</label>
+                            <input title="{{localize 'NONEX_IST_OD6S.RANGE'}}" id="actor.system.sensors.types.{{key}}.range"
                                    name="system.sensors.types.{{key}}.range" data-dtype="{{sensortype.type}}"
                                    value="{{sensortype.range}}">
                         </div>
                         <div class="flexrow flex-group-left">
-                            <label for="actor.system.sensors.types.{{key}}.score">{{localize 'OD6S.SCORE'}}:</label>
-                            <input title="{{localize 'OD6S.SCORE'}}" id="actor.system.sensors.types.{{key}}.score"
+                            <label for="actor.system.sensors.types.{{key}}.score">{{localize 'NONEX_IST_OD6S.SCORE'}}:</label>
+                            <input title="{{localize 'NONEX_IST_OD6S.SCORE'}}" id="actor.system.sensors.types.{{key}}.score"
                                    name="system.sensors.types.{{key}}.score" data-dtype="{{sensortype.type}}"
                                    value="{{sensortype.score}}">
                         </div>
@@ -182,7 +182,7 @@
                     <a data-item-id="{{item.id}}"
                        data-type="item"
                        class="item-control item-delete small-font"
-                       title="{{localize 'OD6S.DELETE_ITEM'}}">
+                       title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>

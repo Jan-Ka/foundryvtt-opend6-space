@@ -28,14 +28,14 @@ export class od6sroll {
             if (sys.subtype === 'vehiclerangedweaponattack') {
                 return actor.rollAction(sys.itemId);
             } else if (sys.subtype === 'vehiclesensors') {
-                if (game.settings.get('od6s', 'sensors')) {
-                    if (item.name.includes(game.i18n.localize('OD6S.SENSORS_PASSIVE'))) {
+                if (game.settings.get('nonex-ist-od6s', 'sensors')) {
+                    if (item.name.includes(game.i18n.localize('NONEX_IST_OD6S.SENSORS_PASSIVE'))) {
                         return actor.rollAction('vehiclesensorspassive');
-                    } else if (item.name.includes(game.i18n.localize('OD6S.SENSORS_SCAN'))) {
+                    } else if (item.name.includes(game.i18n.localize('NONEX_IST_OD6S.SENSORS_SCAN'))) {
                         return actor.rollAction('vehiclesensorsscan');
-                    } else if (item.name.includes(game.i18n.localize('OD6S.SENSORS_SEARCH'))) {
+                    } else if (item.name.includes(game.i18n.localize('NONEX_IST_OD6S.SENSORS_SEARCH'))) {
                         return actor.rollAction('vehiclesensorssearch');
-                    } else if (item.name.includes(game.i18n.localize('OD6S.SENSORS_FOCUS'))) {
+                    } else if (item.name.includes(game.i18n.localize('NONEX_IST_OD6S.SENSORS_FOCUS'))) {
                         return actor.rollAction('vehiclesensorsfocus');
                     }
                 }

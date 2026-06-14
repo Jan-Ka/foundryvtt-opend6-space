@@ -5,7 +5,7 @@
  * keyed-pending-flag work in #40 / PR #116. The placement-preview UI is a
  * PIXI mouse-track + click-to-confirm flow that does not automate cleanly,
  * so we bypass it: pre-create a Region at a known position, pre-write the
- * `flags.od6s.explosivePending.<regionId>` entry that
+ * `flags.nonex-ist-od6s.explosivePending.<regionId>` entry that
  * `ExplosiveDialog.handleResult` would normally write after placement, then
  * call `item.roll(false, region.id)` to enter the resolution dialog.
  *
@@ -72,10 +72,10 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
         window.addEventListener("unhandledrejection", onRej);
 
         const prev = {
-            auto: window.game.settings.get("od6s", "auto_explosive"),
-            end: window.game.settings.get("od6s", "explosive_end_of_round"),
-            zones: window.game.settings.get("od6s", "explosive_zones"),
-            mapRange: window.game.settings.get("od6s", "map_range_to_difficulty"),
+            auto: window.game.settings.get("nonex-ist-od6s", "auto_explosive"),
+            end: window.game.settings.get("nonex-ist-od6s", "explosive_end_of_round"),
+            zones: window.game.settings.get("nonex-ist-od6s", "explosive_zones"),
+            mapRange: window.game.settings.get("nonex-ist-od6s", "map_range_to_difficulty"),
         };
 
         const phases: PhaseResult[] = [];
@@ -88,11 +88,11 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
             // Single-roll blast model: multi-zone needs all four
             // blast_radius.range entries configured, which the smoke item
             // doesn't bother with.
-            await window.game.settings.set("od6s", "explosive_zones", false);
+            await window.game.settings.set("nonex-ist-od6s", "explosive_zones", false);
             // Disable range→difficulty mapping so our forced difficulty
             // actually wins; otherwise getDifficulty would override it.
-            await window.game.settings.set("od6s", "map_range_to_difficulty", false);
-            await window.game.settings.set("od6s", "auto_explosive", true);
+            await window.game.settings.set("nonex-ist-od6s", "map_range_to_difficulty", false);
+            await window.game.settings.set("nonex-ist-od6s", "auto_explosive", true);
 
             actor = window.game.actors.find((a: any) => a.name === "smoke-character");
             if (!actor) {
@@ -143,7 +143,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
             // changes, and target the region id — which by now no longer
             // exists — surfacing as the rejections we're filtering above.
             const leftoverRegions = scene.regions
-                .filter((r: any) => r.flags?.od6s?.explosive === true)
+                .filter((r: any) => r.flags?.["nonex-ist-od6s"]?.explosive === true)
                 .map((r: any) => r.id);
             if (leftoverRegions.length) {
                 await scene.deleteEmbeddedDocuments("Region", leftoverRegions);
@@ -155,7 +155,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                 await scene.deleteEmbeddedDocuments("Token", leftoverTokens);
             }
             const leftoverMsgs = window.game.messages.filter(
-                (m: any) => m.getFlag("od6s", "isExplosive"),
+                (m: any) => m.getFlag("nonex-ist-od6s", "isExplosive"),
             ).map((m: any) => m.id);
             if (leftoverMsgs.length) {
                 await window.ChatMessage.deleteDocuments(leftoverMsgs);
@@ -177,7 +177,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                 name: string,
                 opts: {forceSuccess: boolean; endOfRound: boolean; placementOffsetCells: number},
             ): Promise<PhaseResult> {
-                await window.game.settings.set("od6s", "explosive_end_of_round", opts.endOfRound);
+                await window.game.settings.set("nonex-ist-od6s", "explosive_end_of_round", opts.endOfRound);
 
                 const placementX = gridSize * (2 + opts.placementOffsetCells);
                 const placementY = gridSize * 2;
@@ -194,7 +194,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                         radiusY: radiusPixels,
                     }],
                     flags: {
-                        od6s: {
+                        "nonex-ist-od6s": {
                             explosive: true,
                             actor: actor.uuid,
                             item: weapon.id,
@@ -208,7 +208,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                     {x: placementX, y: placementY},
                 ]).distance);
                 await weapon.update({
-                    [`flags.od6s.explosivePending.${region.id}`]: {
+                    [`flags.nonex-ist-od6s.explosivePending.${region.id}`]: {
                         origin: {x: originX, y: originY},
                         range: distance,
                     },
@@ -241,13 +241,13 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                 // falls back to getDifficulty(). 1 is satisfied by any roll
                 // ≥ 1, which the smoke actor's AGI=9 guarantees.
                 (dlg as any).rollData.difficulty = opts.forceSuccess ? 1 : 9999;
-                (dlg as any).rollData.range = "OD6S.RANGE_SHORT_SHORT";
+                (dlg as any).rollData.range = "NONEX_IST_OD6S.RANGE_SHORT_SHORT";
 
                 (dlg as any).element.querySelector('[data-action="submit"]')?.click();
 
                 // Poll until the resolution path's last side-effect lands:
                 // `clearExplosivePending(item, regionId)` removes the
-                // per-region entry from `flags.od6s.explosivePending`. By
+                // per-region entry from `flags.nonex-ist-od6s.explosivePending`. By
                 // then `templateId`, `originalOwner`, the visibility flip
                 // (if any), and the scatter (on failure) have all been
                 // awaited. Bound at 5 s — if it doesn't clear by then the
@@ -257,11 +257,11 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                 let regionVisibility: number | null = null;
                 let regionShape: {x: number; y: number} | null = null;
                 for (let i = 0; i < 50; i++) {
-                    const pending = (weapon.getFlag("od6s", "explosivePending") ?? {}) as Record<string, unknown>;
+                    const pending = (weapon.getFlag("nonex-ist-od6s", "explosivePending") ?? {}) as Record<string, unknown>;
                     const stillPending = Object.prototype.hasOwnProperty.call(pending, region.id);
                     if (!stillPending) {
                         const fresh = scene.regions.get(region.id);
-                        regionFlags = fresh ? {...fresh.flags?.od6s} : null;
+                        regionFlags = fresh ? {...fresh.flags?.["nonex-ist-od6s"]} : null;
                         regionVisibility = fresh?.visibility ?? null;
                         regionShape = fresh ? {x: fresh.shapes[0].x, y: fresh.shapes[0].y} : null;
                         break;
@@ -272,7 +272,7 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
                 const chatCreated = window.game.messages.size > msgsBefore;
                 const msgs = [...window.game.messages.contents];
                 const last = msgs[msgs.length - 1];
-                const success = last?.flags?.od6s?.success ?? null;
+                const success = last?.flags?.["nonex-ist-od6s"]?.success ?? null;
 
                 return {
                     name,
@@ -314,13 +314,13 @@ test("auto-explosive resolution: success stamps owner+template, failure scatters
             } catch { /* ignore */ }
             try {
                 if (weapon) {
-                    await weapon.update({"flags.od6s.-=explosivePending": null});
+                    await weapon.update({"flags.nonex-ist-od6s.-=explosivePending": null});
                 }
             } catch { /* ignore */ }
-            await window.game.settings.set("od6s", "auto_explosive", prev.auto);
-            await window.game.settings.set("od6s", "explosive_end_of_round", prev.end);
-            await window.game.settings.set("od6s", "explosive_zones", prev.zones);
-            await window.game.settings.set("od6s", "map_range_to_difficulty", prev.mapRange);
+            await window.game.settings.set("nonex-ist-od6s", "auto_explosive", prev.auto);
+            await window.game.settings.set("nonex-ist-od6s", "explosive_end_of_round", prev.end);
+            await window.game.settings.set("nonex-ist-od6s", "explosive_zones", prev.zones);
+            await window.game.settings.set("nonex-ist-od6s", "map_range_to_difficulty", prev.mapRange);
             window.removeEventListener("unhandledrejection", onRej);
         }
     });

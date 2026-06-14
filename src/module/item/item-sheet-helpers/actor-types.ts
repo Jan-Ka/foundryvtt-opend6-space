@@ -11,14 +11,14 @@ const {DialogV2} = foundry.applications.api;
 export async function addActorType(item: Item): Promise<void> {
     if (!isItemGroupItem(item)) return;
     const data = {
-        actorTypes: game.od6s.OD6SActor.TYPES.filter((i: string) => !item.system.actor_types.includes(i)),
+        actorTypes: game["nonex-ist-od6s"].OD6SActor.TYPES.filter((i: string) => !item.system.actor_types.includes(i)),
     };
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/item/item-add-actor-type.html", data);
+        "systems/nonex-ist-od6s/templates/item/item-add-actor-type.html", data);
     const result = await DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.ADD") + " " + game.i18n.localize("OD6S.ACTOR_TYPE")},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.ADD") + " " + game.i18n.localize("NONEX_IST_OD6S.ACTOR_TYPE")},
         content,
-        ok: {label: game.i18n.localize("OD6S.ADD")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.ADD")},
     });
     if (result?.["actor-type"]) await addActorTypeAction(item, result["actor-type"]);
 }

@@ -22,7 +22,7 @@ export async function deleteItem(sheet: ItemCrudSheetLike, ev: Event) {
         if (skillItem) {
             for (const docItem of sheet.document.items as Iterable<Item & { system?: { skill?: string } }>) {
                 if (docItem.type === "specialization" && docItem.system?.skill === skillItem.name) {
-                    ui.notifications.error(game.i18n.localize("OD6S.ERR_SKILL_HAS_SPEC"));
+                    ui.notifications.error(game.i18n.localize("NONEX_IST_OD6S.ERR_SKILL_HAS_SPEC"));
                     return;
                 }
             }
@@ -39,8 +39,8 @@ export async function deleteItem(sheet: ItemCrudSheetLike, ev: Event) {
         // V1 Dialog.prompt rendered with the unstyled grey template; use
         // DialogV2.confirm for the same yes/no shape with the V2 styling.
         const ok = await foundry.applications.api.DialogV2.confirm({
-            window: {title: game.i18n.localize("OD6S.DELETE")},
-            content: `<p>${game.i18n.localize("OD6S.DELETE_CONFIRM")}</p>`,
+            window: {title: game.i18n.localize("NONEX_IST_OD6S.DELETE")},
+            content: `<p>${game.i18n.localize("NONEX_IST_OD6S.DELETE_CONFIRM")}</p>`,
         });
         if (!ok) return;
         if (itemId) await sheet.document.deleteEmbeddedDocuments('Item', [itemId]);
@@ -75,8 +75,8 @@ export async function addItem(
     let worldItems: Item[] = [];
     let compendiumItems: Item[] = [];
 
-    data.label = game.i18n.localize('OD6S.ADD') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
-    data.label_empty = game.i18n.localize('OD6S.ADD_EMPTY') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
+    data.label = game.i18n.localize('NONEX_IST_OD6S.ADD') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
+    data.label_empty = game.i18n.localize('NONEX_IST_OD6S.ADD_EMPTY') + " " + game.i18n.localize(OD6S.itemLabels[itemType])
 
     worldItems = game.items.filter((i: Item) => i.type === itemType);
     const cEntries = od6sutilities.getItemsFromCompendiumByType(itemType as OD6SItemType);
@@ -117,7 +117,7 @@ export async function addItem(
     data.actorType = sheet.document.type;
 
     if (itemType === 'skill' || itemType === 'spec') {
-        if (itemType === 'skill' && data.attrname === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+        if (itemType === 'skill' && data.attrname === 'met' && game.settings.get('nonex-ist-od6s', 'metaphysics_attribute_optional')) {
             // No metaphysics attribute, set skill to default of 1D
             data.score = OD6S.pipsPerDice;
         } else {
@@ -145,7 +145,7 @@ export function onItemCreate(sheet: ItemCrudSheetLike, event: Event) {
     // Grab any data associated with this control.
     const data = foundry.utils.deepClone(header.dataset);
     // Initialize a default name.
-    const name = game.i18n.localize('OD6S.NEW') + ' ' + game.i18n.localize('ITEM.Type' + capType);
+    const name = game.i18n.localize('NONEX_IST_OD6S.NEW') + ' ' + game.i18n.localize('ITEM.Type' + capType);
     // Prepare the item object.
     const itemData: { name: string; type: string; data: Record<string, string | undefined> } = {
         name,

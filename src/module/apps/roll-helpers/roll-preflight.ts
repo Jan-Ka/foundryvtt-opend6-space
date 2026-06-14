@@ -47,25 +47,25 @@ async function passesExplosiveGate(data: IncomingRollData): Promise<boolean> {
 
     const sys = item.system as OD6SWeaponItemSystem | undefined;
     if (sys?.subtype?.toLowerCase() !== 'explosive') return true;
-    if (item.getFlag('od6s', 'explosiveSet')) return true;
+    if (item.getFlag('nonex-ist-od6s', 'explosiveSet')) return true;
     // Auto-explosive throws skip `explosiveSet` and stamp the pending map
     // directly (one entry per region) so multiple in-flight throws can co-exist.
-    const pending = item.getFlag('od6s', 'explosivePending') as Record<string, unknown> | undefined;
+    const pending = item.getFlag('nonex-ist-od6s', 'explosivePending') as Record<string, unknown> | undefined;
     if (pending && Object.keys(pending).length > 0) return true;
 
     await new ExplosiveDialog({
         options: OD6S.explosives,
         item: item,
         actor: data.actor,
-        type: 'OD6S.EXPLOSIVE_THROWN',
-        auto: game.settings.get('od6s', 'auto_explosive'),
+        type: 'NONEX_IST_OD6S.EXPLOSIVE_THROWN',
+        auto: game.settings.get('nonex-ist-od6s', 'auto_explosive'),
     } as never).render({force: true});
     return false;
 }
 
 function passesSheetModeGate(data: IncomingRollData): boolean {
     if (data.actor.system.sheetmode.value === "normal") return true;
-    ui.notifications.warn(game.i18n.localize("OD6S.WARN_SHEET_MODE_NOT_NORMAL"));
+    ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.WARN_SHEET_MODE_NOT_NORMAL"));
     return false;
 }
 
@@ -82,7 +82,7 @@ function passesMeleeRangeGate(data: IncomingRollData): boolean {
     ) - fudge;
 
     if (distance !== 0 && distance / canvas.grid.distance > 1.5) {
-        ui.notifications.warn(game.i18n.localize('OD6S.OUT_OF_MELEE_BRAWL_RANGE'));
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.OUT_OF_MELEE_BRAWL_RANGE'));
         return false;
     }
     return true;

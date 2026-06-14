@@ -61,7 +61,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             attributes[a] = 0;
         }
         this.custom = {
-            templateName: game.i18n.localize("OD6S.CREATE_CUSTOM_TEMPLATE"),
+            templateName: game.i18n.localize("NONEX_IST_OD6S.CREATE_CUSTOM_TEMPLATE"),
             attributeScore: OD6S.initialAttributes,
             characterPoints: OD6S.initialCharacterPoints,
             fatePoints: OD6S.initialFatePoints,
@@ -73,11 +73,11 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-create-character",
-        classes: ["od6s", "create-character-dialog"],
+        id: "nonex-ist-od6s-create-character",
+        classes: ["nonex-ist-od6s", "create-character-dialog"],
         tag: "div",
         window: {
-            title: "OD6S.CREATE_CHARACTER",
+            title: "NONEX_IST_OD6S.CREATE_CHARACTER",
             resizable: true,
             minimizable: true,
         },
@@ -95,7 +95,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/actor/character/create-character.html",
+            template: "systems/nonex-ist-od6s/templates/actor/character/create-character.html",
         },
     };
 
@@ -110,7 +110,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
                 ? await od6sutilities.getItemByName(matchedTemplate.name)
                 : null;
             if (!loaded) {
-                ui.notifications.error(game.i18n.localize("OD6S.ERROR_TEMPLATE_NOT_FOUND"));
+                ui.notifications.error(game.i18n.localize("NONEX_IST_OD6S.ERROR_TEMPLATE_NOT_FOUND"));
                 this.templateData = {};
             } else {
                 this.templateData = loaded as OD6SCharacterTemplateItem;
@@ -227,7 +227,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             elem.addEventListener("click", async (ev) => {
                 ev.preventDefault();
                 if (this.skillScore < 1) {
-                    ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SKILL_DICE"));
+                    ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_SKILL_DICE"));
                     return;
                 }
                 const target = ev.currentTarget as HTMLElement;
@@ -313,17 +313,17 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             elem.addEventListener("click", async (ev) => {
                 ev.preventDefault();
                 if (this.specScore === 0 && this.skillScore < OD6S.pipsPerDice) {
-                    ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SKILL_DICE"));
+                    ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_SKILL_DICE"));
                     return;
                 }
                 const specData = (ev.currentTarget as HTMLElement).dataset as DOMStringMap;
                 const result = await DialogV2.input({
-                    window: {title: game.i18n.localize("OD6S.CREATE_SPECIALIZATION")},
+                    window: {title: game.i18n.localize("NONEX_IST_OD6S.CREATE_SPECIALIZATION")},
                     content: await foundry.applications.handlebars.renderTemplate(
-                        "systems/od6s/templates/apps/character-creation/specialize.html",
+                        "systems/nonex-ist-od6s/templates/apps/character-creation/specialize.html",
                         specData,
                     ),
-                    ok: {label: game.i18n.localize("OD6S.CREATE_SPECIALIZATION")},
+                    ok: {label: game.i18n.localize("NONEX_IST_OD6S.CREATE_SPECIALIZATION")},
                 });
                 if (result?.specname) await this.addSpec(result.specname, specData);
             });
@@ -358,7 +358,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             const before = {skill: this.skillScore, spec: this.specScore};
             const result = addSpecDiceBudget(this.skillScore, this.specScore, getAllocationConfig());
             if (!result.ok) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SKILL_DICE"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_SKILL_DICE"));
             } else {
                 this.skillScore = result.skillScore;
                 this.specScore = result.specScore;
@@ -372,7 +372,7 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
             const before = {skill: this.skillScore, spec: this.specScore};
             const result = removeSpecDiceBudget(this.skillScore, this.specScore, getAllocationConfig());
             if (!result.ok) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_SPECIALIZATION_DICE"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_SPECIALIZATION_DICE"));
             } else {
                 this.skillScore = result.skillScore;
                 this.specScore = result.specScore;
@@ -425,11 +425,11 @@ export default class OD6SCreateCharacter extends HandlebarsApplicationMixin(Appl
 
     async addSpec(name: any, data: any) {
         if (typeof name === "undefined" || name === "") {
-            ui.notifications.warn(game.i18n.localize("OD6S.ERR_SPECIALIZATION_NAME"));
+            ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ERR_SPECIALIZATION_NAME"));
             return;
         }
         if ((this.actor as unknown as { specializations: Item[] }).specializations.find((s) => s.name === name)) {
-            ui.notifications.warn(game.i18n.localize("OD6S.ERR_SPECIALIZATION_EXISTS"));
+            ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ERR_SPECIALIZATION_EXISTS"));
             return;
         }
 

@@ -8,17 +8,17 @@
 // ── Sheet body wash ───────────────────────────────────────────────────────
 // Subtle radial glow + hairline interior frame so the sheet feels intentional
 // rather than a transparent overlay on the Foundry background.
-.od6s.sheet {
+.nonex-ist-od6s.sheet {
   // Interior atmosphere — soft vignette toward the bottom.
-  // --od6s-sheet-opacity (default 1) multiplies every alpha channel. The
+  // --nonex-ist-od6s-sheet-opacity (default 1) multiplies every alpha channel. The
   // user-facing slider in the system settings drives this from 0 (fully
   // transparent) through 1 (designed default) up to 2 (the bottom of the
   // gradient saturates around 1.8; the top still has some translucency).
   .window-content,
   & {
     background:
-      radial-gradient(ellipse at top, rgba(201, 162, 39, calc(0.05 * var(--od6s-sheet-opacity, 1))) 0%, transparent 60%),
-      linear-gradient(180deg, rgba(8, 12, 18, calc(0.35 * var(--od6s-sheet-opacity, 1))) 0%, rgba(8, 12, 18, calc(0.55 * var(--od6s-sheet-opacity, 1))) 100%);
+      radial-gradient(ellipse at top, rgba(201, 162, 39, calc(0.05 * var(--nonex-ist-od6s-sheet-opacity, 1))) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(8, 12, 18, calc(0.35 * var(--nonex-ist-od6s-sheet-opacity, 1))) 0%, rgba(8, 12, 18, calc(0.55 * var(--nonex-ist-od6s-sheet-opacity, 1))) 100%);
   }
 }
 
@@ -106,8 +106,8 @@
 // all use position.height: "auto", which lets content grow past the
 // viewport with no internal scroll. Cap at 90vh and make .window-content
 // the scroll container.
-.od6s.settings-config,
-.od6s.sheet {
+.nonex-ist-od6s.settings-config,
+.nonex-ist-od6s.sheet {
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -122,6 +122,6 @@
 // sheets need the scroll one level deeper (on .sheet-body) so the
 // .sheet-mode footer can pin below the scroll area instead of scrolling
 // with it. See _forms.scss for the full flex chain that makes this work.
-.od6s.settings-config > .window-content {
+.nonex-ist-od6s.settings-config > .window-content {
   overflow-y: auto;
 }

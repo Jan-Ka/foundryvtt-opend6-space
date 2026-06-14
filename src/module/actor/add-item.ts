@@ -20,11 +20,11 @@ export class OD6SAddItem extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-add-item",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-add-item",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.ADD",
+            title: "NONEX_IST_OD6S.ADD",
             resizable: true,
             minimizable: true,
         },
@@ -44,7 +44,7 @@ export class OD6SAddItem extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/actor/common/add-item.html",
+            template: "systems/nonex-ist-od6s/templates/actor/common/add-item.html",
         },
     };
 
@@ -107,7 +107,7 @@ export class OD6SAddItem extends HandlebarsApplicationMixin(ApplicationV2) {
             if (itemData.type === "skill" || itemData.type === "specialization") {
                 itemData.system.attribute = data.attrname;
             }
-            itemData.name = game.i18n.localize("OD6S.NEW_ITEM");
+            itemData.name = game.i18n.localize("NONEX_IST_OD6S.NEW_ITEM");
             // @ts-expect-error OD6SItem(data) v1 construction signature still needed for cloning
             const item = new OD6SItem(itemData);
             await actor!.createEmbeddedDocuments("Item", [item.toObject()]);

@@ -5,7 +5,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
     //const actor = game.actors.get(message.speaker.actor);
     // Bail if out of character points
     if (actor.system.characterpoints.value < 1) {
-        ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_ROLL"));
+        ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_CP_ROLL"));
         return;
     }
     const rollString = "1d6x6[CP]";
@@ -20,7 +20,7 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
     update.system.characterpoints = {};
     update.system.characterpoints.value = actor.system.characterpoints.value -= 1;
 
-    switch (message.getFlag('od6s', 'subtype')) {
+    switch (message.getFlag('nonex-ist-od6s', 'subtype')) {
         case "dodge":
             update.dodge = {};
             update.dodge.score = actor.system.dodge.score + roll.total;
@@ -53,9 +53,9 @@ export async function useCharacterPointOnRoll(actor: any, message: any): Promise
 
     if (game.user.isGM) {
         await message.update(messageUpdate, {"diff": true});
-        await message.setFlag('od6s', 'total', replacementRoll.total);
-        if ((+messageUpdate.content) >= (message.getFlag('od6s', 'difficulty'))) {
-            await message.setFlag('od6s', 'success', true);
+        await message.setFlag('nonex-ist-od6s', 'total', replacementRoll.total);
+        if ((+messageUpdate.content) >= (message.getFlag('nonex-ist-od6s', 'difficulty'))) {
+            await message.setFlag('nonex-ist-od6s', 'success', true);
         }
     } else {
         await OD6S.socket.executeAsGM('updateRollMessage', game.user.id, message.id, messageUpdate);

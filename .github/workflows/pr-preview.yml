@@ -41,18 +41,18 @@ jobs:
         run: |
           set -eu
           mkdir -p build/artifacts
-          cp -r src build/od6s
-          (cd build && zip -r artifacts/od6s.zip od6s/)
-          (cd build/artifacts && sha256sum od6s.zip > od6s.zip.sha256)
+          cp -r src build/nonex-ist-od6s
+          (cd build && zip -r artifacts/nonex-ist-od6s.zip nonex-ist-od6s/)
+          (cd build/artifacts && sha256sum nonex-ist-od6s.zip > nonex-ist-od6s.zip.sha256)
 
       - name: Upload preview artifact
         id: upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          name: nonex-ist-od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
           path: |
-            build/artifacts/od6s.zip
-            build/artifacts/od6s.zip.sha256
+            build/artifacts/nonex-ist-od6s.zip
+            build/artifacts/nonex-ist-od6s.zip.sha256
           retention-days: 14
           if-no-files-found: error
 
@@ -63,7 +63,7 @@ jobs:
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           WIKI_URL: ${{ github.server_url }}/${{ github.repository }}/wiki/Troubleshooting
-          ARTIFACT_NAME: od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
+          ARTIFACT_NAME: nonex-ist-od6s-pr${{ github.event.pull_request.number }}-${{ github.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -eu
@@ -83,10 +83,10 @@ jobs:
             echo
             echo "1. **Back up your world** before testing a preview build."
             echo "2. Sign in to GitHub and click the artifact link above to download the artifact zip."
-            echo "3. Unzip it. Inside you'll find \`od6s.zip\` and a \`.sha256\` checksum."
+            echo "3. Unzip it. Inside you'll find \`nonex-ist-od6s.zip\` and a \`.sha256\` checksum."
             echo "4. Quit Foundry. In your Foundry user data folder, locate \`Data/systems/\`."
-            echo "   - If \`od6s\` already exists there, rename or remove it first (this preview will replace it)."
-            echo "5. Extract \`od6s.zip\` into \`Data/systems/\` so you end up with \`Data/systems/od6s/system.json\`."
+            echo "   - If \`nonex-ist-od6s\` (or the legacy \`od6s\`) already exists there, rename or remove it first (this preview will replace it)."
+            echo "5. Extract \`nonex-ist-od6s.zip\` into \`Data/systems/\` so you end up with \`Data/systems/nonex-ist-od6s/system.json\`."
             echo "6. Start Foundry. The system should appear as **OpenD6 Space** with the preview version stamped above."
             echo
             echo "> Foundry's *Install System → Manifest URL* flow does **not** work for PR previews — artifacts require a logged-in download, so manual extraction is the only path. Stable installs will continue to use the manifest URL from tagged releases."

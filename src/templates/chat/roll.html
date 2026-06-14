@@ -1,51 +1,51 @@
-<header class="message-header flexrow"{{#if message.flags.od6s.itemId}} data-item-id="{{message.flags.od6s.itemId}}"{{/if}}>
+<header class="message-header flexrow"{{#if message.flags.nonex-ist-od6s.itemId}} data-item-id="{{message.flags.nonex-ist-od6s.itemId}}"{{/if}}>
     <h4 class="message-sender" data-message-id="{{message._id}}">{{alias}}</h4>
     <span class="message-metadata">
           <time class="message-timestamp">{{timeSince message.timestamp}}</time>
         {{#if user.isGM}}
-            {{# if (eq message.flags.od6s.isVisible false)}}
+            {{# if (eq message.flags.nonex-ist-od6s.isVisible false)}}
                 <a class="button message-reveal" data-message-id="{{message._id}}"
-                   title="{{localize 'OD6S.REVEAL_DIFFICULTY'}}"
+                   title="{{localize 'NONEX_IST_OD6S.REVEAL_DIFFICULTY'}}"
                    role="button" tabindex="0"
-                   aria-label="{{localize 'OD6S.REVEAL_DIFFICULTY'}}">
+                   aria-label="{{localize 'NONEX_IST_OD6S.REVEAL_DIFFICULTY'}}">
                         <i class="fas fa-eye" aria-hidden="true"></i></a>
             {{/if}}
-            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "NONEX_IST_OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
         {{/if}}
         </span>
     {{#if message.flavor}}
         <span class="flavor-text" data-message-id="{{message._id}}">
             {{{message.flavor}}}
         </span>
-        {{#unless message.flags.od6s.isExplosive}}
-            {{#if (isAttack message.flags.od6s.subtype) }}
-                {{localize "OD6S.ATTACKING"}}&nbsp;
+        {{#unless message.flags.nonex-ist-od6s.isExplosive}}
+            {{#if (isAttack message.flags.nonex-ist-od6s.subtype) }}
+                {{localize "NONEX_IST_OD6S.ATTACKING"}}&nbsp;
                 {{#if user.isGM}}
-                <span class="choose-target" title="{{localize "OD6S.CHANGE_TARGET"}}"
+                <span class="choose-target" title="{{localize "NONEX_IST_OD6S.CHANGE_TARGET"}}"
                       data-message-id="{{message._id}}"
                       role="button" tabindex="0"
-                      aria-label="{{localize "OD6S.CHANGE_TARGET"}}">
+                      aria-label="{{localize "NONEX_IST_OD6S.CHANGE_TARGET"}}">
                 {{else}}
                 <span>
                 {{/if}}
-                {{#if message.flags.od6s.targetName}}
-                    {{message.flags.od6s.targetName}}
+                {{#if message.flags.nonex-ist-od6s.targetName}}
+                    {{message.flags.nonex-ist-od6s.targetName}}
                 {{else}}
-                    {{localize "OD6S.NO_TARGET"}}
+                    {{localize "NONEX_IST_OD6S.NO_TARGET"}}
                 {{/if}}
             </span>
             {{/if}}
         {{/unless}}
     {{/if}}
 </header>
-{{#if message.flags.od6s.wild}}
-    {{#if message.flags.od6s.wildHandled}}
+{{#if message.flags.nonex-ist-od6s.wild}}
+    {{#if message.flags.nonex-ist-od6s.wildHandled}}
         <div class="wilddie">
-            {{localize message.flags.od6s.wildResult}}
+            {{localize message.flags.nonex-ist-od6s.wildResult}}
         </div>
     {{else}}
         <div {{#if user.isGM}}class="wilddiegm" {{else}}class="wilddie"{{/if}} data-message-id="{{message._id}}">
-            {{localize message.flags.od6s.wildResult}}
+            {{localize message.flags.nonex-ist-od6s.wildResult}}
         </div>
     {{/if}}
 {{/if}}
@@ -53,26 +53,26 @@
     {{{message.content}}}
 </div>
 {{#if (isCardVisible message)}}
-    {{#if (isAttack message.flags.od6s.subtype)}}
+    {{#if (isAttack message.flags.nonex-ist-od6s.subtype)}}
         <div class="attacksuccess">
-        <div>{{alias}} {{hitsOrMisses message.flags.od6s.success}}
-            {{#unless message.flags.od6s.isExplosive}}
-                {{#if message.flags.od6s.targetName}}
-                    {{message.flags.od6s.targetName}}
+        <div>{{alias}} {{hitsOrMisses message.flags.nonex-ist-od6s.success}}
+            {{#unless message.flags.nonex-ist-od6s.isExplosive}}
+                {{#if message.flags.nonex-ist-od6s.targetName}}
+                    {{message.flags.nonex-ist-od6s.targetName}}
                 {{else}}
-                    {{localize 'OD6S.NO_TARGET'}}</div>
+                    {{localize 'NONEX_IST_OD6S.NO_TARGET'}}</div>
                 {{/if}}
             {{/unless}}
         </div>
-        {{#unless message.flags.od6s.isExplosive}}
-            {{getHitLocation message.flags.od6s.targetType message.flags.od6s.location}}
+        {{#unless message.flags.nonex-ist-od6s.isExplosive}}
+            {{getHitLocation message.flags.nonex-ist-od6s.targetType message.flags.nonex-ist-od6s.location}}
         {{/unless}}
     {{/if}}
-    {{#if (isSkillOrAttribute message.flags.od6s.type message.flags.od6s.subtype) }}
-        {{#if (eq message.flags.od6s.difficultyLevel 'OD6S.DIFFICULTY_UNKNOWN')}}
+    {{#if (isSkillOrAttribute message.flags.nonex-ist-od6s.type message.flags.nonex-ist-od6s.subtype) }}
+        {{#if (eq message.flags.nonex-ist-od6s.difficultyLevel 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN')}}
             {{#if user.isGM}}
                 <div class="flexrow flex-group-left">
-                    <label for="choose-difficulty">{{localize "OD6S.DIFFICULTY"}}:</label>
+                    <label for="choose-difficulty">{{localize "NONEX_IST_OD6S.DIFFICULTY"}}:</label>
                     <select class="choose-difficulty" name="choose-difficulty" id="choose-difficulty" data-message-id="{{message._id}}">
                         
                             {{#each (getDifficultyLevels) as | level |}}
@@ -85,44 +85,44 @@
         {{else}}
             <div class="skillsuccess">
             <div title="{{localize (getResultDescription
-                                           (onSuccess message.flags.od6s.success message.flags.od6s.total message.flags.od6s.difficulty))}}">
+                                           (onSuccess message.flags.nonex-ist-od6s.success message.flags.nonex-ist-od6s.total message.flags.nonex-ist-od6s.difficulty))}}">
                 {{localize
-                        (onSuccess message.flags.od6s.success message.flags.od6s.total message.flags.od6s.difficulty)}}</div>
+                        (onSuccess message.flags.nonex-ist-od6s.success message.flags.nonex-ist-od6s.total message.flags.nonex-ist-od6s.difficulty)}}</div>
         </div>
         {{/if}}
     {{/if}}
-    {{#unless (isDefense message.flags.od6s.subtype)}}
-        {{#unless (eq message.flags.od6s.type 'damage')}}
-            {{#unless (eq message.flags.od6s.type 'resistance')}}
-                {{#if (isKnown message.flags.od6s.isKnown)}}
-                    {{#unless (eq message.flags.od6s.difficultyLevel 'OD6S.DIFFICULTY_UNKNOWN')}}
-                    {{#if message.flags.od6s.modifiers.length}}
+    {{#unless (isDefense message.flags.nonex-ist-od6s.subtype)}}
+        {{#unless (eq message.flags.nonex-ist-od6s.type 'damage')}}
+            {{#unless (eq message.flags.nonex-ist-od6s.type 'resistance')}}
+                {{#if (isKnown message.flags.nonex-ist-od6s.isKnown)}}
+                    {{#unless (eq message.flags.nonex-ist-od6s.difficultyLevel 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN')}}
+                    {{#if message.flags.nonex-ist-od6s.modifiers.length}}
                         <div class="flexrow">
                             <div{{#if user.isGM}}
-                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
-                                    "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
+                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
+                                    "NONEX_IST_OD6S.DIFFICULTY"}}: {{message.flags.nonex-ist-od6s.difficulty}}</div>
                             <div class="modifiers-button"
                                  data-message-id="{{message._id}}"
-                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}"
+                                 title="{{localize "NONEX_IST_OD6S.SHOW_MODIFIERS"}}"
                                  role="button"
                                  tabindex="0"
-                                 aria-label="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                 aria-label="{{localize "NONEX_IST_OD6S.SHOW_MODIFIERS"}}">
                                 <i class="fas fa-plus modifier-button" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="modifiers-display" id="modifiers-display-{{message._id}}">
                             <ul class="modifiers-list">
-                                <li>{{localize "OD6S.BASE_DIFFICULTY"}}: {{message.flags.od6s.baseDifficulty}}</li>
-                                {{#each message.flags.od6s.modifiers as |m|}}
+                                <li>{{localize "NONEX_IST_OD6S.BASE_DIFFICULTY"}}: {{message.flags.nonex-ist-od6s.baseDifficulty}}</li>
+                                {{#each message.flags.nonex-ist-od6s.modifiers as |m|}}
                                     <li>{{m.name}}: {{m.value}}</li>
                                 {{/each}}
                             </ul>
                         </div>
                     {{else}}
-                        {{#unless (eq message.flags.od6s.type 'simple')}}
+                        {{#unless (eq message.flags.nonex-ist-od6s.type 'simple')}}
                             <div{{#if user.isGM}}
-                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
-                                    "OD6S.DIFFICULTY"}}: {{message.flags.od6s.difficulty}}</div>
+                            class="edit-difficulty" data-message-id="{{message._id}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.EDIT_DIFFICULTY"}}"{{/if}}>{{localize
+                                    "NONEX_IST_OD6S.DIFFICULTY"}}: {{message.flags.nonex-ist-od6s.difficulty}}</div>
                         {{/unless}}
                     {{/if}}
                     {{/unless}}
@@ -130,91 +130,91 @@
             {{/unless}}
         {{/unless}}
     {{/unless}}
-    {{#if message.flags.od6s.isExplosive}}
+    {{#if message.flags.nonex-ist-od6s.isExplosive}}
         {{#if (notExplosivesEndOfRound)}}
-            {{#if message.flags.od6s.wild}}
-                {{#if message.flags.od6s.wildHandled}}
-                    {{> "systems/od6s/templates/chat/explosive-button.html" }}
+            {{#if message.flags.nonex-ist-od6s.wild}}
+                {{#if message.flags.nonex-ist-od6s.wildHandled}}
+                    {{> "systems/nonex-ist-od6s/templates/chat/explosive-button.html" }}
                 {{/if}}
             {{else}}
-                {{> "systems/od6s/templates/chat/explosive-button.html" }}
+                {{> "systems/nonex-ist-od6s/templates/chat/explosive-button.html" }}
             {{/if}}
         {{else}}
-            {{#if message.flags.od6s.triggered}}
-                {{> "systems/od6s/templates/chat/explosive-button.html" }}
+            {{#if message.flags.nonex-ist-od6s.triggered}}
+                {{> "systems/nonex-ist-od6s/templates/chat/explosive-button.html" }}
             {{/if}}
         {{/if}}
     {{else}}
-    {{#if (isAttack message.flags.od6s.subtype)}}
-        {{#if message.flags.od6s.success}}
+    {{#if (isAttack message.flags.nonex-ist-od6s.subtype)}}
+        {{#if message.flags.nonex-ist-od6s.success}}
             {{#if (isGmOrOwner message.speaker.actor)}}
-                {{#if message.flags.od6s.damageScore}}
+                {{#if message.flags.nonex-ist-od6s.damageScore}}
                     <div class="damage-button"
                          data-message-id="{{message._id}}"
-                         data-item-id="{{message.flags.od6s.itemId}}"
-                         data-damage="{{message.flags.od6s.damageScore}}"
-                         data-damage-dice="{{message.flags.od6s.damageDice.dice}}"
-                         data-damage-pips="{{message.flags.od6s.damageDice.pips}}"
-                         data-damageScaleBonus="{{message.flags.od6s.damageScaleBonus}}"
-                         data-damageScaleDice="{{message.flags.od6s.damageScaleDice}}"
-                         data-damageType="{{message.flags.od6s.damageType}}"
-                         data-source="{{message.flags.od6s.source}}"
-                         data-vehicle="{{message.flags.od6s.vehicle}}"
+                         data-item-id="{{message.flags.nonex-ist-od6s.itemId}}"
+                         data-damage="{{message.flags.nonex-ist-od6s.damageScore}}"
+                         data-damage-dice="{{message.flags.nonex-ist-od6s.damageDice.dice}}"
+                         data-damage-pips="{{message.flags.nonex-ist-od6s.damageDice.pips}}"
+                         data-damageScaleBonus="{{message.flags.nonex-ist-od6s.damageScaleBonus}}"
+                         data-damageScaleDice="{{message.flags.nonex-ist-od6s.damageScaleDice}}"
+                         data-damageType="{{message.flags.nonex-ist-od6s.damageType}}"
+                         data-source="{{message.flags.nonex-ist-od6s.source}}"
+                         data-vehicle="{{message.flags.nonex-ist-od6s.vehicle}}"
                          data-actor="{{message.speaker.actor}}"
-                         data-collision="{{eq message.flags.od6s.subtype 'vehicleramattack'}}"
-                         data-targetName="{{message.flags.od6s.targetName}}"
-                         data-targetId="{{message.flags.od6s.targetId}}"
-                         data-stun="{{message.flags.od6s.stun}}"
-                         {{#if message.flags.od6s.stun}}
-                            title="{{localize 'OD6S.ROLL_STUN_DAMAGE'}}">
-                                <button>{{localize 'OD6S.ROLL_STUN_DAMAGE'}}</button>
+                         data-collision="{{eq message.flags.nonex-ist-od6s.subtype 'vehicleramattack'}}"
+                         data-targetName="{{message.flags.nonex-ist-od6s.targetName}}"
+                         data-targetId="{{message.flags.nonex-ist-od6s.targetId}}"
+                         data-stun="{{message.flags.nonex-ist-od6s.stun}}"
+                         {{#if message.flags.nonex-ist-od6s.stun}}
+                            title="{{localize 'NONEX_IST_OD6S.ROLL_STUN_DAMAGE'}}">
+                                <button>{{localize 'NONEX_IST_OD6S.ROLL_STUN_DAMAGE'}}</button>
                          {{else}}
-                             title="{{localize 'OD6S.ROLL_DAMAGE'}}">
-                                <button>{{localize 'OD6S.ROLL_DAMAGE'}}</button>
+                             title="{{localize 'NONEX_IST_OD6S.ROLL_DAMAGE'}}">
+                                <button>{{localize 'NONEX_IST_OD6S.ROLL_DAMAGE'}}</button>
                          {{/if}}
                     </div>
                     <div class="damage-display flexrow">
                         <div{{#if (isGmOrOwner message.speaker.actor)}}
                         class="edit-damage" data-message-id="{{message._id}}"
-                        data-damage="{{message.flags.od6s.damageScore}}" role="button" tabindex="0" aria-label="{{localize "OD6S.EDIT_DAMAGE"}}"{{/if}}>
-                            {{message.flags.od6s.damageDice.dice}}D+{{
-                        message.flags.od6s.damageDice.pips}}{{#if (ne message.flags.od6s.damageScaleBonus 0)}}
-                            {{~showScaleDamage message.flags.od6s.damageScaleBonus}}
+                        data-damage="{{message.flags.nonex-ist-od6s.damageScore}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.EDIT_DAMAGE"}}"{{/if}}>
+                            {{message.flags.nonex-ist-od6s.damageDice.dice}}D+{{
+                        message.flags.nonex-ist-od6s.damageDice.pips}}{{#if (ne message.flags.nonex-ist-od6s.damageScaleBonus 0)}}
+                            {{~showScaleDamage message.flags.nonex-ist-od6s.damageScaleBonus}}
                         {{/if}}
-                            {{localize message.flags.od6s.damageTypeName}}</div>
-                    {{#if message.flags.od6s.damageModifiers.length}}
+                            {{localize message.flags.nonex-ist-od6s.damageTypeName}}</div>
+                    {{#if message.flags.nonex-ist-od6s.damageModifiers.length}}
                             <div class="damage-modifiers-button"
                                  data-message-id="{{message._id}}"
-                                 title="{{localize "OD6S.SHOW_MODIFIERS"}}"
+                                 title="{{localize "NONEX_IST_OD6S.SHOW_MODIFIERS"}}"
                                  role="button"
                                  tabindex="0"
-                                 aria-label="{{localize "OD6S.SHOW_MODIFIERS"}}">
+                                 aria-label="{{localize "NONEX_IST_OD6S.SHOW_MODIFIERS"}}">
                                 <i class="fas fa-plus modifier-button" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="damage-modifiers-display" id="damage-modifiers-display-{{message._id}}">
                             <ul class="damage-modifiers-list">
-                                <li>{{localize "OD6S.BASE_DAMAGE"}}: {{diceFromScore message.flags.od6s.baseDamage}}D+
-                                    {{~pipsFromScore message.flags.od6s.baseDamage}}</li>
-                                {{#each message.flags.od6s.damageModifiers as |m|}}
-                                    {{#if (eq m.name (localize "OD6S.SCALE") ) }}
+                                <li>{{localize "NONEX_IST_OD6S.BASE_DAMAGE"}}: {{diceFromScore message.flags.nonex-ist-od6s.baseDamage}}D+
+                                    {{~pipsFromScore message.flags.nonex-ist-od6s.baseDamage}}</li>
+                                {{#each message.flags.nonex-ist-od6s.damageModifiers as |m|}}
+                                    {{#if (eq m.name (localize "NONEX_IST_OD6S.SCALE") ) }}
                                         <li>
-                                            {{localize "OD6S.SCALE"}}:
+                                            {{localize "NONEX_IST_OD6S.SCALE"}}:
                                             {{#if (eq (diceForScale) true)}}
                                                 {{diceFromScore m.value}}D+{{pipsFromScore m.value}}
                                             {{else}}
-                                                {{showScaleDamage ../message.flags.od6s.damageScaleBonus}}
+                                                {{showScaleDamage ../message.flags.nonex-ist-od6s.damageScaleBonus}}
                                             {{/if}}
                                         </li>
-                                    {{ else if (eq m.name 'OD6S.STRENGTH_DAMAGE_BONUS')}}
+                                    {{ else if (eq m.name 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS')}}
                                         <li>
-                                            {{localize "OD6S.STRENGTH_DAMAGE_BONUS"}}:
-                                            {{../message.flags.od6s.strModDice.dice}}
-                                            D+{{../message.flags.od6s.strModDice.pips}}
+                                            {{localize "NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS"}}:
+                                            {{../message.flags.nonex-ist-od6s.strModDice.dice}}
+                                            D+{{../message.flags.nonex-ist-od6s.strModDice.pips}}
                                         </li>
-                                    {{ else if (eq m.name 'OD6S.WEAPON_DAMAGED')}}
+                                    {{ else if (eq m.name 'NONEX_IST_OD6S.WEAPON_DAMAGED')}}
                                         <li>
-                                            {{localize "OD6S.WEAPON_DAMAGED"}} ({{localize m.level}}):
+                                            {{localize "NONEX_IST_OD6S.WEAPON_DAMAGED"}} ({{localize m.level}}):
                                             {{diceFromScore m.value}}
                                             D+{{pipsFromScore m.value}}
                                         </li>
@@ -239,11 +239,11 @@
     {{/if}}
 {{/if}}
 {{#if user.isGM}}
-    {{#if message.flags.od6s.isOpposable }}
-        {{#unless message.flags.od6s.isOpposed}}
+    {{#if message.flags.nonex-ist-od6s.isOpposable }}
+        {{#unless message.flags.nonex-ist-od6s.isOpposed}}
             <div class="message-oppose" style="text-align: right"
                  data-message-id="{{message._id}}">
-                <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.OPPOSE"}}"><i
+                <a class="button message-oppose-button" title="{{localize "NONEX_IST_OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.OPPOSE"}}"><i
                         class="fas fa-exchange-alt" aria-hidden="true"></i></a>
             </div>
         {{/unless}}

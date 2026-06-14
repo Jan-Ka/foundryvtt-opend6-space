@@ -1,7 +1,7 @@
 <div class="{{cssClass}}">
     <header class="sheet-header">
         <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" title="{{item.name}}"
-             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+             alt="{{localize 'NONEX_IST_OD6S.ALT_ITEM_IMAGE'}}"/>
         <div class="header-fields">
             <div>
                 <h2 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h2>
@@ -13,7 +13,7 @@
                     </div>
                     {{#if (eq (getCost) '0')}}
                         <div class="resource">
-                            <label class="resource-label" for="item.system.price">{{localize 'OD6S.PRICE'}}</label>
+                            <label class="resource-label" for="item.system.price">{{localize 'NONEX_IST_OD6S.PRICE'}}</label>
                             <select name="system.price" id="item.system.price">
                                 
                                     {{#each (getPrices) as |price key|}}
@@ -26,7 +26,7 @@
                         </div>
                     {{else}}
                         <div class="resource">
-                            <label class="resource-label" for="item.system.cost">{{localize 'OD6S.COST'}}</label>
+                            <label class="resource-label" for="item.system.cost">{{localize 'NONEX_IST_OD6S.COST'}}</label>
                             <input type="text" name="system.cost" id="item.system.cost" value="{{item.system.cost}}"
                                    data-dtype="Number"/>
                         </div>
@@ -38,10 +38,10 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
-        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
-        <a class="item" data-tab="effects">{{localize "OD6S.EFFECTS"}}</a>
-        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+        <a class="item" data-tab="description">{{localize "NONEX_IST_OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "NONEX_IST_OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="effects">{{localize "NONEX_IST_OD6S.EFFECTS"}}</a>
+        <a class="item" data-tab="labels">{{localize "NONEX_IST_OD6S.LABELS"}}</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -55,13 +55,13 @@
         {{!-- Attributes Tab --}}
         <div class="tab attributes" data-group="primary" data-tab="attributes">
             {{!-- As you add new fields, add them in here! --}}
-            <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.STARSHIP_GEAR"}}</div>
+            <div>{{localize 'NONEX_IST_OD6S.TYPE'}}: {{localize "NONEX_IST_OD6S.STARSHIP_GEAR"}}</div>
         </div>
 
         {{!-- Effects Tab --}}
-        {{> systems/od6s/templates/item/item-effects.html }}
+        {{> systems/nonex-ist-od6s/templates/item/item-effects.html }}
 
         {{!--Labels Tab --}}
-        {{> systems/od6s/templates/item/item-labels-tags.html }}
+        {{> systems/nonex-ist-od6s/templates/item/item-labels-tags.html }}
     </section>
 </div>

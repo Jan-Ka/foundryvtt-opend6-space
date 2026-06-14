@@ -22,8 +22,8 @@ import {ensureWorldLaunched} from "./helpers/setup-driver.js";
 
 const FOUNDRY_URL = process.env.FOUNDRY_URL ?? "http://localhost:30000";
 const FOUNDRY_ADMIN_KEY = process.env.FOUNDRY_ADMIN_KEY ?? "";
-const FOUNDRY_SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "od6s-smoke";
-const FOUNDRY_SYSTEM_ID = process.env.FOUNDRY_SYSTEM_ID ?? "od6s";
+const FOUNDRY_SMOKE_WORLD = process.env.FOUNDRY_SMOKE_WORLD ?? "nonex-ist-od6s-smoke";
+const FOUNDRY_SYSTEM_ID = process.env.FOUNDRY_SYSTEM_ID ?? "nonex-ist-od6s";
 const FOUNDRY_USER = process.env.FOUNDRY_USER ?? "Gamemaster";
 const FOUNDRY_GM_PASSWORD = process.env.FOUNDRY_GM_PASSWORD ?? "";
 // Default on. Set to "0" / "false" to refuse to shut down a running

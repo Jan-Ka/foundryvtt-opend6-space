@@ -3,30 +3,30 @@ import { lookupWoundPenalty, lookupWoundLevel, lookupInjury } from './wounds';
 
 // Standard deadliness table (level 3 — default OpenD6 Space)
 const deadliness3 = {
-    0: { description: "Healthy", penalty: 0, core: "OD6S.WOUNDS_HEALTHY" },
-    1: { description: "Stunned", penalty: 0, core: "OD6S.WOUNDS_STUNNED" },
-    2: { description: "Wounded", penalty: 1, core: "OD6S.WOUNDS_WOUNDED" },
-    3: { description: "Severely Wounded", penalty: 2, core: "OD6S.WOUNDS_SEVERELY_WOUNDED" },
-    4: { description: "Incapacitated", penalty: 3, core: "OD6S.WOUNDS_INCAPACITATED" },
-    5: { description: "Mortally Wounded", penalty: 0, core: "OD6S.WOUNDS_MORTALLY_WOUNDED" },
-    6: { description: "Dead", penalty: 0, core: "OD6S.WOUNDS_DEAD" },
+    0: { description: "Healthy", penalty: 0, core: "NONEX_IST_OD6S.WOUNDS_HEALTHY" },
+    1: { description: "Stunned", penalty: 0, core: "NONEX_IST_OD6S.WOUNDS_STUNNED" },
+    2: { description: "Wounded", penalty: 1, core: "NONEX_IST_OD6S.WOUNDS_WOUNDED" },
+    3: { description: "Severely Wounded", penalty: 2, core: "NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED" },
+    4: { description: "Incapacitated", penalty: 3, core: "NONEX_IST_OD6S.WOUNDS_INCAPACITATED" },
+    5: { description: "Mortally Wounded", penalty: 0, core: "NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED" },
+    6: { description: "Dead", penalty: 0, core: "NONEX_IST_OD6S.WOUNDS_DEAD" },
 };
 
 const characterDamageTable: Record<string, number> = {
-    "OD6S.WOUNDS_STUNNED": 1,
-    "OD6S.WOUNDS_WOUNDED": 4,
-    "OD6S.WOUNDS_INCAPACITATED": 9,
-    "OD6S.WOUNDS_MORTALLY_WOUNDED": 13,
-    "OD6S.WOUNDS_DEAD": 16,
+    "NONEX_IST_OD6S.WOUNDS_STUNNED": 1,
+    "NONEX_IST_OD6S.WOUNDS_WOUNDED": 4,
+    "NONEX_IST_OD6S.WOUNDS_INCAPACITATED": 9,
+    "NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED": 13,
+    "NONEX_IST_OD6S.WOUNDS_DEAD": 16,
 };
 
 const vehicleDamageTable: Record<string, { damage: number }> = {
-    "OD6S.NO_DAMAGE": { damage: 0 },
-    "OD6S.DAMAGE_VERY_LIGHT": { damage: 1 },
-    "OD6S.DAMAGE_LIGHT": { damage: 4 },
-    "OD6S.DAMAGE_HEAVY": { damage: 9 },
-    "OD6S.DAMAGE_SEVERE": { damage: 13 },
-    "OD6S.DAMAGE_DESTROYED": { damage: 16 },
+    "NONEX_IST_OD6S.NO_DAMAGE": { damage: 0 },
+    "NONEX_IST_OD6S.DAMAGE_VERY_LIGHT": { damage: 1 },
+    "NONEX_IST_OD6S.DAMAGE_LIGHT": { damage: 4 },
+    "NONEX_IST_OD6S.DAMAGE_HEAVY": { damage: 9 },
+    "NONEX_IST_OD6S.DAMAGE_SEVERE": { damage: 13 },
+    "NONEX_IST_OD6S.DAMAGE_DESTROYED": { damage: 16 },
 };
 
 describe('lookupWoundPenalty', () => {
@@ -57,15 +57,15 @@ describe('lookupWoundPenalty', () => {
 
 describe('lookupWoundLevel', () => {
     it('returns healthy core for wound value 0', () => {
-        expect(lookupWoundLevel(deadliness3, 0)).toBe("OD6S.WOUNDS_HEALTHY");
+        expect(lookupWoundLevel(deadliness3, 0)).toBe("NONEX_IST_OD6S.WOUNDS_HEALTHY");
     });
 
     it('returns wounded core for wound value 2', () => {
-        expect(lookupWoundLevel(deadliness3, 2)).toBe("OD6S.WOUNDS_WOUNDED");
+        expect(lookupWoundLevel(deadliness3, 2)).toBe("NONEX_IST_OD6S.WOUNDS_WOUNDED");
     });
 
     it('returns dead core for wound value 6', () => {
-        expect(lookupWoundLevel(deadliness3, 6)).toBe("OD6S.WOUNDS_DEAD");
+        expect(lookupWoundLevel(deadliness3, 6)).toBe("NONEX_IST_OD6S.WOUNDS_DEAD");
     });
 
     it('returns empty string for unknown wound value', () => {
@@ -80,37 +80,37 @@ describe('lookupInjury', () => {
         });
 
         it('returns stunned for 1 damage', () => {
-            expect(lookupInjury(1, characterDamageTable, false)).toBe("OD6S.WOUNDS_STUNNED");
+            expect(lookupInjury(1, characterDamageTable, false)).toBe("NONEX_IST_OD6S.WOUNDS_STUNNED");
         });
 
         it('returns wounded for 4 damage', () => {
-            expect(lookupInjury(4, characterDamageTable, false)).toBe("OD6S.WOUNDS_WOUNDED");
+            expect(lookupInjury(4, characterDamageTable, false)).toBe("NONEX_IST_OD6S.WOUNDS_WOUNDED");
         });
 
         it('returns wounded for 7 damage (between thresholds)', () => {
-            expect(lookupInjury(7, characterDamageTable, false)).toBe("OD6S.WOUNDS_WOUNDED");
+            expect(lookupInjury(7, characterDamageTable, false)).toBe("NONEX_IST_OD6S.WOUNDS_WOUNDED");
         });
 
         it('returns incapacitated for 9 damage', () => {
-            expect(lookupInjury(9, characterDamageTable, false)).toBe("OD6S.WOUNDS_INCAPACITATED");
+            expect(lookupInjury(9, characterDamageTable, false)).toBe("NONEX_IST_OD6S.WOUNDS_INCAPACITATED");
         });
 
         it('returns dead for 20 damage', () => {
-            expect(lookupInjury(20, characterDamageTable, false)).toBe("OD6S.WOUNDS_DEAD");
+            expect(lookupInjury(20, characterDamageTable, false)).toBe("NONEX_IST_OD6S.WOUNDS_DEAD");
         });
     });
 
     describe('vehicle damage', () => {
         it('returns no damage for 0', () => {
-            expect(lookupInjury(0, vehicleDamageTable, true)).toBe("OD6S.NO_DAMAGE");
+            expect(lookupInjury(0, vehicleDamageTable, true)).toBe("NONEX_IST_OD6S.NO_DAMAGE");
         });
 
         it('returns light for 5 damage', () => {
-            expect(lookupInjury(5, vehicleDamageTable, true)).toBe("OD6S.DAMAGE_LIGHT");
+            expect(lookupInjury(5, vehicleDamageTable, true)).toBe("NONEX_IST_OD6S.DAMAGE_LIGHT");
         });
 
         it('returns destroyed for 16+ damage', () => {
-            expect(lookupInjury(20, vehicleDamageTable, true)).toBe("OD6S.DAMAGE_DESTROYED");
+            expect(lookupInjury(20, vehicleDamageTable, true)).toBe("NONEX_IST_OD6S.DAMAGE_DESTROYED");
         });
     });
 });

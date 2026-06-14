@@ -22,52 +22,52 @@ export interface RangeBand {
 }
 
 export const weaponTypes: readonly string[] = [
-    "OD6S.RANGED",
-    "OD6S.MELEE",
-    "OD6S.MISSILE",
-    "OD6S.THROWN",
-    "OD6S.EXPLOSIVE",
+    "NONEX_IST_OD6S.RANGED",
+    "NONEX_IST_OD6S.MELEE",
+    "NONEX_IST_OD6S.MISSILE",
+    "NONEX_IST_OD6S.THROWN",
+    "NONEX_IST_OD6S.EXPLOSIVE",
 ];
 
 export const weaponTypeKeys: readonly WeaponTypeKey[] = [
-    { "key": "OD6S.RANGED", "name": "Ranged" },
-    { "key": "OD6S.MELEE", "name": "Melee" },
-    { "key": "OD6S.MISSILE", "name": "Missile" },
-    { "key": "OD6S.THROWN", "name": "Thrown" },
-    { "key": "OD6S.EXPLOSIVE", "name": "Explosive" },
+    { "key": "NONEX_IST_OD6S.RANGED", "name": "Ranged" },
+    { "key": "NONEX_IST_OD6S.MELEE", "name": "Melee" },
+    { "key": "NONEX_IST_OD6S.MISSILE", "name": "Missile" },
+    { "key": "NONEX_IST_OD6S.THROWN", "name": "Thrown" },
+    { "key": "NONEX_IST_OD6S.EXPLOSIVE", "name": "Explosive" },
 ];
 
 export const meleeDifficulties: readonly string[] = [
-    "OD6S.DIFFICULTY_VERY_EASY",
-    "OD6S.DIFFICULTY_EASY",
-    "OD6S.DIFFICULTY_MODERATE",
-    "OD6S.DIFFICULTY_DIFFICULT",
-    "OD6S.DIFFICULTY_VERY_DIFFICULT",
-    "OD6S.DIFFICULTY_HEROIC",
+    "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY",
+    "NONEX_IST_OD6S.DIFFICULTY_EASY",
+    "NONEX_IST_OD6S.DIFFICULTY_MODERATE",
+    "NONEX_IST_OD6S.DIFFICULTY_DIFFICULT",
+    "NONEX_IST_OD6S.DIFFICULTY_VERY_DIFFICULT",
+    "NONEX_IST_OD6S.DIFFICULTY_HEROIC",
 ];
 
 export const rangedAttackOptions: Record<string, AttackOption> = {
-    "OD6S.ATTACK_STANDARD": {
+    "NONEX_IST_OD6S.ATTACK_STANDARD": {
         "attack": 0,
         "damage": 0,
         "multi": false,
     },
-    "OD6S.ATTACK_RANGED_SINGLE_FIRE_AS_MULTI": {
+    "NONEX_IST_OD6S.ATTACK_RANGED_SINGLE_FIRE_AS_MULTI": {
         "attack": -3,
         "damage": +3,
         "multi": true,
     },
-    "OD6S.ATTACK_RANGED_FULL_AUTO": {
+    "NONEX_IST_OD6S.ATTACK_RANGED_FULL_AUTO": {
         "attack": -6,
         "damage": 6,
         "multi": false,
     },
-    "OD6S.ATTACK_RANGED_SWEEP": {
+    "NONEX_IST_OD6S.ATTACK_RANGED_SWEEP": {
         "attack": -6,
         "damage": -9,
         "multi": false,
     },
-    "OD6S.ATTACK_RANGED_BURST_FIRE_AS_SINGLE": {
+    "NONEX_IST_OD6S.ATTACK_RANGED_BURST_FIRE_AS_SINGLE": {
         "attack": 0,
         "damage": -6,
         "multi": false,
@@ -75,47 +75,47 @@ export const rangedAttackOptions: Record<string, AttackOption> = {
 };
 
 export const meleeAttackOptions: Record<string, AttackOption> = {
-    "OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
-    "OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
-    "OD6S.ATTACK_LUNGE": { "attack": 3, "damage": -3 },
-    "OD6S.ATTACK_KNOCKDOWN_TRIP": { "attack": 6, "damage": 0 },
-    "OD6S.ATTACK_PUSH": { "attack": 3, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
+    "NONEX_IST_OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
+    "NONEX_IST_OD6S.ATTACK_LUNGE": { "attack": 3, "damage": -3 },
+    "NONEX_IST_OD6S.ATTACK_KNOCKDOWN_TRIP": { "attack": 6, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_PUSH": { "attack": 3, "damage": 0 },
 };
 
 export const brawlAttackOptions: Record<string, AttackOption> = {
-    "OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
-    "OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
-    "OD6S.ATTACK_GRAB": { "attack": 9, "damage": 0 },
-    "OD6S.ATTACK_LUNGE": { "attack": 3, "damage": -3 },
-    "OD6S.ATTACK_KNOCKDOWN_TRIP": { "attack": 6, "damage": 0 },
-    "OD6S.ATTACK_PUSH": { "attack": 3, "damage": 0 },
-    "OD6S.ATTACK_SWEEP": { "attack": -6, "damage": -9 },
-    "OD6S.ATTACK_TACKLE": { "attack": 3, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_STANDARD": { "attack": 0, "damage": 0, "multi": false },
+    "NONEX_IST_OD6S.ATTACK_ALL_OUT": { "attack": -6, "damage": 3 },
+    "NONEX_IST_OD6S.ATTACK_GRAB": { "attack": 9, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_LUNGE": { "attack": 3, "damage": -3 },
+    "NONEX_IST_OD6S.ATTACK_KNOCKDOWN_TRIP": { "attack": 6, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_PUSH": { "attack": 3, "damage": 0 },
+    "NONEX_IST_OD6S.ATTACK_SWEEP": { "attack": -6, "damage": -9 },
+    "NONEX_IST_OD6S.ATTACK_TACKLE": { "attack": 3, "damage": 0 },
 };
 
 export const ranges: Record<string, RangeBand> = {
-    "OD6S.RANGE_POINT_BLANK_SHORT": {
-        "name": "OD6S.RANGE_POINT_BLANK",
+    "NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT": {
+        "name": "NONEX_IST_OD6S.RANGE_POINT_BLANK",
         "difficulty": -5,
-        "map": "OD6S.DIFFICULTY_VERY_EASY",
+        "map": "NONEX_IST_OD6S.DIFFICULTY_VERY_EASY",
         "item": "pb",
     },
-    "OD6S.RANGE_SHORT_SHORT": {
-        "name": "OD6S.RANGE_SHORT",
+    "NONEX_IST_OD6S.RANGE_SHORT_SHORT": {
+        "name": "NONEX_IST_OD6S.RANGE_SHORT",
         "difficulty": 0,
-        "map": "OD6S.DIFFICULTY_EASY",
+        "map": "NONEX_IST_OD6S.DIFFICULTY_EASY",
         "item": "short",
     },
-    "OD6S.RANGE_MEDIUM_SHORT": {
-        "name": "OD6S.RANGE_MEDIUM",
+    "NONEX_IST_OD6S.RANGE_MEDIUM_SHORT": {
+        "name": "NONEX_IST_OD6S.RANGE_MEDIUM",
         "difficulty": 5,
-        "map": "OD6S.DIFFICULTY_MODERATE",
+        "map": "NONEX_IST_OD6S.DIFFICULTY_MODERATE",
         "item": "medium",
     },
-    "OD6S.RANGE_LONG_SHORT": {
-        "name": "OD6S.RANGE_LONG",
+    "NONEX_IST_OD6S.RANGE_LONG_SHORT": {
+        "name": "NONEX_IST_OD6S.RANGE_LONG",
         "difficulty": 10,
-        "map": "OD6S.DIFFICULTY_DIFFICULT",
+        "map": "NONEX_IST_OD6S.DIFFICULTY_DIFFICULT",
         "item": "long",
     },
 };

@@ -99,7 +99,7 @@ async function runActionRoll(
                     chatCreated = true;
                     const msgs = [...window.game.messages.contents];
                     const last = msgs[msgs.length - 1];
-                    chatType = last?.flags?.od6s?.type ?? null;
+                    chatType = last?.flags?.["nonex-ist-od6s"]?.type ?? null;
                 }
                 try { await (dlg as any).close(); } catch { /* ignore */ }
             }

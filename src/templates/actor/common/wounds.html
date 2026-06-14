@@ -4,24 +4,24 @@
             <label for="actor.system.wounds.body_points.current">{{localize (getBodyPointsLabel)}}:</label>
         </div>
         <div class="flexrow flex-group-center flex-between editbodypoints">
-            <input title="{{localize 'OD6S.BODY_POINTS_CURRENT'}}" name="system.wounds.body_points.current"
+            <input title="{{localize 'NONEX_IST_OD6S.BODY_POINTS_CURRENT'}}" name="system.wounds.body_points.current"
                    id="actor.system.wounds.body_points.current" type="number" min="0" max="9999"
                    value="{{actor.system.wounds.body_points.current}}"/>
         </div>
         {{#if (eq actor.system.sheetmode.value 'freeedit')}}
             <div class="flexrow flex-group-center flex-between">
-                <input title="{{localize 'OD6S.BODY_POINTS_MAX'}}" name="system.wounds.body_points.max"
+                <input title="{{localize 'NONEX_IST_OD6S.BODY_POINTS_MAX'}}" name="system.wounds.body_points.max"
                        id="actor.system.wounds.body_points.max" type="number" min="0" max="9999"
                        value="{{actor.system.wounds.body_points.max}}"/>
             </div>
         {{else}}
-            <div class="align-center body-points-max" title="{{localize 'OD6S.BODY_POINTS_MAX'}}">
+            <div class="align-center body-points-max" title="{{localize 'NONEX_IST_OD6S.BODY_POINTS_MAX'}}">
                 {{actor.system.wounds.body_points.max}}
             </div>
         {{/if}}
         {{#if (eq actor.system.sheetmode.value 'freeedit')}}
             <div class="rollbodypoints flex-group-center"
-                 title="{{localize 'OD6S.ROLL'}} {{localize (getBodyPointsLabel)}}"><i class="fas fa-dice"></i></div>
+                 title="{{localize 'NONEX_IST_OD6S.ROLL'}} {{localize (getBodyPointsLabel)}}"><i class="fas fa-dice"></i></div>
         {{/if}}
     </div>
 {{/if}}
@@ -32,7 +32,7 @@
         </div>
     {{else}}
         <div class="flexrow flex-group-left">
-            <label for="actor.system.wounds.value">{{localize 'OD6S.WOUNDS'}}:</label>
+            <label for="actor.system.wounds.value">{{localize 'NONEX_IST_OD6S.WOUNDS'}}:</label>
             <select name="system.wounds.value" id="actor.system.wounds.value" style="width: 70px;">
                 
                     {{#each (getWoundLevels actor.type) as |level key|}}

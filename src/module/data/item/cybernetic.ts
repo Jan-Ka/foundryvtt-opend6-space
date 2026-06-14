@@ -14,7 +14,7 @@ export default class CyberneticData extends foundry.abstract.TypeDataModel {
       ...equipSchema(),
       location: new fields.StringField({ initial: "" }),
       slots: new fields.NumberField({ initial: 0 }),
-      label: new fields.StringField({ initial: "OD6S.CHAR_CYBERNETICS" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_CYBERNETICS" }),
     };
   }
 }

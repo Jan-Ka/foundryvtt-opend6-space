@@ -40,7 +40,7 @@ pnpm run build    # JS bundle, SCSS, packs, translations
 
 Expected: 0 lint errors (warnings tolerated), 0 type errors, 152/152 unit
 tests pass (`src/**/*.test.ts`), 237/237 domain tests pass
-(`tests/domain/**/*.test.ts`), bundle ~622 KB at `src/module/od6s.js`, 14
+(`tests/domain/**/*.test.ts`), bundle ~622 KB at `src/module/nonex-ist-od6s.js`, 14
 LevelDB packs in `src/packs/`. The `starships` pack is intentionally empty.
 
 ---
@@ -51,7 +51,7 @@ LevelDB packs in `src/packs/`. The `starships` pack is intentionally empty.
 pnpm run test:smoke
 ```
 
-Requires a running Foundry process at `localhost:30000` with the `od6s`
+Requires a running Foundry process at `localhost:30000` with the `nonex-ist-od6s`
 system installed. Configure via env:
 
 ```text
@@ -59,8 +59,8 @@ FOUNDRY_URL=http://localhost:30000
 FOUNDRY_USER=Gamemaster
 FOUNDRY_GM_PASSWORD=            # per-user GM join password (blank for fresh worlds)
 FOUNDRY_ADMIN_KEY=              # server admin password gating /setup (blank if Foundry has none)
-FOUNDRY_SMOKE_WORLD=od6s-smoke  # world id the suite owns
-FOUNDRY_SYSTEM_ID=od6s          # system to use when creating the world
+FOUNDRY_SMOKE_WORLD=nonex-ist-od6s-smoke  # world id the suite owns
+FOUNDRY_SYSTEM_ID=nonex-ist-od6s          # system to use when creating the world
 ```
 
 Note: `FOUNDRY_PASSWORD` is intentionally *not* read by the smoke harness —
@@ -70,8 +70,8 @@ it is reserved for the foundryvtt.com website password that
 A `globalSetup` orchestrates the world lifecycle:
 
 - If Foundry sits at `/auth`, submits the admin password.
-- If Foundry sits at `/setup`, launches `od6s-smoke` if it exists; creates
-  it (system: `od6s`) and launches it if it doesn't.
+- If Foundry sits at `/setup`, launches `nonex-ist-od6s-smoke` if it exists; creates
+  it (system: `nonex-ist-od6s`) and launches it if it doesn't.
 - If Foundry is already at `/join` or `/game`, attaches.
 
 Each spec then asserts `game.world.id === FOUNDRY_SMOKE_WORLD` via
@@ -90,7 +90,7 @@ actors/items. Any failure prints a screenshot path and trace zip for
   terms, ≥26 status effects with v14 `name`/`img` schema, socketlib active.
 - **Tier 2** (`tier-2-sheets`): all actor and item type sheets render without
   errors; every item sheet contains a `<prose-mirror>` element.
-- **Tier 3a** (`tier-3-settings`): every `od6s.*` settings menu renders a
+- **Tier 3a** (`tier-3-settings`): every `nonex-ist-od6s.*` settings menu renders a
   `<form>`.
 - **Tier 3b** (`tier-3-roll`): attribute roll → dialog opens → submit →
   chat message created, zero v14 deprecation warnings.
@@ -101,7 +101,7 @@ actors/items. Any failure prints a screenshot path and trace zip for
 - **Tier 3d** (`tier-3-combat`): scene + combat creation, combatant added,
   initiative rolled, teardown.
 - **Tier 3e** (`tier-3-damage`): `applyDamage` on a vehicle actor transitions
-  `OD6S.NO_DAMAGE` → `OD6S.DAMAGE_VERY_LIGHT` → `OD6S.DAMAGE_HEAVY`;
+  `NONEX_IST_OD6S.NO_DAMAGE` → `NONEX_IST_OD6S.DAMAGE_VERY_LIGHT` → `NONEX_IST_OD6S.DAMAGE_HEAVY`;
   `applyWounds` escalates a character to Incapacitated without schema errors.
 - **Tier 3f** (`tier-3-vehicle`): vehicle actor schema fields (`scale`,
   `maneuverability`, `move`, `crew`) initialise correctly; vehicle item
@@ -140,7 +140,7 @@ in a live browser session. They replicate what the specs assert.
   r.item  = Object.keys(CONFIG.Item.dataModels || {});
   r.actorSheet = CONFIG.Actor.sheetClasses?.character?.[`${game.system.id}.OD6SActorSheet`]?.cls?.name;
   r.itemSheet  = CONFIG.Item.sheetClasses?.skill?.[`${game.system.id}.OD6SItemSheet`]?.cls?.name;
-  r.packs = game.packs.filter(p => p.metadata.packageName === 'od6s').map(p => p.metadata.name);
+  r.packs = game.packs.filter(p => p.metadata.packageName === 'nonex-ist-od6s').map(p => p.metadata.name);
   r.dice = {w: !!CONFIG.Dice.terms?.w, b: !!CONFIG.Dice.terms?.b};
   r.statusEffects = CONFIG.statusEffects?.length;
   r.socketlib = !!game.modules.get('socketlib')?.active;
@@ -238,9 +238,9 @@ Expect: `dialogOpened: true`, `chatCreated: true`, `warns: []`.
   await actor.update({'system.wounds.value': 0});
   for (const e of [...actor.effects.contents]) { try { await e.delete(); } catch {} }
 
-  await actor.applyWounds('OD6S.WOUNDS_WOUNDED').catch(e => errs.push(e.message));
+  await actor.applyWounds('NONEX_IST_OD6S.WOUNDS_WOUNDED').catch(e => errs.push(e.message));
   const w = actor.system.wounds.value;
-  await actor.applyWounds('OD6S.WOUNDS_SEVERELY_WOUNDED').catch(e => errs.push(e.message));
+  await actor.applyWounds('NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED').catch(e => errs.push(e.message));
   const s = actor.system.wounds.value;
   await actor.toggleStatusEffect('stunned', {active: true}).catch(e => errs.push(e.message));
   await new Promise(r => setTimeout(r, 200));

@@ -19,12 +19,12 @@ export class od6sInitRoll {
         const pips = od6sutilities.getDiceFromScore(initScore).pips;
         // @ts-expect-error
         this.rollData = {
-            label: game.i18n.localize('OD6S.INITIATIVE'),
-            title: game.i18n.localize('OD6S.INITIATIVE'),
+            label: game.i18n.localize('NONEX_IST_OD6S.INITIATIVE'),
+            title: game.i18n.localize('NONEX_IST_OD6S.INITIATIVE'),
             dice: dice,
             pips: pips,
-            wilddie: game.settings.get('od6s', 'use_wild_die'),
-            showWildDie: game.settings.get('od6s', 'use_wild_die'),
+            wilddie: game.settings.get('nonex-ist-od6s', 'use_wild_die'),
+            showWildDie: game.settings.get('nonex-ist-od6s', 'use_wild_die'),
             characterpoints: 0,
             cpcost: 0,
             cpcostcolor: "black",
@@ -33,7 +33,7 @@ export class od6sInitRoll {
             actor: actor,
             combat: combat,
             combatantId: combatantId,
-            template: "systems/od6s/templates/initRoll.html"
+            template: "systems/nonex-ist-od6s/templates/initRoll.html"
         }
 
         const caller = this as unknown as od6sInitRoll;
@@ -52,10 +52,10 @@ export class od6sInitRoll {
         if (rollData.wilddie) {
             rollData.dice = (+rollData.dice) - 1;
             rollString = rollData.dice;
-            rollString += "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR") + "+1dw" +
-                game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+            rollString += "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR") + "+1dw" +
+                game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
         } else {
-            rollString = rollData.dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR");
+            rollString = rollData.dice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR");
         }
 
         if (rollData.pips > 0) {
@@ -65,13 +65,13 @@ export class od6sInitRoll {
         // Character point dice also explode on a 6
         if (rollData.characterpoints > 0) {
             cpString = "+" + rollData.characterpoints + "db" +
-                game.i18n.localize("OD6S.CHARACTER_POINT_DIE_FLAVOR");
+                game.i18n.localize("NONEX_IST_OD6S.CHARACTER_POINT_DIE_FLAVOR");
             rollString += cpString;
         }
 
         // Bonus pips are not calculated to add new dice, just a bonus
         if (rollData.bonusdice > 0) {
-            rollString += "+" + rollData.bonusdice + "d6" + game.i18n.localize("OD6S.BONUS_DIE_FLAVOR")
+            rollString += "+" + rollData.bonusdice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BONUS_DIE_FLAVOR")
         }
         if (rollData.bonuspips > 0) {
             rollString += "+" + rollData.bonuspips;
@@ -94,9 +94,9 @@ export class od6sInitRoll {
         }
 
         const messageOptions: any = {
-            'flags.od6s.canUseCp': true
+            'flags.nonex-ist-od6s.canUseCp': true
         };
-        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) messageOptions.rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
+        if (game.user.isGM && game.settings.get('nonex-ist-od6s', 'hide-gm-rolls')) messageOptions.rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         await game.combats.active.rollInitiative(rollData.combatantId, {
             "formula": rollString,
             "messageOptions": messageOptions

@@ -58,7 +58,7 @@ export async function cancelAction(rollData: RollData): Promise<void> {
             if (item) await clearExplosivePending(item, regionId);
         } else {
             // Manual (non-auto) path: only `explosiveSet` was written.
-            await item?.unsetFlag('od6s', 'explosiveSet');
+            await item?.unsetFlag('nonex-ist-od6s', 'explosiveSet');
         }
     }
 }

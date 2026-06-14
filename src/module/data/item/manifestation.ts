@@ -14,7 +14,7 @@ export default class ManifestationData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       ...baseSchema(),
-      label: new fields.StringField({ initial: "OD6S.CHAR_MANIFESTATIONS" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_MANIFESTATIONS" }),
       attack: new fields.BooleanField({ initial: false }),
       activate: new fields.BooleanField({ initial: false }),
       active: new fields.BooleanField({ initial: false }),

@@ -11,12 +11,12 @@ export default class VehicleData extends foundry.abstract.TypeDataModel {
       cover: new fields.SchemaField({
         value: new fields.StringField({ initial: "" }),
         type: new fields.StringField({ initial: "String" }),
-        label: new fields.StringField({ initial: "OD6S.COVER" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.COVER" }),
       }),
       altitude: new fields.SchemaField({
         value: new fields.NumberField({ initial: 0 }),
         type: new fields.StringField({ initial: "Number" }),
-        label: new fields.StringField({ initial: "OD6S.ALTITUDE" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.ALTITUDE" }),
       }),
     };
   }

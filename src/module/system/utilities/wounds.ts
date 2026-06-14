@@ -65,7 +65,7 @@ export function getWoundPenalty(actor: Actor): number {
         const settingKey = actor.type === 'npc' ? 'npc-deadliness'
             : actor.type === 'creature' ? 'creature-deadliness'
             : 'deadliness';
-        deadlinessLevel = game.settings.get('od6s', settingKey) as number;
+        deadlinessLevel = game.settings.get('nonex-ist-od6s', settingKey) as number;
     }
     return lookupWoundPenalty(OD6S.deadliness[deadlinessLevel], actor.system.wounds.value);
 }
@@ -78,7 +78,7 @@ export function getWoundLevel(value: number, actor: Actor): string {
         const settingKey = actor.type === 'npc' ? 'npc-deadliness'
             : actor.type === 'creature' ? 'creature-deadliness'
             : 'deadliness';
-        deadlinessLevel = game.settings.get('od6s', settingKey) as number;
+        deadlinessLevel = game.settings.get('nonex-ist-od6s', settingKey) as number;
     }
     return lookupWoundLevel(OD6S.deadliness[deadlinessLevel], value);
 }

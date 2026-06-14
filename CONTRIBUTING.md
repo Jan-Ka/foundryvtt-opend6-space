@@ -49,7 +49,7 @@ pnpm run test:smoke                     # all smoke specs
 pnpm run test:smoke:ui                  # interactive Playwright UI
 ```
 
-Requires a Foundry world running with `od6s` selected. Defaults to
+Requires a Foundry world running with `nonex-ist-od6s` selected. Defaults to
 `http://localhost:30000` and user `Gamemaster` with no password;
 override via `FOUNDRY_URL`, `FOUNDRY_USER`, `FOUNDRY_PASSWORD`.
 
@@ -137,28 +137,28 @@ Other rules:
    The task verifies that `src/system.json` and `package.json` already
    carry the computed next version, then creates and pushes the tag.
    CI triggers automatically on `v*` tags and produces the signed
-   `od6s.zip`, SBOM, and checksum.
+   `nonex-ist-od6s.zip`, SBOM, and checksum.
 
 ## Verifying a release
 
 Release artifacts are signed with [cosign](https://docs.sigstore.dev/)
 keyless signing via GitHub Actions OIDC. To verify a downloaded
-`od6s.zip`:
+`nonex-ist-od6s.zip`:
 
 <!-- markdownlint-disable MD013 -->
 ```bash
 cosign verify-blob \
-  --bundle od6s.zip.bundle \
+  --bundle nonex-ist-od6s.zip.bundle \
   --certificate-identity-regexp 'https://github\.com/nonex-ist/foundryvtt-opend6-space/\.github/workflows/release\.yml@refs/tags/.+' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  od6s.zip
+  nonex-ist-od6s.zip
 ```
 <!-- markdownlint-enable MD013 -->
 
 The same `--bundle <file>.bundle` form verifies `system.json` and
 `sbom.cdx.json`, which ship signed alongside the zip. Each release also
 includes a CycloneDX SBOM (`sbom.cdx.json`) and a SHA-256 checksum file
-(`od6s.zip.sha256`).
+(`nonex-ist-od6s.zip.sha256`).
 
 Tags before `v2.7.1` were signed under the previous workflow identity
 at `github.com/Jan-Ka/foundryvtt-opend6-space`. To verify older

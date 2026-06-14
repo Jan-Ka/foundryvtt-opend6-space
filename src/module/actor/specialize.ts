@@ -79,7 +79,7 @@ export class od6sspecialize {
     ) {
         // Can't have a blank name
         if (typeof(itemData.specname)==='undefined' || itemData.specname==="" ) {
-            ui.notifications.error(game.i18n.localize("OD6S.ERR_SPECIALIZATION_NAME"));
+            ui.notifications.error(game.i18n.localize("NONEX_IST_OD6S.ERR_SPECIALIZATION_NAME"));
             return;
         }
 
@@ -88,7 +88,7 @@ export class od6sspecialize {
             const charSystem = actorSheet.actor.system as OD6SCharacterSystem;
             if ((+itemData.cpcost) > (+charSystem.characterpoints.value) &&
                 charSystem.sheetmode.value !== "freeedit") {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_SPEC"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_CP_SPEC"));
                 return;
             }
         }

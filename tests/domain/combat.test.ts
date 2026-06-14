@@ -119,20 +119,20 @@ describe('clampCombatDifficulty', () => {
 const WEAPON = { short: 20, medium: 50, long: 100 };
 
 describe('range modifier values match book table', () => {
-    it('OD6S.ranges has correct Point Blank modifier (-5)', () => {
-        expect(OD6S.ranges['OD6S.RANGE_POINT_BLANK_SHORT'].difficulty).toBe(-5);
+    it('NONEX_IST_OD6S.ranges has correct Point Blank modifier (-5)', () => {
+        expect(OD6S.ranges['NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT'].difficulty).toBe(-5);
     });
 
-    it('OD6S.ranges has correct Short modifier (0)', () => {
-        expect(OD6S.ranges['OD6S.RANGE_SHORT_SHORT'].difficulty).toBe(0);
+    it('NONEX_IST_OD6S.ranges has correct Short modifier (0)', () => {
+        expect(OD6S.ranges['NONEX_IST_OD6S.RANGE_SHORT_SHORT'].difficulty).toBe(0);
     });
 
-    it('OD6S.ranges has correct Medium modifier (+5)', () => {
-        expect(OD6S.ranges['OD6S.RANGE_MEDIUM_SHORT'].difficulty).toBe(5);
+    it('NONEX_IST_OD6S.ranges has correct Medium modifier (+5)', () => {
+        expect(OD6S.ranges['NONEX_IST_OD6S.RANGE_MEDIUM_SHORT'].difficulty).toBe(5);
     });
 
-    it('OD6S.ranges has correct Long modifier (+10)', () => {
-        expect(OD6S.ranges['OD6S.RANGE_LONG_SHORT'].difficulty).toBe(10);
+    it('NONEX_IST_OD6S.ranges has correct Long modifier (+10)', () => {
+        expect(OD6S.ranges['NONEX_IST_OD6S.RANGE_LONG_SHORT'].difficulty).toBe(10);
     });
 });
 

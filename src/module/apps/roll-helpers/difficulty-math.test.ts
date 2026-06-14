@@ -78,23 +78,23 @@ describe('applyDamageModifiers', () => {
 
     it('adds all modifiers when no exclusion', () => {
         expect(applyDamageModifiers(10, [
-            { name: 'OD6S.SCALE', value: 2 },
-            { name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 3 },
+            { name: 'NONEX_IST_OD6S.SCALE', value: 2 },
+            { name: 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS', value: 3 },
         ])).toBe(15);
     });
 
     it('excludes the named modifier', () => {
         // Used by fatepointeffect to skip strength damage doubling
         expect(applyDamageModifiers(10, [
-            { name: 'OD6S.SCALE', value: 2 },
-            { name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 3 },
-        ], 'OD6S.STRENGTH_DAMAGE_BONUS')).toBe(12);
+            { name: 'NONEX_IST_OD6S.SCALE', value: 2 },
+            { name: 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS', value: 3 },
+        ], 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS')).toBe(12);
     });
 
     it('exclusion name with no match leaves all modifiers in', () => {
         expect(applyDamageModifiers(10, [
-            { name: 'OD6S.SCALE', value: 2 },
-        ], 'OD6S.UNRELATED')).toBe(12);
+            { name: 'NONEX_IST_OD6S.SCALE', value: 2 },
+        ], 'NONEX_IST_OD6S.UNRELATED')).toBe(12);
     });
 });
 
@@ -103,44 +103,44 @@ describe('bucketRangeFromDistance', () => {
 
     it('returns point blank for distance < 3', () => {
         expect(bucketRangeFromDistance(0, range, false)).toEqual({
-            range: 'OD6S.RANGE_POINT_BLANK_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT',
             difficultyLevel: null,
         });
         expect(bucketRangeFromDistance(2, range, false)).toEqual({
-            range: 'OD6S.RANGE_POINT_BLANK_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_POINT_BLANK_SHORT',
             difficultyLevel: null,
         });
     });
 
     it('returns short range at boundary', () => {
         expect(bucketRangeFromDistance(3, range, false)).toEqual({
-            range: 'OD6S.RANGE_SHORT_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
             difficultyLevel: null,
         });
         expect(bucketRangeFromDistance(10, range, false)).toEqual({
-            range: 'OD6S.RANGE_SHORT_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_SHORT_SHORT',
             difficultyLevel: null,
         });
     });
 
     it('returns medium range at boundary', () => {
         expect(bucketRangeFromDistance(11, range, false)).toEqual({
-            range: 'OD6S.RANGE_MEDIUM_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_MEDIUM_SHORT',
             difficultyLevel: null,
         });
         expect(bucketRangeFromDistance(30, range, false)).toEqual({
-            range: 'OD6S.RANGE_MEDIUM_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_MEDIUM_SHORT',
             difficultyLevel: null,
         });
     });
 
     it('returns long range at boundary', () => {
         expect(bucketRangeFromDistance(31, range, false)).toEqual({
-            range: 'OD6S.RANGE_LONG_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_LONG_SHORT',
             difficultyLevel: null,
         });
         expect(bucketRangeFromDistance(60, range, false)).toEqual({
-            range: 'OD6S.RANGE_LONG_SHORT',
+            range: 'NONEX_IST_OD6S.RANGE_LONG_SHORT',
             difficultyLevel: null,
         });
     });
@@ -151,10 +151,10 @@ describe('bucketRangeFromDistance', () => {
     });
 
     it('emits matching difficulty level when mapRangeToDifficulty is on', () => {
-        expect(bucketRangeFromDistance(2, range, true)?.difficultyLevel).toBe('OD6S.DIFFICULTY_VERY_EASY');
-        expect(bucketRangeFromDistance(5, range, true)?.difficultyLevel).toBe('OD6S.DIFFICULTY_EASY');
-        expect(bucketRangeFromDistance(20, range, true)?.difficultyLevel).toBe('OD6S.DIFFICULTY_MODERATE');
-        expect(bucketRangeFromDistance(50, range, true)?.difficultyLevel).toBe('OD6S.DIFFICULTY_DIFFICULT');
+        expect(bucketRangeFromDistance(2, range, true)?.difficultyLevel).toBe('NONEX_IST_OD6S.DIFFICULTY_VERY_EASY');
+        expect(bucketRangeFromDistance(5, range, true)?.difficultyLevel).toBe('NONEX_IST_OD6S.DIFFICULTY_EASY');
+        expect(bucketRangeFromDistance(20, range, true)?.difficultyLevel).toBe('NONEX_IST_OD6S.DIFFICULTY_MODERATE');
+        expect(bucketRangeFromDistance(50, range, true)?.difficultyLevel).toBe('NONEX_IST_OD6S.DIFFICULTY_DIFFICULT');
     });
 });
 

@@ -8,21 +8,21 @@ export default function od6sHandlebars() {
 }
 
 async function loadHandleBarTemplates() {
-    const charPath = "systems/od6s/templates/actor/character/";
+    const charPath = "systems/nonex-ist-od6s/templates/actor/character/";
     const charTabPath = charPath + "tabs/";
-    const containerPath = "systems/od6s/templates/actor/container/";
-    const commonPath = "systems/od6s/templates/actor/common/";
+    const containerPath = "systems/nonex-ist-od6s/templates/actor/container/";
+    const commonPath = "systems/nonex-ist-od6s/templates/actor/common/";
     const commonTabPath = commonPath + "tabs/";
-    const npcPath = "systems/od6s/templates/actor/npc/";
+    const npcPath = "systems/nonex-ist-od6s/templates/actor/npc/";
     const npcTabPath = npcPath + "tabs/";
-    const creaturePath = "systems/od6s/templates/actor/creature/";
+    const creaturePath = "systems/nonex-ist-od6s/templates/actor/creature/";
     const creatureTabPath = creaturePath + "tabs/";
-    const vehiclePath = "systems/od6s/templates/actor/vehicle/";
+    const vehiclePath = "systems/nonex-ist-od6s/templates/actor/vehicle/";
     const vehicleTabPath = vehiclePath + "tabs/";
-    const starshipPath = "systems/od6s/templates/actor/starship/";
+    const starshipPath = "systems/nonex-ist-od6s/templates/actor/starship/";
     const starshipTabPath = starshipPath + "tabs/";
-    const chatPath = "systems/od6s/templates/chat/";
-    const itemPath = "systems/od6s/templates/item/";
+    const chatPath = "systems/nonex-ist-od6s/templates/chat/";
+    const itemPath = "systems/nonex-ist-od6s/templates/item/";
 
     const templatePaths = [
         charTabPath + "biography.html",

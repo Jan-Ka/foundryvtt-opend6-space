@@ -1,8 +1,8 @@
 {
-  "id": "od6s",
+  "id": "nonex-ist-od6s",
   "title": "OpenD6 Space",
   "description": "OpenD6 Space System for FoundryVTT",
-  "version": "2.7.4",
+  "version": "3.0.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14.363",
@@ -41,16 +41,16 @@
   },
   "authors": [
     {
-      "name": "Jan-Ka",
-      "url": "https://github.com/jan-ka"
+      "name": "nonex-ist",
+      "url": "https://github.com/nonex-ist"
     }
   ],
   "esmodules": [
-    "module/od6s.js"
+    "module/nonex-ist-od6s.js"
   ],
   "scripts": [],
   "styles": [
-    "css/od6s.css"
+    "css/nonex-ist-od6s.css"
   ],
   "packs": [
     {
@@ -58,98 +58,98 @@
       "label": "Weapons",
       "path": "packs/weapons",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "armor",
       "label": "Armor",
       "path": "packs/armor",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "natural",
       "label": "Natural Combat Items",
       "path": "packs/natural",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "advantages",
       "label": "Advantages",
       "path": "packs/advantages",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "disadvantages",
       "label": "Disadvantages",
       "path": "packs/disadvantages",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "skills",
       "label": "Skills",
       "path": "packs/skills",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "metaphysics-skills",
       "label": "Metaphysics Skills",
       "path": "packs/metaphysics-skills",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "specialabilities",
       "label": "Special Abilities",
       "path": "packs/special-abilities",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "gear",
       "label": "Gear",
       "path": "packs/gear",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "cybernetics",
       "label": "Cybernetics",
       "path": "packs/cybernetics",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "vehicles",
       "label": "Vehicles",
       "path": "packs/vehicles",
       "type": "Actor",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "starships",
       "label": "Starships",
       "path": "packs/starships",
       "type": "Actor",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "character-templates",
       "label": "Character Templates",
       "path": "packs/character-templates",
       "type": "Item",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     },
     {
       "name": "macros",
       "label": "Macros",
       "path": "packs/macros",
       "type": "Macro",
-      "system": "od6s"
+      "system": "nonex-ist-od6s"
     }
   ],
   "languages": [
@@ -186,16 +186,16 @@
   "media": [
     {
       "type": "setup",
-      "url": "systems/od6s/assets/od6s_cover.webp",
-      "thumbnail": "systems/od6s/assets/od6s_thumbnail.webp"
+      "url": "systems/nonex-ist-od6s/assets/od6s_cover.webp",
+      "thumbnail": "systems/nonex-ist-od6s/assets/od6s_thumbnail.webp"
     },
     {
       "type": "icon",
-      "url": "systems/od6s/assets/od6s_icon.webp"
+      "url": "systems/nonex-ist-od6s/assets/od6s_icon.webp"
     }
   ],
   "url": "https://github.com/nonex-ist/foundryvtt-opend6-space",
   "manifest": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/system.json",
-  "download": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/od6s.zip",
+  "download": "https://github.com/nonex-ist/foundryvtt-opend6-space/releases/latest/download/nonex-ist-od6s.zip",
   "license": "https://github.com/nonex-ist/foundryvtt-opend6-space/blob/main/LICENSE"
 }

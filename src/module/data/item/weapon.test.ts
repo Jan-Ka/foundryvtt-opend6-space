@@ -34,8 +34,8 @@ describe("migrateWeaponSource", () => {
 
   describe("subtype localization (#42)", () => {
     it("replaces a stored i18n key with its localized form", () => {
-      const source: Record<string, unknown> = { subtype: "OD6S.RANGED" };
-      migrateWeaponSource(source, (k) => (k === "OD6S.RANGED" ? "Ranged" : k));
+      const source: Record<string, unknown> = { subtype: "NONEX_IST_OD6S.RANGED" };
+      migrateWeaponSource(source, (k) => (k === "NONEX_IST_OD6S.RANGED" ? "Ranged" : k));
       expect(source.subtype).toBe("Ranged");
     });
 
@@ -46,15 +46,15 @@ describe("migrateWeaponSource", () => {
     });
 
     it("leaves the key in place if localize returns the key (i18n not ready yet)", () => {
-      const source: Record<string, unknown> = { subtype: "OD6S.RANGED" };
+      const source: Record<string, unknown> = { subtype: "NONEX_IST_OD6S.RANGED" };
       migrateWeaponSource(source, (k) => k);
-      expect(source.subtype).toBe("OD6S.RANGED");
+      expect(source.subtype).toBe("NONEX_IST_OD6S.RANGED");
     });
 
     it("is a no-op when localize is not provided", () => {
-      const source: Record<string, unknown> = { subtype: "OD6S.RANGED" };
+      const source: Record<string, unknown> = { subtype: "NONEX_IST_OD6S.RANGED" };
       migrateWeaponSource(source);
-      expect(source.subtype).toBe("OD6S.RANGED");
+      expect(source.subtype).toBe("NONEX_IST_OD6S.RANGED");
     });
 
     it("does not touch non-OD6S subtype strings", () => {

@@ -56,19 +56,19 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     const rollMode: string = resolveRollMode({
         explicit: typeof rollData.rollmode === "string" ? rollData.rollmode : null,
         isGM: !!game.user.isGM,
-        hideGmRolls: !!game.settings.get('od6s', 'hide-gm-rolls'),
+        hideGmRolls: !!game.settings.get('nonex-ist-od6s', 'hide-gm-rolls'),
     });
     if (rollData.fatepoint) {
         rollData.dice = (+rollData.originaldice * 2);
         rollData.pips = (+rollData.originalpips * 2);
-        await actor.setFlag('od6s', 'fatepointeffect', true)
+        await actor.setFlag('nonex-ist-od6s', 'fatepointeffect', true)
     }
 
     if (rollData.scaledice < 0) {
         rollData.otherpenalty += rollData.scaledice;
     }
 
-    if (rollData.type === "resistance" && game.settings.get('od6s','dice_for_scale')) {
+    if (rollData.type === "resistance" && game.settings.get('nonex-ist-od6s','dice_for_scale')) {
         rollData.dice = (+rollData.dice)+(+rollData.scaledice);
     }
 
@@ -87,10 +87,10 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         bonuspips: +rollData.bonuspips,
         wilddie: !!rollData.wilddie,
         labels: {
-            base: game.i18n.localize("OD6S.BASE_DIE_FLAVOR"),
-            wild: game.i18n.localize("OD6S.WILD_DIE_FLAVOR"),
-            cp: game.i18n.localize("OD6S.CHARACTER_POINT_DIE_FLAVOR"),
-            bonus: game.i18n.localize("OD6S.BONUS_DIE_FLAVOR"),
+            base: game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR"),
+            wild: game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR"),
+            cp: game.i18n.localize("NONEX_IST_OD6S.CHARACTER_POINT_DIE_FLAVOR"),
+            bonus: game.i18n.localize("NONEX_IST_OD6S.BONUS_DIE_FLAVOR"),
         },
     });
 
@@ -121,12 +121,12 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     const baseDifficulty = difficulty;
     const modifiers = applyDifficultyEffects(rollData);
 
-    if (rollData.difficultylevel === 'OD6S.DIFFICULTY_UNKNOWN') {
+    if (rollData.difficultylevel === 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN') {
         rollData.isvisible = false;
         rollData.isknown = false;
     }
 
-    if (game.settings.get('od6s', 'hide-skill-cards')) {
+    if (game.settings.get('nonex-ist-od6s', 'hide-skill-cards')) {
         rollData.isknown = false;
     }
 
@@ -158,9 +158,9 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         damageModifiers: rollData.damagemodifiers,
         strModDice,
         subtype: rollData.subtype ?? '',
-        fatepointInEffect: !!rollData.actor.getFlag('od6s', 'fatepointeffect'),
-        scaleLabel: game.i18n.localize("OD6S.SCALE"),
-        diceForScale: !!game.settings.get('od6s', 'dice_for_scale'),
+        fatepointInEffect: !!rollData.actor.getFlag('nonex-ist-od6s', 'fatepointeffect'),
+        scaleLabel: game.i18n.localize("NONEX_IST_OD6S.SCALE"),
+        diceForScale: !!game.settings.get('nonex-ist-od6s', 'dice_for_scale'),
         scaleMod: +rollData.modifiers.scalemod,
         scaleDice: +rollData.scaledice,
         vehicleRamDamage: isVehicleRam ? +OD6S.vehicle_speeds[rollData.vehiclespeed].damage : 0,
@@ -288,11 +288,11 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     if (rollData.isExplosive) {
         flags.showButton = true;
-        if(!game.settings.get('od6s', 'explosive_end_of_round')) {
+        if(!game.settings.get('nonex-ist-od6s', 'explosive_end_of_round')) {
             flags.triggered = true;
         }
-        if(game.settings.get('od6s','auto_explosive')
-            && !game.settings.get('od6s','explosive_end_of_round')) {
+        if(game.settings.get('nonex-ist-od6s','auto_explosive')
+            && !game.settings.get('nonex-ist-od6s','explosive_end_of_round')) {
             flags.targets = await od6sutilities.getExplosiveTargets(
                 rollData.actor.isToken ? rollData.actor.token.actor : rollData.actor, rollData.itemid, rollData.regionId
             )
@@ -301,7 +301,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     // Let's roll!
     if (rollString === '') {
-        ui.notifications.warn(game.i18n.localize('OD6S.ZERO_DICE'));
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.ZERO_DICE'));
         return;
     }
 
@@ -309,20 +309,20 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     let label;
     if (OD6S.showSkillSpecialization && rollData.specSkill !== '') {
-        label = rollData.label ? `${game.i18n.localize('OD6S.ROLLING')} ${rollData.specSkill}: ${rollData.label}` : '';
+        label = rollData.label ? `${game.i18n.localize('NONEX_IST_OD6S.ROLLING')} ${rollData.specSkill}: ${rollData.label}` : '';
     } else {
-        label = rollData.label ? `${game.i18n.localize('OD6S.ROLLING')} ${rollData.label}` : '';
+        label = rollData.label ? `${game.i18n.localize('NONEX_IST_OD6S.ROLLING')} ${rollData.label}` : '';
     }
 
     if (typeof (rollData.vehicle) !== 'undefined' && rollData.vehicle !== ''
         && (rollData.actor.type !== 'vehicle' && rollData.actor.type !== 'starship')) {
         const vehicle = await od6sutilities.getActorFromUuid(rollData.vehicle);
-        label = label + " " + game.i18n.localize('OD6S.FOR') + " " + vehicle!.name;
+        label = label + " " + game.i18n.localize('NONEX_IST_OD6S.FOR') + " " + vehicle!.name;
     }
 
     let useWildDie;
 
-    if(!game.settings.get('od6s', 'use_wild_die')) {
+    if(!game.settings.get('nonex-ist-od6s', 'use_wild_die')) {
         useWildDie = false;
     } else {
         if(!rollData.wilddie) {
@@ -335,7 +335,7 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
     if (useWildDie && rollMin < 1) {
         const detection = detectWildDieResult({
             terms: roll.terms as Array<{ flavor?: string; total?: number }>,
-            wildFlavor: game.i18n.localize('OD6S.WILD_DIE_FLAVOR').replace(/[[\]]/g, ""),
+            wildFlavor: game.i18n.localize('NONEX_IST_OD6S.WILD_DIE_FLAVOR').replace(/[[\]]/g, ""),
             wildDieOneDefault: OD6S.wildDieOneDefault,
             wildDieOneAuto: OD6S.wildDieOneAuto,
         });
@@ -360,20 +360,20 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
             asPips: !OD6S.highHitDamagePipsOrDice,
         });
         if (asPips) {
-            flags.damageModifiers.push({ "name": 'OD6S.HIGH_HIT_DAMAGE', "value": 0, "pips": extra });
+            flags.damageModifiers.push({ "name": 'NONEX_IST_OD6S.HIGH_HIT_DAMAGE', "value": 0, "pips": extra });
             flags.damageDice.pips += extra;
         } else {
-            flags.damageModifiers.push({ "name": 'OD6S.HIGH_HIT_DAMAGE', "value": extra, "pips": 0 });
+            flags.damageModifiers.push({ "name": 'NONEX_IST_OD6S.HIGH_HIT_DAMAGE', "value": extra, "pips": 0 });
             flags.damageDice.dice += extra;
         }
     }
 
     if (rollData.modifiers.calledshot && flags.success) {
         switch (rollData.modifiers.calledshot) {
-            case 'OD6S.CALLED_SHOT_NONE':
-            case 'OD6S.CALLED_SHOT_LARGE':
-            case 'OD6S.CALLED_SHOT_MEDIUM':
-            case 'OD6S.CALLED_SHOT_SMALL':
+            case 'NONEX_IST_OD6S.CALLED_SHOT_NONE':
+            case 'NONEX_IST_OD6S.CALLED_SHOT_LARGE':
+            case 'NONEX_IST_OD6S.CALLED_SHOT_MEDIUM':
+            case 'NONEX_IST_OD6S.CALLED_SHOT_SMALL':
                 flags.location = "";
                 break;
             default:
@@ -382,13 +382,13 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
 
     }
     if (rollMin > 0) {
-        label = label + " (" + game.i18n.localize('OD6S.SKILL_MINIMUM') + ": " + rollMin + ")";
+        label = label + " (" + game.i18n.localize('NONEX_IST_OD6S.SKILL_MINIMUM') + ": " + rollMin + ")";
     }
 
     const rollMessage = await roll.toMessage({
             speaker: ChatMessage.getSpeaker({actor: actor}),
             flavor: label,
-            flags: {od6s: flags}
+            flags: {"nonex-ist-od6s": flags}
         },
         {rollMode, create: true}
     );
@@ -405,20 +405,20 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         replacementRoll.terms[0].results[discardedIndex].active = false;
         replacementRoll.total = newTotal;
         flags.total = replacementRoll.total;
-        const rollMessageUpdate: { content?: number; rolls?: unknown[]; flags?: { od6s?: Partial<RollMessageFlags> } } = {};
+        const rollMessageUpdate: { content?: number; rolls?: unknown[]; flags?: { "nonex-ist-od6s"?: Partial<RollMessageFlags> } } = {};
         rollMessageUpdate.content = replacementRoll.total;
         rollMessageUpdate.rolls = rollMessage.rolls;
         rollMessageUpdate.rolls[0] = replacementRoll;
         rollMessageUpdate.flags = {};
-        rollMessageUpdate.flags.od6s = {};
-        const newSuccess = replacementRoll.total >= rollMessage.getFlag('od6s', 'difficulty')
+        rollMessageUpdate.flags["nonex-ist-od6s"] = {};
+        const newSuccess = replacementRoll.total >= rollMessage.getFlag('nonex-ist-od6s', 'difficulty')
 
         if (game.user.isGM) {
-            if (rollMessage.getFlag('od6s', 'difficulty') && rollMessage.getFlag('od6s', 'success')) {
-                rollMessageUpdate.flags.od6s.success = newSuccess;
+            if (rollMessage.getFlag('nonex-ist-od6s', 'difficulty') && rollMessage.getFlag('nonex-ist-od6s', 'success')) {
+                rollMessageUpdate.flags["nonex-ist-od6s"].success = newSuccess;
             }
-            rollMessageUpdate.flags.od6s.originalroll = rollMessage.rolls[0];
-            rollMessageUpdate.flags.od6s.wildHandled = true;
+            rollMessageUpdate.flags["nonex-ist-od6s"].originalroll = rollMessage.rolls[0];
+            rollMessageUpdate.flags["nonex-ist-od6s"].wildHandled = true;
             await rollMessage.update(rollMessageUpdate);
         } else {
             await OD6S.socket.executeAsGM('updateRollMessage', game.user.id, rollMessage.id, rollMessageUpdate);
@@ -440,35 +440,35 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         const origin = pending?.origin;
         const region = regionId ? canvas.scene.getEmbeddedDocument('Region', regionId) : null;
         if (region) {
-            await region.setFlag('od6s','message', rollMessage.id);
+            await region.setFlag('nonex-ist-od6s','message', rollMessage.id);
 
             if(rollData.actor.isToken) {
-                await region.setFlag('od6s','token', rollData.actor.token.id);
+                await region.setFlag('nonex-ist-od6s','token', rollData.actor.token.id);
             } else {
-                await region.setFlag('od6s','token', '');
+                await region.setFlag('nonex-ist-od6s','token', '');
             }
         }
-        if (game.settings.get('od6s', 'auto_explosive') && region) {
-            await region.setFlag('od6s', 'originalOwner', game.user.id);
-            await region.setFlag('od6s', 'templateId', rollMessage._id);
+        if (game.settings.get('nonex-ist-od6s', 'auto_explosive') && region) {
+            await region.setFlag('nonex-ist-od6s', 'originalOwner', game.user.id);
+            await region.setFlag('nonex-ist-od6s', 'templateId', rollMessage._id);
 
             if (!flags.success && origin && regionId) {
                 await od6sutilities.scatterExplosive(rollData.range, origin, regionId);
                 await od6sutilities.wait(100);
                 const newTargets = await od6sutilities.getExplosiveTargets(rollData.actor, rollData.itemid, regionId);
                 if (Object.keys(newTargets).length === 0) {
-                    await rollMessage.unsetFlag('od6s', 'showButton');
-                    await rollMessage.setFlag('od6s', 'showButton', false);
+                    await rollMessage.unsetFlag('nonex-ist-od6s', 'showButton');
+                    await rollMessage.setFlag('nonex-ist-od6s', 'showButton', false);
                 }
-                await rollMessage.unsetFlag('od6s', 'targets');
-                await rollMessage.setFlag('od6s', 'targets', newTargets);
+                await rollMessage.unsetFlag('nonex-ist-od6s', 'targets');
+                await rollMessage.setFlag('nonex-ist-od6s', 'targets', newTargets);
                 await od6sutilities.wait(100);
             }
         }
-        if (region && !game.settings.get('od6s', 'explosive_end_of_round')) {
+        if (region && !game.settings.get('nonex-ist-od6s', 'explosive_end_of_round')) {
             await region.update({ visibility: 2 });
         }
-        if (game.settings.get('od6s', 'auto_explosive') && item) {
+        if (game.settings.get('nonex-ist-od6s', 'auto_explosive') && item) {
             // Clear only this throw's pending entry so other in-flight throws
             // of the same item document remain resolvable (#40).
             await clearExplosivePending(item, regionId);
@@ -498,11 +498,11 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         const dodgeScore = rollData.fulldefense
             ? (+roll.total + baseAttackDifficulty)
             : (+roll.total);
-        const vehicleUpdate: { system: { dodge: { score: number } }; flags?: { od6s?: { dodge_actor?: string } } } = {
+        const vehicleUpdate: { system: { dodge: { score: number } }; flags?: { "nonex-ist-od6s"?: { dodge_actor?: string } } } = {
             system: { dodge: { score: dodgeScore } },
         };
-        if (!game.settings.get("od6s", "reaction_skills")) {
-            vehicleUpdate.flags = { od6s: { dodge_actor: actor.uuid } };
+        if (!game.settings.get("nonex-ist-od6s", "reaction_skills")) {
+            vehicleUpdate.flags = { "nonex-ist-od6s": { dodge_actor: actor.uuid } };
         }
 
         if (game.user.isGM) {
@@ -525,25 +525,25 @@ export async function executeRollAction(rollData: RollData): Promise<unknown> {
         await actor.update(update);
     }
 
-    if (!rollMessage.getFlag('od6s', 'wildHandled')) {
-        if (rollData.type === 'incapacitated' && !rollMessage.getFlag('od6s', 'success')) {
+    if (!rollMessage.getFlag('nonex-ist-od6s', 'wildHandled')) {
+        if (rollData.type === 'incapacitated' && !rollMessage.getFlag('nonex-ist-od6s', 'success')) {
             await rollData.actor.applyIncapacitatedFailure();
         }
 
-        if (rollData.type === 'mortally_wounded' && !rollMessage.getFlag('od6s', 'success')) {
+        if (rollData.type === 'mortally_wounded' && !rollMessage.getFlag('nonex-ist-od6s', 'success')) {
             await rollData.actor.applyMortallyWoundedFailure();
         }
     }
 
     if (rollData.subtype === 'purchase') {
-        await rollMessage.setFlag('od6s', 'purchasedItem', rollData.itemid);
+        await rollMessage.setFlag('nonex-ist-od6s', 'purchasedItem', rollData.itemid);
     }
 
-    if (rollData.subtype === 'purchase' && rollMessage.getFlag('od6s', 'success')) {
-        if (!rollMessage.getFlag('od6s', 'wild')) {
+    if (rollData.subtype === 'purchase' && rollMessage.getFlag('nonex-ist-od6s', 'success')) {
+        if (!rollMessage.getFlag('nonex-ist-od6s', 'wild')) {
             const seller = game.actors.get(rollData.seller);
             seller!.sheet._onPurchase(rollData.itemid, rollData.actor.id);
-        } else if (rollMessage.getFlag('od6s', 'wildHandled')) {
+        } else if (rollMessage.getFlag('nonex-ist-od6s', 'wildHandled')) {
             const seller = game.actors.get(rollData.seller);
             await seller!.sheet._onPurchase(rollData.itemid, rollData.actor.id);
         }

@@ -12,7 +12,7 @@ export default class VehicleWeaponData extends foundry.abstract.TypeDataModel {
       ...equipmentSchema(),
       ...equipSchema(),
       ...vehicleWeaponsFieldsSchema(),
-      label: new fields.StringField({ initial: "OD6S.VEHICLE_WEAPON" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.VEHICLE_WEAPON" }),
     };
   }
 }

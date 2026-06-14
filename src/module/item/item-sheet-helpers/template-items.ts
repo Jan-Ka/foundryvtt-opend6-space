@@ -29,13 +29,13 @@ export async function addTemplateItem(sheet: SheetLike, event: Event): Promise<v
     const type = target.dataset.type!;
     const templateItems = await getGameItemsByType(type);
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/item/item-template-add.html",
+        "systems/nonex-ist-od6s/templates/item/item-template-add.html",
         {templateItems});
     const label = game.i18n.localize(game.system.template.Item[type].label);
     const result = await DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.ADD") + " " + label + "!"},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.ADD") + " " + label + "!"},
         content,
-        ok: {label: game.i18n.localize("OD6S.ADD")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.ADD")},
     });
     if (result?.itemname) await addTemplateItemAction(sheet, result.itemname, type);
 }
@@ -75,13 +75,13 @@ export async function editTemplateItem(sheet: SheetLike, event: Event): Promise<
     const item = items.find((i) => i.name === target.dataset.name);
     const itemData = {name: target.dataset.name, type: target.dataset.type, description: item?.description};
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/item/item-template-item-edit.html",
+        "systems/nonex-ist-od6s/templates/item/item-template-item-edit.html",
         itemData);
     const label = game.i18n.localize(game.system.template.Item[target.dataset.type!].label);
     const result = await DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.EDIT") + " " + label + "!"},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.EDIT") + " " + label + "!"},
         content,
-        ok: {label: game.i18n.localize("OD6S.EDIT")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.EDIT")},
     });
     if (typeof result?.itemdesc === "string") {
         await editTemplateItemAction(sheet, result.itemdesc, event);
@@ -105,8 +105,8 @@ export async function deleteTemplateItem(sheet: SheetLike, event: Event): Promis
     if (!isTemplateLikeItem(sheet.item)) return;
     const item = sheet.item;
     const result = await DialogV2.confirm({
-        window: {title: game.i18n.localize("OD6S.DELETE")},
-        content: `<p>${game.i18n.localize("OD6S.DELETE_CONFIRM")}</p>`,
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.DELETE")},
+        content: `<p>${game.i18n.localize("NONEX_IST_OD6S.DELETE_CONFIRM")}</p>`,
     });
     if (!result) return;
 
@@ -124,12 +124,12 @@ export async function editTemplateAttribute(sheet: SheetLike, event: Event): Pro
     const target = event.currentTarget as HTMLElement;
     const score = target.dataset.score;
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/item/item-attribute-edit.html",
+        "systems/nonex-ist-od6s/templates/item/item-attribute-edit.html",
         {score});
     const result = await DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.EDIT") + " " + target.dataset.label + "!"},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.EDIT") + " " + target.dataset.label + "!"},
         content,
-        ok: {label: game.i18n.localize("OD6S.EDIT_ATTRIBUTE")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.EDIT_ATTRIBUTE")},
     });
     if (result) await editAttributeAction(sheet, result.dice, result.pips, event);
 }

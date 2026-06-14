@@ -1,7 +1,7 @@
 /**
  * Attribute definitions used to render the actor sheet attribute grid.
  * `name` and `shortName` are populated from settings at module init.
- * Mounted onto `OD6S.attributes` by `config-od6s.ts`.
+ * Mounted onto `NONEX_IST_OD6S.attributes` by `config-od6s.ts`.
  */
 export interface AttributeDef {
     name: string;

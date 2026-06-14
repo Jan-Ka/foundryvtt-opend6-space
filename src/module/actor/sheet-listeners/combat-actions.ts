@@ -57,14 +57,14 @@ export function registerCombatActionListeners(
         elem.addEventListener('change', async () => {
             // Don't allow if actor has 0 points
             if (sheet.document.system.fatepoints.value < 1) {
-                await sheet.document.setFlag('od6s', 'fatepointeffect', false)
+                await sheet.document.setFlag('nonex-ist-od6s', 'fatepointeffect', false)
                 sheet.render();
                 return;
             }
 
-            let inEffect = sheet.document.getFlag('od6s', 'fatepointeffect');
-            await sheet.document.setFlag('od6s', 'fatepointeffect', !inEffect);
-            inEffect = sheet.document.getFlag('od6s', 'fatepointeffect');
+            let inEffect = sheet.document.getFlag('nonex-ist-od6s', 'fatepointeffect');
+            await sheet.document.setFlag('nonex-ist-od6s', 'fatepointeffect', !inEffect);
+            inEffect = sheet.document.getFlag('nonex-ist-od6s', 'fatepointeffect');
             if (inEffect) {
                 const newValue = sheet.document.system.fatepoints.value - 1;
                 const update: Record<string, unknown> = {

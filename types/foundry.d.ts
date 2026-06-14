@@ -945,7 +945,7 @@ interface Game {
     settings: GameSettings;
     i18n: Localization;
     socket: GameSocket;
-    od6s: any;
+    "nonex-ist-od6s": any;
     system: GameSystem;
     version: string;
     packs: Collection<CompendiumPack>;

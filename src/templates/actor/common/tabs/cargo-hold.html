@@ -1,9 +1,9 @@
 <div class="tab items" data-group="primary" data-tab="cargo-hold">
     <div class="flexrow flex-group-center">
         <div class="align-center-header">
-            {{localize 'OD6S.ITEMS'}}
+            {{localize 'NONEX_IST_OD6S.ITEMS'}}
             <a class="item-controls-right cargo-hold-add" data-type="cargo-hold"
-               title="{{localize 'OD6S.ADD'}} {{localize 'OD6S.ITEM'}}">
+               title="{{localize 'NONEX_IST_OD6S.ADD'}} {{localize 'NONEX_IST_OD6S.ITEM'}}">
                 <i class="fas fa-plus"></i>
             </a>
         </div>
@@ -12,7 +12,7 @@
         <ul class="cargo-hold-list">
             {{#each actor.cargo_hold as |item key|}}
                 <li class="item grid cargo-hold-grid" data-item-id="{{item._id}}">
-                    <div class="edit-quantity" title="{{localize 'OD6S.QUANTITY'}}"
+                    <div class="edit-quantity" title="{{localize 'NONEX_IST_OD6S.QUANTITY'}}"
                          data-item-id="{{item._id}}">
                         <input type="number" name="item.system.quantity"
                                id="item.system.quantity" data-dtype="Number"
@@ -26,13 +26,13 @@
                          data-item-id="{{item._id}}"
                          data-type="{{item.type}}">
                         <a class="item-control item-edit small-font" data-item-id="{{item._id}}"
-                           title="{{localize 'OD6S.EDIT_ITEM'}}">
+                           title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                             <i class="fas fa-edit"></i>
                         </a>
                         <a data-item-id="{{item._id}}"
                            data-type="{{item.type}}"
                            class="item-control item-delete small-font"
-                           title="{{localize 'OD6S.DELETE_ITEM'}}">
+                           title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                             <i class="fas fa-trash"></i>
                         </a>
                     </div>

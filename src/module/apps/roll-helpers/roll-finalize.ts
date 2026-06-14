@@ -172,7 +172,7 @@ export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): Rol
         shots: 1,
         fulldefense: false,
         timer: 0,
-        template: 'systems/od6s/templates/roll.html',
+        template: 'systems/nonex-ist-od6s/templates/roll.html',
         vehiclespeed: 'cruise',
         vehiclecollisiontype: 't_bone',
         vehicleterraindifficulty: input.vehicleTerrainDifficulty,
@@ -184,7 +184,7 @@ export function runFinalize<K extends RollTypeKey>(input: FinalizeInput<K>): Rol
         // Modifiers sub-object
         modifiers: {
             range: input.range,
-            attackoption: 'OD6S.ATTACK_STANDARD',
+            attackoption: 'NONEX_IST_OD6S.ATTACK_STANDARD',
             calledshot: '',
             cover: '',
             coverlight: '',

@@ -1,8 +1,8 @@
 {{!-- Sheet Tab Navigation --}}
 <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="main">{{localize 'OD6S.TAB_MAIN'}}</a>
-    <a class="item" data-tab="cargo-hold">{{localize 'OD6S.TAB_CARGO_HOLD'}}</a>
-    <a class="item" data-tab="description">{{localize 'OD6S.DESCRIPTION'}}</a>
+    <a class="item" data-tab="main">{{localize 'NONEX_IST_OD6S.TAB_MAIN'}}</a>
+    <a class="item" data-tab="cargo-hold">{{localize 'NONEX_IST_OD6S.TAB_CARGO_HOLD'}}</a>
+    <a class="item" data-tab="description">{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}</a>
     {{#if (eq actor.system.sheetmode.value 'freeedit') }}
         <a class="item" data-tab="data"><i class="fas fa-cog"></i></a>
     {{/if}}
@@ -10,16 +10,16 @@
 {{!-- Sheet Body --}}
 <section class="sheet-body">
     {{!-- Attribues Tab --}}
-    {{> systems/od6s/templates/actor/starship/tabs/main.html }}
+    {{> systems/nonex-ist-od6s/templates/actor/starship/tabs/main.html }}
 
     {{!-- Cargo Hold Tab --}}
-    {{> systems/od6s/templates/actor/common/tabs/cargo-hold.html }}
+    {{> systems/nonex-ist-od6s/templates/actor/common/tabs/cargo-hold.html }}
 
     {{!-- Description tab --}}
-    {{>systems/od6s/templates/actor/common/tabs/description.html}}
+    {{>systems/nonex-ist-od6s/templates/actor/common/tabs/description.html}}
 
     {{#if (eq actor.system.sheetmode.value 'freeedit') }}
     {{!-- Data Tab --}}
-        {{> systems/od6s/templates/actor/starship/tabs/data.html }}
+        {{> systems/nonex-ist-od6s/templates/actor/starship/tabs/data.html }}
     {{/if}}
 </section>

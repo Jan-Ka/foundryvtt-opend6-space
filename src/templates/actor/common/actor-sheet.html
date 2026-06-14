@@ -2,7 +2,7 @@
     {{!-- Sheet Header --}}
     <header class="sheet-header flex-group-left">
         <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="200" width="200"
-             alt="{{localize 'OD6S.ALT_ACTOR_IMAGE'}}"/>
+             alt="{{localize 'NONEX_IST_OD6S.ALT_ACTOR_IMAGE'}}"/>
         <div class="header-right">
             <h2 class="charname">
                 <input title="{{localize OD6S.CHAR_NAME}}" name="name" type="text" value="{{actor.name}}"
@@ -13,7 +13,7 @@
     </header>
     {{> (getBodyTemplate actor.type)}}
     {{#if actor.system.sheetmode}}
-        {{> systems/od6s/templates/actor/common/sheet-mode.html}}
+        {{> systems/nonex-ist-od6s/templates/actor/common/sheet-mode.html}}
     {{/if}}
 </div>
 

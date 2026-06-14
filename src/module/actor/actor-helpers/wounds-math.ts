@@ -28,24 +28,24 @@ export function findWoundLevelByCore(
  * Preserves an undefined return for (DESTROYED, anything-other-than-DESTROYED) — historic behavior.
  */
 export function computeNewDamageLevel(currentDamageLevel: string, damage: string): string | undefined {
-    if (damage === 'OD6S.DAMAGE_DESTROYED') return damage;
-    if (currentDamageLevel === 'OD6S.NO_DAMAGE') return damage;
-    if (currentDamageLevel === 'OD6S.DAMAGE_VERY_LIGHT') return damage;
-    if (currentDamageLevel === 'OD6S.DAMAGE_LIGHT') {
-        if (damage === 'OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
+    if (damage === 'NONEX_IST_OD6S.DAMAGE_DESTROYED') return damage;
+    if (currentDamageLevel === 'NONEX_IST_OD6S.NO_DAMAGE') return damage;
+    if (currentDamageLevel === 'NONEX_IST_OD6S.DAMAGE_VERY_LIGHT') return damage;
+    if (currentDamageLevel === 'NONEX_IST_OD6S.DAMAGE_LIGHT') {
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
         return damage;
     }
-    if (currentDamageLevel === 'OD6S.DAMAGE_HEAVY') {
-        if (damage === 'OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
-        if (damage === 'OD6S.DAMAGE_LIGHT') return 'OD6S.DAMAGE_SEVERE';
-        if (damage === 'OD6S.DAMAGE_HEAVY') return 'OD6S.DAMAGE_SEVERE';
+    if (currentDamageLevel === 'NONEX_IST_OD6S.DAMAGE_HEAVY') {
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_LIGHT') return 'NONEX_IST_OD6S.DAMAGE_SEVERE';
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_HEAVY') return 'NONEX_IST_OD6S.DAMAGE_SEVERE';
         return damage;
     }
-    if (currentDamageLevel === 'OD6S.DAMAGE_SEVERE') {
-        if (damage === 'OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
-        if (damage === 'OD6S.DAMAGE_LIGHT') return 'OD6S.DAMAGE_DESTROYED';
-        if (damage === 'OD6S.DAMAGE_HEAVY') return 'OD6S.DAMAGE_DESTROYED';
-        if (damage === 'OD6S.DAMAGE_SEVERE') return 'OD6S.DAMAGE_DESTROYED';
+    if (currentDamageLevel === 'NONEX_IST_OD6S.DAMAGE_SEVERE') {
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_VERY_LIGHT') return currentDamageLevel;
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_LIGHT') return 'NONEX_IST_OD6S.DAMAGE_DESTROYED';
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_HEAVY') return 'NONEX_IST_OD6S.DAMAGE_DESTROYED';
+        if (damage === 'NONEX_IST_OD6S.DAMAGE_SEVERE') return 'NONEX_IST_OD6S.DAMAGE_DESTROYED';
     }
     return undefined;
 }
@@ -63,54 +63,54 @@ export function computeNewWoundLevel(
     const currentWoundCore = deadlinessTable[currentWoundValue as string]?.core;
     let wound = incomingWound;
 
-    if (wound === 'OD6S.WOUNDS_DEAD') return findWoundLevelByCore(deadlinessTable, wound);
-    if (wound === 'OD6S.WOUNDS_STUNNED' && !findWoundLevelByCore(deadlinessTable, wound)) {
-        wound = 'OD6S.WOUNDS_WOUNDED';
+    if (wound === 'NONEX_IST_OD6S.WOUNDS_DEAD') return findWoundLevelByCore(deadlinessTable, wound);
+    if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED' && !findWoundLevelByCore(deadlinessTable, wound)) {
+        wound = 'NONEX_IST_OD6S.WOUNDS_WOUNDED';
     }
-    if (wound === 'OD6S.WOUNDS_INCAPACITATED' && !findWoundLevelByCore(deadlinessTable, wound)) {
-        wound = 'OD6S.WOUNDS_MORTALLY_WOUNDED';
+    if (wound === 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED' && !findWoundLevelByCore(deadlinessTable, wound)) {
+        wound = 'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED';
     }
 
-    if (currentWoundCore === 'OD6S.WOUNDS_HEALTHY') {
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_HEALTHY') {
         return findWoundLevelByCore(deadlinessTable, wound);
     }
-    if (currentWoundCore === 'OD6S.WOUNDS_STUNNED') {
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_STUNNED') {
         return stunDamageIncrement
             ? (+currentWoundValue) + 1
             : findWoundLevelByCore(deadlinessTable, wound);
     }
-    if (currentWoundCore === 'OD6S.WOUNDS_WOUNDED') {
-        if (!stunDamageIncrement && wound === 'OD6S.WOUNDS_STUNNED') return currentWoundValue;
-        if (wound === 'OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') {
+        if (!stunDamageIncrement && wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return currentWoundValue;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
         return findWoundLevelByCore(deadlinessTable, wound);
     }
-    if (currentWoundCore === 'OD6S.WOUNDS_SEVERELY_WOUNDED') {
-        if (!stunDamageIncrement && wound === 'OD6S.WOUNDS_STUNNED') return currentWoundValue;
-        if (wound === 'OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED') {
+        if (!stunDamageIncrement && wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return currentWoundValue;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
         return findWoundLevelByCore(deadlinessTable, wound);
     }
-    if (currentWoundCore === 'OD6S.WOUNDS_INCAPACITATED') {
-        if (!stunDamageIncrement && wound === 'OD6S.WOUNDS_STUNNED') return currentWoundValue;
-        if (wound === 'OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_INCAPACITATED') return (+currentWoundValue) + 1;
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED') {
+        if (!stunDamageIncrement && wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return currentWoundValue;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED') return (+currentWoundValue) + 1;
         return findWoundLevelByCore(deadlinessTable, wound);
     }
-    if (currentWoundCore === 'OD6S.WOUNDS_MORTALLY_WOUNDED') {
+    if (currentWoundCore === 'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED') {
         if (!stunDamageIncrement) {
-            if (wound === 'OD6S.WOUNDS_STUNNED') return currentWoundValue;
-            if (wound === 'OD6S.WOUNDS_WOUNDED') return currentWoundValue;
-            if (wound === 'OD6S.WOUNDS_SEVERELY_WOUNDED') return currentWoundValue;
+            if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return currentWoundValue;
+            if (wound === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') return currentWoundValue;
+            if (wound === 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED') return currentWoundValue;
         }
-        if (wound === 'OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_INCAPACITATED') return (+currentWoundValue) + 1;
-        if (wound === 'OD6S.WOUNDS_MORTALLY_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_STUNNED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_INCAPACITATED') return (+currentWoundValue) + 1;
+        if (wound === 'NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED') return (+currentWoundValue) + 1;
         return findWoundLevelByCore(deadlinessTable, wound);
     }
     return undefined;

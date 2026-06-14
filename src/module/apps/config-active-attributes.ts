@@ -9,11 +9,11 @@ export default class od6sActiveAttributesConfiguration extends HandlebarsApplica
     requiresWorldReload = false;
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-active-attributes-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-active-attributes-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_ACTIVE_ATTRIBUTES",
+            title: "NONEX_IST_OD6S.CONFIG_ACTIVE_ATTRIBUTES",
             resizable: true,
             minimizable: true,
         },
@@ -33,7 +33,7 @@ export default class od6sActiveAttributesConfiguration extends HandlebarsApplica
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/active-attributes.html",
+            template: "systems/nonex-ist-od6s/templates/settings/active-attributes.html",
         },
     };
 
@@ -66,11 +66,11 @@ export default class od6sActiveAttributesConfiguration extends HandlebarsApplica
                         ? od6sActiveAttributesConfiguration.#updateActorTypes(value, type, true)
                         : od6sActiveAttributesConfiguration.#updateActorTypes(value, type, false);
                 }
-                await game.settings.set("od6s", setting, value);
+                await game.settings.set("nonex-ist-od6s", setting, value);
             } else {
-                await game.settings.set("od6s", setting, data[setting]);
+                await game.settings.set("nonex-ist-od6s", setting, data[setting]);
             }
-            const s = game.settings.settings.get("od6s." + setting);
+            const s = game.settings.settings.get("nonex-ist-od6s." + setting);
             if (s?.requiresReload) this.requiresWorldReload = true;
         }
     }

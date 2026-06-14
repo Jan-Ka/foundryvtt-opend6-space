@@ -271,7 +271,7 @@ describe('assembleDamageDice', () => {
     it('adds modifier value to damageScore', () => {
         const r = assembleDamageDice({
             ...base,
-            damageModifiers: [{ name: 'OD6S.RANGE_MOD', value: 3 }],
+            damageModifiers: [{ name: 'NONEX_IST_OD6S.RANGE_MOD', value: 3 }],
         });
         expect(r.damageScore).toBe(12);
         expect(r.damageDice).toEqual({ dice: 4, pips: 0 });
@@ -306,7 +306,7 @@ describe('assembleDamageDice', () => {
         const r = assembleDamageDice({
             ...base,
             damageScore: 6, // 2d
-            damageModifiers: [{ name: 'OD6S.STRENGTH_DAMAGE_BONUS', value: 3 }],
+            damageModifiers: [{ name: 'NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS', value: 3 }],
             strModDice: { dice: 1, pips: 0 },
             fatepointInEffect: true,
         });
@@ -331,7 +331,7 @@ describe('assembleDamageDice', () => {
     it('adds modifier pips to damageDice', () => {
         const r = assembleDamageDice({
             ...base,
-            damageModifiers: [{ name: 'OD6S.HIGH_HIT_DAMAGE', value: 0, pips: 2 }],
+            damageModifiers: [{ name: 'NONEX_IST_OD6S.HIGH_HIT_DAMAGE', value: 0, pips: 2 }],
         });
         expect(r.damageDice).toEqual({ dice: 3, pips: 2 });
     });

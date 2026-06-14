@@ -13,7 +13,7 @@ export default class ArmorData extends foundry.abstract.TypeDataModel {
       pr: new fields.NumberField({ initial: 0 }),
       er: new fields.NumberField({ initial: 0 }),
       damaged: new fields.NumberField({ initial: 0 }),
-      label: new fields.StringField({ initial: "OD6S.CHAR_ARMOR" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.CHAR_ARMOR" }),
     };
   }
 }

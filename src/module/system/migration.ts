@@ -58,7 +58,11 @@ const MIGRATION_STEPS: Array<{ since: string; run: () => Promise<void> }> = [
   },
 ];
 
-const CURRENT_MIGRATION_VERSION = MIGRATION_STEPS[MIGRATION_STEPS.length - 1]!.since;
+// Bumped manually for the 3.0.0 system-id rename. The pre-migration
+// `migrateLegacyOd6sFlags()` runs unconditionally inside `migrateWorld()`
+// before the version-gated steps, so older worlds (`<2.6.0`) have their
+// flag bag rewritten before the legacy steps reach for them.
+const CURRENT_MIGRATION_VERSION = "3.0.0";
 
 /**
  * Check if migration is needed and run it.
@@ -67,7 +71,7 @@ const CURRENT_MIGRATION_VERSION = MIGRATION_STEPS[MIGRATION_STEPS.length - 1]!.s
 export async function migrateWorld() {
   if (!game.user.isGM) return;
 
-  const lastMigration = game.settings.get("od6s", "migrationVersion") ?? "0";
+  const lastMigration = game.settings.get("nonex-ist-od6s", "migrationVersion") ?? "0";
   if (!foundry.utils.isNewerVersion(CURRENT_MIGRATION_VERSION, lastMigration)) return;
 
   // V14 returns a Notification object with a bound .remove(); the project's
@@ -86,6 +90,11 @@ export async function migrateWorld() {
   });
 
   try {
+    // 3.0.0 system-id rename: copy any leftover `flags.od6s.*` payload onto
+    // `flags.nonex-ist-od6s.*` before the older version-gated steps run, so
+    // their `getFlag("nonex-ist-od6s", …)` reads find the data.
+    await migrateLegacyOd6sFlags();
+
     for (const step of MIGRATION_STEPS) {
       if (foundry.utils.isNewerVersion(step.since, lastMigration)) {
         await step.run();
@@ -93,7 +102,7 @@ export async function migrateWorld() {
     }
 
     // Record completion
-    await game.settings.set("od6s", "migrationVersion", CURRENT_MIGRATION_VERSION);
+    await game.settings.set("nonex-ist-od6s", "migrationVersion", CURRENT_MIGRATION_VERSION);
     ui.notifications.info("OpenD6 Space: Migration complete.");
   } catch (err) {
     logError("migration", "Migration failed:", err);
@@ -108,7 +117,7 @@ export async function migrateWorld() {
  * Called during system init.
  */
 export function registerMigrationSetting() {
-  game.settings.register("od6s", "migrationVersion", {
+  game.settings.register("nonex-ist-od6s", "migrationVersion", {
     name: "Migration Version",
     scope: "world",
     config: false,
@@ -119,7 +128,7 @@ export function registerMigrationSetting() {
 
 /**
  * Update active effect icons that still reference old .png paths to .svg equivalents.
- * Affects any effect whose img is under systems/od6s/ and ends with .png.
+ * Affects any effect whose img is under systems/nonex-ist-od6s/ and ends with .png.
  */
 async function migrateStatusEffectIcons() {
   debug("migration", "Migrating status effect icons from .png to .svg...");
@@ -129,7 +138,7 @@ async function migrateStatusEffectIcons() {
     const updates = [];
     for (const effect of actor.effects) {
       const img: string = effect.img ?? "";
-      if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+      if (img.startsWith("systems/nonex-ist-od6s/") && img.endsWith(".png")) {
         updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
       }
     }
@@ -146,7 +155,7 @@ async function migrateStatusEffectIcons() {
       const updates = [];
       for (const effect of token.actor?.effects ?? []) {
         const img: string = effect.img ?? "";
-        if (img.startsWith("systems/od6s/") && img.endsWith(".png")) {
+        if (img.startsWith("systems/nonex-ist-od6s/") && img.endsWith(".png")) {
           updates.push({ _id: effect.id, img: img.replace(/\.png$/, ".svg") });
         }
       }
@@ -184,14 +193,14 @@ async function migrateExplosiveTemplateFlags() {
   for (const actor of game.actors) {
     const updates = [];
     for (const item of actor.items) {
-      const explosiveTemplate = item.getFlag("od6s", "explosiveTemplate");
+      const explosiveTemplate = item.getFlag("nonex-ist-od6s", "explosiveTemplate");
       if (explosiveTemplate) {
         updates.push({
           _id: item.id,
-          "flags.od6s.-=explosiveTemplate": null,
-          "flags.od6s.-=explosiveSet": null,
-          "flags.od6s.-=explosiveOrigin": null,
-          "flags.od6s.-=explosiveRange": null,
+          "flags.nonex-ist-od6s.-=explosiveTemplate": null,
+          "flags.nonex-ist-od6s.-=explosiveSet": null,
+          "flags.nonex-ist-od6s.-=explosiveOrigin": null,
+          "flags.nonex-ist-od6s.-=explosiveRange": null,
         });
       }
     }
@@ -206,14 +215,14 @@ async function migrateExplosiveTemplateFlags() {
   // Also check unowned items in the world collection
   const worldItemUpdates = [];
   for (const item of game.items) {
-    const explosiveTemplate = item.getFlag("od6s", "explosiveTemplate");
+    const explosiveTemplate = item.getFlag("nonex-ist-od6s", "explosiveTemplate");
     if (explosiveTemplate) {
       worldItemUpdates.push({
         _id: item.id,
-        "flags.od6s.-=explosiveTemplate": null,
-        "flags.od6s.-=explosiveSet": null,
-        "flags.od6s.-=explosiveOrigin": null,
-        "flags.od6s.-=explosiveRange": null,
+        "flags.nonex-ist-od6s.-=explosiveTemplate": null,
+        "flags.nonex-ist-od6s.-=explosiveSet": null,
+        "flags.nonex-ist-od6s.-=explosiveOrigin": null,
+        "flags.nonex-ist-od6s.-=explosiveRange": null,
       });
     }
   }
@@ -228,7 +237,7 @@ async function migrateExplosiveTemplateFlags() {
 /**
  * Drop the legacy scalar explosive flags (`explosiveTemplate`, `explosiveOrigin`,
  * `explosiveRange`, `explosiveSet`). #40 replaces them with a per-region keyed
- * map at `flags.od6s.explosivePending.<regionId>`. Stale scalars are transient
+ * map at `flags.nonex-ist-od6s.explosivePending.<regionId>`. Stale scalars are transient
  * pending state — the regions they pointed at have been gone since the v14
  * migration, and the new code reads only the keyed map.
  */
@@ -237,19 +246,19 @@ async function migrateExplosivePendingFlags() {
   let count = 0;
 
   const drop = {
-    "flags.od6s.-=explosiveTemplate": null,
-    "flags.od6s.-=explosiveOrigin": null,
-    "flags.od6s.-=explosiveRange": null,
-    "flags.od6s.-=explosiveSet": null,
+    "flags.nonex-ist-od6s.-=explosiveTemplate": null,
+    "flags.nonex-ist-od6s.-=explosiveOrigin": null,
+    "flags.nonex-ist-od6s.-=explosiveRange": null,
+    "flags.nonex-ist-od6s.-=explosiveSet": null,
   };
 
   for (const actor of game.actors) {
     const updates = [];
     for (const item of actor.items) {
-      if (item.getFlag("od6s", "explosiveTemplate")
-          || item.getFlag("od6s", "explosiveOrigin")
-          || item.getFlag("od6s", "explosiveRange")
-          || item.getFlag("od6s", "explosiveSet")) {
+      if (item.getFlag("nonex-ist-od6s", "explosiveTemplate")
+          || item.getFlag("nonex-ist-od6s", "explosiveOrigin")
+          || item.getFlag("nonex-ist-od6s", "explosiveRange")
+          || item.getFlag("nonex-ist-od6s", "explosiveSet")) {
         updates.push({ _id: item.id, ...drop });
       }
     }
@@ -261,10 +270,10 @@ async function migrateExplosivePendingFlags() {
 
   const worldItemUpdates = [];
   for (const item of game.items) {
-    if (item.getFlag("od6s", "explosiveTemplate")
-        || item.getFlag("od6s", "explosiveOrigin")
-        || item.getFlag("od6s", "explosiveRange")
-        || item.getFlag("od6s", "explosiveSet")) {
+    if (item.getFlag("nonex-ist-od6s", "explosiveTemplate")
+        || item.getFlag("nonex-ist-od6s", "explosiveOrigin")
+        || item.getFlag("nonex-ist-od6s", "explosiveRange")
+        || item.getFlag("nonex-ist-od6s", "explosiveSet")) {
       worldItemUpdates.push({ _id: item.id, ...drop });
     }
   }
@@ -287,11 +296,11 @@ async function migrateChatMessageFlags() {
 
   const updates = [];
   for (const message of game.messages) {
-    if (message.getFlag("od6s", "isExplosive") && message.getFlag("od6s", "template")) {
+    if (message.getFlag("nonex-ist-od6s", "isExplosive") && message.getFlag("nonex-ist-od6s", "template")) {
       updates.push({
         _id: message.id,
-        "flags.od6s.-=template": null,
-        "flags.od6s.handled": true,
+        "flags.nonex-ist-od6s.-=template": null,
+        "flags.nonex-ist-od6s.handled": true,
       });
       count++;
     }
@@ -349,4 +358,94 @@ async function stampAllSchemaVersions() {
   }
 
   debug("migration", `Stamped ${count} docs.`);
+}
+
+/**
+ * #v3-rename: the system id changed from `od6s` to `nonex-ist-od6s`.
+ * Foundry treats these as separate systems, so a world re-pointed at the new
+ * id still carries every document's old `flags.od6s.*` payload. Copy each
+ * legacy flag bag onto the new scope and drop the old one so downstream code
+ * (which now reads from `flags.nonex-ist-od6s`) sees the data.
+ *
+ * We deliberately do *not* try to copy world-level settings: those live in
+ * Foundry's per-system settings store and the new id starts with an empty
+ * namespace. Users have to redo system-settings on the first load.
+ */
+async function migrateLegacyOd6sFlags() {
+  debug("migration", "Copying legacy flags.od6s.* → flags.nonex-ist-od6s.* ...");
+  let count = 0;
+
+  const rewrite = (doc: any): Record<string, unknown> | null => {
+    const legacy = doc.flags?.od6s;
+    if (!legacy || Object.keys(legacy).length === 0) return null;
+    return {
+      _id: doc.id,
+      "flags.nonex-ist-od6s": foundry.utils.mergeObject(
+        doc.flags?.["nonex-ist-od6s"] ?? {},
+        legacy,
+        { inplace: false },
+      ),
+      "flags.-=od6s": null,
+    };
+  };
+
+  // Actors and their embedded items
+  for (const actor of game.actors) {
+    const actorUpdate = rewrite(actor);
+    if (actorUpdate) {
+      await Actor.updateDocuments([actorUpdate]);
+      count++;
+    }
+    const itemUpdates: Array<Record<string, unknown>> = [];
+    for (const item of actor.items) {
+      const u = rewrite(item);
+      if (u) itemUpdates.push(u);
+    }
+    if (itemUpdates.length > 0) {
+      await actor.updateEmbeddedDocuments("Item", itemUpdates);
+      count += itemUpdates.length;
+    }
+  }
+
+  // World-level items
+  const worldItemUpdates: Array<Record<string, unknown>> = [];
+  for (const item of game.items) {
+    const u = rewrite(item);
+    if (u) worldItemUpdates.push(u);
+  }
+  if (worldItemUpdates.length > 0) {
+    await Item.updateDocuments(worldItemUpdates);
+    count += worldItemUpdates.length;
+  }
+
+  // Scenes and the tokens / token-actors they own
+  for (const scene of game.scenes) {
+    const sceneUpdate = rewrite(scene);
+    if (sceneUpdate) {
+      await Scene.updateDocuments([sceneUpdate]);
+      count++;
+    }
+    const tokenUpdates: Array<Record<string, unknown>> = [];
+    for (const token of scene.tokens) {
+      const u = rewrite(token);
+      if (u) tokenUpdates.push(u);
+    }
+    if (tokenUpdates.length > 0) {
+      await scene.updateEmbeddedDocuments("Token", tokenUpdates);
+      count += tokenUpdates.length;
+    }
+  }
+
+  // Chat messages
+  const messageUpdates: Array<Record<string, unknown>> = [];
+  for (const message of game.messages) {
+    const u = rewrite(message);
+    if (u) messageUpdates.push(u);
+  }
+  if (messageUpdates.length > 0) {
+    await ChatMessage.updateDocuments(messageUpdates);
+    count += messageUpdates.length;
+  }
+
+  debug("migration", `Rewrote legacy od6s flags on ${count} documents.`);
 }

@@ -49,7 +49,7 @@ export function registerVehicleHelpers() {
         const sensorsTypes = (actor.system.sensors as { types: Record<string, { score: number }> }).types;
         let score: number = sensorsTypes[sensor]!.score;
         if (!found) {
-            const skillType = game.i18n.localize('OD6S.SENSORS');
+            const skillType = game.i18n.localize('NONEX_IST_OD6S.SENSORS');
             const skill =
                 actor.items.find((i: Item) => i.type === "skill" && i.name === skillType);
             if (typeof (skill) !== 'undefined') {
@@ -92,7 +92,7 @@ export function registerVehicleHelpers() {
     })
 
     Handlebars.registerHelper('getSensorsConfig', function () {
-        return game.settings.get('od6s', 'sensors');
+        return game.settings.get('nonex-ist-od6s', 'sensors');
     })
 
     Handlebars.registerHelper('getSensorTotal', function (actor: VehicleHelperActor, sensorScore: number) {
@@ -135,8 +135,8 @@ export function registerVehicleHelpers() {
             return OD6S.terrain_difficulty;
         } else {
             return Object.fromEntries(
-                Object.entries(OD6S.difficulty).filter(([key]) => key !== 'OD6S.DIFFICULTY_UNKNOWN' &&
-                    key !== 'OD6S.DIFFICULTY_CUSTOM'));
+                Object.entries(OD6S.difficulty).filter(([key]) => key !== 'NONEX_IST_OD6S.DIFFICULTY_UNKNOWN' &&
+                    key !== 'NONEX_IST_OD6S.DIFFICULTY_CUSTOM'));
         }
     })
 

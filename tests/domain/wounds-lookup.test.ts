@@ -78,31 +78,31 @@ describe('lookupWoundLevel — deadliness 3', () => {
     const TABLE = deadlinessConfig[3];
 
     it('wound 0 → OD6S.WOUNDS_HEALTHY', () => {
-        expect(lookupWoundLevel(TABLE, 0)).toBe('OD6S.WOUNDS_HEALTHY');
+        expect(lookupWoundLevel(TABLE, 0)).toBe('NONEX_IST_OD6S.WOUNDS_HEALTHY');
     });
 
     it('wound 1 → OD6S.WOUNDS_STUNNED', () => {
-        expect(lookupWoundLevel(TABLE, 1)).toBe('OD6S.WOUNDS_STUNNED');
+        expect(lookupWoundLevel(TABLE, 1)).toBe('NONEX_IST_OD6S.WOUNDS_STUNNED');
     });
 
     it('wound 2 → OD6S.WOUNDS_WOUNDED', () => {
-        expect(lookupWoundLevel(TABLE, 2)).toBe('OD6S.WOUNDS_WOUNDED');
+        expect(lookupWoundLevel(TABLE, 2)).toBe('NONEX_IST_OD6S.WOUNDS_WOUNDED');
     });
 
     it('wound 3 → OD6S.WOUNDS_SEVERELY_WOUNDED', () => {
-        expect(lookupWoundLevel(TABLE, 3)).toBe('OD6S.WOUNDS_SEVERELY_WOUNDED');
+        expect(lookupWoundLevel(TABLE, 3)).toBe('NONEX_IST_OD6S.WOUNDS_SEVERELY_WOUNDED');
     });
 
     it('wound 4 → OD6S.WOUNDS_INCAPACITATED', () => {
-        expect(lookupWoundLevel(TABLE, 4)).toBe('OD6S.WOUNDS_INCAPACITATED');
+        expect(lookupWoundLevel(TABLE, 4)).toBe('NONEX_IST_OD6S.WOUNDS_INCAPACITATED');
     });
 
     it('wound 5 → OD6S.WOUNDS_MORTALLY_WOUNDED', () => {
-        expect(lookupWoundLevel(TABLE, 5)).toBe('OD6S.WOUNDS_MORTALLY_WOUNDED');
+        expect(lookupWoundLevel(TABLE, 5)).toBe('NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED');
     });
 
     it('wound 6 → OD6S.WOUNDS_DEAD', () => {
-        expect(lookupWoundLevel(TABLE, 6)).toBe('OD6S.WOUNDS_DEAD');
+        expect(lookupWoundLevel(TABLE, 6)).toBe('NONEX_IST_OD6S.WOUNDS_DEAD');
     });
 
     it('missing entry → empty string (default)', () => {
@@ -118,11 +118,11 @@ describe('lookupWoundLevel — deadliness 4 (no Stunned level)', () => {
     const TABLE = deadlinessConfig[4];
 
     it('wound 0 → OD6S.WOUNDS_HEALTHY', () => {
-        expect(lookupWoundLevel(TABLE, 0)).toBe('OD6S.WOUNDS_HEALTHY');
+        expect(lookupWoundLevel(TABLE, 0)).toBe('NONEX_IST_OD6S.WOUNDS_HEALTHY');
     });
 
     it('wound 1 → OD6S.WOUNDS_WOUNDED (no stunned step)', () => {
-        expect(lookupWoundLevel(TABLE, 1)).toBe('OD6S.WOUNDS_WOUNDED');
+        expect(lookupWoundLevel(TABLE, 1)).toBe('NONEX_IST_OD6S.WOUNDS_WOUNDED');
     });
 });
 
@@ -137,35 +137,35 @@ describe('lookupInjury — personal damage', () => {
     });
 
     it('damage 1 → OD6S.WOUNDS_STUNNED (at threshold)', () => {
-        expect(lookupInjury(1, damage, false)).toBe('OD6S.WOUNDS_STUNNED');
+        expect(lookupInjury(1, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_STUNNED');
     });
 
     it('damage 3 → OD6S.WOUNDS_STUNNED (between Stunned and Wounded)', () => {
-        expect(lookupInjury(3, damage, false)).toBe('OD6S.WOUNDS_STUNNED');
+        expect(lookupInjury(3, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_STUNNED');
     });
 
     it('damage 4 → OD6S.WOUNDS_WOUNDED (at threshold)', () => {
-        expect(lookupInjury(4, damage, false)).toBe('OD6S.WOUNDS_WOUNDED');
+        expect(lookupInjury(4, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_WOUNDED');
     });
 
     it('damage 8 → OD6S.WOUNDS_WOUNDED (below Incapacitated)', () => {
-        expect(lookupInjury(8, damage, false)).toBe('OD6S.WOUNDS_WOUNDED');
+        expect(lookupInjury(8, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_WOUNDED');
     });
 
     it('damage 9 → OD6S.WOUNDS_INCAPACITATED (at threshold)', () => {
-        expect(lookupInjury(9, damage, false)).toBe('OD6S.WOUNDS_INCAPACITATED');
+        expect(lookupInjury(9, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_INCAPACITATED');
     });
 
     it('damage 13 → OD6S.WOUNDS_MORTALLY_WOUNDED (at threshold)', () => {
-        expect(lookupInjury(13, damage, false)).toBe('OD6S.WOUNDS_MORTALLY_WOUNDED');
+        expect(lookupInjury(13, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_MORTALLY_WOUNDED');
     });
 
     it('damage 16 → OD6S.WOUNDS_DEAD (at threshold)', () => {
-        expect(lookupInjury(16, damage, false)).toBe('OD6S.WOUNDS_DEAD');
+        expect(lookupInjury(16, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_DEAD');
     });
 
     it('damage 20 → OD6S.WOUNDS_DEAD (above Dead threshold)', () => {
-        expect(lookupInjury(20, damage, false)).toBe('OD6S.WOUNDS_DEAD');
+        expect(lookupInjury(20, damage, false)).toBe('NONEX_IST_OD6S.WOUNDS_DEAD');
     });
 });
 
@@ -175,26 +175,26 @@ describe('lookupInjury — personal damage', () => {
 
 describe('lookupInjury — vehicle damage', () => {
     it('damage 0 → OD6S.NO_DAMAGE', () => {
-        expect(lookupInjury(0, vehicleDamage, true)).toBe('OD6S.NO_DAMAGE');
+        expect(lookupInjury(0, vehicleDamage, true)).toBe('NONEX_IST_OD6S.NO_DAMAGE');
     });
 
     it('damage 1 → OD6S.DAMAGE_VERY_LIGHT', () => {
-        expect(lookupInjury(1, vehicleDamage, true)).toBe('OD6S.DAMAGE_VERY_LIGHT');
+        expect(lookupInjury(1, vehicleDamage, true)).toBe('NONEX_IST_OD6S.DAMAGE_VERY_LIGHT');
     });
 
     it('damage 4 → OD6S.DAMAGE_LIGHT', () => {
-        expect(lookupInjury(4, vehicleDamage, true)).toBe('OD6S.DAMAGE_LIGHT');
+        expect(lookupInjury(4, vehicleDamage, true)).toBe('NONEX_IST_OD6S.DAMAGE_LIGHT');
     });
 
     it('damage 9 → OD6S.DAMAGE_HEAVY', () => {
-        expect(lookupInjury(9, vehicleDamage, true)).toBe('OD6S.DAMAGE_HEAVY');
+        expect(lookupInjury(9, vehicleDamage, true)).toBe('NONEX_IST_OD6S.DAMAGE_HEAVY');
     });
 
     it('damage 13 → OD6S.DAMAGE_SEVERE', () => {
-        expect(lookupInjury(13, vehicleDamage, true)).toBe('OD6S.DAMAGE_SEVERE');
+        expect(lookupInjury(13, vehicleDamage, true)).toBe('NONEX_IST_OD6S.DAMAGE_SEVERE');
     });
 
     it('damage 16 → OD6S.DAMAGE_DESTROYED', () => {
-        expect(lookupInjury(16, vehicleDamage, true)).toBe('OD6S.DAMAGE_DESTROYED');
+        expect(lookupInjury(16, vehicleDamage, true)).toBe('NONEX_IST_OD6S.DAMAGE_DESTROYED');
     });
 });

@@ -7,19 +7,19 @@ const {DialogV2} = foundry.applications.api;
 
 export async function addLabel(item: Item): Promise<void> {
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/item/item-add-label.html",
+        "systems/nonex-ist-od6s/templates/item/item-add-label.html",
         {id: item.id});
     const result = await DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.ADD") + " " + game.i18n.localize("OD6S.LABEL") + "!"},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.ADD") + " " + game.i18n.localize("NONEX_IST_OD6S.LABEL") + "!"},
         content,
-        ok: {label: game.i18n.localize("OD6S.ADD")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.ADD")},
     });
     if (result?.key) await addLabelAction(item, result.key, result.value);
 }
 
 export async function addLabelAction(item: Item, key: string, value: string): Promise<void> {
     if (item.system.labels[key]) {
-        ui.notifications.warn(game.i18n.localize("OD6S.LABEL_ALREADY_EXISTS"));
+        ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.LABEL_ALREADY_EXISTS"));
         return;
     }
     await item.update({id: item.id, [`system.labels.${key}`]: value});

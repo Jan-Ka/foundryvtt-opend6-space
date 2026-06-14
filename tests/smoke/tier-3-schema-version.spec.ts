@@ -4,7 +4,7 @@
  * Verifies:
  *   - new actors/items get `system._systemSchemaVersion` stamped from
  *     `_preCreate` against `game.system.version`;
- *   - a synthetically downlevel actor logs a `[od6s:schema-version]`
+ *   - a synthetically downlevel actor logs a `[nonex-ist-od6s:schema-version]`
  *     warning to the console on next `prepareData`.
  *
  * The notification side of the warn is GM-visible; we don't assert on
@@ -55,7 +55,7 @@ test("downlevel actor stamp triggers a console warn from prepareData", async ({p
     });
 
     const lagWarn = messages.find(m =>
-        m.includes("[od6s:schema-version]") && m.includes("stamped 0.1.0"),
+        m.includes("[nonex-ist-od6s:schema-version]") && m.includes("stamped 0.1.0"),
     );
     expect(lagWarn, `expected schema-version lag warn, got:\n${messages.join("\n")}`)
         .toBeTruthy();

@@ -20,19 +20,19 @@ export default class StarshipData extends foundry.abstract.TypeDataModel {
       interstellar_drive: new fields.SchemaField({
         type: new fields.StringField({ initial: "Number" }),
         value: new fields.NumberField({ initial: 0 }),
-        label: new fields.StringField({ initial: "OD6S.INTERSTELLAR_DRIVE" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.INTERSTELLAR_DRIVE" }),
       }),
       atmospheric: new fields.SchemaField({
         value: new fields.BooleanField({ initial: true }),
         type: new fields.StringField({ initial: "Boolean" }),
-        label: new fields.StringField({ initial: "OD6S.ATMOSPHERIC" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.ATMOSPHERIC" }),
         move: new fields.SchemaField({
-          label: new fields.StringField({ initial: "OD6S.ATMOSPHERIC_MOVE" }),
+          label: new fields.StringField({ initial: "NONEX_IST_OD6S.ATMOSPHERIC_MOVE" }),
           value: new fields.NumberField({ initial: 0 }),
           type: new fields.StringField({ initial: "Number" }),
         }),
         kph: new fields.SchemaField({
-          label: new fields.StringField({ initial: "OD6S.ATMOSPHERIC_KPH" }),
+          label: new fields.StringField({ initial: "NONEX_IST_OD6S.ATMOSPHERIC_KPH" }),
           value: new fields.NumberField({ initial: 0 }),
           type: new fields.StringField({ initial: "Number" }),
         }),
@@ -41,14 +41,14 @@ export default class StarshipData extends foundry.abstract.TypeDataModel {
       sensors: new fields.SchemaField({
         value: new fields.BooleanField({ initial: true }),
         type: new fields.StringField({ initial: "Boolean" }),
-        label: new fields.StringField({ initial: "OD6S.SENSORS" }),
+        label: new fields.StringField({ initial: "NONEX_IST_OD6S.SENSORS" }),
         skill: new fields.StringField({ initial: "Sensors" }),
         mod: new fields.NumberField({ initial: 0 }),
         types: new fields.SchemaField({
-          passive: sensorTypeField("OD6S.SENSORS_PASSIVE"),
-          scan: sensorTypeField("OD6S.SENSORS_SCAN"),
-          search: sensorTypeField("OD6S.SENSORS_SEARCH"),
-          focus: sensorTypeField("OD6S.SENSORS_FOCUS"),
+          passive: sensorTypeField("NONEX_IST_OD6S.SENSORS_PASSIVE"),
+          scan: sensorTypeField("NONEX_IST_OD6S.SENSORS_SCAN"),
+          search: sensorTypeField("NONEX_IST_OD6S.SENSORS_SEARCH"),
+          focus: sensorTypeField("NONEX_IST_OD6S.SENSORS_FOCUS"),
         }),
       }),
     };

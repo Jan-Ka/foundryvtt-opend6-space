@@ -7,11 +7,11 @@ export default class od6sMiscRulesConfiguration extends HandlebarsApplicationMix
     requiresWorldReload = false;
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-miscrules-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-miscrules-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_MISC_RULES",
+            title: "NONEX_IST_OD6S.CONFIG_MISC_RULES",
             resizable: true,
             minimizable: true,
         },
@@ -31,7 +31,7 @@ export default class od6sMiscRulesConfiguration extends HandlebarsApplicationMix
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/settings-v2.html",
+            template: "systems/nonex-ist-od6s/templates/settings/settings-v2.html",
         },
     };
 
@@ -57,8 +57,8 @@ export default class od6sMiscRulesConfiguration extends HandlebarsApplicationMix
     ): Promise<void> {
         const data = formData.object;
         for (const setting in data) {
-            await game.settings.set("od6s", setting, data[setting]);
-            const s = game.settings.settings.get("od6s." + setting);
+            await game.settings.set("nonex-ist-od6s", setting, data[setting]);
+            const s = game.settings.settings.get("nonex-ist-od6s." + setting);
             if (s?.requiresReload) this.requiresWorldReload = true;
         }
     }

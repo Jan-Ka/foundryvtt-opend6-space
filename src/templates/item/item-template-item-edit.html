@@ -1,13 +1,13 @@
 <form>
     <div>
-        <label for="itemname"><b>{{localize 'OD6S.NAME'}}</b>:</label>
-        <input title="{{localize 'OD6S.NAME'}}" name="itemname" type="text"
-               id="itemname" value="{{this.name}}" placeholder="{{localize 'OD6S.NAME'}}"
+        <label for="itemname"><b>{{localize 'NONEX_IST_OD6S.NAME'}}</b>:</label>
+        <input title="{{localize 'NONEX_IST_OD6S.NAME'}}" name="itemname" type="text"
+               id="itemname" value="{{this.name}}" placeholder="{{localize 'NONEX_IST_OD6S.NAME'}}"
                data-dtype="String"/>
     </div>
     {{#if (eq this.type "item-group") }}
         <div>
-            <label for="itemtype"><b>{{localize 'OD6S.TYPE'}}</b>:</label>
+            <label for="itemtype"><b>{{localize 'NONEX_IST_OD6S.TYPE'}}</b>:</label>
             <select name="itemtype" id="itemtype">
                 
                     {{#each (templateItemTypes this.type) as |itemType itemKey|}}
@@ -18,9 +18,9 @@
         </div>
     {{/if}}
     <div>
-        <label for="itemdesc"><b>{{localize 'OD6S.DESCRIPTION'}}</b>:</label>
-        <textarea title="{{localize 'OD6S.DESCRIPTION'}}" name="itemdesc"
-                  id="itemdesc" placeholder="{{localize 'OD6S.DESCRIPTION'}}"
+        <label for="itemdesc"><b>{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}</b>:</label>
+        <textarea title="{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}" name="itemdesc"
+                  id="itemdesc" placeholder="{{localize 'NONEX_IST_OD6S.DESCRIPTION'}}"
                   rows="5"
                   data-dtype="String">{{this.description}}</textarea>
     </div>

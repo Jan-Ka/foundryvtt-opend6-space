@@ -11,7 +11,7 @@ export default class ItemGroupData extends foundry.abstract.TypeDataModel {
         { initial: ["character"] }
       ),
       items: new fields.ArrayField(new fields.ObjectField()),
-      label: new fields.StringField({ initial: "OD6S.ITEM_GROUP" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.ITEM_GROUP" }),
     };
   }
 }

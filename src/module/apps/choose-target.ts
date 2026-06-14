@@ -12,11 +12,11 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-choose-target",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-choose-target",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.CHOOSE_TARGET",
+            title: "NONEX_IST_OD6S.CHOOSE_TARGET",
             resizable: false,
             minimizable: true,
         },
@@ -36,7 +36,7 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/chat/choose-target.html",
+            template: "systems/nonex-ist-od6s/templates/chat/choose-target.html",
         },
     };
 
@@ -54,9 +54,9 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
         const message = game.messages.get(data.messageId);
         if (!message) return;
 
-        if (message.getFlag("od6s", "isExplosive")) {
+        if (message.getFlag("nonex-ist-od6s", "isExplosive")) {
             const targets: any[] = [];
-            const currentTargets = message.getFlag("od6s", "targets");
+            const currentTargets = message.getFlag("nonex-ist-od6s", "targets");
             const formTargetIds = Array.isArray(data.choosetarget) ? data.choosetarget : [data.choosetarget];
             const formTargets = this.object.targets.filter((t: any) => formTargetIds.includes(t.id));
             for (const ft of formTargets) {
@@ -72,13 +72,13 @@ export class OD6SChooseTarget extends HandlebarsApplicationMixin(ApplicationV2) 
                     targets.push({id: ft.id, name: ft.name, range: 0, zone: 1});
                 }
             }
-            await message.unsetFlag("od6s", "targets");
-            await message.setFlag("od6s", "targets", targets);
+            await message.unsetFlag("nonex-ist-od6s", "targets");
+            await message.setFlag("nonex-ist-od6s", "targets", targets);
         } else {
-            await message.setFlag("od6s", "targetId", data.choosetarget);
+            await message.setFlag("nonex-ist-od6s", "targetId", data.choosetarget);
             const targetName = game.scenes.active.tokens
                 .find((t: any) => t.id === data.choosetarget)?.name;
-            await message.setFlag("od6s", "targetName", targetName);
+            await message.setFlag("nonex-ist-od6s", "targetName", targetName);
         }
     }
 

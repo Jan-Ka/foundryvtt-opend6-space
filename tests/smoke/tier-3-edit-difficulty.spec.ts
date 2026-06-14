@@ -58,11 +58,11 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
         if (!msg) throw new Error(`message ${id} not found`);
         await msg.update({
             flags: {
-                od6s: {
+                "nonex-ist-od6s": {
                     isKnown: true,
                     difficulty: 10,
                     baseDifficulty: 10,
-                    difficultyLevel: "OD6S.DIFFICULTY_EASY",
+                    difficultyLevel: "NONEX_IST_OD6S.DIFFICULTY_EASY",
                     type: "skill",
                     subtype: "",
                 },
@@ -75,8 +75,8 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
     await page.evaluate(async (id: string) => {
         const msg = (window as any).game.messages.get(id);
         if (!msg) throw new Error(`message ${id} not found`);
-        const baseDifficulty = msg.getFlag("od6s", "baseDifficulty");
-        const modifiers = msg.getFlag("od6s", "modifiers") ?? [];
+        const baseDifficulty = msg.getFlag("nonex-ist-od6s", "baseDifficulty");
+        const modifiers = msg.getFlag("nonex-ist-od6s", "modifiers") ?? [];
 
         // The click handler in chat-log-listeners.ts creates OD6SEditDifficulty
         // and renders it. We trigger the same path by finding the registered app
@@ -96,7 +96,7 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
         // call the registered hook directly via ChatMessage update hooks.
         // As a last resort: look up OD6SEditDifficulty through compendium-class map.
         const appRegistry = Object.values((window as any).foundry?.applications?.registry ?? {});
-        const EditDiffClass = appRegistry.find((c: any) => c?.DEFAULT_OPTIONS?.id === "od6s-edit-difficulty") as any;
+        const EditDiffClass = appRegistry.find((c: any) => c?.DEFAULT_OPTIONS?.id === "nonex-ist-od6s-edit-difficulty") as any;
         if (EditDiffClass) {
             new EditDiffClass({messageId: id, baseDifficulty, modifiers}).render(true);
         }
@@ -107,7 +107,7 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
     // Find the dialog, fill in new baseDifficulty=15, submit
     const dialogOpened = await evalInWorld(page, async () => {
         const dlg = [...window.foundry.applications.instances.values()].find(
-            (a: any) => (a as any).id === "od6s-edit-difficulty",
+            (a: any) => (a as any).id === "nonex-ist-od6s-edit-difficulty",
         );
         if (!dlg) return false;
 
@@ -135,8 +135,8 @@ test("edit-difficulty dialog updates message difficulty and success flags", asyn
     const updated = await page.evaluate((id: string) => {
         const msg = (window as any).game.messages.get(id);
         return {
-            difficulty: msg?.getFlag("od6s", "difficulty") ?? null,
-            baseDifficulty: msg?.getFlag("od6s", "baseDifficulty") ?? null,
+            difficulty: msg?.getFlag("nonex-ist-od6s", "difficulty") ?? null,
+            baseDifficulty: msg?.getFlag("nonex-ist-od6s", "baseDifficulty") ?? null,
         };
     }, msgId as string);
 

@@ -10,6 +10,22 @@ GitLab wiki at <https://gitlab.com/vtt2/opend6-space/-/wikis/Release-Notes>.
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** System id renamed from `od6s` to `nonex-ist-od6s`. Foundry
+  treats this as a different system, so existing worlds need to be re-pointed
+  at the new system folder (`Data/systems/nonex-ist-od6s/`). The world's per-
+  system settings live under the old id and won't carry over automatically;
+  document flags are preserved by a one-shot world migration that rewrites
+  every `flags.od6s.*` entry on actors, items, scenes, and chat messages to
+  `flags.nonex-ist-od6s.*`.
+- CSS class/id prefix renamed from `od6s-` to `nonex-ist-od6s-`. CSS custom
+  properties renamed from `--od6s-*` to `--nonex-ist-od6s-*`.
+- i18n key root renamed from `OD6S.*` to `NONEX_IST_OD6S.*` across all four
+  bundled translations.
+- Global JS namespace renamed from `game.od6s` to `game["nonex-ist-od6s"]`
+  (the new id contains hyphens, so bracket access is required).
+
 ## [2.7.4] - 2026-06-02
 
 Second hotfix for the 2.7.2 manifest art: the package tile and thumbnail
@@ -22,7 +38,7 @@ the full `systems/<id>/` prefix — same convention used by dnd5e and pf2e.
 ### Fixed
 
 - `media[].url`, `media[].thumbnail`, and the icon entry's `url` in
-  `system.json` now use absolute `systems/od6s/assets/...` paths instead
+  `system.json` now use absolute `systems/nonex-ist-od6s/assets/...` paths instead
   of relative ones, so Foundry's setup screen actually loads the artwork.
 
 ## [2.7.3] - 2026-06-02
@@ -93,7 +109,7 @@ mitigation for the Pings module interaction.
   Abilities / Data tabs now expose an enable/disable control next to
   edit and delete, wired to a `.effect-toggle` listener that flips
   `effect.disabled` and re-renders the sheet so the icon and disabled
-  styling refresh immediately. `OD6S.TOGGLE_EFFECT` added to
+  styling refresh immediately. `NONEX_IST_OD6S.TOGGLE_EFFECT` added to
   `en.json`.
 - Opt-in `block_sheet_pointer_bleed` client setting (#166): when
   enabled, a `document.body` mousedown listener calls
@@ -237,7 +253,7 @@ surface (chat-card a11y) and one new GM-visible notification
 
 - v14 polish batch (#132): dropped the dead V1
   `foundry.appv1.sheets.ActorSheet` / `ItemSheet` `unregisterSheet`
-  calls in `od6s.ts`; routed `system/migration.ts` and
+  calls in `nonex-ist-od6s.ts`; routed `system/migration.ts` and
   `system/schema-version.ts` console output through `logger.ts` so
   output is debug-flag-gated (`localStorage.od6sDebug`) and tagged
   consistently; wrapped the async `chat-hooks` (`preDeleteChatMessage`,
@@ -259,7 +275,7 @@ surface (chat-card a11y) and one new GM-visible notification
   gained explicit interfaces. The public surface for the ~60
   import sites is unchanged; one pre-existing typo
   (`starshipToughessName` → `starshipToughnessName`) was unified,
-  the dead `OD6S.metaphysicsSkills` write and the unused/broken
+  the dead `NONEX_IST_OD6S.metaphysicsSkills` write and the unused/broken
   `getDifficultyFromShort` Handlebars helper were removed (#58).
 - Extracted four pure helpers from `roll-execute.ts` into
   `roll-execute-math.ts` — `applyDicePenalties`, `buildRollString`,
@@ -282,7 +298,7 @@ surface (chat-card a11y) and one new GM-visible notification
   named constants in `explosives.ts`; added an `error()` breadcrumb
   to `system/logger.ts` and wired it into the three swallowed-failure
   sites the issue called out (`roll-effects.ts:cancelAction`,
-  `roll-setup.ts` out-of-range cleanup, the `od6s.ts` socket
+  `roll-setup.ts` out-of-range cleanup, the `nonex-ist-od6s.ts` socket
   dispatcher); enabled `noUnusedLocals`, `noImplicitReturns`, and
   `noFallthroughCasesInSwitch` in `tsconfig.json` and fixed the ~30
   errors that surfaced (mostly explicit fall-through `return undefined`
@@ -301,11 +317,11 @@ surface (chat-card a11y) and one new GM-visible notification
   (no behavioural change; lint count drops 613 → 579) (#59 part 2).
 - Socket transport consolidated onto socketlib (#130): the three live
   native-socket ops (`updateRollMessage`, `updateInitRoll`,
-  `removeFromVehicle`) migrated to `OD6S.socket.executeAsGM`, with
+  `removeFromVehicle`) migrated to `NONEX_IST_OD6S.socket.executeAsGM`, with
   four dead ops removed (`addToVehicle`-native, `sendVehicleStats`,
   and the dead native branches of the two explosive-region ops).
   `src/module/system/socket.ts` and the
-  `game.socket.on('system.od6s', …)` dispatcher in `od6s.ts` are
+  `game.socket.on('system.nonex-ist-od6s', …)` dispatcher in `nonex-ist-od6s.ts` are
   gone. Every socketlib handler is now wrapped in a small `register()`
   helper that catches handler exceptions and routes them through
   `logError('socket', …)` — same `[od6s:socket]` breadcrumb the
@@ -429,9 +445,9 @@ typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
   `explosiveRange` / `explosiveSet`) was scalar on the item document,
   so throw 2 overwrote the region pointer set by throw 1 and throw 1
   could no longer be resolved. Replaced with a per-region keyed map
-  at `flags.od6s.explosivePending.<regionId>`; the region id is
+  at `flags.nonex-ist-od6s.explosivePending.<regionId>`; the region id is
   threaded through `OD6SItem.roll(parry, regionId)` and stamped on
-  each attack chat message as `flags.od6s.template`, so cleanup
+  each attack chat message as `flags.nonex-ist-od6s.template`, so cleanup
   paths address only their own throw's entry. Migration drops the
   legacy scalars on world upgrade (#40).
 - Auto-explosive zone-damage code now reads target dodge from
@@ -453,7 +469,7 @@ typed per-roll-type handlers; #83 `actor-sheet.ts` 788 → 401 LOC;
   starship) crashed in `undefined.specialization`. Caught by the new
   tier-3-action-rolls smoke spec (#98).
 - Stun-flag schema typo on the explosive-without-zones path was
-  writing to `flags.od6s.stuns` (existing schema field) instead of
+  writing to `flags.nonex-ist-od6s.stuns` (existing schema field) instead of
   the intended `stun` boolean. Surfaced while extracting weapon
   mods/stun math; fixed inline (#82).
 - Effect-mod accumulator on weapon stats now uses an explicit
@@ -664,7 +680,7 @@ pervasive type-safety cleanups across the codebase.
 - Item.roll lifts Actor narrowing to one place.
 - `system/utilities` barrel passthroughs given proper types.
 - `wounds.ts` helpers typed; vehicle damage shape added.
-- Redundant `as-any` casts dropped in favor of `od6s.d.ts`.
+- Redundant `as-any` casts dropped in favor of `nonex-ist-od6s.d.ts`.
 
 ### Maintenance
 

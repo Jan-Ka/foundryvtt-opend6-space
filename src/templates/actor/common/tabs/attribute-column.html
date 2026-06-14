@@ -4,15 +4,13 @@
         class="attributes grid-2col-attributes"
         {{else}} class="attributes grid grid-3col-attributes"
         {{/if}}>
-            <div class="attribute attributedialog flex-group-center{{#if
-                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+            <div class="attribute attributedialog flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                  data-type="attribute"
                  data-score="{{attribute.score}}"
                  data-label="{{getAttributeName key}}">
                 <b>{{ getAttributeName key }}</b>
             </div>
-            <div class="flex-group-center{{#if
-                    (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}{{getModColor attribute.mod}}"
+            <div class="flex-group-center{{#if (eq actor.system.sheetmode.value "normal")}} rolldialog{{/if}}{{getModColor attribute.mod}}"
                  data-type="attribute"
                  data-score="{{attribute.score}}"
                  data-label="{{getAttributeName key}}">
@@ -29,13 +27,13 @@
             {{#if (eq actor.system.sheetmode.value "freeedit")}}
                 <div class="flexrow flex-group-center">
                     <div class="item-add"
-                         title="{{localize 'OD6S.ADD_SKILL'}}"
+                         title="{{localize 'NONEX_IST_OD6S.ADD_SKILL'}}"
                          data-type="skill"
                          data-attrname="{{ key }}">
                         <a><i class="fas fa-plus"></i></a>
                     </div>
                     <div class="attribute-edit"
-                         title="{{localize 'OD6S.EDIT_ATTRIBUTE'}}"
+                         title="{{localize 'NONEX_IST_OD6S.EDIT_ATTRIBUTE'}}"
                          data-type="attribute"
                          data-label="{{getAttributeName key}}"
                          data-freeadvance="true"
@@ -57,16 +55,15 @@
                             {{#if (skillUsed)}}
                             <input type="checkbox" class="skill-used-checkbox"
                                    {{#if skill.system.used.value}}
-                                   title="{{localize 'OD6S.SKILL_USED'}}"
+                                   title="{{localize 'NONEX_IST_OD6S.SKILL_USED'}}"
                                    {{else}}
-                                   title="{{localize 'OD6S.SKILL_NOT_USED'}}"
+                                   title="{{localize 'NONEX_IST_OD6S.SKILL_NOT_USED'}}"
                                    {{/if}}
                                    data-item-id="{{skill._id}}" name="skill-used-{{skill._id}}"
                                    id="skill-used-{{skill._id}}" data-dtype="Boolean"
                                    {{#if skill.system.used.value}}checked{{/if}}>
                             {{/if}}
-                            <div class="skilldialog flex-group-left{{#if
-                                    (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                            <div class="skilldialog flex-group-left{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                  data-item-id="{{skill._id}}"
                                  data-type="skill"
                                  data-score="{{skill.system.total}}"
@@ -75,8 +72,7 @@
                                 {{skill.name}}
                             </div>
                         </div>
-                            <div class="flex-group-center{{#if
-                                    (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                            <div class="flex-group-center{{#if (eq ../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
                                 {{getModColor skill.system.mod}}"
                                  data-item-id="{{skill._id}}"
                                  data-type="skill"
@@ -93,7 +89,7 @@
                                 <div class="item item-controls flexrow flex-group-center"
                                      data-item-id="{{skill._id}}">
                                     <a class="advancedialog"
-                                       title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                       title="{{localize "NONEX_IST_OD6S.ADVANCE_SKILL"}}"
                                        data-item-id="{{skill._id}}"
                                        data-type="skill"
                                        data-score="{{skill.system.total}}"
@@ -102,7 +98,7 @@
                                        data-freeadvance="false">
                                         <i class="fas fa-plus-square"></i></a>
                                     <a class="specializedialog"
-                                       title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                       title="{{localize "NONEX_IST_OD6S.CREATE_SPECIALIZATION"}}"
                                        data-item-id="{{skill._id}}"
                                        data-type="skill">
                                         <i class="fas fa-chevron-circle-left"></i></a>
@@ -118,14 +114,14 @@
                                     <a class="item-control item-edit" title="Edit Skill"><i
                                             class="fas fa-edit"></i></a>
                                     <a class="specializedialog"
-                                       title="{{localize "OD6S.CREATE_SPECIALIZATION"}}"
+                                       title="{{localize "NONEX_IST_OD6S.CREATE_SPECIALIZATION"}}"
                                        data-item-id="{{skill._id}}"
                                        data-type="skill">
                                         <i class="fas fa-chevron-circle-left"></i></a>
                                     <a data-item-id="{{skill._id}}"
                                        data-type="skill"
                                        class="item-control item-delete"
-                                       title={{localize 'OD6S.DELETE_SKILL'}}>
+                                       title={{localize 'NONEX_IST_OD6S.DELETE_SKILL'}}>
                                         <i class="fas fa-trash"></i></a>
                                 </div>{{/if}}
                         </div>
@@ -145,8 +141,7 @@
                                                id="spec-used-{{spec._id}}" data-dtype="Boolean"
                                                {{#if spec.system.used.value}}checked{{/if}}>
                                         {{/if}}
-                                        <div class="specdialog indent flex-row flex-group-left{{#if
-                                                (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
+                                        <div class="specdialog indent flex-row flex-group-left{{#if (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}"
                                              data-item-id="{{spec._id}}"
                                              data-type="specialization"
                                              data-score="{{spec.system.total}}"
@@ -154,8 +149,7 @@
                                             <i>{{spec.name}}</i>
                                         </div>
                                     </div>
-                                        <div class="flex-group-center{{#if
-                                                (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
+                                        <div class="flex-group-center{{#if (eq ../../actor.system.sheetmode.value "normal")}} rolldialog{{/if}}
                                             {{getModColor spec.system.mod}}"
                                              data-item-id="{{spec._id}}"
                                              data-type="specialization"
@@ -171,7 +165,7 @@
                                             <div class="item item-controls flexrow flex-group-center"
                                                  data-item-id="{{spec._id}}">
                                                 <a class="advancedialog"
-                                                   title="{{localize "OD6S.ADVANCE_SKILL"}}"
+                                                   title="{{localize "NONEX_IST_OD6S.ADVANCE_SKILL"}}"
                                                    data-item-id="{{spec._id}}"
                                                    data-type="specialization"
                                                    data-score="{{spec.system.total}}"

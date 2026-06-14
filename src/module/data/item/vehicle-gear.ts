@@ -12,7 +12,7 @@ export default class VehicleGearData extends foundry.abstract.TypeDataModel {
       ...equipSchema(),
       quantity: new fields.NumberField({ initial: 1 }),
       consumable: new fields.BooleanField({ initial: false }),
-      label: new fields.StringField({ initial: "OD6S.VEHICLE_GEAR" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.VEHICLE_GEAR" }),
     };
   }
 }

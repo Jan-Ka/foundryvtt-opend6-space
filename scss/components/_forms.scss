@@ -1,7 +1,7 @@
 @use '../utils' as *;
 
 // ── Sheet ──────────────────────────────────────────────────────────────────
-.od6s {
+.nonex-ist-od6s {
   .item-form {
     font-family: $font-primary;
   }
@@ -195,7 +195,7 @@
   //
   // For .sheet-mode to pin to the bottom of the form, every layer from
   // window-content down has to be a flex column that fills its parent and
-  // does not itself become the scroll container. The .od6s.sheet >
+  // does not itself become the scroll container. The .nonex-ist-od6s.sheet >
   // .window-content rule in _window.scss provides flex:1+min-height on
   // window-content; here we (a) make it a flex column with overflow:hidden
   // so its child (the data-application-part div) actually controls layout,

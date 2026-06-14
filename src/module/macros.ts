@@ -11,7 +11,7 @@ import OD6S from "./config/config-od6s";
 export async function createOD6SMacro(data: any, slot: number) {
 
     if (data.type !== "Item") return;
-    if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.'))return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NOT_OWNED'));
+    if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.'))return ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NOT_OWNED'));
     const item = await Item.fromDropData(data);
 
     // Filter out certain item types
@@ -23,11 +23,11 @@ export async function createOD6SMacro(data: any, slot: number) {
         item.type === 'gear' ||
         item.type === 'cybernetic' ||
         item.type === 'vehicle') {
-        return ui.notifications.warn(game.i18n.localize('OD6S.WARN_INVALID_MACRO_ITEM'));
+        return ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_INVALID_MACRO_ITEM'));
     }
 
     // Create the macro command
-    const command = `game.od6s.rollItemMacro("${item._id}");`;
+    const command = `game["nonex-ist-od6s"].rollItemMacro("${item._id}");`;
     let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
     if (!macro) {
         macro = await Macro.create({
@@ -35,7 +35,7 @@ export async function createOD6SMacro(data: any, slot: number) {
             type: "script",
             img: item.img,
             command: command,
-            flags: {"od6s.itemMacro": true}
+            flags: {"nonex-ist-od6s.itemMacro": true}
         });
     }
     await game.user.assignHotbarMacro(macro, slot);
@@ -54,7 +54,7 @@ export function rollItemMacro(itemId: string) {
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
     const item = actor ? actor.items.find((i: Item) => i.id === itemId) : null;
-    if (!item) return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_ITEM_ID') + " " + itemId);
+    if (!item) return ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NO_ITEM_ID') + " " + itemId);
 
     // Trigger the item roll
     return item.roll();
@@ -72,7 +72,7 @@ export function rollItemNameMacro(name: string) {
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
     const item = actor ? actor.items.find((i: Item) => i.name === name) : null;
-    if (!item) return ui.notifications.warn(game.i18n.localize('OD6S.WARN_NO_ITEM_NAME') + " " + name);
+    if (!item) return ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_NO_ITEM_NAME') + " " + name);
 
     // Trigger the item roll
     return item.roll();
@@ -86,7 +86,7 @@ export function rollItemNameMacro(name: string) {
 export function getAttributeName(attribute: string): string | undefined {
     attribute = attribute.toLowerCase();
     if (typeof (OD6S.attributes[attribute]) === "undefined") {
-        const warnString = game.i18n.localize('OD6S.ERROR_ATTRIBUTE_KEY') + ": " + attribute;
+        const warnString = game.i18n.localize('NONEX_IST_OD6S.ERROR_ATTRIBUTE_KEY') + ": " + attribute;
         ui.notifications.warn(warnString);
         return undefined;
     }
@@ -105,12 +105,12 @@ export function getAttributeShortName(attribute: string) {
 
 export async function simpleRoll() {
     const content = await foundry.applications.handlebars.renderTemplate(
-        "systems/od6s/templates/simpleRoll.html",
+        "systems/nonex-ist-od6s/templates/simpleRoll.html",
         {wilddie: true, dice: 1, pips: 0});
     const result = await foundry.applications.api.DialogV2.input({
-        window: {title: game.i18n.localize("OD6S.ROLL")},
+        window: {title: game.i18n.localize("NONEX_IST_OD6S.ROLL")},
         content,
-        ok: {label: game.i18n.localize("OD6S.ROLL")},
+        ok: {label: game.i18n.localize("NONEX_IST_OD6S.ROLL")},
     });
     if (!result) return;
 
@@ -133,25 +133,25 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     const pips = result.pips;
     const damageRoll = !!result.damageroll;
     const damageType = result.damagetype;
-    if (game.settings.get("od6s", "use_wild_die")) {
+    if (game.settings.get("nonex-ist-od6s", "use_wild_die")) {
         wild = !!result.wilddie;
     }
     if (wild) {
         dice -= 1;
         if (dice < 0) {
-            ui.notifications.warn("OD6S.NOT_ENOUGH_DICE");
+            ui.notifications.warn("NONEX_IST_OD6S.NOT_ENOUGH_DICE");
             return;
         }
-        if (dice > 0) rollString = dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR");
-        rollString += "+1dw" + game.i18n.localize("OD6S.WILD_DIE_FLAVOR");
+        if (dice > 0) rollString = dice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR");
+        rollString += "+1dw" + game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR");
     } else {
-        rollString = dice + "d6" + game.i18n.localize("OD6S.BASE_DIE_FLAVOR");
+        rollString = dice + "d6" + game.i18n.localize("NONEX_IST_OD6S.BASE_DIE_FLAVOR");
     }
     if (pips > 0) rollString += "+" + pips;
 
-    let label = game.i18n.localize("OD6S.ROLLING");
+    let label = game.i18n.localize("NONEX_IST_OD6S.ROLLING");
     if (damageRoll) {
-        label += " " + game.i18n.localize("OD6S.DAMAGE") + "("
+        label += " " + game.i18n.localize("NONEX_IST_OD6S.DAMAGE") + "("
             + game.i18n.localize(OD6S.damageTypes[damageType!]) + ")";
     }
     const roll = await new Roll(rollString).evaluate();
@@ -165,7 +165,7 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
     if (damageRoll) {
         flags = {
             type: "damage",
-            source: game.i18n.localize("OD6S.DAMAGE"),
+            source: game.i18n.localize("NONEX_IST_OD6S.DAMAGE"),
             damageType,
             isOpposable: true,
             wild: false,
@@ -174,21 +174,21 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
         };
     }
 
-    if (game.settings.get("od6s", "use_wild_die")) {
-        const WildDie = roll.terms.find((d: { flavor: string }) => game.i18n.localize("OD6S.WILD_DIE_FLAVOR").includes(d.flavor));
+    if (game.settings.get("nonex-ist-od6s", "use_wild_die")) {
+        const WildDie = roll.terms.find((d: { flavor: string }) => game.i18n.localize("NONEX_IST_OD6S.WILD_DIE_FLAVOR").includes(d.flavor));
         if (WildDie!.total === 1) {
             flags.wild = true;
             if (OD6S.wildDieOneDefault > 0 && OD6S.wildDieOneAuto === 0) flags.wildHandled = true;
         }
     }
 
-    if (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls")) {
+    if (game.user.isGM && game.settings.get("nonex-ist-od6s", "hide-gm-rolls")) {
         rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
     }
     const rollMessage = await roll.toMessage({
         speaker: ChatMessage.getSpeaker(),
         flavor: label,
-        flags: {od6s: flags},
+        flags: {"nonex-ist-od6s": flags},
     }, {rollMode, create: true});
 
     if (flags.wild === true && OD6S.wildDieOneDefault === 2 && OD6S.wildDieOneAuto === 0) {
@@ -210,11 +210,11 @@ async function runSimpleRoll(result: SimpleRollResult): Promise<void> {
         };
 
         if (game.user.isGM) {
-            if (rollMessage.getFlag("od6s", "difficulty") && rollMessage.getFlag("od6s", "success")) {
-                await rollMessage.setFlag("od6s", "success",
-                    replacementRoll.total >= rollMessage.getFlag("od6s", "difficulty"));
+            if (rollMessage.getFlag("nonex-ist-od6s", "difficulty") && rollMessage.getFlag("nonex-ist-od6s", "success")) {
+                await rollMessage.setFlag("nonex-ist-od6s", "success",
+                    replacementRoll.total >= rollMessage.getFlag("nonex-ist-od6s", "difficulty"));
             }
-            await rollMessage.setFlag("od6s", "originalroll", rollMessage.rolls[0]);
+            await rollMessage.setFlag("nonex-ist-od6s", "originalroll", rollMessage.rolls[0]);
             await rollMessage.update(rollMessageUpdate, {diff: true});
         } else {
             await OD6S.socket.executeAsGM("updateRollMessage", game.user.id, rollMessage.id, rollMessageUpdate);

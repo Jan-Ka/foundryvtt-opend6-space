@@ -23,7 +23,7 @@ export default class SpeciesTemplateData extends foundry.abstract.TypeDataModel 
         met: attributeRangeSchema(),
       }),
       items: new fields.ArrayField(new fields.ObjectField()),
-      label: new fields.StringField({ initial: "OD6S.SPECIES_TEMPLATE" }),
+      label: new fields.StringField({ initial: "NONEX_IST_OD6S.SPECIES_TEMPLATE" }),
     };
   }
 }

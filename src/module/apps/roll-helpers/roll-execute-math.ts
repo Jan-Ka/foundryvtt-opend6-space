@@ -254,7 +254,7 @@ export function assembleDamageDice(input: DamageAssemblyInput): DamageAssemblyRe
         if (d.name === scaleLabel) {
             if (diceForScale) damageScore += d.value;
         } else {
-            const isStrBonusUnderFatepoint = fatepointInEffect && d.name === "OD6S.STRENGTH_DAMAGE_BONUS";
+            const isStrBonusUnderFatepoint = fatepointInEffect && d.name === "NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS";
             if (!isStrBonusUnderFatepoint) damageScore += d.value;
         }
     }
@@ -262,7 +262,7 @@ export function assembleDamageDice(input: DamageAssemblyInput): DamageAssemblyRe
     let damageDice = getDiceFromScore(damageScore, pipsPerDice);
 
     if (fatepointInEffect && strModDice) {
-        const strMod = damageModifiers.find(d => d.name === "OD6S.STRENGTH_DAMAGE_BONUS");
+        const strMod = damageModifiers.find(d => d.name === "NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS");
         if (strMod) {
             damageDice = {
                 dice: damageDice.dice + strModDice.dice * 2,

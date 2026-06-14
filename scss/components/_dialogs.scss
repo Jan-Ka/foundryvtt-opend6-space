@@ -1,9 +1,9 @@
 @use '../utils' as *;
 
 // ── Roll / advance / specialize dialogs ─────────────────────────────────
-// Scoped to .od6s.dialog so we don't accidentally restyle Foundry's
+// Scoped to .nonex-ist-od6s.dialog so we don't accidentally restyle Foundry's
 // generic DialogV2 confirms used by the rest of the system.
-.od6s.dialog {
+.nonex-ist-od6s.dialog {
 
   // Section divider — replaces the bare <div class="center"><b>X</b></div>
   // pattern. Gives Penalties / Modifiers a real visual weight matched to

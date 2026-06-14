@@ -29,10 +29,10 @@ test("vehicle applyDamage transitions damage level without errors", async ({page
             // Initial state should be no damage
             const before = vehicle.system.damage.value;
 
-            await vehicle.applyDamage("OD6S.DAMAGE_VERY_LIGHT");
+            await vehicle.applyDamage("NONEX_IST_OD6S.DAMAGE_VERY_LIGHT");
             const afterLight = vehicle.system.damage.value;
 
-            await vehicle.applyDamage("OD6S.DAMAGE_HEAVY");
+            await vehicle.applyDamage("NONEX_IST_OD6S.DAMAGE_HEAVY");
             const afterHeavy = vehicle.system.damage.value;
 
             await new Promise((r) => setTimeout(r, 200));
@@ -47,9 +47,9 @@ test("vehicle applyDamage transitions damage level without errors", async ({page
     });
 
     expect(result.errs, "damage pipeline errors").toEqual([]);
-    expect(result.before).toBe("OD6S.NO_DAMAGE");
-    expect(result.afterLight).toBe("OD6S.DAMAGE_VERY_LIGHT");
-    expect(result.afterHeavy).toBe("OD6S.DAMAGE_HEAVY");
+    expect(result.before).toBe("NONEX_IST_OD6S.NO_DAMAGE");
+    expect(result.afterLight).toBe("NONEX_IST_OD6S.DAMAGE_VERY_LIGHT");
+    expect(result.afterHeavy).toBe("NONEX_IST_OD6S.DAMAGE_HEAVY");
 });
 
 test("character wound escalation reaches incapacitated without schema errors", async ({page}) => {
@@ -75,7 +75,7 @@ test("character wound escalation reaches incapacitated without schema errors", a
         }
 
         try {
-            await actor.applyWounds("OD6S.WOUNDS_INCAPACITATED");
+            await actor.applyWounds("NONEX_IST_OD6S.WOUNDS_INCAPACITATED");
         } catch (e) {
             errs.push("incapacitated: " + (e as Error).message);
         }

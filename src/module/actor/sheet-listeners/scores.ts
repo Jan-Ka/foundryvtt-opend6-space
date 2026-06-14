@@ -56,8 +56,8 @@ export function registerRollListeners(
     root.querySelectorAll<HTMLElement>('.rollbodypoints').forEach((elem) =>
         elem.addEventListener('click', async () => {
             const ok = await foundry.applications.api.DialogV2.confirm({
-                window: {title: game.i18n.localize("OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
-                content: `<p>${game.i18n.localize("OD6S.CONFIRM_ROLL_BODYPOINTS")}</p>`,
+                window: {title: game.i18n.localize("NONEX_IST_OD6S.ROLL") + " " + game.i18n.localize(OD6S.bodyPointsName)},
+                content: `<p>${game.i18n.localize("NONEX_IST_OD6S.CONFIRM_ROLL_BODYPOINTS")}</p>`,
             });
             if (ok) await sheet._rollBodyPoints();
         }));

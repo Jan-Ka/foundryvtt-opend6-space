@@ -18,7 +18,7 @@
  *                   than adjacent so the test doesn't depend on the smoke
  *                   world's `canvas.grid.distance` unit (1 vs 5).
  *
- * The gate only applies when `OD6S.meleeRange` is true and the classified
+ * The gate only applies when `NONEX_IST_OD6S.meleeRange` is true and the classified
  * subtype is `meleeattack` / `brawlattack`. We toggle the `melee_range`
  * setting for the duration of the spec and restore it after.
  */
@@ -46,11 +46,11 @@ async function runMeleeRoll(
 
         // Restore-after-each via try/finally — the setting toggle and scene
         // mutations need to unwind cleanly even if a probe throws.
-        const prevMeleeRange = window.game.settings.get("od6s", "melee_range");
+        const prevMeleeRange = window.game.settings.get("nonex-ist-od6s", "melee_range");
         const origWarn = window.ui.notifications.warn.bind(window.ui.notifications);
         let warned = false;
         let warnMessage: string | null = null;
-        const expectedWarn = window.game.i18n.localize("OD6S.OUT_OF_MELEE_BRAWL_RANGE");
+        const expectedWarn = window.game.i18n.localize("NONEX_IST_OD6S.OUT_OF_MELEE_BRAWL_RANGE");
         window.ui.notifications.warn = (msg: string, ...rest: any[]) => {
             if (msg === expectedWarn) {
                 warned = true;
@@ -63,7 +63,7 @@ async function runMeleeRoll(
         let actorToken: any = null;
         let targetToken: any = null;
         try {
-            await window.game.settings.set("od6s", "melee_range", true);
+            await window.game.settings.set("nonex-ist-od6s", "melee_range", true);
 
             // Character with a strength to roll, melee weapon, and active token.
             let actor = window.game.actors.find((a: any) => a.name === "smoke-character");
@@ -77,7 +77,7 @@ async function runMeleeRoll(
                 await actor.update({"system.attributes.str.base": 9});
             }
 
-            const meleeLabel = window.game.i18n.localize("OD6S.MELEE");
+            const meleeLabel = window.game.i18n.localize("NONEX_IST_OD6S.MELEE");
             const stale = actor.items.filter(
                 (i: any) => i.type === "weapon" && i.name === "smoke-melee-weapon",
             ).map((i: any) => i.id);
@@ -191,7 +191,7 @@ async function runMeleeRoll(
                     }
                 }
             } catch { /* ignore */ }
-            await window.game.settings.set("od6s", "melee_range", prevMeleeRange);
+            await window.game.settings.set("nonex-ist-od6s", "melee_range", prevMeleeRange);
             window.removeEventListener("unhandledrejection", onRej);
         }
     }, {targetCells});

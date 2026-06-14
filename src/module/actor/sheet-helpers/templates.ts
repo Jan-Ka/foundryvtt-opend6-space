@@ -24,7 +24,7 @@ export async function onDropCharacterTemplate(
     if (sheet.document.type !== 'character') return false;
     // Check if a template has already been assigned to this actor
     if (sheet.document.items.find((E: Item) => E.type === 'character-template')) {
-        ui.notifications.error(game.i18n.localize("OD6S.ERROR_TEMPLATE_ALREADY_ASSIGNED"));
+        ui.notifications.error(game.i18n.localize("NONEX_IST_OD6S.ERROR_TEMPLATE_ALREADY_ASSIGNED"));
         return false;
     }
     await addCharacterTemplate(sheet, item);
@@ -43,7 +43,7 @@ export async function onDropSpeciesTemplate(
     if (!sheet.document.isOwner) return false;
     if (sheet.document.type !== 'character' && sheet.document.type !== 'npc') return false;
     if (sheet.document.items.find((E: Item) => E.type === 'species-template')) {
-        ui.notifications.error(game.i18n.localize("OD6S.ERROR_SPECIES_TEMPLATE_ALREADY_ASSIGNED"));
+        ui.notifications.error(game.i18n.localize("NONEX_IST_OD6S.ERROR_SPECIES_TEMPLATE_ALREADY_ASSIGNED"));
         return false;
     }
 
@@ -151,7 +151,7 @@ export async function templateItems(
             }
         }
         if ((i.type === 'advantage' || i.type === 'disadvantage') &&
-            game.settings.get('od6s', 'hide_advantages_disadvantages')) continue;
+            game.settings.get('nonex-ist-od6s', 'hide_advantages_disadvantages')) continue;
         if (typeof i.description !== 'undefined' && i.description !== '' && i.description !== null) {
             (templateItem as Item & { description?: string }).description = i.description;
         }
@@ -165,7 +165,7 @@ export async function templateItems(
         }
 
         // Metaphysics skills get 1D if the attribute is not used
-        if (isSkillItem(templateItem) && templateItem.system.attribute === 'met' && game.settings.get('od6s', 'metaphysics_attribute_optional')) {
+        if (isSkillItem(templateItem) && templateItem.system.attribute === 'met' && game.settings.get('nonex-ist-od6s', 'metaphysics_attribute_optional')) {
             templateItem.system.base = OD6S.pipsPerDice;
         }
 

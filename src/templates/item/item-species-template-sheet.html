@@ -1,7 +1,7 @@
 <div class="{{cssClass}}">
     <header class="sheet-header">
         <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" title="{{item.name}}"
-             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}"/>
+             alt="{{localize 'NONEX_IST_OD6S.ALT_ITEM_IMAGE'}}"/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
         </div>
@@ -9,9 +9,9 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="description">{{localize "OD6S.DESCRIPTION"}}</a>
-        <a class="item" data-tab="attributes">{{localize "OD6S.ATTRIBUTES"}}</a>
-        <a class="item" data-tab="labels">{{localize "OD6S.LABELS"}}</a>
+        <a class="item" data-tab="description">{{localize "NONEX_IST_OD6S.DESCRIPTION"}}</a>
+        <a class="item" data-tab="attributes">{{localize "NONEX_IST_OD6S.ATTRIBUTES"}}</a>
+        <a class="item" data-tab="labels">{{localize "NONEX_IST_OD6S.LABELS"}}</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -24,23 +24,23 @@
 
         {{!-- Attributes Tab --}}
         <div class="tab attributes" data-group="primary" data-tab="attributes">
-            <div>{{localize 'OD6S.TYPE'}}: {{localize "OD6S.SPECIES_TEMPLATE"}}</div>
+            <div>{{localize 'NONEX_IST_OD6S.TYPE'}}: {{localize "NONEX_IST_OD6S.SPECIES_TEMPLATE"}}</div>
             <div class="grid grid-2col">
                 {{#each item.system.attributes as |data key|}}
                     {{#unless (eq key "met") }}
                         <div>
                             <div class="grid grid-5col-attributes">
                                 <div class="attribute_min flexrow flex-group-center"
-                                     title="{{localize 'OD6S.ATTRIBUTE_MINIMUM_MAXIMUM'}}">{{getAttributeName key}}:
+                                     title="{{localize 'NONEX_IST_OD6S.ATTRIBUTE_MINIMUM_MAXIMUM'}}">{{getAttributeName key}}:
                                 </div>
-                                <div class="flex-group-center" title="{{localize 'OD6S.ATTRIBUTE_MIN'}}"
+                                <div class="flex-group-center" title="{{localize 'NONEX_IST_OD6S.ATTRIBUTE_MIN'}}"
                                      data-type="attribute_min"
                                      data-min="{{data.min}}"
                                      data-label="{{key}}">
                                     <b>{{diceFromScore data.min}}</b>D+<b>{{pipsFromScore data.min}}</b>
                                 </div>
                                 <div class="edittemplateattribute flexrow flex-group-center"
-                                     title="{{localize 'OD6S.ATTRIBUTE_MIN_EDIT'}}"
+                                     title="{{localize 'NONEX_IST_OD6S.ATTRIBUTE_MIN_EDIT'}}"
                                      data-type="attribute"
                                      data-score="{{data.min}}"
                                      data-label="{{key}}"
@@ -49,14 +49,14 @@
                                     <a><i class="fas fa-edit"></i></a>
                                 </div>
                                 <div class="flex-group-center"
-                                     title="{{localize 'OD6S.ATTRIBUTE_MAX'}}"
+                                     title="{{localize 'NONEX_IST_OD6S.ATTRIBUTE_MAX'}}"
                                      data-type="attribute_max"
                                      data-max="{{data.max}}"
                                      data-label="{{key}}">
                                     <b>{{diceFromScore data.max}}</b>D+<b>{{pipsFromScore data.max}}</b>
                                 </div>
                                 <div class="edittemplateattribute flexrow flex-group-center"
-                                     title="{{localize 'OD6S.ATTRIBUTE_MAX_EDIT'}}"
+                                     title="{{localize 'NONEX_IST_OD6S.ATTRIBUTE_MAX_EDIT'}}"
                                      data-type="attribute"
                                      data-score="{{data.max}}"
                                      data-label="{{key}}"
@@ -78,7 +78,7 @@
                                 {{#if itemType.label}}
                                     <div class="item-controls">
                                         <a class="item-control template-item-add"
-                                           title="{{localize 'OD6S.ADD'}} {{localize itemType.label}}"
+                                           title="{{localize 'NONEX_IST_OD6S.ADD'}} {{localize itemType.label}}"
                                            data-type="{{typeKey}}">
                                             <i class="fas fa-plus"></i>
                                         </a>
@@ -98,12 +98,12 @@
                                                        data-name="{{templateItem.name}}"
                                                        data-type="{{templateItem.type}}"
                                                        data-desc="{{templateItem.system.description}}"
-                                                       title="{{localize 'OD6S.EDIT_ITEM'}}">
+                                                       title="{{localize 'NONEX_IST_OD6S.EDIT_ITEM'}}">
                                                         <i class="fas fa-edit"></i></a>
                                                     <a class="template-item-control template-item-delete"
                                                        data-name="{{templateItem.name}}"
                                                        data-type="{{templateItem.type}}"
-                                                       title="{{localize 'OD6S.DELETE_ITEM'}}">
+                                                       title="{{localize 'NONEX_IST_OD6S.DELETE_ITEM'}}">
                                                         <i class="fas fa-trash"></i></a>
                                                 </div>
                                             </div>
@@ -118,7 +118,7 @@
         </div>
 
         {{!--Labels Tab --}}
-        {{> systems/od6s/templates/item/item-labels-tags.html }}
+        {{> systems/nonex-ist-od6s/templates/item/item-labels-tags.html }}
 
     </section>
 </div>

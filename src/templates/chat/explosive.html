@@ -3,7 +3,7 @@
     <span class="message-metadata">
           <time class="message-timestamp">{{timeSince message.timestamp}}</time>
         {{#if user.isGM}}
-            <a class="button message-delete" data-action="deleteMessage" title="{{localize "OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
+            <a class="button message-delete" data-action="deleteMessage" title="{{localize "NONEX_IST_OD6S.DELETE"}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.DELETE"}}"><i class="fas fa-trash" aria-hidden="true"></i></a>
         {{/if}}
       </span>
     {{#if message.flavor}}
@@ -13,15 +13,15 @@
 <div class="message-content">
 	{{{message.content}}}
 </div>
-{{#if message.flags.od6s.targets }}
+{{#if message.flags.nonex-ist-od6s.targets }}
 <div class="explosive-targets">
-    <div class="center">{{localize 'OD6S.TARGETS'}}:</div>
+    <div class="center">{{localize 'NONEX_IST_OD6S.TARGETS'}}:</div>
     <div class="grid-4col-explosive-damage">
-        <span>{{ localize 'OD6S.NAME'}}:</span>
-        <span>{{ localize 'OD6S.ZONE'}}</span>
-        <span>{{ localize 'OD6S.DAMAGE'}}</span>
+        <span>{{ localize 'NONEX_IST_OD6S.NAME'}}:</span>
+        <span>{{ localize 'NONEX_IST_OD6S.ZONE'}}</span>
+        <span>{{ localize 'NONEX_IST_OD6S.DAMAGE'}}</span>
         <span></span>
-    {{#each message.flags.od6s.targets as |target key|}}
+    {{#each message.flags.nonex-ist-od6s.targets as |target key|}}
         <span>{{target.name}}</span>
         <span class="center">{{target.zone}}</span>
         {{#if ../user.isGM}}
@@ -38,7 +38,7 @@
     <div class="message-oppose" style="text-align: right"
 				data-message-id="{{../message._id}}" data-target="{{target.id}}">
         {{#if ../user.isGM}}
-        <a class="button message-oppose-button" title="{{localize "OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "OD6S.OPPOSE"}}">&nbsp;<i
+        <a class="button message-oppose-button" title="{{localize "NONEX_IST_OD6S.OPPOSE"}}" role="button" tabindex="0" aria-label="{{localize "NONEX_IST_OD6S.OPPOSE"}}">&nbsp;<i
                 class="fas fa-exchange-alt" aria-hidden="true"></i></a>
         {{/if}}
     </div>
@@ -46,17 +46,17 @@
     </div>
 </div>
 {{/if}}
-{{#if user.isGM}}{{#if isExplosivesAuto}}{{#if message.flags.od6s.apply}}{{#unless message.flags.od6s.applied}}
+{{#if user.isGM}}{{#if isExplosivesAuto}}{{#if message.flags.nonex-ist-od6s.apply}}{{#unless message.flags.nonex-ist-od6s.applied}}
     <br>
     <div class="apply-explosive-damage-button"
          data-message-id="{{message._id}}"
-         title="{{localize 'OD6S.APPLY_DAMAGE'}}">
-        {{#if message.flags.od6s.stun}}
-            title="{{localize 'OD6S.APPLY_STUN'}}">
-            <button>{{localize 'OD6S.APPLY_STUN'}}</button>
+         title="{{localize 'NONEX_IST_OD6S.APPLY_DAMAGE'}}">
+        {{#if message.flags.nonex-ist-od6s.stun}}
+            title="{{localize 'NONEX_IST_OD6S.APPLY_STUN'}}">
+            <button>{{localize 'NONEX_IST_OD6S.APPLY_STUN'}}</button>
         {{else}}
-            title="{{localize 'OD6S.APPLY_DAMAGE'}}">
-            <button>{{localize 'OD6S.APPLY_DAMAGE'}}</button>
+            title="{{localize 'NONEX_IST_OD6S.APPLY_DAMAGE'}}">
+            <button>{{localize 'NONEX_IST_OD6S.APPLY_DAMAGE'}}</button>
         {{/if}}
     </div>
 {{/unless}}{{/if}}{{/if}}{{/if}}

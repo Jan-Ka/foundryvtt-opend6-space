@@ -33,11 +33,11 @@ export default class od6sAttributesSortingConfiguration extends HandlebarsApplic
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-attributes-sorting-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-attributes-sorting-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_ATTRIBUTES_SORTING",
+            title: "NONEX_IST_OD6S.CONFIG_ATTRIBUTES_SORTING",
             resizable: true,
             minimizable: true,
         },
@@ -57,7 +57,7 @@ export default class od6sAttributesSortingConfiguration extends HandlebarsApplic
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/attributes-sorting.html",
+            template: "systems/nonex-ist-od6s/templates/settings/attributes-sorting.html",
         },
     };
 
@@ -155,7 +155,7 @@ export default class od6sAttributesSortingConfiguration extends HandlebarsApplic
         for (const a of this.attributes) {
             attrSort[a.id] = {sort: a.sort};
         }
-        await game.settings.set("od6s", "attributes_sorting", attrSort);
+        await game.settings.set("nonex-ist-od6s", "attributes_sorting", attrSort);
         if (this.requiresWorldReload) {
             await foundry.applications.settings.SettingsConfig.reloadConfirm({world: true});
         }

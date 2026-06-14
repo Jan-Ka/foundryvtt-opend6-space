@@ -6,7 +6,7 @@
  */
 import {readFileSync, writeFileSync} from "node:fs";
 
-const path = "src/css/od6s.css";
+const path = "src/css/nonex-ist-od6s.css";
 const css = readFileSync(path, "utf8");
 
 const lines = css.split("\n");

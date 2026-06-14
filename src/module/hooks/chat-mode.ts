@@ -15,7 +15,7 @@ export interface DeriveRollModeInput {
      * distinguish a single-GM /gmroll from a /selfroll (both have whisper
      * === [author.id]).
      */
-    flags?: { od6s?: { rollMode?: string } } | null;
+    flags?: { "nonex-ist-od6s"?: { rollMode?: string } } | null;
 }
 
 const PERSISTED_TO_MODE: Record<string, RollMode> = {
@@ -27,12 +27,12 @@ const PERSISTED_TO_MODE: Record<string, RollMode> = {
 
 /**
  * Classify a chat message into one of four modes. Prefers the persisted
- * `flags.od6s.rollMode` set by our roll dialog; falls back to deriving from
+ * `flags.nonex-ist-od6s.rollMode` set by our roll dialog; falls back to deriving from
  * Foundry's blind/whisper/author for messages we didn't author (typed
  * `/gmroll`, third-party modules, pre-existing history).
  */
 export function deriveRollMode(msg: DeriveRollModeInput): RollMode {
-    const persisted = msg?.flags?.od6s?.rollMode;
+    const persisted = msg?.flags?.["nonex-ist-od6s"]?.rollMode;
     if (persisted && PERSISTED_TO_MODE[persisted]) return PERSISTED_TO_MODE[persisted];
 
     if (msg?.blind) return 'blind';

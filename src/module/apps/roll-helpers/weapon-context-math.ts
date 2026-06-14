@@ -88,7 +88,7 @@ export function buildDamagedWeaponModifier(
     const entry = table[damaged];
     if (!entry) return null;
     return {
-        name: "OD6S.WEAPON_DAMAGED",
+        name: "NONEX_IST_OD6S.WEAPON_DAMAGED",
         value: -entry.penalty,
         level: entry.label,
     };
@@ -100,7 +100,7 @@ export function buildDamagedWeaponModifier(
  */
 export function buildStrengthDamageModifier(strScore: number): Modifier {
     return {
-        name: "OD6S.STRENGTH_DAMAGE_BONUS",
+        name: "NONEX_IST_OD6S.STRENGTH_DAMAGE_BONUS",
         value: strScore,
     };
 }
@@ -120,7 +120,7 @@ export function ramAttackContribution(ramScore: number, ramDamageScore: number):
     return {
         bonusModIncrement: ramScore > 0 ? ramScore : 0,
         modifier: ramDamageScore > 0
-            ? { name: "OD6S.ACTIVE_EFFECTS", value: ramDamageScore }
+            ? { name: "NONEX_IST_OD6S.ACTIVE_EFFECTS", value: ramDamageScore }
             : null,
     };
 }

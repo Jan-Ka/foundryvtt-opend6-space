@@ -18,11 +18,11 @@ export class InitRollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-init-roll-dialog",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-init-roll-dialog",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.ROLL",
+            title: "NONEX_IST_OD6S.ROLL",
             resizable: false,
             minimizable: true,
         },
@@ -39,7 +39,7 @@ export class InitRollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/initRoll.html",
+            template: "systems/nonex-ist-od6s/templates/initRoll.html",
         },
     };
 
@@ -54,9 +54,9 @@ export class InitRollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         root.querySelector(".cpup")?.addEventListener("click", async () => {
             if ((+this.rollData.characterpoints) >= this.cpLimit) {
-                ui.notifications.warn(game.i18n.localize("OD6S.MAX_CP"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.MAX_CP"));
             } else if ((+this.rollData.characterpoints) >= this.rollData.actor.system.characterpoints.value) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_ROLL"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_CP_ROLL"));
             } else {
                 this.rollData.characterpoints++;
                 await this.render();

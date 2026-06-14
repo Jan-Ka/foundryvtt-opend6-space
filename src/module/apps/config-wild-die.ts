@@ -7,11 +7,11 @@ export default class od6sWildDieConfiguration extends HandlebarsApplicationMixin
     requiresWorldReload = false;
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-wild-die-configuration",
-        classes: ["od6s", "settings-config"],
+        id: "nonex-ist-od6s-wild-die-configuration",
+        classes: ["nonex-ist-od6s", "settings-config"],
         tag: "form",
         window: {
-            title: "OD6S.CONFIG_WILD_DIE_MENU",
+            title: "NONEX_IST_OD6S.CONFIG_WILD_DIE_MENU",
             resizable: true,
             minimizable: true,
         },
@@ -31,7 +31,7 @@ export default class od6sWildDieConfiguration extends HandlebarsApplicationMixin
 
     static PARTS = {
         form: {
-            template: "systems/od6s/templates/settings/wild-die.html",
+            template: "systems/nonex-ist-od6s/templates/settings/wild-die.html",
         },
     };
 
@@ -59,8 +59,8 @@ export default class od6sWildDieConfiguration extends HandlebarsApplicationMixin
     ): Promise<void> {
         const data = formData.object;
         for (const setting in data) {
-            await game.settings.set("od6s", setting, data[setting]);
-            const s = game.settings.settings.get("od6s." + setting);
+            await game.settings.set("nonex-ist-od6s", setting, data[setting]);
+            const s = game.settings.settings.get("nonex-ist-od6s." + setting);
             if (s?.requiresReload) this.requiresWorldReload = true;
         }
     }

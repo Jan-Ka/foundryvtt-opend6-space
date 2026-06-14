@@ -37,7 +37,7 @@ export function isDebugEnabled(category?: string): boolean {
 export function debug(category: string, ...args: any[]): void {
     if (!isDebugEnabled(category)) return;
 
-    console.debug(`[od6s:${category}]`, ...args);
+    console.debug(`[nonex-ist-od6s:${category}]`, ...args);
 }
 
 /**
@@ -47,7 +47,7 @@ export function debug(category: string, ...args: any[]): void {
  * so dev-tools severity filters still distinguish it from hard errors.
  */
 export function warn(category: string, ...args: any[]): void {
-    console.warn(`[od6s:${category}]`, ...args);
+    console.warn(`[nonex-ist-od6s:${category}]`, ...args);
 }
 
 /**
@@ -58,5 +58,5 @@ export function warn(category: string, ...args: any[]): void {
  */
 export function error(category: string, ...args: any[]): void {
 
-    console.error(`[od6s:${category}]`, ...args);
+    console.error(`[nonex-ist-od6s:${category}]`, ...args);
 }

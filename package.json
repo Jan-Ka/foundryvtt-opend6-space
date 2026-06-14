@@ -1,19 +1,19 @@
 {
   "name": "opend6-space",
-  "version": "2.7.4",
+  "version": "3.0.0",
   "type": "module",
   "description": "OpenD6 Space system for Foundry VTT v14. Uses the rules from the OpenD6 Project SRD.",
   "scripts": {
     "prepare": "husky",
     "build": "pnpm run build:ts && pnpm run build:css && pnpm run build:packs && pnpm run build:translations && pnpm run build:icons",
-    "build:ts": "esbuild src/module/od6s.ts --bundle --format=esm --outfile=src/module/od6s.js --sourcemap",
-    "build:css": "sass scss/od6s.scss src/css/od6s.css --style=expanded --no-source-map && node scripts/wrap-css.mjs",
+    "build:ts": "esbuild src/module/nonex-ist-od6s.ts --bundle --format=esm --outfile=src/module/nonex-ist-od6s.js --sourcemap",
+    "build:css": "sass scss/nonex-ist-od6s.scss src/css/nonex-ist-od6s.css --style=expanded --no-source-map && node scripts/wrap-css.mjs",
     "build:packs": "node scripts/build-packs.mjs",
     "build:translations": "node scripts/build-translations.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "watch": "pnpm run build:css && pnpm run watch:ts & pnpm run watch:css",
-    "watch:ts": "esbuild src/module/od6s.ts --bundle --format=esm --outfile=src/module/od6s.js --sourcemap --watch",
-    "watch:css": "sass scss/od6s.scss src/css/od6s.css --style=expanded --no-source-map --watch",
+    "watch:ts": "esbuild src/module/nonex-ist-od6s.ts --bundle --format=esm --outfile=src/module/nonex-ist-od6s.js --sourcemap --watch",
+    "watch:css": "sass scss/nonex-ist-od6s.scss src/css/nonex-ist-od6s.css --style=expanded --no-source-map --watch",
     "lint": "eslint --max-warnings 720 src/",
     "lint:fix": "eslint src/ --fix",
     "typecheck": "tsc --noEmit",
@@ -24,7 +24,7 @@
     "test:smoke": "playwright test",
     "test:smoke:ui": "playwright test --ui",
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run test:domain",
-    "clean": "rm -rf dist src/packs src/css/od6s.css src/module/od6s.js src/module/od6s.js.map"
+    "clean": "rm -rf dist src/packs src/css/nonex-ist-od6s.css src/module/nonex-ist-od6s.js src/module/nonex-ist-od6s.js.map"
   },
   "author": "Jan Ka",
   "license": "MIT",

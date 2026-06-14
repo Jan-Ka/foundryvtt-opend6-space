@@ -48,7 +48,7 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
             }
             if (foundRange[rangeKey] === '') {
                 // String is present, but attribute not found.  Flee!
-                ui.notifications.warn(game.i18n.localize('OD6S.WARN_INVALID_RANGE_ATTRIBUTE'));
+                ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_INVALID_RANGE_ATTRIBUTE'));
                 return false;
             }
         }
@@ -58,23 +58,23 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
     }
     if ((new Set([foundRange.short, foundRange.medium, foundRange.long])).size === 1) {
         baseDice = Math.floor(actor.system.attributes[foundRange.short].score / OD6S.pipsPerDice) * OD6S.pipsPerDice;
-        if (!game.settings.get('od6s', 'strength_damage')) {
+        if (!game.settings.get('nonex-ist-od6s', 'strength_damage')) {
             // CHeck for a lift skill
-            const lift = actor.items.find((skill: Item) => skill.name === game.i18n.localize("OD6S.LIFT"));
+            const lift = actor.items.find((skill: Item) => skill.name === game.i18n.localize("NONEX_IST_OD6S.LIFT"));
             if (lift != null && typeof (lift) !== 'undefined') {
                 baseDice = getScoreFromSkill(actor, '', lift.name, 'str');
             }
         }
     } else {
         // Range attribute does not match, flee.
-        ui.notifications.warn(game.i18n.localize('OD6S.WARN_INVALID_RANGE_ATTRIBUTE'));
+        ui.notifications.warn(game.i18n.localize('NONEX_IST_OD6S.WARN_INVALID_RANGE_ATTRIBUTE'));
         return false;
     }
 
     const newRanges: Record<string, number> = {};
     const dice = getDiceFromScore(baseDice, OD6S.pipsPerDice);
 
-    if (game.settings.get('od6s', 'static_str_range')) {
+    if (game.settings.get('nonex-ist-od6s', 'static_str_range')) {
         for (const r of Object.keys(range) as (keyof RangeBucket)[]) {
             const e = range[r].match(/([+|-][0-9])$/);
             if (e) {
@@ -103,14 +103,14 @@ export async function getWeaponRange(actor: Actor, item: Item): Promise<Record<s
             range: newRanges,
             origRange: range,
         };
-        const label = game.i18n.localize('OD6S.RANGE_ROLL') + ": " + item.name;
+        const label = game.i18n.localize('NONEX_IST_OD6S.RANGE_ROLL') + ": " + item.name;
         let rollMode = CONST.DICE_ROLL_MODES.PUBLIC;
-        if (game.user.isGM && game.settings.get('od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
+        if (game.user.isGM && game.settings.get('nonex-ist-od6s', 'hide-gm-rolls')) rollMode = CONST.DICE_ROLL_MODES.PRIVATE;
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker(),
             flavor: label,
             flags: {
-                od6s: flags
+                "nonex-ist-od6s": flags
             },
         }, {rollMode, create: true})
     }

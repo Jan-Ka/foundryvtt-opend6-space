@@ -14,7 +14,7 @@ test("every od6s settings form renders with a <form>", async ({page}) => {
         const errs: string[] = [];
         const opened: any[] = [];
         const menus = [...window.game.settings.menus.entries()]
-            .filter(([k]) => k.startsWith("od6s."))
+            .filter(([k]) => k.startsWith("nonex-ist-od6s."))
             .map(([k, v]) => ({key: k, type: (v as any).type}));
 
         for (const m of menus) {
@@ -52,28 +52,28 @@ test("every od6s settings form renders with a <form>", async ({page}) => {
     expect(result.total).toBeGreaterThan(0);
 });
 
-test("sheet_background_opacity drives --od6s-sheet-opacity CSS var (#31)", async ({page}) => {
+test("sheet_background_opacity drives --nonex-ist-od6s-sheet-opacity CSS var (#31)", async ({page}) => {
     await loginAndWaitReady(page);
 
     const result = await evalInWorld(page, async () => {
-        const initial = window.game.settings.get("od6s", "sheet_background_opacity") as number;
+        const initial = window.game.settings.get("nonex-ist-od6s", "sheet_background_opacity") as number;
         const initialVar = getComputedStyle(document.documentElement)
-            .getPropertyValue("--od6s-sheet-opacity").trim();
+            .getPropertyValue("--nonex-ist-od6s-sheet-opacity").trim();
 
-        await window.game.settings.set("od6s", "sheet_background_opacity", 0.25);
+        await window.game.settings.set("nonex-ist-od6s", "sheet_background_opacity", 0.25);
         await new Promise((r) => setTimeout(r, 100));
         const lowVar = getComputedStyle(document.documentElement)
-            .getPropertyValue("--od6s-sheet-opacity").trim();
+            .getPropertyValue("--nonex-ist-od6s-sheet-opacity").trim();
 
-        await window.game.settings.set("od6s", "sheet_background_opacity", 1.75);
+        await window.game.settings.set("nonex-ist-od6s", "sheet_background_opacity", 1.75);
         await new Promise((r) => setTimeout(r, 100));
         const highVar = getComputedStyle(document.documentElement)
-            .getPropertyValue("--od6s-sheet-opacity").trim();
+            .getPropertyValue("--nonex-ist-od6s-sheet-opacity").trim();
 
         // Restore default so other specs aren't affected.
-        await window.game.settings.set("od6s", "sheet_background_opacity", 1);
+        await window.game.settings.set("nonex-ist-od6s", "sheet_background_opacity", 1);
 
-        const setting = window.game.settings.settings.get("od6s.sheet_background_opacity") as any;
+        const setting = window.game.settings.settings.get("nonex-ist-od6s.sheet_background_opacity") as any;
         return {
             initial,
             initialVar,

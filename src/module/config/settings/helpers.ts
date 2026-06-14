@@ -40,7 +40,7 @@ export function defineSetting<T>(key: string, opts: DefineSettingOptions<T>): vo
     if (opts.actorType) config.actorType = true;
     if (opts.onChange) config.onChange = opts.onChange;
 
-    game.settings.register("od6s", key, config as never);
+    game.settings.register("nonex-ist-od6s", key, config as never);
 }
 
 /**
@@ -88,11 +88,11 @@ export function defineCustomField(
 }
 
 const deadlinessChoices = (): Record<string, string> => ({
-    "1": game.i18n.localize("OD6S.CONFIG_DEADLINESS_1"),
-    "2": game.i18n.localize("OD6S.CONFIG_DEADLINESS_2"),
-    "3": game.i18n.localize("OD6S.CONFIG_DEADLINESS_3"),
-    "4": game.i18n.localize("OD6S.CONFIG_DEADLINESS_4"),
-    "5": game.i18n.localize("OD6S.CONFIG_DEADLINESS_5"),
+    "1": game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_1"),
+    "2": game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_2"),
+    "3": game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_3"),
+    "4": game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_4"),
+    "5": game.i18n.localize("NONEX_IST_OD6S.CONFIG_DEADLINESS_5"),
 });
 
 export function defineDeadliness(

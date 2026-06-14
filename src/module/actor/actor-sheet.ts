@@ -62,7 +62,7 @@ interface ActorSheetContext {
 export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     static DEFAULT_OPTIONS = {
-        classes: ["od6s", "sheet", "actor"],
+        classes: ["nonex-ist-od6s", "sheet", "actor"],
         position: {width: 915, height: 800},
         window: {resizable: true, minimizable: true},
         form: {submitOnChange: true, closeOnSubmit: false},
@@ -70,7 +70,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     };
 
     static PARTS = {
-        body: {template: "systems/od6s/templates/actor/common/actor-sheet.html"},
+        body: {template: "systems/nonex-ist-od6s/templates/actor/common/actor-sheet.html"},
     };
 
     async _prepareContext(_options?: object): Promise<ActorSheetContext> {
@@ -117,14 +117,14 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     async _setCommonFlags() {
         const actor = this.document;
-        if (typeof actor.getFlag("od6s", "fatepointeffect") === "undefined") {
-            await actor.setFlag("od6s", "fatepointeffect", false);
+        if (typeof actor.getFlag("nonex-ist-od6s", "fatepointeffect") === "undefined") {
+            await actor.setFlag("nonex-ist-od6s", "fatepointeffect", false);
         }
-        if (typeof actor.getFlag("od6s", "crew") === "undefined") {
-            await actor.setFlag("od6s", "crew", "");
+        if (typeof actor.getFlag("nonex-ist-od6s", "crew") === "undefined") {
+            await actor.setFlag("nonex-ist-od6s", "crew", "");
         }
-        if (typeof actor.getFlag("od6s", "hasTakenTurn") === "undefined") {
-            await actor.setFlag("od6s", "hasTakenTurn", false);
+        if (typeof actor.getFlag("nonex-ist-od6s", "hasTakenTurn") === "undefined") {
+            await actor.setFlag("nonex-ist-od6s", "hasTakenTurn", false);
         }
     }
 
@@ -178,8 +178,8 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         root.querySelectorAll(".reset-template").forEach((elem) =>
             elem.addEventListener("click", async () => {
                 const ok = await DialogV2.confirm({
-                    window: {title: game.i18n.localize("OD6S.CLEAR_TEMPLATE")},
-                    content: `<p>${game.i18n.localize("OD6S.CONFIRM_TEMPLATE_CLEAR")}</p>`,
+                    window: {title: game.i18n.localize("NONEX_IST_OD6S.CLEAR_TEMPLATE")},
+                    content: `<p>${game.i18n.localize("NONEX_IST_OD6S.CONFIRM_TEMPLATE_CLEAR")}</p>`,
                 });
                 if (ok) await this._onClearCharacterTemplate();
             }));
@@ -187,8 +187,8 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         root.querySelectorAll(".reset-species-template").forEach((elem) =>
             elem.addEventListener("click", async () => {
                 const ok = await DialogV2.confirm({
-                    window: {title: game.i18n.localize("OD6S.CLEAR_SPECIES_TEMPLATE")},
-                    content: `<p>${game.i18n.localize("OD6S.CONFIRM_SPECIES_TEMPLATE_CLEAR")}</p>`,
+                    window: {title: game.i18n.localize("NONEX_IST_OD6S.CLEAR_SPECIES_TEMPLATE")},
+                    content: `<p>${game.i18n.localize("NONEX_IST_OD6S.CONFIRM_SPECIES_TEMPLATE_CLEAR")}</p>`,
                 });
                 if (ok) await this._onClearSpeciesTemplate();
             }));
@@ -242,7 +242,7 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     /* -------------------------------------------- */
 
     async _onActionAdd() {
-        await this._createAction({name: game.i18n.localize("OD6S.ACTION_OTHER"), subtype: "misc"});
+        await this._createAction({name: game.i18n.localize("NONEX_IST_OD6S.ACTION_OTHER"), subtype: "misc"});
         await this.render();
     }
 
@@ -322,12 +322,12 @@ export class OD6SActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     async _createAction(data: { name: string; type?: string; subtype: string; rollable?: boolean | string; itemId?: string }) {
-        if (data.name.startsWith("OD6S.")) {
+        if (data.name.startsWith("NONEX_IST_OD6S.")) {
             data.name = game.i18n.localize(data.name);
         }
         if (["dodge", "parry", "block", "vehicledodge"].includes(data.subtype)) {
             if (this.document.itemTypes.action.find((i: Item) => (i.system as OD6SActionItemSystem).subtype === data.subtype)) {
-                ui.notifications.warn(game.i18n.localize("OD6S.ACTION_ONLY_ONE"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.ACTION_ONLY_ONE"));
                 return;
             }
         }

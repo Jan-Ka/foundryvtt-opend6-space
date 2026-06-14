@@ -530,10 +530,10 @@ type OD6SItemSystem =
 
 // ---- Discriminated type literals ----
 
-/** All actor subtypes registered in `od6s.ts`. */
+/** All actor subtypes registered in `nonex-ist-od6s.ts`. */
 type OD6SActorType = "character" | "npc" | "creature" | "vehicle" | "starship" | "container";
 
-/** All item subtypes registered in `od6s.ts`. */
+/** All item subtypes registered in `nonex-ist-od6s.ts`. */
 type OD6SItemType =
     | "skill"
     | "specialization"

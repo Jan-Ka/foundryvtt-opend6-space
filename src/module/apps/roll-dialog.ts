@@ -32,11 +32,11 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static DEFAULT_OPTIONS = {
-        id: "od6s-roll-dialog",
-        classes: ["od6s", "dialog"],
+        id: "nonex-ist-od6s-roll-dialog",
+        classes: ["nonex-ist-od6s", "dialog"],
         tag: "form",
         window: {
-            title: "OD6S.ROLL",
+            title: "NONEX_IST_OD6S.ROLL",
             resizable: true,
             minimizable: true,
         },
@@ -53,10 +53,10 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         standard: {
-            template: "systems/od6s/templates/roll.html",
+            template: "systems/nonex-ist-od6s/templates/roll.html",
         },
         metaphysics: {
-            template: "systems/od6s/templates/metaphysicsRoll.html",
+            template: "systems/nonex-ist-od6s/templates/metaphysicsRoll.html",
         },
     };
 
@@ -73,7 +73,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
                 this.rollData.characterpoints > actor.system.characterpoints.value ? "red" : "black";
         }
         if (typeof this.rollData.rollmode !== "string") {
-            this.rollData.rollmode = (game.user.isGM && game.settings.get("od6s", "hide-gm-rolls"))
+            this.rollData.rollmode = (game.user.isGM && game.settings.get("nonex-ist-od6s", "hide-gm-rolls"))
                 ? "gmroll"
                 : "publicroll";
         }
@@ -119,9 +119,9 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
             if (!isCharacterActor(actor)) return;
             if ((+this.rollData.characterpoints) >= this.cpLimit[rollType as keyof CharacterPointLimits]) {
-                ui.notifications.warn(game.i18n.localize("OD6S.MAX_CP"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.MAX_CP"));
             } else if ((+this.rollData.characterpoints) >= actor.system.characterpoints.value) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_CP_ROLL"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_CP_ROLL"));
             } else {
                 this.rollData.characterpoints++;
                 await this.render();
@@ -164,7 +164,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             const item = this.rollData.actor.items.find((i: Item) => i.id === this.rollData.itemid);
             if (!item) return;
             const value = (ev.target as HTMLInputElement).valueAsNumber;
-            await item.setFlag("od6s", "explosiveTimer", value);
+            await item.setFlag("nonex-ist-od6s", "explosiveTimer", value);
             this.rollData.timer = value;
             await this.render();
         });
@@ -172,7 +172,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
         find(".contact input")?.addEventListener("change", async () => {
             const item = this.rollData.actor.items.find((i: Item) => i.id === this.rollData.itemid);
             if (!item) return;
-            await item.setFlag("od6s", "explosiveTimer", 0);
+            await item.setFlag("nonex-ist-od6s", "explosiveTimer", 0);
             this.rollData.contact = !this.rollData.contact;
             this.rollData.timer = 0;
             await this.render();
@@ -183,7 +183,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
             if (!isCharacterActor(actor)) return;
             this.rollData.fatepoint = !this.rollData.fatepoint;
             if (this.rollData.fatepoint && actor.system.fatepoints.value <= 0) {
-                ui.notifications.warn(game.i18n.localize("OD6S.NOT_ENOUGH_FP_ROLL"));
+                ui.notifications.warn(game.i18n.localize("NONEX_IST_OD6S.NOT_ENOUGH_FP_ROLL"));
                 this.rollData.fatepoint = !this.rollData.fatepoint;
             }
             if (this.rollData.fatepoint) {
@@ -273,7 +273,7 @@ export class RollDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 
         find("#attackoption")?.addEventListener("change", async (ev) => {
             const value = (ev.target as HTMLSelectElement).value;
-            this.rollData.multishot = value === "OD6S.ATTACK_RANGED_SINGLE_FIRE_AS_MULTI";
+            this.rollData.multishot = value === "NONEX_IST_OD6S.ATTACK_RANGED_SINGLE_FIRE_AS_MULTI";
             this.rollData.modifiers.attackoption = value;
             await this.render();
         });

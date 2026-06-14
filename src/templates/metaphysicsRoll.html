@@ -1,44 +1,44 @@
-<div class="od6s metaphysics-roll-dialog">
+<div class="nonex-ist-od6s metaphysics-roll-dialog">
     {{#each skills as |skill key|}}
     <div>
         <b>{{skill.skill.name}}</b>
         {{#if (eq (showWildDie) true)}}
             <div class="flexrow flex-group-left showWildDie" data-wilddie="{{wilddie}}">
-                <label for="wilddie">{{localize 'OD6S.USE_WILD_DIE'}}</label>
+                <label for="wilddie">{{localize 'NONEX_IST_OD6S.USE_WILD_DIE'}}</label>
                 <input type="checkbox" data-dtype="Boolean" id="wilddie" name="wilddie"
                        {{#if ../wilddie}}checked{{/if}}>
             </div>
         {{/if}}
         <div class="flexrow flex-group-left">
             <div class="dice flexrow flex-group-left" data-dice="{{diceFromScore skill.system.total}}">
-                <label for="dice">{{localize 'OD6S.DICE'}}</label>
+                <label for="dice">{{localize 'NONEX_IST_OD6S.DICE'}}</label>
                 <input type="number" data-dtype="Number"
                        max="99" id="dice" name="dice" value="{{diceFromScore skill.system.total}}">
             </div>
             <div class="pips flexrow flex-group-left" data-pips="{{pipsFromScore skill.system.total}}">
-                <label for="pips">{{localize 'OD6S.PIPS'}}</label>
+                <label for="pips">{{localize 'NONEX_IST_OD6S.PIPS'}}</label>
                 <input type="number" data-dtype="Number"
                        max="99" id="pips" name="pips" value="{{pipsFromScore skill.system.total}}">
             </div>
         </div>
         <div class="flexrow flex-group-left">
             <div class="bonusdice flexrow flex-group-left usebonus">
-                <label for="bonusdice">{{localize 'OD6S.USE_BONUS_DICE'}}</label>
+                <label for="bonusdice">{{localize 'NONEX_IST_OD6S.USE_BONUS_DICE'}}</label>
                 <input type="number" data-dtype="Number"
                        max="99" id="bonusdice" name="bonusdice" value="{{bonusdice}}">
             </div>
             <div class="bonuspips flexrow flex-group-left usebonus" data-bonuspips="{{bonuspips}}">
-                <label for="bonuspips">{{localize 'OD6S.USE_BONUS_PIPS'}}</label>
+                <label for="bonuspips">{{localize 'NONEX_IST_OD6S.USE_BONUS_PIPS'}}</label>
                 <input type="number" data-dtype="Number"
                        max="99" id="bonuspips" name="bonuspips" value="{{bonuspips}}">
             </div>
         </div>
-        <h3 class="dialog-section">{{localize "OD6S.PENALTIES"}}</h3>
+        <h3 class="dialog-section">{{localize "NONEX_IST_OD6S.PENALTIES"}}</h3>
         <div class="row">
             <div class="column">
-                <div class="flexrow flex-group-left" title="{{localize 'OD6S.ACTION_PENALTY'}}">
+                <div class="flexrow flex-group-left" title="{{localize 'NONEX_IST_OD6S.ACTION_PENALTY'}}">
                     <div class="actionpenalty flexrow flex-group-left">
-                        <label for="actionpenalty">{{localize 'OD6S.ACTIONS'}}:</label>
+                        <label for="actionpenalty">{{localize 'NONEX_IST_OD6S.ACTIONS'}}:</label>
                     </div>
                     <div class="flexrow flex-group-center actionpenalty"
                          data-actionpenalty="{{../actionpenalty}}">
@@ -49,9 +49,9 @@
                 </div>
             </div>
             <div class="column">
-                <div class="flexrow flex-group-left" title="{{localize 'OD6S.WOUND_PENALTY'}}">
+                <div class="flexrow flex-group-left" title="{{localize 'NONEX_IST_OD6S.WOUND_PENALTY'}}">
                     <div class="woundpenalty flexrow flex-group-left">
-                        <label for="woundpenalty">{{localize 'OD6S.WOUNDS'}}:</label>
+                        <label for="woundpenalty">{{localize 'NONEX_IST_OD6S.WOUNDS'}}:</label>
                     </div>
                     <div class="flexrow flex-group-center woundpenalty"
                          data-woundpenalty="{{../woundpenalty}}">
@@ -62,9 +62,9 @@
                 </div>
             </div>
             <div class="column">
-                <div class="flexrow flex-group-left" title="{{localize 'OD6S.OTHER_PENALTY'}}">
+                <div class="flexrow flex-group-left" title="{{localize 'NONEX_IST_OD6S.OTHER_PENALTY'}}">
                     <div class="otherpenalty flexrow flex-group-left">
-                        <label for="otherpenalty">{{localize 'OD6S.OTHER'}}:</label>
+                        <label for="otherpenalty">{{localize 'NONEX_IST_OD6S.OTHER'}}:</label>
                     </div>
                     <div class="flexrow flex-group-center otherpenalty"
                          data-otherpenalty="{{../otherpenalty}}">
@@ -79,7 +79,7 @@
             <div class="flexrow flex-group-left">
                 <div class="flexrow flex-group-left difficultylevel" data-difficultylevel="{{difficultylevel}}"
                      data-skill="{{key}}">
-                    <label for="difficultylevel">{{localize 'OD6S.DIFFICULTY'}}</label>
+                    <label for="difficultylevel">{{localize 'NONEX_IST_OD6S.DIFFICULTY'}}</label>
                     <select name="difficultylevel" id="difficultylevel">
                         {{#each (getDifficulties) as |diff key|}}
                             <option value="{{key}}" {{#if (eq key ../skill.difficulty)}}selected{{/if}}>
@@ -88,9 +88,9 @@
                         {{/each}}
                     </select>
                 </div>
-                {{#if (eq difficultylevel "OD6S.DIFFICULTY_CUSTOM")}}
+                {{#if (eq difficultylevel "NONEX_IST_OD6S.DIFFICULTY_CUSTOM")}}
                     <div class="flexrow flex-group-left difficulty" data-difficulty="{{difficulty}}">
-                        <label for="difficulty">{{localize "OD6S.DIFFICULTY_CUSTOM_LABEL"}}</label>
+                        <label for="difficulty">{{localize "NONEX_IST_OD6S.DIFFICULTY_CUSTOM_LABEL"}}</label>
                         <input type="number" data-dtype="Number"
                                max="99" id="difficulty" name="difficulty" value="{{difficulty}}"
                                placeholder="10">
@@ -104,7 +104,7 @@
     <footer class="form-footer">
         <section class="sheet-mode roll-mode">
             <div class="flexrow flex-group-left sheetmode">
-                <label for="rollmode">{{localize 'OD6S.ROLL_MODE'}}</label>
+                <label for="rollmode">{{localize 'NONEX_IST_OD6S.ROLL_MODE'}}</label>
                 <select name="rollmode" id="rollmode">
                     <option value="publicroll" {{#if (eq rollmode "publicroll")}}selected{{/if}}>{{localize "CHAT.MODES.public"}}</option>
                     <option value="gmroll"     {{#if (eq rollmode "gmroll")}}selected{{/if}}>{{localize "CHAT.MODES.gm"}}</option>
@@ -113,6 +113,6 @@
                 </select>
             </div>
         </section>
-        <button type="submit" class="dialog-submit" data-action="submit">{{localize "OD6S.ROLL"}}</button>
+        <button type="submit" class="dialog-submit" data-action="submit">{{localize "NONEX_IST_OD6S.ROLL"}}</button>
     </footer>
 </div>

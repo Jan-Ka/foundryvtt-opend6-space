@@ -6,7 +6,7 @@ import OD6S from "../../config/config-od6s";
 export function registerChatHelpers() {
     Handlebars.registerHelper('getChatTemplate', function (messageId) {
         // @ts-expect-error
-        const messageType = game!.messages.get(messageId).getFlag('od6s', 'type')
+        const messageType = game!.messages.get(messageId).getFlag('nonex-ist-od6s', 'type')
         switch (messageType) {
             case "explosive":
                 return OD6S.chatTemplates.explosive;
@@ -37,7 +37,7 @@ export function registerChatHelpers() {
 
     Handlebars.registerHelper('isCardVisible', function (message) {
         if (game.user.isGM) return true;
-        return message.flags.od6s.isVisible;
+        return message.flags["nonex-ist-od6s"].isVisible;
     })
 
     Handlebars.registerHelper('getRollTypeForCard', function (type, subtype) {
@@ -46,13 +46,13 @@ export function registerChatHelpers() {
             case "weapon":
                 switch (subtype) {
                     case "rangedattack":
-                        label = "OD6S.CARD_RANGED_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_RANGED_ATTACK";
                         break;
                     case "meleeattack":
-                        label = "OD6S.CARD_MELEE_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_MELEE_ATTACK";
                         break;
                     case "brawlattack":
-                        label = "OD6S.CARD_BRAWL_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_BRAWL_ATTACK";
                         break
                     default:
                         // @ts-expect-error
@@ -62,22 +62,22 @@ export function registerChatHelpers() {
             case "action":
                 switch (subtype) {
                     case "rangedattack":
-                        label = "OD6S.CARD_RANGED_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_RANGED_ATTACK";
                         break;
                     case "meleeattack":
-                        label = "OD6S.CARD_MELEE_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_MELEE_ATTACK";
                         break;
                     case "brawlattack":
-                        label = "OD6S.CARD_BRAWL_ATTACK";
+                        label = "NONEX_IST_OD6S.CARD_BRAWL_ATTACK";
                         break;
                     case "dodge":
-                        label = "OD6S.CARD_DODGE";
+                        label = "NONEX_IST_OD6S.CARD_DODGE";
                         break;
                     case "parry":
-                        label = "OD6S.CARD_PARRY";
+                        label = "NONEX_IST_OD6S.CARD_PARRY";
                         break;
                     case "block":
-                        label = "OD6S.CARD_BLOCK";
+                        label = "NONEX_IST_OD6S.CARD_BLOCK";
                         break;
                     default:
                 }

@@ -2,7 +2,7 @@
     <br>
     <div class="row">
         <img class="profile-img" src="{{object.img}}" data-action="editImage" data-edit="img" title="{{object.name}}"
-             alt="{{localize 'OD6S.ALT_ITEM_IMAGE'}}" width="75" height="75"/>&nbsp&nbsp
+             alt="{{localize 'NONEX_IST_OD6S.ALT_ITEM_IMAGE'}}" width="75" height="75"/>&nbsp&nbsp
         <h3><br>{{object.name}}</h3>
     </div>
     {{#if object.system.description}}
@@ -12,59 +12,59 @@
     {{/if}}
     {{#if (eq object.type "armor")}}
         <div id="er-value">
-            {{localize 'OD6S.ENERGY_RESISTANCE'}}: {{diceFromScore object.system.er}}D+{{pipsFromScore object.system.er}}
+            {{localize 'NONEX_IST_OD6S.ENERGY_RESISTANCE'}}: {{diceFromScore object.system.er}}D+{{pipsFromScore object.system.er}}
         </div>
         <div id="pr-value">
-            {{localize 'OD6S.PHYSICAL_RESISTANCE'}}: {{diceFromScore object.system.pr}}D+{{pipsFromScore object.system.pr}}
+            {{localize 'NONEX_IST_OD6S.PHYSICAL_RESISTANCE'}}: {{diceFromScore object.system.pr}}D+{{pipsFromScore object.system.pr}}
         </div>
     {{/if}}
     {{#if (eq object.type "weapon")}}
         <div id="damage-value">
-            {{localize 'OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
+            {{localize 'NONEX_IST_OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
                 object.system.damage.score}}
             {{localize (getDamageType object.system.damage.type)}}
         </div>
         <div id="weapon-type">
-            {{localize 'OD6S.TYPE'}}: {{localize object.system.subtype}}
+            {{localize 'NONEX_IST_OD6S.TYPE'}}: {{localize object.system.subtype}}
         </div>
-        {{#if (compareSubtype object.system.subtype 'OD6S.RANGED')}}
+        {{#if (compareSubtype object.system.subtype 'NONEX_IST_OD6S.RANGED')}}
             <div id="weapon-range">
-                {{localize 'OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
+                {{localize 'NONEX_IST_OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
                 {{object.system.range.long}}
             </div>
         {{/if}}
-        {{#if (eq object.system.subtype 'OD6S.MISSILE')}}
+        {{#if (eq object.system.subtype 'NONEX_IST_OD6S.MISSILE')}}
             <div id="weapon-range">
-                {{localize 'OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
+                {{localize 'NONEX_IST_OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
                 /{{object.system.range.long}}
             </div>
         {{/if}}
-        {{#if (eq object.system.subtype 'OD6S.THROWN')}}
+        {{#if (eq object.system.subtype 'NONEX_IST_OD6S.THROWN')}}
             <div id="weapon-range">
-                {{localize 'OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
+                {{localize 'NONEX_IST_OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
                 /{{object.system.range.long}}
             </div>
         {{/if}}
     {{/if}}
     {{#if (eq object.type "vehicle-weapon")}}
         <div id="damage-value">
-            {{localize 'OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
+            {{localize 'NONEX_IST_OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
                 object.system.damage.score}}
             {{localize (getDamageType object.system.damage.type)}}
         </div>
         <div>
-            {{localize 'OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
+            {{localize 'NONEX_IST_OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
             /{{object.system.range.long}}
         </div>
     {{/if}}
     {{#if (eq object.type "starship-weapon")}}
         <div id="damage-value">
-            {{localize 'OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
+            {{localize 'NONEX_IST_OD6S.DAMAGE'}}: {{diceFromScore object.system.damage.score}}D+{{pipsFromScore
                 object.system.damage.score}}
             {{localize (getDamageType object.system.damage.type)}}
         </div>
         <div>
-            {{localize 'OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
+            {{localize 'NONEX_IST_OD6S.RANGE'}}: {{object.system.range.short}}/{{object.system.range.medium}}
             /{{object.system.range.long}}
         </div>
     {{/if}}

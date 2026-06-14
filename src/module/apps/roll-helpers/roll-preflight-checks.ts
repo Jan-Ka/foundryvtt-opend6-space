@@ -11,7 +11,7 @@ import type { Localize } from './roll-data';
  * Pure check: does the melee-range gate apply to this incoming roll?
  *
  * The original setupRollData ran the gate after its own subtype normalization
- * (`OD6S.MELEE` → `meleeattack`); preflight runs before that normalization,
+ * (`NONEX_IST_OD6S.MELEE` → `meleeattack`); preflight runs before that normalization,
  * so we route through `classifyRoll` to get the canonical subtype. Without
  * this, a melee-weapon `item.roll()` (which passes the localized subtype
  * verbatim) would silently bypass the range check.
